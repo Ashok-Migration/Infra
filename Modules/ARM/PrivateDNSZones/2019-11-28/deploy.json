@@ -1,0 +1,107 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "zoneName": {
+            "type": "string",
+			"metadata": {
+				"description": "Required. The name of the private DNS zone."
+			}
+        },
+        "lockForDeletion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Required. Whether resource sould or should not be protected from deletion."
+            }
+        },
+        "vNets": {
+            "type": "array",
+			"metadata": {
+				"description": "Required. Virtual networks to create links to."
+			}
+        }
+    },
+    "variables" : {
+        "vNetIDs" : {
+            "copy": [
+                {
+                    "name": "vNetIDs",
+                    "count": "[length(parameters('vNets'))]",
+                    "input": "[resourceId(parameters('vNets')[copyIndex('vNetIDs')].subscriptionId, parameters('vNets')[copyIndex('vNetIDs')].resourceGroupName, 'Microsoft.Network/virtualNetworks', parameters('vNets')[copyIndex('vNetIDs')].vnetName)]"
+                }
+            ]
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('zoneName')]",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100
+            }
+            // Resource authorization is mising to create the locks, so commenting out for the 
+            // time being
+            // ,
+            // "resources": [
+            // {
+            //     "type": "providers/locks",
+            //     "apiVersion": "2016-09-01",
+            //     "condition": "[parameters('lockForDeletion')]",
+            //     "name": "Microsoft.Authorization/privateDnsZonesDoNotDelete",
+            //     "dependsOn": [
+            //         "[concat('Microsoft.Network/privateDnsZones/', parameters('zoneName'))]"
+            //     ],
+            //     "comments": "Resource lock on Azure Private DNS Zone",
+            //     "properties": {
+            //         "level": "CannotDelete"
+            //     }
+            // }        
+            // ]
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('zoneName'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1,
+                    "minimumTtl": 300
+                }
+            }
+        },
+        {
+            "copy": {
+                "name": "vNetIDsLoop",
+                "count": "[length(variables('vNetIDs').vNetIDs)]",
+                "mode": "Parallel"
+            },
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('zoneName'), '/dns-vnl-', parameters('vNets')[copyIndex('vNetIDsLoop')].vnetName)]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
+            ],
+            "properties": {
+                "registrationEnabled": true,
+                "virtualNetwork": {
+                    "id": "[variables('vNetIDs').vNetIDs[copyIndex('vNetIDsLoop')]]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

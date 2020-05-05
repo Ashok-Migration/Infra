@@ -1,0 +1,49 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "zoneName": {
+            "type": "string",
+			"metadata": {
+				"description": "Required. The name of the private DNS zone."
+			}
+        },
+        "vNets": {
+            "type": "array",
+			"metadata": {
+				"description": "Required. Virtual networks to create links to."
+			}
+        }
+    },
+    "variables" : {
+        "vNetIDs" : {
+            "copy": [
+                {
+                    "name": "vNetIDs",
+                    "count": "[length(parameters('vNets'))]",
+                    "input": "[resourceId(parameters('vNets')[copyIndex('vNetIDs')].subscriptionId, parameters('vNets')[copyIndex('vNetIDs')].resourceGroupName, 'Microsoft.Network/virtualNetworks', parameters('vNets')[copyIndex('vNetIDs')].vnetName)]"
+                }
+            ]
+        }
+    },
+    "resources": [
+        {
+            "copy": {
+                "name": "vNetIDsLoop",
+                "count": "[length(variables('vNetIDs').vNetIDs)]",
+                "mode": "Parallel"
+            },
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('zoneName'), '/dns-vnl-', parameters('vNets')[copyIndex('vNetIDsLoop')].vnetName)]",
+            "location": "global",
+            "properties": {
+                "registrationEnabled": true,
+                "virtualNetwork": {
+                    "id": "[variables('vNetIDs').vNetIDs[copyIndex('vNetIDsLoop')]]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

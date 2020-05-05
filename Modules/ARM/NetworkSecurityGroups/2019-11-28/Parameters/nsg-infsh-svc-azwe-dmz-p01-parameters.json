@@ -1,0 +1,139 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-infsh-svc-azwe-dmz-p01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "deny_vnet-2-vnet",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "",
+            "destinationAddressPrefix": "",
+            "access": "Deny",
+            "priority": 3500,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [
+              "10.18.0.0/16",
+              "10.19.0.0/16"
+            ],
+            "destinationAddressPrefixes": [
+              "10.18.0.0/16",
+              "10.19.0.0/16"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "viaFW_dr-2-vnet",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "10.21.0.0/16",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 3900,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "viaFW_onprem-2-vnet",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 3910,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [
+              "10.0.0.0/12",
+              "10.32.0.0/11",
+              "10.64.0.0/10",
+              "10.128.0.0/9",
+              "192.168.0.0/16",
+              "172.16.0.0/12"
+            ],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "deny_any-2-any",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Deny",
+            "priority": 4000,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-infsh-svc-azwe-mon"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stinfshcorensgflwep01"
+    },
+    "workspaceRGName":
+    {
+        "value": "rg-infsh-svc-azwe-mon"  
+    },
+    "workspaceName":
+    {
+        "value": "log-infsh-core-azwe-ws-p01"
+    },
+    "diagnosticLogsRetentionInDays": 
+    {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Reused": "False"
+      }
+    }
+  }
+}

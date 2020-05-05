@@ -1,0 +1,115 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-shared-private-uaen-prod"
+        },
+        "vnetAddressPrefixes": {
+            "value": [
+                "10.106.0.0/23",
+                "10.106.4.0/24"
+            ]
+        },
+        "nsgsRGName":
+        {
+            "value": "rg-infsh-core-azwe-nsgs"
+        },
+        "routesRGName":
+        {
+            "value": "rg-infsh-core-azwe-routes"
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "GatewaySubnet",
+                    "addressPrefix": "10.106.0.0/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-management-private-uaen-prod",
+                    "addressPrefix": "10.106.1.0/24",
+                    "networkSecurityGroupName": "nsg-management-private-prod",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.EventHub"
+                        },
+                        {
+                            "service": "Microsoft.Sql"
+                        },
+                        {
+                            "service": "Microsoft.Storage"
+                        },
+                        {
+                            "service": "Microsoft.KeyVault"
+                        }
+                    ]
+                },
+                {
+                    "name": "snet-cloudperimeter-private-uaen-prod",
+                    "addressPrefix": "10.106.0.32/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.EventHub"
+                        },
+                        {
+                            "service": "Microsoft.Sql"
+                        },
+                        {
+                            "service": "Microsoft.Storage"
+                        },
+                        {
+                            "service": "Microsoft.KeyVault"
+                        }
+                    ]
+                },
+                {
+                    "name": "snet-fwsync-private-uaen-prod",
+                    "addressPrefix": "10.106.0.64/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                    ]
+                },
+                {
+                    "name": "snet-identity-private-uaen-prod",
+                    "addressPrefix": "10.106.0.96/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                    ]
+                }
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+            }
+        }
+    }
+}

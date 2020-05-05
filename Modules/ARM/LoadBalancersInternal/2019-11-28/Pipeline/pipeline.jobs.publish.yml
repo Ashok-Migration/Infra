@@ -1,0 +1,44 @@
+jobs:
+  - job: PublishArtifact
+    displayName: Publish Artifact
+    pool:
+      # name: $(poolName)
+      vmImage: $(vmImage)
+    variables:
+    - template: pipeline.variables.yml
+    steps:
+      - task: PublishBuildArtifacts@1
+        displayName: Publish $(moduleName) Artifacts
+        inputs:
+          PathtoPublish: $(modulePath)
+          ArtifactName: $(moduleName)-$(moduleVersion)
+  
+  - job: PublishComponent
+    displayName: Publish Component
+    pool:
+      vmImage: $(vmImage)
+    variables:
+    - template: pipeline.variables.yml
+    steps:
+      - task: CopyFiles@2
+        displayName: Filter folders
+        inputs:
+          Contents: |
+            Modules/ARM/$(moduleName)/$(moduleVersion)/**
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: AzureCLI@1
+        displayName: Copy Module to $(componentStorageAccountName)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          scriptLocation: inlineScript
+          inlineScript: |
+              az storage container create --name          "$(componentStorageContainerName)" \
+                                          --public-access off \
+                                          --account-name  "$(componentStorageAccountName)" \
+                                          --subscription  "$(componentStorageAccountSubscriptionId)"
+                                          
+              az storage blob sync --container    "$(componentStorageContainerName)" \
+                                  --source       "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" \
+                                  --destination  "Modules/ARM/$(moduleName)/$(moduleVersion)" \
+                                  --account-name "$(componentStorageAccountName)" \
+                                  --subscription  "$(componentStorageAccountSubscriptionId)"

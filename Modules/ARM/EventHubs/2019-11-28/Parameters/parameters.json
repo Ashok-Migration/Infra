@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"namespaceName": {
+			"value": "evhns-private-mon-shared-01"
+		},
+		"eventHubName": {
+			"value": "evh-private-mon-shared-01"
+		},
+        "authorizationRules": {
+            "value": [
+                {
+                    "name": "RootManageSharedAccessKey",
+                    "properties": {
+                        "rights": [
+                            "Listen",
+                            "Manage",
+                            "Send"
+                        ]
+                    }
+                },
+                {
+                    "name": "SendListenAccess",
+                    "properties": {
+                        "rights": [
+                            "Listen",
+                            "Send"
+                        ]
+                    }
+                }
+            ]
+        },
+        "eventHubConfiguration": {
+			"value": {
+				"properties": {
+					"messageRetentionInDays": 1,
+					"partitionCount": 2,
+					"status": "Active",
+					"captureDescription": {
+						"enabled": false,
+						"encoding": "Avro",
+						"intervalInSeconds": 300,
+						"sizeLimitInBytes": 314572800,
+						"destination": {
+							"name": "EventHubArchive.AzureBlockBlob",
+							"properties": {
+								"storageAccountResourceId": "/subscriptions/xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx/resourceGroups/rg-private-mgmt-shared/providers/Microsoft.Storage/storageAccounts/stdiagsh001uaen001",
+								"blobContainer": "eventhub",
+								"archiveNameFormat": "{Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}"
+							}
+						},
+						"skipEmptyArchives": true
+					}
+				},
+				"consumerGroups": [
+					{
+						"name": "$Default"
+					}
+				]
+            }
+		},
+		"lockForDeletion": {
+            "value": false
+        }
+	}
+}

@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "erGWName": {
+        "type": "string",
+        "metadata": {
+          "description": "Arbitrary name for the azure gateway"
+        }
+      },
+      "erGWauthorizationKey": {
+        "type": "string",
+        "metadata": {
+          "description": "ExpressRoute circuit Authorization Key."
+        }
+      },
+      "erGWCircuitId": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the ExpressRoute circuit with which the VNet Gateway needs to connect. The Circuit must be already created successfully and must have its circuitProvisioningState property set to 'Enabled', and serviceProviderProvisioningState property set to 'Provisioned'. The Circuit must also have a BGP Peering of type AzurePrivatePeering."
+        }
+      },
+      "erGWConnName": {
+        "type": "string",
+        "defaultValue": "AzureConnection1",
+        "metadata": {
+          "description": "Arbitrary name for the new connection between Azure VNet and other network"
+        }
+      }
+    },
+    "variables": {
+      "routingWeight": 3
+  
+    },
+    "resources": [
+      {
+        "apiVersion": "2019-04-01",
+        "name": "[parameters('erGWConnName')]",
+        "type": "Microsoft.Network/connections",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "authorizationKey": "[parameters('erGWauthorizationKey')]", 
+          "virtualNetworkGateway1": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('erGWName'))]"
+          },
+          "peer": {
+            "id": "[parameters('erGWCircuitId'))]"
+          },
+          "connectionType": "ExpressRoute",
+          "routingWeight": "[variables('routingWeight')]"
+        }
+      }
+    ],
+    "outputs": {
+    }
+  }

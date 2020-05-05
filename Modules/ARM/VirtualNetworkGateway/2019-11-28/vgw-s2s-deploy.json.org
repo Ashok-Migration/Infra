@@ -1,0 +1,94 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "virtualNetworkName": {
+        "type": "string",
+        "defaultValue": null,
+        "metadata": {
+          "description": "VNet name"
+        }
+      },
+      "vpnGWName": {
+        "type": "string",
+        "defaultValue": null,
+        "metadata": {
+          "description": "Arbitrary name for the azure gateway"
+        }
+      },
+      "vpnGWSkuName": {
+        "type": "string",
+        "defaultValue": "VpnGw1",
+        "metadata": {
+          "description": "The Sku of the Gateway. This must be one of VpnGW1, VpnGW2 or VpnGW3."
+        }
+      },
+      "vpnGWSkuTier": {
+        "type": "string",
+        "defaultValue": "VpnGw1",
+        "metadata": {
+          "description": "The Sku of the Gateway. This must be one of VpnGW1, VpnGW2 or VpnGW3."
+        }
+      },
+      "vpnGWPipName": {
+        "type": "string",
+        "defaultValue": null,
+        "metadata": {
+          "description": "Aribtary name for public IP resource used for an azure gateway"
+        }
+      }
+    },
+    "variables": {
+      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+      "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]",
+      "routingWeight": 3
+  
+    },
+    "resources": [
+      {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[parameters('vpnGWPipName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+        ],
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic"
+        }
+      },
+      {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/virtualNetworkGateways",
+        "name": "[parameters('vpnGWName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/publicIPAddresses/', parameters('vpnGWPipName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[variables('gatewaySubnetRef')]"
+                },
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('vpnGWPipName'))]"
+                }
+              },
+              "name": "vnetGatewayConfig"
+            }
+          ],
+          "sku": {
+            "name": "[parameters('vpnGWSkuName')]",
+            "tier": "[parameters('vpnGWSkuTier')]"
+          },
+          "gatewayType": "Vpn",
+          "vpnType": "RouteBased",
+          "enableBgp": false
+        }
+      }
+    ],
+    "outputs": {
+    }
+  }

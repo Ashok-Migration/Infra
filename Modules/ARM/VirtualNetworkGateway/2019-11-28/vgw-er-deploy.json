@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": null,
+      "metadata": {
+        "description": "VNet name"
+      }
+    },
+    "erGWName": {
+      "type": "string",
+      "metadata": {
+        "description": "Arbitrary name for the azure gateway"
+      }
+    },
+    "erGWSkuName": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "The Sku of the Gateway. This must be one of Standard, HighPerformance or UltraPerformance."
+      }
+    },
+    "erGWSkuTier": {
+      "type": "string",
+      "defaultValue": "VpnGw1",
+      "metadata": {
+        "description": "The Sku of the Gateway. This must be one of VpnGW1, VpnGW2 or VpnGW3."
+      }
+    },
+    "erGWCircuitName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the ExpressRoute circuit with which the VNet Gateway needs to connect. The Circuit must be already created successfully and must have its circuitProvisioningState property set to 'Enabled', and serviceProviderProvisioningState property set to 'Provisioned'. The Circuit must also have a BGP Peering of type AzurePrivatePeering."
+      }
+    },
+    "erGWPipName": {
+      "type": "string",
+      "defaultValue": "azureGateway1-IP",
+      "metadata": {
+        "description": "Aribtary name for public IP resource used for an azure gateway"
+      }
+    }
+  },
+  "variables": {
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]"
+
+  },
+  "resources": [
+    {
+      "apiVersion": "2019-04-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('erGWPipName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2019-04-01",
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[parameters('erGWName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('erGWPipName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('gatewaySubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('erGWPipName'))]"
+              }
+            },
+            "name": "ERGatewayIPConfig"
+          }
+        ],
+        "sku": {
+          "name": "[parameters('erGWSkuName')]",
+          "tier": "[parameters('erGWSkuTier')]"
+        },
+        "gatewayType": "ExpressRoute"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

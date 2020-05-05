@@ -1,0 +1,183 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-infsh-core-azne-fw-onp-p01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "fw-onp-2-fw-onp",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "10.19.102.0/24",
+            "destinationAddressPrefix": "10.19.102.0/24",
+            "access": "Allow",
+            "priority": 3010,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "onp-lb-2-fw-onp",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "AzureLoadBalancer",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 3020,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "deny_vnet-2-vnet",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "",
+            "destinationAddressPrefix": "",
+            "access": "Deny",
+            "priority": 3500,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [
+              "10.18.0.0/17",
+              "10.19.0.0/17"
+            ],
+            "destinationAddressPrefixes": [
+              "10.18.0.0/17",
+              "10.19.0.0/17"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "deny_any-2-any",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Deny",
+            "priority": 4000,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "viaFW_azwe-2-azne",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "10.29.0.0/16",
+            "destinationAddressPrefix": "10.28.0.0/16",
+            "access": "Allow",
+            "priority": 3810,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        },
+        {
+          "name": "viaFW_onprem-2-azne",
+          "properties": {
+            "description": "",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "",
+            "destinationAddressPrefix": "",
+            "access": "Allow",
+            "priority": 3900,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [
+              "10.0.0.0/12",
+              "10.32.0.0/11",
+              "10.64.0.0/10",
+              "10.128.0.0/9",
+              "192.168.0.0/16",
+              "172.16.0.0/12"
+            ],
+            "destinationAddressPrefixes": [
+              "10.19.0.0/16",
+              "10.18.0.0/16",
+              "10.28.0.0/16"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": []
+          }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-infsh-svc-azne-mon"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stinfshcorensgflnep01"
+    },
+    "workspaceRGName":
+    {
+        "value": "rg-infsh-svc-azne-mon"  
+    },
+    "workspaceName":
+    {
+        "value": "log-infsh-core-azne-ws-p01"
+    },
+    "diagnosticLogsRetentionInDays": 
+    {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Reused": "False"
+      }
+    }
+  }
+}
