@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-12-01/Microsoft.ApiManagement.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiManagementServiceName": {
+      "metadata": {
+        "description": "The name of the api management service"
+      },
+      "type": "string"
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      },
+      "type": "string"
+    },
+    "publisherEmail": {
+      "metadata": {
+        "description": "The email address of the owner of the service"
+      },
+      "minLength": 1,
+      "type": "string"
+    },
+    "publisherName": {
+      "metadata": {
+        "description": "The name of the owner of the service"
+      },
+      "minLength": 1,
+      "type": "string"
+    },
+    "sku": {
+      "allowedValues": [
+        "Basic",
+        "Consumption",
+        "Developer",
+        "Standard",
+        "Premium"
+      ],
+      "defaultValue": "Developer",
+      "metadata": {
+        "description": "The pricing tier of this API Management service"
+      },
+      "type": "string"
+    },
+    "skuCount": {
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The instance size of this API Management service."
+      },
+      "type": "int"
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2019-12-01",
+      "name": "[parameters('apiManagementServiceName')]",
+      "type": "Microsoft.ApiManagement/service",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "[parameters('skuCount')]"
+      },
+      "properties": {
+        "publisherEmail": "[parameters('publisherEmail')]",
+        "publisherName": "[parameters('publisherName')]"
+      }
+    }
+  ]
+}

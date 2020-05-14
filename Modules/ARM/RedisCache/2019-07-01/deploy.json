@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-07-01/Microsoft.Cache.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "enableNonSslPort": {
+      "defaultValue": false,
+      "metadata": {
+        "description": "Set to true to allow access to redis on port 6379, without SSL tunneling (less secure)."
+      },
+      "type": "bool"
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      },
+      "type": "string"
+    },
+    "redisCacheCapacity": {
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The size of the new Azure Redis Cache instance. Valid family and capacity combinations are (C0..C6, P1..P4)."
+      },
+      "type": "int"
+    },
+    "redisCacheName": {
+      "metadata": {
+        "description": "The name of the Azure Redis Cache to create."
+      },
+      "type": "string"
+    },
+    "redisShardCount": {
+      "metadata": {
+        "description": "Number of highly available shards to create in the cluster. Requires Premium SKU."
+      },
+      "type": "int"
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Cache/Redis",
+      "apiVersion": "2019-07-01",
+      "name": "[parameters('redisCacheName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "enableNonSslPort": "[parameters('enableNonSslPort')]",
+        "shardCount": "[parameters('redisShardCount')]",
+        "sku": {
+          "capacity": "[parameters('redisCacheCapacity')]",
+          "family": "P",
+          "name": "Premium"
+        }
+      }
+    }
+  ]
+}
