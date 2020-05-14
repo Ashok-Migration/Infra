@@ -57,12 +57,15 @@
     },
     "remoteVnetResourceGroup":{
       "type": "string"
+    },
+    "remoteVnetsubscriptionid": {
+      "type": "string"
     }
   },
   "variables": {
     "localToRemotePeeringName": "[concat(parameters('localVnetName'),'/', parameters('peeringName'))]",
     "remoteToLocalPeeringName": "[concat(parameters('remoteVnetName'),'/', parameters('peeringName'))]",
-    "remoteVnetID": "[resourceId('<CPH subscription ID>', parameters('remoteVnetResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('remoteVnetName'))]"
+    "remoteVnetID": "[resourceId(parameters('remoteVnetsubscriptionid'), parameters('remoteVnetResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('remoteVnetName'))]"
   },
   "resources": [
     {

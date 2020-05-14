@@ -154,48 +154,6 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-dbr-pub-dev-01",
-            "resourceGroup": "rg-cpd-net-dev-01",
-            "dependsOn": [
-                "DEP-rg-cpd-net-dev-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-dbr-pub-dev-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-dbr-pri-dev-01",
-            "resourceGroup": "rg-cpd-net-dev-01",
-            "dependsOn": [
-                "DEP-rg-cpd-net-dev-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-dbr-pri-dev-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
             "name": "DEP-route-cpd-daisvcs-dev-01",
             "resourceGroup": "rg-cpd-net-dev-01",
             "dependsOn": [
@@ -329,8 +287,6 @@
                 "DEP-route-cpd-agw-dev-01",
                 "DEP-route-cpd-ilb-dev-01",
                 "DEP-route-cpd-bkend-dev-01",
-                "DEP-route-cpd-dbr-pub-dev-01",
-                "DEP-route-cpd-dbr-pri-dev-01",
                 "DEP-route-cpd-daisvcs-dev-01",
                 "DEP-route-cpd-hdi-dev-01",
                 "DEP-route-cpd-hdi-dev-02",
