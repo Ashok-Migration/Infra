@@ -1,8 +1,8 @@
 name: $(resourceGroupName)
 
 variables:
-  - name: vmImage
-    value: ubuntu-latest
+  - name: PoolName
+    value: "tasmumsagents"
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/rg-cpd-apps-sbx-we-01/deploy.json
   - name: parameterFilePath
@@ -30,7 +30,7 @@ stages:
       - job: ValidateTemplate
         displayName: Validate Template
         pool:
-          vmImage: $(vmImage)
+          name: $(PoolName)
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
@@ -63,7 +63,7 @@ stages:
       - job: DeployTemplate
         displayName: Deploy Template
         pool:
-          vmImage: $(vmImage)
+          name: $(PoolName)
         steps:
           - task: AzurePowerShell@4
             displayName: Deploy template on $(resourceGroupName)
