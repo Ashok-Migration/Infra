@@ -1,0 +1,79 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cph-hub-prd-we-01"
+        } ,
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.20.32.0/22"
+            ]
+        },
+        "nsgsRGName":
+        {
+            "value": "rg-cph-sec-prd-we-01"
+        },
+        "routesRGName":
+        {
+            "value": "rg-cph-net-prd-we-01"
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-cph-hub-iacbl-prod-we-01",
+                    "addressPrefix": "172.20.32.0/26",
+                    "networkSecurityGroupName": "nsg-cph-hub-iacbl-prod-we-01",
+                    "routeTableName": "route-cph-hub-iacbl-prod-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cph-hub-mgmt-prod-we-01",
+                    "addressPrefix": "172.20.32.64/26",
+                    "networkSecurityGroupName": "nsg-cph-hub-mgmt-prod-we-01",
+                    "routeTableName": "route-cph-hub-mgmt-prod-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "AzureFirewallSubnet",
+                    "addressPrefix": "172.20.32.128/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "AzureFirewallManagementSubnet",
+                    "addressPrefix": "172.20.32.196/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": []
+                }
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+            }
+        }
+    }
+}

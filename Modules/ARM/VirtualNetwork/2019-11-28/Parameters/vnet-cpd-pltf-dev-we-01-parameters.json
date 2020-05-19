@@ -1,0 +1,166 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cpd-dev-01"
+        } ,
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.20.40.0/22",
+                "172.20.44.0/22", 
+                "172.20.48.0/22", 
+                "172.20.52.0/24"
+            ]
+        },
+        "nsgsRGName":
+        {
+            "value": "rg-cpd-sec-dev-we-01"
+        },
+        "routesRGName":
+        {
+            "value": "rg-cpd-net-dev-we-01"
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-cpd-pltf-aks-dev-we-01",
+                    "addressPrefix": "172.20.40.0/23",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-aks-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-aks-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-agw-dev-we-01",
+                    "addressPrefix": "172.20.42.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-agw-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-agw-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-ilb-dev-we-01",
+                    "addressPrefix": "172.20.42.32/27",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-ilb-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-ilb-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-apim-dev-we-01",
+                    "addressPrefix": "172.20.42.64/26",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-apim-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-apim-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-bkend-dev-we-01",
+                    "addressPrefix": "172.20.43.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-bkend-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-bkend-dev-we-011",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-dbr-pub-dev-we-01",
+                    "addressPrefix": "172.20.44.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-dbr-pub-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-dbr-pub-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-dbr-pri-dev-we-01",
+                    "addressPrefix": "172.20.45.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-dbr-pri-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-dbr-pri-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-daisvcs-dev-we-01",
+                    "addressPrefix": "172.20.46.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-daisvcs-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-daisvcs-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-hdi-dev-we-01",
+                    "addressPrefix": "172.20.47.0/24",
+                    "networkSecurityGroupName": "cpd-pltf-hdi-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-hdi-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-hdi-dev-we-02",
+                    "addressPrefix": "172.20.48.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-hdi-dev-we-02",
+                    "routeTableName": "route-cpd-pltf-hdi-dev-we-02",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-sqlmi-dev-we-01",
+                    "addressPrefix": "172.20.49.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-sqlmi-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-sqlmi-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-bkup-dev-we-01",
+                    "addressPrefix": "172.20.50.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-bkup-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-bkup-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-testvms-dev-we-01",
+                    "addressPrefix": "172.20.52.192/26",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-testvms-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-testvms-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-workloads-dev-we-01",
+                    "addressPrefix": "172.20.52.128/26",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-workloads-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-workloads-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-db-dev-we-01",
+                    "addressPrefix": "172.20.52.64/26",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-db-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-db-dev-we-01",
+                    "serviceEndpoints": []
+                },
+                {
+                    "name": "snet-cpd-pltf-web-dev-we-01",
+                    "addressPrefix": "172.20.52.0/26",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-web-dev-we-01",
+                    "routeTableName": "route-cpd-pltf-web-dev-we-01",
+                    "serviceEndpoints": []
+                }
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+            }
+        }
+    }
+}
