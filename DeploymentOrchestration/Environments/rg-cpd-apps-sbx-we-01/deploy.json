@@ -20,7 +20,7 @@
             "signedResourceTypes": "co",
             "signedProtocol": "https"
         },
-        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-iac-prod-01/providers/Microsoft.Storage/storageAccounts/stinfshcoreiacwep01",
+        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-iacstaging-prod-01/providers/Microsoft.Storage/storageAccounts/stcphiacstagingprod01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
         "containerName": "components",
@@ -31,7 +31,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-rg-cpd-platformapps-sbx-01",
+            "name": "DEP-rg-cpd-apps-sbx-we-01",
             "location": "[variables('location')]",
             "dependsOn": [],
             "properties": {
@@ -43,7 +43,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-platformapps-sbx-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -51,9 +51,9 @@
             "apiVersion": "2019-10-01", 
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments", 
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": { 
                 "mode": "Incremental", 
@@ -67,10 +67,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-apim-cpd-platformapps-sbx-01",
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "name": "DEP-apim-cpd-apps-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -81,17 +81,17 @@
                     "uri": "[concat(variables('modulesPath'), 'ApiManagement/2019-12-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ApiManagement/2019-12-01/Parameters/apim-cpd-platformapps-sbx-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiManagement/2019-12-01/Parameters/apim-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-appi-cpd-platformapps-sbx-01",
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "name": "DEP-appi-cpd-apps-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -102,17 +102,17 @@
                     "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-platformapps-sbx-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-kv-cpd-platformapps-sbx-01",
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "name": "DEP-kv-cpd-apps-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -123,17 +123,17 @@
                     "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-platformapps-sbx-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-redis-cpd-platformapps-sbx-01",
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "name": "DEP-redis-cpd-apps-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -144,17 +144,17 @@
                     "uri": "[concat(variables('modulesPath'), 'RedisCache/2019-07-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RedisCache/2019-07-01/Parameters/redis-cpd-platformapps-sbx-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'RedisCache/2019-07-01/Parameters/redis-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-stcpdplatformappssbx01",
-            "resourceGroup": "rg-cpd-platformapps-sbx-01",
+            "name": "DEP-stcpdappssbxwe01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-platformapps-sbx-01"
+                "DEP-rg-cpd-apps-sbx-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -165,7 +165,28 @@
                     "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdplatformappssbx01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappssbxwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-aks-cpd-apps-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-sbx-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-sbx-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ManagedClusters/2020-03-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ManagedClusters/2020-03-01/Parameters/aks-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }

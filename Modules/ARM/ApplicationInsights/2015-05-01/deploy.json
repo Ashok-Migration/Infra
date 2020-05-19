@@ -5,6 +5,10 @@
     "appInsightsName": {
       "type": "String"
     },
+    "applicationType": {
+      "defaultValue": "web",
+      "type": "string"
+    },
     "location": {
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
@@ -23,11 +27,16 @@
   "variables": {},
   "resources": [
     {
-      "type": "microsoft.insights/components",
+      "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
       "name": "[parameters('appInsightsName')]",
       "location": "[parameters('location')]",
-      "tags": "[parameters('tags')]"
+      "tags": "[parameters('tags')]",
+      "kind": "web",
+      "properties": {
+        "ApplicationId": "[parameters('appInsightsName')]",
+        "Application_Type": "[parameters('applicationType')]"
+      }
     }
   ],
   "outputs": {}
