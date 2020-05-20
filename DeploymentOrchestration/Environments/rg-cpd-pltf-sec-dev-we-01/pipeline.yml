@@ -10,7 +10,7 @@ variables:
 - name: location
   value: westeurope
 - name: resourceGroupName
-  value: rg-cpd-sec-dev-we-01
+  value: rg-cpd-pltf-sec-dev-we-01
 - name: serviceConnection
   value: centralplatformdevelopment-spn
 
@@ -31,7 +31,7 @@ stages:
   - job: ValidateTemplate
     displayName: Validate Template
     pool:
-      vmImage: $(vmImage)
+      name: $(PoolName)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
@@ -64,7 +64,7 @@ stages:
   - job: DeployTemplate
     displayName: Deploy Template
     pool:
-      vmImage: $(vmImage)
+      name: $(PoolName)
     steps:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupName)

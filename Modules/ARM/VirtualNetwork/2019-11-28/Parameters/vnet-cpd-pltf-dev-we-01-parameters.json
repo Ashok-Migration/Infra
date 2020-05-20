@@ -15,11 +15,11 @@
         },
         "nsgsRGName":
         {
-            "value": "rg-cpd-sec-dev-we-01"
+            "value": "rg-cpd-pltf-sec-dev-we-01"
         },
         "routesRGName":
         {
-            "value": "rg-cpd-net-dev-we-01"
+            "value": "rg-cpd-pltf-net-dev-we-01"
         },
         "subnets": {
             "value": [
@@ -55,7 +55,7 @@
                     "name": "snet-cpd-pltf-bkend-dev-we-01",
                     "addressPrefix": "172.20.43.0/24",
                     "networkSecurityGroupName": "nsg-cpd-pltf-bkend-dev-we-01",
-                    "routeTableName": "route-cpd-pltf-bkend-dev-we-011",
+                    "routeTableName": "route-cpd-pltf-bkend-dev-we-01",
                     "serviceEndpoints": []
                 },
                 {
@@ -78,14 +78,24 @@
                     "networkSecurityGroupName": "nsg-cpd-pltf-daisvcs-dev-we-01",
                     "routeTableName": "route-cpd-pltf-daisvcs-dev-we-01",
                     "serviceEndpoints": [
-                        "Microsoft.KeyVault",
-                        "Microsoft.Storage"
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.KeyVault",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
                     ]
                 },
                 {
                     "name": "snet-cpd-pltf-hdi-dev-we-01",
                     "addressPrefix": "172.20.47.0/24",
-                    "networkSecurityGroupName": "cpd-pltf-hdi-dev-we-01",
+                    "networkSecurityGroupName": "nsg-cpd-pltf-hdi-dev-we-01",
                     "routeTableName": "route-cpd-pltf-hdi-dev-we-01",
                     "serviceEndpoints": []
                 },
