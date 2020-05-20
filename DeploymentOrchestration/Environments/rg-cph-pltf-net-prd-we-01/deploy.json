@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-net-prd-we-01",
+            "name": "DEP-rg-cph-pltf-net-prd-we-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -46,7 +46,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-net-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-net-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -54,9 +54,9 @@
             "apiVersion": "2019-08-01", 
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments", 
-            "resourceGroup": "rg-cph-net-prd-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-net-prd-we-01"
+                "DEP-rg-cph-pltf-net-prd-we-01"
             ],
             "properties": { 
                 "mode": "Incremental", 
@@ -70,10 +70,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-hub-iacbl-prod-we-01",
-            "resourceGroup": "rg-cph-net-prd-we-01",
+            "name": "DEP-route-cph-pltf-iacbl-prod-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-net-prd-we-01"
+                "DEP-rg-cph-pltf-net-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -84,17 +84,17 @@
                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-hub-iacbl-prod-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-iacbl-prod-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-hub-mgmt-prod-we-01",
-            "resourceGroup": "rg-cph-net-prd-we-01",
+            "name": "DEP-route-cph-pltf-mgmt-prod-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-net-prd-we-01"
+                "DEP-rg-cph-pltf-net-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -105,18 +105,18 @@
                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-hub-mgmt-prod-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-mgmt-prod-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-vnet-cph-hub-prd-we-01",
-            "resourceGroup": "rg-cph-net-prd-we-01",
+            "name": "DEP-vnet-cph-pltf-prd-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-route-cph-hub-iacbl-prod-we-01",
-                "DEP-route-cph-hub-mgmt-prod-we-01"
+                "DEP-route-cph-pltf-iacbl-prod-we-01",
+                "DEP-route-cph-pltf-mgmt-prod-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -127,17 +127,17 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-hub-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-pltf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-vnet-cph-hub-prd-we-01-peering",
-            "resourceGroup": "rg-cph-net-prd-we-01",
+            "name": "DEP-vnet-cph-pltf-prd-we-01-peering",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-vnet-cph-hub-prd-we-01"
+                "DEP-vnet-cph-pltf-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -148,7 +148,7 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-hub-prd-we-01-to-cpd-pltf-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-we-01-to-cpd-pltf-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }

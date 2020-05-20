@@ -6,8 +6,8 @@ jobs:
 - job: ValidateModule
   displayName: Validate Module
   pool:
-    # name: $(PoolName)
-    vmImage: $(vmImage)
+    name: $(PoolName)
+    #vmImage: $(vmImage)
   variables:
   - template: pipeline.variables.yml
   steps:
@@ -27,7 +27,8 @@ jobs:
           }
 
           Invoke-Pester @PesterSettings
-          
+        pwsh: true
+
     - task: PublishTestResults@2 #Publish test results
       displayName: Publish Test Results
       inputs:

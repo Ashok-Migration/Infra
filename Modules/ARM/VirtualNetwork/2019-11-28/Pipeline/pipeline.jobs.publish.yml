@@ -2,23 +2,23 @@ jobs:
   - job: PublishArtifact
     displayName: Publish Artifact
     pool:
-      # name: $(poolName)
-      vmImage: $(vmImage)
+      name: $(poolName)
+      
     variables:
-    - template: pipeline.variables.yml
+      - template: pipeline.variables.yml
     steps:
       - task: PublishBuildArtifacts@1
         displayName: Publish $(moduleName) Artifacts
         inputs:
           PathtoPublish: $(modulePath)
           ArtifactName: $(moduleName)-$(moduleVersion)
-  
+
   - job: PublishComponent
     displayName: Publish Component
     pool:
-      vmImage: $(vmImage)
+      name: $(poolName)
     variables:
-    - template: pipeline.variables.yml
+      - template: pipeline.variables.yml
     steps:
       - task: CopyFiles@2
         displayName: Filter folders
@@ -27,17 +27,17 @@ jobs:
             Modules/ARM/$(moduleName)/$(moduleVersion)/**
           targetFolder: $(Build.ArtifactStagingDirectory)
       - task: AzureCLI@1
+        displayName: Create container $(componentStorageContainerName)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountName)" --subscription "$(componentStorageAccountSubscriptionId)"           
+        
+      - task: AzureCLI@1
         displayName: Copy Module to $(componentStorageAccountName)
         inputs:
           azureSubscription: $(serviceConnection)
           scriptLocation: inlineScript
           inlineScript: |
-              az storage container create --name          "$(componentStorageContainerName)" \
-                                          --public-access off \
-                                          --account-name  "$(componentStorageAccountName)" \
-                                          --subscription  "$(componentStorageAccountSubscriptionId)"
-                                          
-              az storage blob upload-batch --source       "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" \
-                                  --destination  "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" \
-                                  --account-name "$(componentStorageAccountName)" \
-                                  --subscription  "$(componentStorageAccountSubscriptionId)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountName)" --subscription  "$(componentStorageAccountSubscriptionId)"
