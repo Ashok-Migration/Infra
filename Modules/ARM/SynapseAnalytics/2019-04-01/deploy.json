@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseName": {
+            "type": "String"
+        },
+        "skuName": {
+            "type": "String"
+        },
+        "serverName": {
+            "type": "String"
+        },
+        "serverLocation": {
+            "type": "String"
+        },
+        "collation": {
+            "type": "String"
+        },
+        "databaseTags": {
+            "defaultValue": {},
+            "type": "Object"
+        }
+    },
+    "variables": {
+
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('serverName'), '/', parameters('databaseName'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2017-10-01-preview",
+            "location": "[parameters('serverLocation')]",
+            "tags": "[parameters('databaseTags')]",
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "DataWarehouse"
+            },
+            "properties": {
+                "collation": "[parameters('collation')]"
+            }
+        }
+    ],
+    "outputs": {
+        "DBCollation": {
+            "type": "string",
+            "value": "[parameters('collation')]",
+            "metadata": {
+                "description": "The DB collation"
+            }
+        }
+    }
+}
