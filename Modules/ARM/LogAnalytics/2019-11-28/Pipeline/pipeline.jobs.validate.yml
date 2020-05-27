@@ -6,8 +6,8 @@ jobs:
 - job: ValidateModule
   displayName: Validate Module
   pool:
-    # name: $(PoolName)
-    vmImage: $(vmImage)
+    name: $(PoolName)
+    #vmImage: $(vmImage)
   variables:
   - template: pipeline.variables.yml
   steps:
@@ -28,7 +28,8 @@ jobs:
           }
 
           Invoke-Pester @PesterSettings
-          
+        pwsh: true
+
     - task: PublishTestResults@2
       displayName: Publish Test Results
       inputs:
@@ -41,26 +42,26 @@ jobs:
         azureSubscription: $(serviceConnection)
         ScriptType: InlineScript
         inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupName) -ErrorAction SilentlyContinue))
-            {
-              New-AzResourceGroup -Name $(resourceGroupName) -Location "$(location)"
-            }
+          $ValidationErrors = $null
 
-            $ValidationErrors = $null
+          $Location = "$(location)" -replace " ",""
 
-            $DeploymentInputs = @{
-              ResourceGroupName     = "$(resourceGroupName)"
-              TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
-              TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
-              Mode                  = "Incremental"
-              Verbose               = $true
-              OutVariable           = "ValidationErrors"
-            }
-            
-            Test-AzResourceGroupDeployment @DeploymentInputs
+          $DeploymentInputs = @{
+            Location              = "$Location"
+            TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
+            TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
+            Verbose               = $true
+            OutVariable           = "ValidationErrors"
+          }
+          
+          Test-AzDeployment @DeploymentInputs
 
-            if ($ValidationErrors)
-            {
-              Write-Error "Template is not valid."
-            }
+          if ($ValidationErrors)
+          {
+                foreach ($message in $ValidationErrors.Details)
+                {
+                    Write-Error $message.Message
+                }
+                Write-Error "Template is not valid."
+          }
         azurePowerShellVersion: LatestVersion

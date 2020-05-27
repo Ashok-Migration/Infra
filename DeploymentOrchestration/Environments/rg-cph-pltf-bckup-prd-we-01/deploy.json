@@ -22,19 +22,18 @@
             "signedProtocol": "https"
         },
         //update line below with actual values
-        "componentStorageAccountId": "/subscriptions/<CPH subscription ID>/resourceGroups/rg-cph-iac-prod-01/providers/Microsoft.Storage/storageAccounts/stinfshcoreiacwep01",
+        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-iacstaging-prod-01/providers/Microsoft.Storage/storageAccounts/stcphiacstagingprod01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
         "containerName": "components",
         "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
         "location": "[deployment().location]"
-
     },
     "resources": [  
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-mon-prod-01",
+            "name": "DEP-rg-cph-pltf-bckup-prd-we-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -47,7 +46,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-mon-prod-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-bckup-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -55,9 +54,9 @@
             "apiVersion": "2019-08-01", 
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments", 
-            "resourceGroup": "rg-cph-mon-prod-01",
+            "resourceGroup": "rg-cph-pltf-bckup-prd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-mon-prod-01"
+                "DEP-rg-cph-pltf-bckup-prd-we-01"
             ],
             "properties": { 
                 "mode": "Incremental", 
@@ -71,10 +70,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-log-infsh-core-azne-ws-p01",
-            "resourceGroup": "rg-cph-mon-prod-01",
+            "name": "DEP-rsv-cph-pltf-prd-we-01",
+            "resourceGroup": "rg-cph-pltf-bckup-prd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-mon-prod-01"
+                "DEP-rg-cph-pltf-bckup-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -82,31 +81,10 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'RecoveryServicesVaults/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/Parameters/log-cph-ws-prod-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-stinfshcorensgflnep01",
-            "resourceGroup": "rg-cph-mon-prod-01",
-            "dependsOn": [
-                "DEP-rg-cph-mon-prod-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stinfshcorensgflnep01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'RecoveryServicesVaults/2019-11-28/Parameters/rsv-cph-pltf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
