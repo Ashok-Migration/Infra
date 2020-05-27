@@ -16,7 +16,8 @@ jobs:
         inputs:
           targetType: inline
           script: |
-            Install-Module Pester -Force -ErrorAction Stop
+            Install-Module -Name Pester -RequiredVersion 4.10.1 -Force -ErrorAction Stop
+
 
             $PesterSettings  = @{
               Script       = "$(System.DefaultWorkingDirectory)/$(modulePath)/Tests/*.tests.ps1"
