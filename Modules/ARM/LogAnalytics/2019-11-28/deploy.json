@@ -109,7 +109,6 @@
                     "type": "datasources",
                     "kind": "AzureActivityLog",
                     "name": "[subscription().subscriptionId]",
-                    "location": "[parameters('location')]",
                     "dependsOn": [
                         "[concat('Microsoft.OperationalInsights/workspaces/', parameters('logAnalyticsWorkspaceName'))]"
                     ],
@@ -117,7 +116,7 @@
                         "linkedResourceId": "[concat(subscription().Id, '/providers/microsoft.insights/eventTypes/management')]"
                     }
                 },
-                {
+                    {
                     "apiVersion": "2015-11-01-preview",
                     "type": "datasources",
                     "name": "applicationEvent",

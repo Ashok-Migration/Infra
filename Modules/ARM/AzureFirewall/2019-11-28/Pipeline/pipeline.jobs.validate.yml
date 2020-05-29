@@ -11,7 +11,7 @@ jobs:
   variables:
   - template: pipeline.variables.yml
   steps:
-    - task: PowerShell@2 #Run Pester
+    - task: PowerShell@2
       displayName: Test Module $(moduleName) (Pester)
       inputs:
         targetType: inline
@@ -30,13 +30,13 @@ jobs:
           Invoke-Pester @PesterSettings
         pwsh: true
 
-    - task: PublishTestResults@2 #Publish test results
+    - task: PublishTestResults@2
       displayName: Publish Test Results
       inputs:
         testResultsFormat: NUnit
         testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
-    - task: AzurePowerShell@4 #Test deployment 
+    - task: AzurePowerShell@4
       displayName: 'Validate $(moduleName) in $(resourceGroupName) via $(serviceconnection)'
       inputs:
         azureSubscription: $(serviceConnection)
