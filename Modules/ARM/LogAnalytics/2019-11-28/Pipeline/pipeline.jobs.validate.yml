@@ -42,26 +42,30 @@ jobs:
         azureSubscription: $(serviceConnection)
         ScriptType: InlineScript
         inline: |
-          $ValidationErrors = $null
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupName) -ErrorAction SilentlyContinue))
+            {
+              New-AzResourceGroup -Name $(resourceGroupName) -Location "$(location)"
+            }
 
-          $Location = "$(location)" -replace " ",""
+            $ValidationErrors = $null
 
-          $DeploymentInputs = @{
-            Location              = "$Location"
-            TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
-            TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
-            Verbose               = $true
-            OutVariable           = "ValidationErrors"
-          }
-          
-          Test-AzDeployment @DeploymentInputs
+            $DeploymentInputs = @{
+              ResourceGroupName     = "$(resourceGroupName)"
+              TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
+              TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
+              Mode                  = "Incremental"
+              Verbose               = $true
+              OutVariable           = "ValidationErrors"
+            }
+            
+            Test-AzResourceGroupDeployment @DeploymentInputs
 
-          if ($ValidationErrors)
-          {
+            if ($ValidationErrors)
+            {
                 foreach ($message in $ValidationErrors.Details)
                 {
                     Write-Error $message.Message
                 }
                 Write-Error "Template is not valid."
-          }
+            }
         azurePowerShellVersion: LatestVersion
