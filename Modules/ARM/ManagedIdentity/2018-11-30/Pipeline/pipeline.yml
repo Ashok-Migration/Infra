@@ -1,0 +1,28 @@
+name: $(moduleName)-$(moduleVersion)
+
+variables:
+  - template: pipeline.variables.yml
+  - template: /Modules/.global/global.variables.yml
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - Modules/ARM/ManagedIdentity/*
+    exclude:
+      - Modules/ARM/ManagedIdentity/*/readme.md
+
+stages:
+  - stage: Validate
+    jobs:
+      - template: pipeline.jobs.validate.yml
+        parameters:
+          templateFile: $(modulePath)/deploy.json
+          parametersFile: $(modulePath)/Parameters/parameters.json
+
+  - stage: Publish
+    jobs:
+      - template: pipeline.jobs.publish.yml

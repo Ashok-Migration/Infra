@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "tags": {
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-11-30",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "tags": "[parameters('tags')]",
+            "properties": {
+            }
+        }
+    ]
+}
