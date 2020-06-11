@@ -5,7 +5,23 @@
     "projectName": {
       "type": "string",
       "metadata": {
-        "description": "Specifies a project name that is used to generate the Event Hub name and the Namespace name."
+        "description": "Required. Specifies a project name to be used as Event Hub Namespace name."
+      }
+    },
+    "eventHubName": {
+      "type": "array",
+      "defaultValue": [
+      ],
+      "metadata": {
+        "description": "Optional. List of specific Event Hubs to create."
+      }
+    },
+    "consumerGroupName": {
+      "type": "array",
+      "defaultValue": [
+      ],
+      "metadata": {
+        "description": "Optional. List of specific Consumer Groups to create in each Event Hub."
       }
     },
     "location": {
@@ -25,8 +41,7 @@
     }
   },
   "variables": {
-    "eventHubNamespaceName": "[concat(parameters('projectName'), 'ns')]",
-    "eventHubName": "[parameters('projectName')]"
+    "eventHubNamespaceName": "[concat(parameters('projectName'), 'ns')]"
   },
   "resources": [
     {
@@ -47,8 +62,13 @@
     {
       "apiVersion": "2017-04-01",
       "type": "Microsoft.EventHub/namespaces/eventhubs",
-      "name": "[concat(variables('eventHubNamespaceName'), '/', variables('eventHubName'))]",
+      "condition": "[not(empty(parameters('eventHubName')))]",
+      "name": "[concat(variables('eventHubNamespaceName'), '/', parameters('eventHubName')[copyIndex('eventHubNameLoop')].name)]",
       "location": "[parameters('location')]",
+      "copy": {
+        "name": "eventHubNameLoop",
+        "count": "[if(empty(parameters('eventHubName')) , 1, length(parameters('eventHubName')))]"
+      },
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
       ],
@@ -56,6 +76,22 @@
         "messageRetentionInDays": 7,
         "partitionCount": 1
       }
+    },
+    {
+      "apiVersion": "2017-04-01",
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "condition": "[not(empty(parameters('consumerGroupName')))]",
+      "name": "[concat(variables('eventHubNamespaceName'), '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub, '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].consumerGroup)]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "consumerGroupNameLoop",
+        "count": "[if(empty(parameters('consumerGroupName')) , 1, length(parameters('consumerGroupName')))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]",
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubNamespaceName'), parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub)]"
+      ],
+      "properties": {}
     }
   ],
   "outputs": {}

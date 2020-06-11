@@ -21,7 +21,7 @@ This module is used to deploy an Azure Storage Account with hierarchical namespa
 | `networkAclsDefaultAction` | string | `Deny` | Deny, Allow | Optional. Specifies the default action of allow or deny when no other rules match.
 | `networkAclsVirtualNetworkRules` | array | [] | | Optional. Sets the virtual network rules, like resource ID of a subnet.
 | `networkAclsIpRules` | array | [] | | Optional. Sets the IP rules.
-| `blobContainers` | array | [] | | Optional. Blob containers to create.
+| `blobContainers` | array | [] | Complex structure, see below. | Optional. Blob containers to create.
 | `utcYear` | `[utcNow('yyyy')]` | Optional. Year data used to generate a SAS token. Default is the current year.
 | `lockForDeletion` | bool | `true` | | Optional. Switch to lock Virtual Network Gateway from deletion.
 | `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
