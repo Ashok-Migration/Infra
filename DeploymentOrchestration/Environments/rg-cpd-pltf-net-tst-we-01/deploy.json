@@ -214,27 +214,6 @@
                 }
             }
         },
-         {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-db-tst-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-db-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
@@ -280,87 +259,18 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-testvms-tst-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-testvms-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-web-tst-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-web-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-app-tst-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-app-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
             "name": "DEP-vnet-cpd-pltf-tst-we-01",
             "resourceGroup": "rg-cpd-pltf-net-tst-we-01",
             "dependsOn": [
-                "DEP-route-cpd-pltf-db-tst-we-01",
                 "DEP-route-cpd-pltf-aks-tst-we-01",
                 "DEP-route-cpd-pltf-ilb-tst-we-01",
                 "DEP-route-cpd-pltf-bkend-tst-we-01",
                 "DEP-route-cpd-pltf-daisvcs-tst-we-01",
                 "DEP-route-cpd-pltf-hdi-tst-we-01",
-                "DEP-route-cpd-pltf-hdi-tst-we-02",
                 "DEP-route-cpd-pltf-sqlmi-tst-we-01",
-                "DEP-route-cpd-pltf-bkup-tst-we-01",
                 "DEP-route-cpd-pltf-apim-tst-we-01",
                 "DEP-route-cpd-pltf-dbrpri-tst-we-01",
-                "DEP-route-cpd-pltf-dbrpub-tst-we-01",
-                "DEP-route-cpd-pltf-testvms-tst-we-01",
-                "DEP-route-cpd-pltf-web-tst-we-01",
-                "DEP-route-cpd-pltf-app-tst-we-01"
+                "DEP-route-cpd-pltf-dbrpub-tst-we-01"
             ],
             "properties": {
                 "mode": "Incremental",

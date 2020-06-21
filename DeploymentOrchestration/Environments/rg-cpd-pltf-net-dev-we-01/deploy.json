@@ -256,27 +256,6 @@
                 }
             }
         },
-         {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-db-dev-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-dev-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-dev-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-db-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
@@ -343,52 +322,9 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-web-dev-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-dev-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-dev-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-web-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cpd-pltf-app-dev-we-01",
-            "resourceGroup": "rg-cpd-pltf-net-dev-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-net-dev-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-pltf-app-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
             "name": "DEP-vnet-cpd-pltf-dev-we-01",
             "resourceGroup": "rg-cpd-pltf-net-dev-we-01",
             "dependsOn": [
-                "DEP-route-cpd-pltf-db-dev-we-01",
                 "DEP-route-cpd-pltf-aks-dev-we-01",
                 "DEP-route-cpd-pltf-ilb-dev-we-01",
                 "DEP-route-cpd-pltf-bkend-dev-we-01",
@@ -400,9 +336,7 @@
                 "DEP-route-cpd-pltf-apim-dev-we-01",
                 "DEP-route-cpd-pltf-dbrpri-dev-we-01",
                 "DEP-route-cpd-pltf-dbrpub-dev-we-01",
-                "DEP-route-cpd-pltf-testvms-dev-we-01",
-                "DEP-route-cpd-pltf-web-dev-we-01",
-                "DEP-route-cpd-pltf-app-dev-we-01"
+                "DEP-route-cpd-pltf-testvms-dev-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
