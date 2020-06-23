@@ -8,6 +8,9 @@
       },
       "type": "string"
     },
+    "appInsightsName": {
+      "type": "string"
+    },
     "location": {
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
@@ -50,15 +53,41 @@
       },
       "type": "int"
     },
+    "subnetName": {
+      "type": "string"
+    },
     "tags": {
-      "defaultValue": {},
+      "defaultValue": {
+      },
       "metadata": {
         "description": "Optional. Resource tags."
       },
       "type": "object"
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "virtualNetworkType": {
+      "allowedValues": [
+        "External",
+        "Internal",
+        "None"
+      ],
+      "defaultValue": "None",
+      "metadata": {
+        "description": "The virtual network type"
+      },
+      "type": "string"
+    },
+    "vnetResourceGroup": {
+      "type": "string"
     }
   },
-  "variables": {},
+  "variables": {
+    "appInsightsId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Insights/components/', parameters('appInsightsName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
+  },
   "resources": [
     {
       "apiVersion": "2019-12-01",
@@ -72,9 +101,46 @@
       },
       "properties": {
         "publisherEmail": "[parameters('publisherEmail')]",
-        "publisherName": "[parameters('publisherName')]"
-      }
+        "publisherName": "[parameters('publisherName')]",
+        "virtualNetworkType": "[parameters('virtualNetworkType')]",
+        "virtualNetworkConfiguration": "[if(equals(parameters('virtualNetworkType'),'Internal'), json(concat('{\"subnetResourceId\": \"', variables('subnetRef'), '\"}')), json('null'))]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2019-01-01",
+          "type": "loggers",
+          "name": "[parameters('appInsightsName')]",
+          "dependsOn": [
+            "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]"
+          ],
+          "properties": {
+            "loggerType": "applicationInsights",
+            "resourceId": "[variables('appInsightsId')]",
+            "credentials": {
+              "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+            }
+          }
+        },
+        {
+          "apiVersion": "2019-01-01",
+          "type": "diagnostics",
+          "name": "applicationinsights",
+          "dependsOn": [
+            "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]",
+            "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', parameters('appInsightsName'))]"
+          ],
+          "properties": {
+            "loggerId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', parameters('appInsightsName'))]",
+            "alwaysLog": "allErrors",
+            "sampling": {
+              "percentage": 100,
+              "samplingType": "fixed"
+            }
+          }
+        }
+      ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+  }
 }

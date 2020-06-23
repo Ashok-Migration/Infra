@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            },
+            "type": "string"
+        },
+        "sku": {
+            "allowedValues": [
+                "Free",
+                "Standard"
+            ],
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "The pricing tier of the app configuration store"
+            },
+            "type": "string"
+        },
+        "storeName": {
+            "type": "String"
+        },
+        "tags": {
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.AppConfiguration/configurationStores",
+            "apiVersion": "2019-10-01",
+            "name": "[parameters('storeName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {
+                "encryption": {
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

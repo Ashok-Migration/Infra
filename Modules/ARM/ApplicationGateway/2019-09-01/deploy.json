@@ -74,8 +74,8 @@
   },
   "variables": {
     "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
-    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]"
   },
   "resources": [
@@ -199,6 +199,7 @@
       "sku": {
         "name": "[parameters('sku')]"
       },
+      "tags": "[parameters('tags')]",
       "zones": "[parameters('publicIpZones')]",
       "properties": {
         "publicIPAllocationMethod": "[parameters('allocationMethod')]"

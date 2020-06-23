@@ -1,0 +1,96 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hostingPlanName": {
+            "type": "string"
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            },
+            "type": "string"
+        },
+        "sku": {
+            "type": "string",
+            "allowedValues": [
+                "D1",
+                "F1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P1V2",
+                "P2V2",
+                "P3V2",
+                "I1",
+                "I2",
+                "I3",
+                "Y1"
+            ],
+            "defaultValue": "S1",
+            "metadata": {
+                "description": "The pricing tier for the hosting plan."
+            }
+        },
+        "workerSize": {
+            "type": "string",
+            "allowedValues": [
+                "0",
+                "1",
+                "2"
+            ],
+            "defaultValue": "0",
+            "metadata": {
+                "description": "The instance size of the hosting plan (small, medium, or large)."
+            }
+        },
+        "kind": {
+            "type": "string",
+            "defaultValue": "windows",
+            "allowedValues": [
+                "linux",
+                "windows"
+            ]
+        },
+        "tags": {
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        },
+        "numberOfWorkers": {
+            "type": "string"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-08-01",
+            "name": "[parameters('hostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location')]",
+            "kind": "[parameters('kind')]",
+            "tags": "[parameters('tags')]",
+            "sku": {
+                "Name": "[parameters('sku')]"
+            },
+            "properties": {
+                "name": "[parameters('hostingPlanName')]",
+                "workerSize": "[parameters('workerSize')]",
+                "numberOfWorkers": "[parameters('numberOfWorkers')]"
+            }
+        }
+    ],
+    "outputs": {
+    }
+}
