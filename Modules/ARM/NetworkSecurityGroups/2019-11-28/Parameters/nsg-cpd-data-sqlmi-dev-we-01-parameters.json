@@ -1,0 +1,205 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "networkSecurityGroupName": {
+        "value": "nsg-cpd-data-sqlmi-dev-we-01"
+      },
+      "networkSecurityGroupSecurityRules": {
+        "value": [
+          {
+            "name": "allow_tds_inbound",
+            "properties": {
+              "description": "Allow access to data",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "172.20.49.0/24",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound",
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [],
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "allow_redirect_inbound",
+            "properties": {
+                "description": "Allow inbound redirect traffic to Managed Instance inside the virtual network",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "11000-11999",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "172.20.49.0/24",
+                "access": "Allow",
+                "priority": 1100,
+                "direction": "Inbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "allow_geodr_inbound",
+            "properties": {
+                "description": "Allow inbound geodr traffic inside the virtual network",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "5022",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationAddressPrefix": "172.20.49.0/24",
+                "access": "Allow",
+                "priority": 1200,
+                "direction": "Inbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "deny_all_inbound",
+            "properties": {
+                "description": "Deny all other inbound traffic",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Deny",
+                "priority": 4096,
+                "direction": "Inbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "allow_linkedserver_outbound",
+            "properties": {
+                "description": "Allow outbound linkedserver traffic inside the virtual network",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "1433",
+                "sourceAddressPrefix": "172.20.49.0/24",
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 1000,
+                "direction": "Outbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "allow_redirect_outbound",
+            "properties": {
+                "description": "Allow outbound redirect traffic to Managed Instance inside the virtual network",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "11000-11999",
+                "sourceAddressPrefix": "172.20.49.0/24",
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 1100,
+                "direction": "Outbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "allow_geodr_outbound",
+            "properties": {
+                "description": "Allow outbound geodr traffic inside the virtual network",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "5022",
+                "sourceAddressPrefix": "172.20.49.0/24",
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 1200,
+                "direction": "Outbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "deny_all_outbound",
+            "properties": {
+                "description": "Deny all other outbound traffic",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Deny",
+                "priority": 4096,
+                "direction": "Outbound",
+                "destinationPortRanges": [],
+                "destinationApplicationSecurityGroups": [],
+                "sourceApplicationSecurityGroups": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": [],
+                "sourcePortRanges": []
+            }
+          }
+        ]
+      },
+      "flowLogsDeloy": {
+        "value": true
+      },
+      "flowLogsEnabled": {
+        "value": true
+      },
+      "flowLogStorageAccountRGName": {
+        "value": "rg-cph-pltf-mon-prd-we-01"
+      },
+      "flowLogStorageAccountName": {
+        "value": "stcphpltfnsgflprdwe01"
+      },
+      "workspaceRGName":      {
+          "value": "rg-cph-pltf-mon-prd-we-01"  
+      },
+      "workspaceName":      {
+          "value": "log-cph-pltf-prd-we-01"
+      },
+      "NSGFlowsubscriptionid": {
+          "value": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
+      },
+      "diagnosticLogsRetentionInDays": 
+      {
+        "value": 365
+      },
+      "lockForDeletion": {
+        "value": false
+      },
+      "tags": {
+        "value": {
+        }
+      }
+    }
+  }
