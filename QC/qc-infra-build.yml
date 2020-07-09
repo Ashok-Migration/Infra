@@ -24,6 +24,9 @@ steps:
     inputs:
       debugMode: false
 
+  - task: EnterpriseServicesDevOpsTeam.BuildTool-Tasks.task-ServicesDevopsAddToSonarNSG.ServicesDevOpsSonarPreReq@5
+    displayName: "T-ServicesDevOpsSonarPreReq:"
+
   - task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@4
     displayName: "Prepare analysis on SonarQube"
     inputs:
@@ -35,6 +38,9 @@ steps:
 
   - task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@4
     displayName: "Run Code Analysis"
+
+  - task: EnterpriseServicesDevOpsTeam.BuildTool-Tasks.task-ServicesDevopsRemoveFromNSG.ServicesDevOpsSonarPreReqComplete@5
+    displayName: "T-ServicesDevOpsSonarPreReqComplete:"
 
   - task: whitesource.ws-bolt.bolt.wss.WhiteSource Bolt@20
     displayName: "WhiteSource Bolt"
