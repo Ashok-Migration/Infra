@@ -372,7 +372,8 @@
                             "properties": {
                                 "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
                                 "principalType": "ServicePrincipal",
-                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]", // Contributor
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                                "roleDefinitionName": "Contributor",
                                 "scope": "[resourceId(parameters('acrResourceGroup'),'Microsoft.ContainerRegistry/registries/', parameters('acrName'))]"
                             }
                         }
@@ -401,7 +402,8 @@
                             "properties": {
                                 "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
                                 "principalType": "ServicePrincipal",
-                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')]", // App Configuration Data Reader
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')]",
+                                "roleDefinitionName": "App Configuration Data Reader",
                                 "scope": "[resourceId(resourceGroup().name,'Microsoft.AppConfiguration/configurationStores/', parameters('configStoreName'))]"
                             }
                         }

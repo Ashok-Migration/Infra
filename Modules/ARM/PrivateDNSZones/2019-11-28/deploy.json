@@ -4,9 +4,9 @@
     "parameters": {
         "zoneName": {
             "type": "string",
-			"metadata": {
-				"description": "Required. The name of the private DNS zone."
-			}
+            "metadata": {
+                "description": "Required. The name of the private DNS zone."
+            }
         },
         "lockForDeletion": {
             "type": "bool",
@@ -16,13 +16,13 @@
         },
         "vNets": {
             "type": "array",
-			"metadata": {
-				"description": "Required. Virtual networks to create links to."
-			}
+            "metadata": {
+                "description": "Required. Virtual networks to create links to."
+            }
         }
     },
-    "variables" : {
-        "vNetIDs" : {
+    "variables": {
+        "vNetIDs": {
             "copy": [
                 {
                     "name": "vNetIDs",
@@ -43,24 +43,6 @@
                 "maxNumberOfVirtualNetworkLinks": 1000,
                 "maxNumberOfVirtualNetworkLinksWithRegistration": 100
             }
-            // Resource authorization is mising to create the locks, so commenting out for the 
-            // time being
-            // ,
-            // "resources": [
-            // {
-            //     "type": "providers/locks",
-            //     "apiVersion": "2016-09-01",
-            //     "condition": "[parameters('lockForDeletion')]",
-            //     "name": "Microsoft.Authorization/privateDnsZonesDoNotDelete",
-            //     "dependsOn": [
-            //         "[concat('Microsoft.Network/privateDnsZones/', parameters('zoneName'))]"
-            //     ],
-            //     "comments": "Resource lock on Azure Private DNS Zone",
-            //     "properties": {
-            //         "level": "CannotDelete"
-            //     }
-            // }        
-            // ]
         },
         {
             "type": "Microsoft.Network/privateDnsZones/SOA",

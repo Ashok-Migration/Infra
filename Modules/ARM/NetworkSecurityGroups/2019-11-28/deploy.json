@@ -47,12 +47,10 @@
                 "description": "In case if NSG Flow Log is deployed - should be the name of the storage account to store logs to."
             }
         },
-        "workspaceRGName":
-        {
-            "type": "string"  
+        "workspaceRGName": {
+            "type": "string"
         },
-        "workspaceName":
-        {
+        "workspaceName": {
             "type": "string"
         },
         "diagnosticLogsRetentionInDays": {
@@ -79,7 +77,7 @@
                 "description": "Optional. Tags of the NSG resource."
             }
         },
-        "NSGFlowsubscriptionid":{
+        "NSGFlowsubscriptionid": {
             "type": "string",
             "defaultValue": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
         }
@@ -111,7 +109,7 @@
                 }
             }
         ]
-        
+
     },
     "resources": [
         {
@@ -174,10 +172,7 @@
                         "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
                     ],
                     "properties": {
-                        //"storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
                         "workspaceId": "[if(empty(variables('workspaceId')), json('null'), variables('workspaceId'))]",
-                        //"eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                        //"eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
                         "metrics": "[if(empty(variables('workspaceId')), json('null'), variables('diagnosticsMetrics'))]",
                         "logs": "[if(empty(variables('workspaceId')), json('null'), variables('diagnosticsLogs'))]"
                     }
@@ -211,8 +206,7 @@
                                 "storageId": "[variables('nsgFlowLogsStorageAccountId')]",
                                 "enabled": "[parameters('flowLogsEnabled')]",
                                 "flowAnalyticsConfiguration": {
-                                    "networkWatcherFlowAnalyticsConfiguration":
-                                    {
+                                    "networkWatcherFlowAnalyticsConfiguration": {
                                         "enabled": true,
                                         "workspaceResourceId": "[variables('workspaceId')]",
                                         "trafficAnalyticsInterval": 10
@@ -226,11 +220,11 @@
                                     "type": "JSON",
                                     "version": 2
                                 }
-                                }
+                            }
                         }
                     ]
                 }
-            }            
+            }
         }
     ],
     "outputs": {

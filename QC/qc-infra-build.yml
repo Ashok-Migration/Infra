@@ -24,6 +24,13 @@ steps:
     inputs:
       debugMode: false
 
+  - task: PowerShell@2
+    displayName: "Install PSScriptAnalyzer"
+    inputs:
+      targetType: 'inline'
+      script: |        
+        Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+
   - task: EnterpriseServicesDevOpsTeam.BuildTool-Tasks.task-ServicesDevopsAddToSonarNSG.ServicesDevOpsSonarPreReq@5
     displayName: "T-ServicesDevOpsSonarPreReq:"
 
@@ -53,7 +60,6 @@ steps:
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: BuildLogFolder"
     inputs:
+      PathtoPublish: '$(Agent.BuildDirectory)\BuildLogFolder'
       ArtifactName: BuildLogFolder
-
-  - task: PublishBuildArtifacts@1
-    displayName: "Publish Artifact: drop"
+    condition: always()

@@ -29,45 +29,45 @@
         "location": "[deployment().location]"
 
     },
-  "resources": [
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-rg-cpd-apps-sec-tst-we-01",
-      "location": "[variables('location')]",
-      "dependsOn": [
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-rg-cpd-apps-sec-tst-we-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-apps-sec-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        {
+            "apiVersion": "2019-08-01",
+            "name": "[variables('CUA')]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "rg-cpd-apps-sec-tst-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-sec-tst-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
         },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-apps-sec-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "apiVersion": "2019-08-01",
-      "name": "[variables('CUA')]",
-      "type": "Microsoft.Resources/deployments",
-      "resourceGroup": "rg-cpd-apps-sec-tst-we-01",
-      "dependsOn": [
-        "DEP-rg-cpd-apps-sec-tst-we-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": []
-        }
-      }
-    },
-    {
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
             "name": "DEP-nsg-cpd-apps-aks-tst-we-01",
@@ -87,8 +87,8 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-aks-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    },
-    {
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
             "name": "DEP-nsg-cpd-apps-agw-tst-we-01",
@@ -108,8 +108,8 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-agw-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    },
-    {
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
             "name": "DEP-nsg-cpd-apps-ilb-tst-we-01",
@@ -129,7 +129,7 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-ilb-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    },
+        },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
@@ -150,7 +150,7 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-apim-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    },
+        },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
@@ -171,8 +171,8 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-bkend-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    },
-    {
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
             "name": "DEP-nsg-cpd-apps-testvms-tst-we-01",
@@ -192,10 +192,10 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-apps-testvms-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-    }
+        }
 
 
-  ],
+    ],
     "outputs": {
     }
 }
