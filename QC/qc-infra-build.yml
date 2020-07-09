@@ -1,0 +1,53 @@
+trigger: none
+
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily UTC midnight build
+    branches:
+      include:
+        - master
+    always: true
+
+pool:
+  name: "tasmumsagents"
+  demands: java
+
+steps:
+  - task: EnterpriseServicesDevOpsTeam.BuildTool-Tasks.task-ESDevopsCIConfig.ServicesDevOpsBuildConfig@6
+    displayName: ServicesDevOpsBuildConfig
+    inputs:
+      ServicesDevOpsServiceEndpoint: ServicesBuildEndPoint
+      emailto: "$(emailto)"
+
+  - task: CredScan@2
+    displayName: "Run CredScan"
+    inputs:
+      debugMode: false
+
+  - task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@4
+    displayName: "Prepare analysis on SonarQube"
+    inputs:
+      SonarQube: "ServiceSonar-CORP"
+      scannerMode: CLI
+      configMode: manual
+      cliProjectKey: "TASMUCP_infra_master"
+      cliProjectName: "TASMUCP_infra_master_#MA"
+
+  - task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@4
+    displayName: "Run Code Analysis"
+
+  - task: whitesource.ws-bolt.bolt.wss.WhiteSource Bolt@20
+    displayName: "WhiteSource Bolt"
+    inputs:
+      cwd: "$(System.DefaultWorkingDirectory)"
+
+  - task: EnterpriseServicesDevOpsTeam.BuildTool-Tasks.task-ESDevopsCopyReports.ServicesDevOpsCopyReports@6
+    displayName: ServicesDevOpsCopyReports
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: BuildLogFolder"
+    inputs:
+      ArtifactName: BuildLogFolder
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: drop"

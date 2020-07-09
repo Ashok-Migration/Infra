@@ -14,6 +14,13 @@
                 "description": "The name of the resource group the container registry is associated with."
             }
         },
+        "acrRoleGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the container registry service. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
+        },
         "agentCount": {
             "defaultValue": 3,
             "minValue": 1,
@@ -35,6 +42,19 @@
             "metadata": {
                 "description": "The name of the Managed Cluster resource."
             }
+        },
+        "configStoreName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the app configuration store."
+            }
+        },
+        "configStoreRoleGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the app config store. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
         },
         "dnsPrefix": {
             "type": "string",
@@ -82,27 +102,6 @@
                 "description": "Boolean flag to turn on and off of RBAC."
             }
         },
-        "acrRoleGuidValue": {
-            "type": "string",
-            "metadata": {
-                "description": "The unique id used in the role assignment of the kubernetes service to the container registry service. It is recommended to use the default value."
-            },
-            "defaultValue": "[newGuid()]"
-        },
-        "subnetRoleGuidValue": {
-            "type": "string",
-            "metadata": {
-                "description": "The unique id used in the role assignment of the kubernetes service to the subent. It is recommended to use the default value."
-            },
-            "defaultValue": "[newGuid()]"
-        },
-        "omsRoleGuidValue": {
-            "type": "string",
-            "metadata": {
-                "description": "The unique id used in the role assignment of the kubernetes service to the subent. It is recommended to use the default value."
-            },
-            "defaultValue": "[newGuid()]"
-        },
         "kubernetesVersion": {
             "type": "string",
             "defaultValue": "1.7.7",
@@ -124,6 +123,13 @@
                 "description": "Maximum number of pods that can run on a node."
             }
         },
+        "micGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the node resource group. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
+        },
         "networkPlugin": {
             "type": "string",
             "allowedValues": [
@@ -139,6 +145,16 @@
             "metadata": {
                 "description": "Network policy used for building Kubernetes network."
             }
+        },
+        "nodeResourceGroup": {
+            "type": "string"
+        },
+        "omsRoleGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the subent. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
         },
         "omsSku": {
             "type": "string",
@@ -180,6 +196,13 @@
         "subnetName": {
             "type": "string"
         },
+        "subnetRoleGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the subent. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
+        },
         "tags": {
             "defaultValue": {
             },
@@ -191,6 +214,13 @@
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "vnet-cpd-pltf-dev-we-01"
+        },
+        "vmcGuidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the node resource group. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
         },
         "vmssNodePool": {
             "type": "bool",
@@ -239,6 +269,7 @@
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "enableRBAC": "[parameters('enableRBAC')]",
+                "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
                 "dnsPrefix": "[parameters('dnsPrefix')]",
                 "agentPoolProfiles": [
                     {
@@ -312,7 +343,7 @@
                                 "promotionCode": "",
                                 "publisher": "Microsoft"
                             },
-                            "tags": "[parameters('tags')]"      
+                            "tags": "[parameters('tags')]"
                         }
                     ]
                 }
@@ -341,8 +372,97 @@
                             "properties": {
                                 "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
                                 "principalType": "ServicePrincipal",
-                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]", // Contributor
                                 "scope": "[resourceId(parameters('acrResourceGroup'),'Microsoft.ContainerRegistry/registries/', parameters('acrName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[concat('DEP-', parameters('clusterName'), '-AKStoACST')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[resourceGroup().name]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-09-01-preview",
+                            "type": "Microsoft.AppConfiguration/configurationStores/providers/roleAssignments",
+                            "name": "[concat(parameters('configStoreName'), '/Microsoft.Authorization/', parameters('configStoreRoleGuidValue'))]",
+                            "properties": {
+                                "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')]", // App Configuration Data Reader
+                                "scope": "[resourceId(resourceGroup().name,'Microsoft.AppConfiguration/configurationStores/', parameters('configStoreName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[concat('DEP-', parameters('clusterName'), '-micagentpoolToNodeRG')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[parameters('nodeResourceGroup')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-09-01-preview",
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "name": "[parameters('micGuidValue')]",
+                            "properties": {
+                                "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'e40ec5ca-96e0-45a2-b4ff-59039f2c2b59')]",
+                                "roleDefinitionName": "Managed Identity Contributor",
+                                "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('nodeResourceGroup'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[concat('DEP-', parameters('clusterName'), '-vmcagentpoolToNodeRG')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[parameters('nodeResourceGroup')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-09-01-preview",
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "name": "[parameters('vmcGuidValue')]",
+                            "properties": {
+                                "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
+                                "roleDefinitionName": "Virtual Machine Contributor",
+                                "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourcegroups/', parameters('nodeResourceGroup'))]"
                             }
                         }
                     ]
