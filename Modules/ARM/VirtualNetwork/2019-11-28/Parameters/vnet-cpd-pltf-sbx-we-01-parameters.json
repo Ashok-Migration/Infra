@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cph-pltf-prd-we-01"
+        } ,
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.20.32.0/22"
+            ]
+        },
+        
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-cph-pltf-iacbl-prd-we-01",
+                    "addressPrefix": "172.20.32.0/26",
+                    "networkSecurityGroupName": "nsg-cph-pltf-iacbl-prd-we-01",
+                    "routeTableName": "route-cph-pltf-iacbl-prd-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName":"rg-cph-pltf-sec-prd-we-01",
+                    "routesRGName": "rg-cph-pltf-net-prd-we-01"
+                },
+                {
+                    "name": "snet-cph-pltf-mgmt-prd-we-01",
+                    "addressPrefix": "172.20.32.64/26",
+                    "networkSecurityGroupName": "nsg-cph-pltf-mgmt-prd-we-01",
+                    "routeTableName": "route-cph-pltf-mgmt-prd-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName":"rg-cph-pltf-sec-prd-we-01",
+                    "routesRGName": "rg-cph-pltf-net-prd-we-01"
+                },
+                {
+                    "name": "AzureFirewallSubnet",
+                    "addressPrefix": "172.20.32.128/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "nsgsRGName":"",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "AzureFirewallManagementSubnet",
+                    "addressPrefix": "172.20.32.192/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "nsgsRGName":"",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "AzureBastionSubnet",
+                    "addressPrefix": "172.20.33.0/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "nsgsRGName":"",
+                    "routesRGName": ""
+                }                
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+            }
+        }
+    }
+}
