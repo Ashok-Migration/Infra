@@ -134,7 +134,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-vnet-cph-pltf-prd-we-01-peering",
+            "name": "DEP-vnet-cph-pltf-prd-we-01-peering-01",
             "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
                 "DEP-vnet-cph-pltf-prd-we-01"
@@ -158,7 +158,7 @@
             "name": "DEP-azfw-cph-pltf-prd-we-01",
             "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
-                "DEP-vnet-cph-pltf-prd-we-01-peering"
+                "DEP-vnet-cph-pltf-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -191,6 +191,69 @@
                 },
                 "parametersLink": {
                     "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-mgmt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-vnet-cph-pltf-prd-we-01-peering-02",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+            "dependsOn": [
+                "DEP-vnet-cph-pltf-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-we-01-to-cpd-pltf-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-vnet-cph-mgmt-prd-we-01-peering-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+            "dependsOn": [
+                "DEP-vnet-cph-mgmt-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-mgmt-prd-we-01-to-cpd-pltf-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-vnet-cph-mgmt-prd-we-01-peering-02",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+            "dependsOn": [
+                "DEP-vnet-cph-mgmt-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-mgmt-prd-we-01-to-cpd-pltf-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
