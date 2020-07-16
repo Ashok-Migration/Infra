@@ -16,6 +16,13 @@
                 "description": "Optional. Location for all resources."
             }
         },
+        "subscriptionid": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]",
+            "metadata": {
+                "description": "Optional. Location for all resources."
+            }
+        },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_D2s_v3",
@@ -187,6 +194,7 @@
         },
         "subnetId": {
             "type": "string",
+            "defaultValue": "",
             "metadata": {
                 "description": "Required. Full qualified subnet Id"
             }
@@ -199,7 +207,7 @@
             }
         },
         "dnsServers": {
-            "type": "string",
+            "type": "array",
             "metadata": {
                 "description": "Optional. DNS Server IP addresses used for the VM on NIC level. If left empty, the VM will use Azure default DNS settings."
             }
@@ -456,6 +464,14 @@
             "metadata": {
                 "description": "Optional. Tags of the VM resource."
             }
+        },
+        "NetworkDetails": {
+            "type": "object",
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Network details of the VM resource."
+            }
         }
     },
     "variables": {
@@ -468,6 +484,10 @@
                 }
             ]
         },
+        "dnsServersValues": {
+            "dnsServers": "[parameters('dnsServers')]"
+        },        
+        "subnetid" : "[concat('/subscriptions/', parameters('subscriptionid'), '/resourceGroups/',parameters('NetworkDetails').vnetRG,'/providers/Microsoft.Network/virtualNetworks/',parameters('NetworkDetails').vnet, '/subnets/', parameters('NetworkDetails').subnet )]",
         "diagnosticsMetrics": [
             {
                 "category": "AllMetrics",
@@ -585,16 +605,14 @@
                             "publicIPAddress": "[if(not(parameters('enablePublicIP')), json('null'), json(concat('{\"id\":\"', resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNames')[copyIndex()], '-pip-', padLeft(copyIndex(1),2,'0'))),'\"}')))]",
                             "privateIPAddress": "[if(empty(parameters('vmIPAddress')), json('null'), vdc.nextIP(parameters('vmIPAddress'), copyIndex()))]",
                             "subnet": {
-                                "id": "[parameters('subnetId')]"
+                                "id": "[variables('subnetId')]"
                             },
                             "loadBalancerBackendAddressPools": "[if(empty(parameters('loadBalancerBackendPoolId')), json('null'), parameters('loadBalancerBackendPoolId'))]",
                             "applicationSecurityGroups": "[if(empty(parameters('applicationSecurityGroupId')), json('null'), parameters('applicationSecurityGroupId'))]"
                         }
                     }
                 ],
-                "dnsSettings": {
-                    "dnsServers": [ "[if(empty(parameters('dnsServers')), json('null'), parameters('dnsServers'))]" ]
-                }
+                "dnsSettings": "[if(equals(length(parameters('dnsServers')),0), json('null'), variables('dnsServersValues'))]"
             }
         },
         {
@@ -688,7 +706,14 @@
                 },
                 "storageProfile": {
                     "imageReference": "[if(not(empty(parameters('imageResourceId'))),parameters('imageResourceId'),parameters('standardImage'))]",
-                    "osDisk": "[parameters('osDisk')]",
+                    "osDisk": {
+                        "name": "[concat(parameters('vmNames')[copyIndex('vmLoop')], '-disk-os-01')]",
+                        "createOption": "[parameters('osDisk').createOption]",
+                        "diskSizeGB": "[parameters('osDisk').diskSizeGB]",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDisk').managedDisk.storageAccountType]"
+                        }
+                    },
                     "copy": [
                         {
                             "name": "dataDisks",
@@ -786,10 +811,10 @@
                         "typeHandlerVersion": "1.0",
                         "autoUpgradeMinorVersion": true,
                         "settings": {
-                            "workspaceId": "[reference(parameters('workspaceId'), '2015-11-01-preview').customerId]"
+                            "workspaceId": "[if(empty(parameters('workspaceId')), 'dummy', reference(parameters('workspaceId'), '2015-11-01-preview').customerId)]"
                         },
                         "protectedSettings": {
-                            "workspaceKey": "[listKeys(parameters('workspaceId'), '2015-11-01-preview').primarySharedKey]"
+                            "workspaceKey": "[if(empty(parameters('workspaceId')), 'dummy',listKeys(parameters('workspaceId'), '2015-11-01-preview').primarySharedKey)]"
                         }
                     }
                 },
@@ -808,10 +833,10 @@
                         "typeHandlerVersion": "1.7",
                         "autoUpgradeMinorVersion": true,
                         "settings": {
-                            "workspaceId": "[reference(parameters('workspaceId'), '2015-11-01-preview').customerId]"
+                            "workspaceId": "[if(empty(parameters('workspaceId')), 'dummy', reference(parameters('workspaceId'), '2015-11-01-preview').customerId)]"
                         },
                         "protectedSettings": {
-                            "workspaceKey": "[listKeys(parameters('workspaceId'), '2015-11-01-preview').primarySharedKey]"
+                            "workspaceKey": "[if(empty(parameters('workspaceId')), 'dummy', listKeys(parameters('workspaceId'), '2015-11-01-preview').primarySharedKey)]"
                         }
                     }
                 },
