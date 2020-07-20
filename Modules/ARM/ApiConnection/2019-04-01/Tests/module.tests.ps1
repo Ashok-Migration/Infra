@@ -87,8 +87,10 @@ Describe "Template: $template" -Tags Unit {
             'contentVersion',
 			'parameters' | Sort-Object
 			$templateFileProperties = (Get-Content (Join-Path "$here" "$ParameterFile") `
-				| ConvertFrom-Json -AsHashtable  -ErrorAction SilentlyContinue).Keys `
-				| Sort-Object
+				| ConvertFrom-Json -ErrorAction SilentlyContinue) `
+				| Get-Member -MemberType NoteProperty `
+				| Sort-Object -Property Name `
+				| ForEach-Object Name
             $templateFileProperties | Should Be $expectedProperties 
         }
     }
@@ -105,8 +107,9 @@ Describe "Template: $template" -Tags Unit {
 				| ForEach-Object Name
 			ForEach ( $Parameter in $Module.Parameters ) {
 				$allParametersInParametersFile = (Get-Content $Parameter `
-					| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-					| Sort-Object
+					| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+					| Sort-Object -Property Name `
+					| ForEach-Object Name
 				if ($requiredParametersInTemplateFile.Count -gt $allParametersInParametersFile.Count) {
 					Write-Host "Mismatch found, parameters from parameter file are more than the expected in the template"
 					Write-Host "Required parameters are: $(ConvertTo-Json $requiredParametersInTemplateFile)"
@@ -125,8 +128,9 @@ Describe "Template: $template" -Tags Unit {
 				| ForEach-Object Name
 			ForEach ( $Parameter in $Module.Parameters ) {
 				$allParametersInParametersFile = (Get-Content $Parameter `
-					| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-					| Sort-Object
+					| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+					| Sort-Object -Property Name `
+					| ForEach-Object Name
 				$result = @($allParametersInParametersFile| Where-Object {$allParametersInTemplateFile -notcontains $_});
 				if($result) {Write-Host "Invalid parameters: $(ConvertTo-Json $result)"}
 				@($allParametersInParametersFile| Where-Object {$allParametersInTemplateFile -notcontains $_}).Count | Should Be 0;
@@ -144,8 +148,9 @@ Describe "Template: $template" -Tags Unit {
 			ForEach ( $Parameter in $Module.Parameters ) {
 				
 				$allParametersInParametersFile = (Get-Content $Parameter `
-					| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-					| Sort-Object
+					| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+					| Sort-Object -Property Name `
+					| ForEach-Object Name
 				
 				$invalid = $requiredParametersInTemplateFile | Where-Object {$allParametersInParametersFile -notcontains $_}
 				if ($invalid.Count -gt 0) {

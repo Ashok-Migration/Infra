@@ -1,86 +1,107 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "workflowName": {
-            "type": "string",
-            "metadata": {
-                "description": "Required. Name of the workflow."
-            }
-        },
-        "workflowLocation": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "metadata": {
-                "description": "Optional. Location for all resources."
-            }
-        },
-        "workflowSchema": {
-            "type": "string",
-            "metadata": {
-                "description": "Required."
-            }
-        },
-        "logicAppState": {
-            "type": "string",
-            "defaultValue": "Enabled",
-            "metadata": {
-                "description": "Optional."
-            }
-        },
-        "definition": {
-            "type": "string",
-            "defaultValue": "[concat('{\"contentVersion\":\"1.0.0.0\",\"parameters\":{},\"actions\":{},\"triggers\":{},\"outputs\":{},\"$schema\":\"', parameters('workflowSchema'), '\"}')]",
-            "metadata": {
-                "description": "Optional."
-            }
-        },
-        "parameters": {
-            "type": "object",
-            "defaultValue": {},
-            "metadata": {
-                "description": "Optional."
-            }
-        },
-        "tags": {
-            "type": "object",
-            "defaultValue": {},
-            "metadata": {
-                "description": "Optional. Tags of the Logic App resource."
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Name of the workflow."
+      }
     },
-    "variables": {
-
+    "workflowLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Optional. Location for all resources."
+      }
     },
-    "resources": [
-        {
-            "apiVersion": "2016-10-01",
-            "name": "[parameters('workflowName')]",
-            "type": "Microsoft.Logic/workflows",
-            "location": "[parameters('workflowLocation')]",
-            "tags": "[parameters('tags')]",
-            "properties": {
-                "definition": "[json(parameters('definition'))]",
-                "parameters": "[parameters('parameters')]",
-                "state": "[parameters('logicAppState')]"
-            }
-        }
-    ],
-    "outputs": {
-        "LogicAppRegion": {
-            "type": "string",
-            "value": "[parameters('workflowLocation')]",
-            "metadata": {
-                "description": "The Region of the LogicApp."
-            }
-        },
-        "LogicAppResourceGroup": {
-            "type": "string",
-            "value": "[resourceGroup().name]",
-            "metadata": {
-                "description": "The name of the Resource Group the LogicApp was created in."
-            }
-        }
+    "workflowSchema": {
+      "type": "string",
+      "metadata": {
+        "description": "Required."
+      }
+    },
+    "workflowTriggers": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional."
+      }
+    },
+    "workflowActions": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional."
+      }
+    },
+    "workflowParameters": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional."
+      }
+    },
+    "logicAppState": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Optional."
+      }
+    },
+    "connectionParameters": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Tags of the Logic App resource."
+      }
     }
+  },
+  "variables": {
+
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-10-01",
+      "name": "[parameters('workflowName')]",
+      "type": "Microsoft.Logic/workflows",
+      "location": "[parameters('workflowLocation')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "definition": {
+          "contentVersion": "1.0.0.0",
+          "parameters": "[parameters('workflowParameters')]",
+          "actions": "[parameters('workflowActions')]",
+          "triggers": "[parameters('workflowTriggers')]",
+          "outputs": {},
+          "$schema": "[parameters('workflowSchema')]"
+        },
+        "parameters": "[parameters('connectionParameters')]",
+        "state": "[parameters('logicAppState')]"
+      }
+    }
+  ],
+  "outputs": {
+    "LogicAppRegion": {
+      "type": "string",
+      "value": "[parameters('workflowLocation')]",
+      "metadata": {
+        "description": "The Region of the LogicApp."
+      }
+    },
+    "LogicAppResourceGroup": {
+      "type": "string",
+      "value": "[resourceGroup().name]",
+      "metadata": {
+        "description": "The name of the Resource Group the LogicApp was created in."
+      }
+    }
+  }
 }

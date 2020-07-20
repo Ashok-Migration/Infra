@@ -1,0 +1,1 @@
+This template deploys an Azure API Connection instance.
