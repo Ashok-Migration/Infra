@@ -36,60 +36,26 @@
     },
     "workflowActions": {
       "value": {
-        "value": {
-          "Condition_4": {
-            "actions": {
-              "Condition": {
-                "actions": {
-                  "For_each_2": {
-                    "foreach": "@body('Parse_JSON_2')?['d']?['results']",
-                    "actions": {
-                      "Send_an_HTTP_request_to_SharePoint_2": {
-                        "runAfter": {},
-                        "type": "ApiConnection",
-                        "inputs": {
-                          "body": {
-                            "body": "{'__metadata':{'type':'SP.Data.ProductsListItem'},'Title':'@{variables('EnglishTitle')}', 'arProductName':'@{variables('ArabicTitle')}', 'arProductShortDescription':'@{variables('ArabicShortDescription')}', 'ProductLongDescription':'@{variables('EnglishLongDescription')}','arProductLongDescription':'@{variables('ArabicLongDescription')}','ProductShortDescription':'@{variables('EnglishShortDescription')}', 'ProductReferenceURL':{'__metadata':{'type':'SP.FieldUrlValue'},'Description':'@{variables('RefrenceURL')}','Url':'@{variables('RefrenceURL')}'}}",
-                            "headers": {
-                              "IF-MATCH": "*",
-                              "X-HTTP-Method": "MERGE",
-                              "content-Type": "application/json;odata=verbose"
-                            },
-                            "method": "POST",
-                            "uri": "_api/web/lists/getbytitle('Products')/items(@{items('For_each_2')?['ID']})"
-                          },
-                          "host": {
-                            "connection": {
-                              "name": "@parameters('$connections')['apicon-cpd-apps-spo-tst-we-01']['connectionId']"
-                            }
-                          },
-                          "method": "post",
-                          "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointUrl')))}/httprequest"
-                        }
-                      }
-                    },
-                    "runAfter": {},
-                    "type": "Foreach"
-                  }
-                },
-                "runAfter": {
-                  "Parse_JSON_2": [
-                    "Succeeded"
-                  ]
-                },
-                "else": {
+        "Condition_4": {
+          "actions": {
+            "Condition": {
+              "actions": {
+                "For_each_2": {
+                  "foreach": "@body('Parse_JSON_2')?['d']?['results']",
                   "actions": {
-                    "Send_an_HTTP_request_to_SharePoint_3": {
+                    "Send_an_HTTP_request_to_SharePoint_2": {
                       "runAfter": {},
                       "type": "ApiConnection",
                       "inputs": {
                         "body": {
-                          "body": "{'__metadata':{'type':'SP.Data.ProductsListItem'},'ProductId':'@{variables('ProductID')}','Title':'@{variables('EnglishTitle')}', 'arProductName':'@{variables('ArabicTitle')}', 'arProductShortDescription':'@{variables('ArabicShortDescription')}', 'ProductLongDescription':'@{variables('EnglishLongDescription')}','arProductLongDescription':'@{variables('ArabicLongDescription')}','ProductShortDescription':'@{variables('EnglishShortDescription')}','ProductReferenceURL':{'__metadata':{'type':'SP.FieldUrlValue'},'Description':'@{variables('RefrenceURL')}','Url':'@{variables('RefrenceURL')}'}}",
+                          "body": "{'__metadata':{'type':'SP.Data.ProductsListItem'},'Title':'@{variables('EnglishTitle')}', 'arProductName':'@{variables('ArabicTitle')}', 'arProductShortDescription':'@{variables('ArabicShortDescription')}', 'ProductLongDescription':'@{variables('EnglishLongDescription')}','arProductLongDescription':'@{variables('ArabicLongDescription')}','ProductShortDescription':'@{variables('EnglishShortDescription')}', 'ProductReferenceURL':{'__metadata':{'type':'SP.FieldUrlValue'},'Description':'@{variables('RefrenceURL')}','Url':'@{variables('RefrenceURL')}'}}",
                           "headers": {
+                            "IF-MATCH": "*",
+                            "X-HTTP-Method": "MERGE",
                             "content-Type": "application/json;odata=verbose"
                           },
                           "method": "POST",
-                          "uri": "_api/web/lists/getbytitle('Products')/items"
+                          "uri": "_api/web/lists/getbytitle('Products')/items(@{items('For_each_2')?['ID']})"
                         },
                         "host": {
                           "connection": {
@@ -100,455 +66,487 @@
                         "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointUrl')))}/httprequest"
                       }
                     }
-                  }
-                },
-                "expression": {
-                  "and": [
-                    {
-                      "greater": [
-                        "@length(body('Parse_JSON_2')?['d']?['results'])",
-                        0
-                      ]
-                    }
-                  ]
-                },
-                "type": "If"
+                  },
+                  "runAfter": {},
+                  "type": "Foreach"
+                }
               },
-              "For_each": {
-                "foreach": "@body('Parse_JSON')?['Name']",
+              "runAfter": {
+                "Parse_JSON_2": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
                 "actions": {
-                  "Condition_2": {
+                  "Send_an_HTTP_request_to_SharePoint_3": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                      "body": {
+                        "body": "{'__metadata':{'type':'SP.Data.ProductsListItem'},'ProductId':'@{variables('ProductID')}','Title':'@{variables('EnglishTitle')}', 'arProductName':'@{variables('ArabicTitle')}', 'arProductShortDescription':'@{variables('ArabicShortDescription')}', 'ProductLongDescription':'@{variables('EnglishLongDescription')}','arProductLongDescription':'@{variables('ArabicLongDescription')}','ProductShortDescription':'@{variables('EnglishShortDescription')}','ProductReferenceURL':{'__metadata':{'type':'SP.FieldUrlValue'},'Description':'@{variables('RefrenceURL')}','Url':'@{variables('RefrenceURL')}'}}",
+                        "headers": {
+                          "content-Type": "application/json;odata=verbose"
+                        },
+                        "method": "POST",
+                        "uri": "_api/web/lists/getbytitle('Products')/items"
+                      },
+                      "host": {
+                        "connection": {
+                          "name": "@parameters('$connections')['apicon-cpd-apps-spo-tst-we-01']['connectionId']"
+                        }
+                      },
+                      "method": "post",
+                      "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointUrl')))}/httprequest"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "greater": [
+                      "@length(body('Parse_JSON_2')?['d']?['results'])",
+                      0
+                    ]
+                  }
+                ]
+              },
+              "type": "If"
+            },
+            "For_each": {
+              "foreach": "@body('Parse_JSON')?['Name']",
+              "actions": {
+                "Condition_2": {
+                  "actions": {
+                    "Set_variable": {
+                      "runAfter": {},
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "ArabicTitle",
+                        "value": "@{items('For_each')?['Value']}"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
                     "actions": {
-                      "Set_variable": {
+                      "Set_variable_2": {
                         "runAfter": {},
                         "type": "SetVariable",
                         "inputs": {
-                          "name": "ArabicTitle",
+                          "name": "EnglishTitle",
                           "value": "@{items('For_each')?['Value']}"
                         }
                       }
-                    },
-                    "runAfter": {},
-                    "else": {
-                      "actions": {
-                        "Set_variable_2": {
-                          "runAfter": {},
-                          "type": "SetVariable",
-                          "inputs": {
-                            "name": "EnglishTitle",
-                            "value": "@{items('For_each')?['Value']}"
-                          }
-                        }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@items('For_each')?['LanguageCodeIso']",
+                          "ara"
+                        ]
                       }
-                    },
-                    "expression": {
-                      "and": [
-                        {
-                          "equals": [
-                            "@items('For_each')?['LanguageCodeIso']",
-                            "ara"
-                          ]
-                        }
-                      ]
-                    },
-                    "type": "If"
-                  }
-                },
-                "runAfter": {},
-                "type": "Foreach"
+                    ]
+                  },
+                  "type": "If"
+                }
               },
-              "For_each_3": {
-                "foreach": "@body('Parse_JSON')?['LongDescription']",
-                "actions": {
-                  "Condition_3": {
+              "runAfter": {},
+              "type": "Foreach"
+            },
+            "For_each_3": {
+              "foreach": "@body('Parse_JSON')?['LongDescription']",
+              "actions": {
+                "Condition_3": {
+                  "actions": {
+                    "Set_variable_7": {
+                      "runAfter": {},
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "ArabicLongDescription",
+                        "value": "@items('For_each_3')?['Value']"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
                     "actions": {
-                      "Set_variable_7": {
+                      "Set_variable_8": {
                         "runAfter": {},
                         "type": "SetVariable",
                         "inputs": {
-                          "name": "ArabicLongDescription",
+                          "name": "EnglishLongDescription",
                           "value": "@items('For_each_3')?['Value']"
                         }
                       }
-                    },
-                    "runAfter": {},
-                    "else": {
-                      "actions": {
-                        "Set_variable_8": {
-                          "runAfter": {},
-                          "type": "SetVariable",
-                          "inputs": {
-                            "name": "EnglishLongDescription",
-                            "value": "@items('For_each_3')?['Value']"
-                          }
-                        }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@items('For_each_3')?['LanguageCodeIso']",
+                          "ara"
+                        ]
                       }
-                    },
-                    "expression": {
-                      "and": [
-                        {
-                          "equals": [
-                            "@items('For_each_3')?['LanguageCodeIso']",
-                            "ara"
-                          ]
-                        }
-                      ]
-                    },
-                    "type": "If"
-                  }
-                },
-                "runAfter": {
-                  "For_each": [
-                    "Succeeded"
-                  ]
-                },
-                "type": "Foreach"
+                    ]
+                  },
+                  "type": "If"
+                }
               },
-              "For_each_4": {
-                "foreach": "@body('Parse_JSON')?['ShortDescription']",
-                "actions": {
-                  "Condition_5": {
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            },
+            "For_each_4": {
+              "foreach": "@body('Parse_JSON')?['ShortDescription']",
+              "actions": {
+                "Condition_5": {
+                  "actions": {
+                    "Set_variable_5": {
+                      "runAfter": {},
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "ArabicShortDescription",
+                        "value": "@items('For_each_4')?['Value']"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
                     "actions": {
-                      "Set_variable_5": {
+                      "Set_variable_6": {
                         "runAfter": {},
                         "type": "SetVariable",
                         "inputs": {
-                          "name": "ArabicShortDescription",
+                          "name": "EnglishShortDescription",
                           "value": "@items('For_each_4')?['Value']"
                         }
                       }
-                    },
-                    "runAfter": {},
-                    "else": {
-                      "actions": {
-                        "Set_variable_6": {
-                          "runAfter": {},
-                          "type": "SetVariable",
-                          "inputs": {
-                            "name": "EnglishShortDescription",
-                            "value": "@items('For_each_4')?['Value']"
-                          }
-                        }
-                      }
-                    },
-                    "expression": {
-                      "and": [
-                        {
-                          "equals": [
-                            "@items('For_each_4')?['LanguageCodeIso']",
-                            "ara"
-                          ]
-                        }
-                      ]
-                    },
-                    "type": "If"
-                  }
-                },
-                "runAfter": {
-                  "For_each_3": [
-                    "Succeeded"
-                  ]
-                },
-                "type": "Foreach"
-              },
-              "Parse_JSON_2": {
-                "runAfter": {
-                  "Send_an_HTTP_request_to_SharePoint": [
-                    "Succeeded"
-                  ]
-                },
-                "type": "ParseJson",
-                "inputs": {
-                  "content": "@body('Send_an_HTTP_request_to_SharePoint')",
-                  "schema": {
-                    "properties": {
-                      "d": {
-                        "properties": {
-                          "results": {
-                            "items": {
-                              "properties": {
-                                "ID": {
-                                  "type": "integer"
-                                },
-                                "Id": {
-                                  "type": "integer"
-                                },
-                                "__metadata": {
-                                  "properties": {
-                                    "etag": {
-                                      "type": "string"
-                                    },
-                                    "id": {
-                                      "type": "string"
-                                    },
-                                    "type": {
-                                      "type": "string"
-                                    },
-                                    "uri": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "type": "object"
-                                }
-                              },
-                              "required": [
-                                "__metadata",
-                                "Id",
-                                "ID"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          }
-                        },
-                        "type": "object"
-                      }
-                    },
-                    "type": "object"
-                  }
-                }
-              },
-              "Send_an_HTTP_request_to_SharePoint": {
-                "runAfter": {
-                  "For_each_4": [
-                    "Succeeded"
-                  ]
-                },
-                "type": "ApiConnection",
-                "inputs": {
-                  "body": {
-                    "method": "GET",
-                    "uri": "_api/web/lists/getbytitle('Products')/items?$Select=ID&$Filter=ProductId eq '@{body('Parse_JSON')?['Id']}'"
-                  },
-                  "host": {
-                    "connection": {
-                      "name": "@parameters('$connections')['apicon-cpd-apps-spo-tst-we-01']['connectionId']"
                     }
                   },
-                  "method": "post",
-                  "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointUrl')))}/httprequest"
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@items('For_each_4')?['LanguageCodeIso']",
+                          "ara"
+                        ]
+                      }
+                    ]
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "For_each_3": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            },
+            "Parse_JSON_2": {
+              "runAfter": {
+                "Send_an_HTTP_request_to_SharePoint": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('Send_an_HTTP_request_to_SharePoint')",
+                "schema": {
+                  "properties": {
+                    "d": {
+                      "properties": {
+                        "results": {
+                          "items": {
+                            "properties": {
+                              "ID": {
+                                "type": "integer"
+                              },
+                              "Id": {
+                                "type": "integer"
+                              },
+                              "__metadata": {
+                                "properties": {
+                                  "etag": {
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "type": {
+                                    "type": "string"
+                                  },
+                                  "uri": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "__metadata",
+                              "Id",
+                              "ID"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
                 }
               }
             },
-            "runAfter": {
-              "Initialize_variable_6": [
-                "Succeeded"
-              ]
-            },
-            "expression": {
-              "and": [
-                {
-                  "not": {
-                    "equals": [
-                      "@variables('ProductID')",
-                      "@''"
-                    ]
-                  }
-                }
-              ]
-            },
-            "type": "If"
-          },
-          "Initialize_variable": {
-            "runAfter": {
-              "Initialize_variable_8": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "ArabicTitle",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_2": {
-            "runAfter": {
-              "Initialize_variable": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "EnglishTitle",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_3": {
-            "runAfter": {
-              "Initialize_variable_2": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "ArabicShortDescription",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_4": {
-            "runAfter": {
-              "Initialize_variable_3": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "EnglishShortDescription",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_5": {
-            "runAfter": {
-              "Initialize_variable_4": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "EnglishLongDescription",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_6": {
-            "runAfter": {
-              "Initialize_variable_5": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "ArabicLongDescription",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_7": {
-            "runAfter": {
-              "Parse_JSON": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "ProductID",
-                  "type": "string",
-                  "value": "@body('Parse_JSON')?['Id']"
-                }
-              ]
-            }
-          },
-          "Initialize_variable_8": {
-            "runAfter": {
-              "Initialize_variable_7": [
-                "Succeeded"
-              ]
-            },
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "RefrenceURL",
-                  "type": "string",
-                  "value": "@body('Parse_JSON')?['InternalUrl']"
-                }
-              ]
-            }
-          },
-          "Parse_JSON": {
-            "runAfter": {},
-            "type": "ParseJson",
-            "inputs": {
-              "content": "@json(base64ToString(triggerBody()?['ContentData']))",
-              "schema": {
-                "properties": {
-                  "Id": {
-                    "type": "string"
-                  },
-                  "InternalUrl": {
-                    "type": "string"
-                  },
-                  "LongDescription": {
-                    "items": {
-                      "properties": {
-                        "LanguageCodeIso": {
-                          "type": "string"
-                        },
-                        "Value": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "LanguageCodeIso",
-                        "Value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  "Name": {
-                    "items": {
-                      "properties": {
-                        "LanguageCodeIso": {
-                          "type": "string"
-                        },
-                        "Value": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "LanguageCodeIso",
-                        "Value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  "ShortDescription": {
-                    "items": {
-                      "properties": {
-                        "LanguageCodeIso": {
-                          "type": "string"
-                        },
-                        "Value": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "LanguageCodeIso",
-                        "Value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
+            "Send_an_HTTP_request_to_SharePoint": {
+              "runAfter": {
+                "For_each_4": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "body": {
+                  "method": "GET",
+                  "uri": "_api/web/lists/getbytitle('Products')/items?$Select=ID&$Filter=ProductId eq '@{body('Parse_JSON')?['Id']}'"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-spo-tst-we-01']['connectionId']"
                   }
                 },
-                "type": "object"
+                "method": "post",
+                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointUrl')))}/httprequest"
               }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_6": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "and": [
+              {
+                "not": {
+                  "equals": [
+                    "@variables('ProductID')",
+                    "@''"
+                  ]
+                }
+              }
+            ]
+          },
+          "type": "If"
+        },
+        "Initialize_variable": {
+          "runAfter": {
+            "Initialize_variable_8": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ArabicTitle",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_2": {
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "EnglishTitle",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_3": {
+          "runAfter": {
+            "Initialize_variable_2": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ArabicShortDescription",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_4": {
+          "runAfter": {
+            "Initialize_variable_3": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "EnglishShortDescription",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_5": {
+          "runAfter": {
+            "Initialize_variable_4": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "EnglishLongDescription",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_6": {
+          "runAfter": {
+            "Initialize_variable_5": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ArabicLongDescription",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_7": {
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ProductID",
+                "type": "string",
+                "value": "@body('Parse_JSON')?['Id']"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_8": {
+          "runAfter": {
+            "Initialize_variable_7": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "RefrenceURL",
+                "type": "string",
+                "value": "@body('Parse_JSON')?['InternalUrl']"
+              }
+            ]
+          }
+        },
+        "Parse_JSON": {
+          "runAfter": {},
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@json(base64ToString(triggerBody()?['ContentData']))",
+            "schema": {
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "InternalUrl": {
+                  "type": "string"
+                },
+                "LongDescription": {
+                  "items": {
+                    "properties": {
+                      "LanguageCodeIso": {
+                        "type": "string"
+                      },
+                      "Value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "LanguageCodeIso",
+                      "Value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "Name": {
+                  "items": {
+                    "properties": {
+                      "LanguageCodeIso": {
+                        "type": "string"
+                      },
+                      "Value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "LanguageCodeIso",
+                      "Value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "ShortDescription": {
+                  "items": {
+                    "properties": {
+                      "LanguageCodeIso": {
+                        "type": "string"
+                      },
+                      "Value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "LanguageCodeIso",
+                      "Value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
             }
           }
         }
