@@ -1,0 +1,87 @@
+name: $(resourceGroupName)
+
+variables:
+- name: PoolName
+  value: "tasmumsagents"
+- name: templateFilePath
+  value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-mgmt-cctr-npd-we-01/deploy.json
+- name: parameterFilePath
+  value: 
+- name: location
+  value: westeurope
+- name: resourceGroupName
+  value: rg-cph-mgmt-cctr-npd-we-01
+- name: serviceConnection
+  value: sqcp-ado-spn-hub
+
+trigger: none
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#      - master
+#  paths:
+#    include:
+#    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
+
+stages:
+
+- stage: Validate
+  jobs:
+  - job: ValidateTemplate
+    displayName: Validate Template
+    pool:
+      name: $(PoolName)
+    steps:
+      - task: AzurePowerShell@4
+        displayName: Validate template on $(resourceGroupName)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          ScriptType: InlineScript
+          inline: |
+               = 
+
+               = "$(location)" -replace " ",""
+
+               = @{
+                Location              = "$Location"
+                TemplateFile          = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                # TemplateParameterFile = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                Verbose               = True
+                OutVariable           = "ValidationErrors"
+              }
+              
+              Test-AzDeployment @DeploymentInputs
+
+              if ()
+              {
+                Write-Error "Template is not valid."
+              }
+          azurePowerShellVersion: LatestVersion
+
+- stage: DeployTemplate
+  jobs:
+  - job: DeployTemplate
+    displayName: Deploy Template
+    pool:
+      name: $(PoolName)
+    steps:
+      - task: AzurePowerShell@4
+        displayName: Deploy template on $(resourceGroupName)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          ScriptType: InlineScript
+          inline: |
+               = "$(location)" -replace " ",""
+              
+               = @{
+                Name                    = "$(resourceGroupName)-master"
+                Location                = ""
+                TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                DeploymentDebugLogLevel = "All"
+                Verbose                 = True
+                ErrorAction             = "Stop"
+              }
+              New-AzDeployment @DeploymentInputs
+          azurePowerShellVersion: LatestVersion

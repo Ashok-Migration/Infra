@@ -1,0 +1,97 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNames": {
+            "value": ["jmp6dnpdwe01"]
+        },
+        "vmSize" :{
+            "value": "Standard_B4ms"
+        },
+        "standardImage": {
+            "value": {
+                "publisher": "MicrosoftWindowsServer",
+                "offer": "WindowsServer",
+                "sku": "2019-Datacenter",
+                "version": "latest"
+            }
+        },
+        "osDisk": {
+            "value": {
+                "createOption": "fromImage",
+                "diskSizeGB": "128",
+            "managedDisk": {
+            "storageAccountType": "Standard_LRS"
+        }
+            }
+        },
+        "dataDisks": {
+            "value": [{
+                "caching": "ReadOnly",
+                "createOption": "Empty",
+                "diskSizeGB": "64",
+                "managedDisk": {
+                    "storageAccountType": "Standard_LRS"
+                }
+            }]
+        },
+        "NetworkDetails": {
+            "value": {
+                "vnetRG": "rg-cph-mgmt-net-prd-we-01",
+                "vnet": "vnet-cph-mgmt-prd-we-01",
+                "subnet": "snet-cph-mgmt-6d-npd-we-01"
+            }
+        },
+        "adminUsername": {
+            "value": "tasmuadmin"
+        },
+        "adminPassword": {
+            "value": "T@smu@123"
+        },
+        "availabilitySetName" : {
+            "value" : ""
+        },
+        "vmIPAddress": {
+            "value": ""
+        },
+        "dnsServers": {
+            "value":  [ 
+
+            ]
+        },
+        "useAvailabilityZone": {
+            "value": false
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "enableBootDiagnostics": {
+            "value": true
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "a3fcffaf-dfd6-47d3-a780-f6dc403f6571"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+            }
+        },
+        "enablePublicIP": {
+            "value": false
+        },
+        "enableIPForwarding": {
+            "value": true
+        }
+    }
+}
