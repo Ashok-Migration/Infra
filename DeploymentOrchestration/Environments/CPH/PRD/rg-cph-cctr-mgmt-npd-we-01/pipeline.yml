@@ -23,7 +23,6 @@ trigger: none
 #  paths:
 #    include:
 #    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
-
 stages:
 
 - stage: Validate
@@ -43,17 +42,17 @@ stages:
 
               $Location = "$(location)" -replace " ",""
 
-               = @{
+              $DeploymentInputs = @{
                 Location              = "$Location"
                 TemplateFile          = "$(Build.Repository.LocalPath)/$(templateFilePath)"
                 # TemplateParameterFile = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
-                Verbose               = True
+                Verbose               = $true
                 OutVariable           = "ValidationErrors"
               }
               
               Test-AzDeployment @DeploymentInputs
 
-              if ()
+              if ($ValidationErrors)
               {
                 Write-Error "Template is not valid."
               }
@@ -80,7 +79,7 @@ stages:
                 TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
                 # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
                 DeploymentDebugLogLevel = "All"
-                Verbose                 = True
+                Verbose                 = $true
                 ErrorAction             = "Stop"
               }
               New-AzDeployment @DeploymentInputs
