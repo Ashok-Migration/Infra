@@ -372,8 +372,8 @@
                             "properties": {
                                 "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
                                 "principalType": "ServicePrincipal",
-                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-                                "roleDefinitionName": "Contributor",
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
+                                "roleDefinitionName": "AcrPull",
                                 "scope": "[resourceId(parameters('acrResourceGroup'),'Microsoft.ContainerRegistry/registries/', parameters('acrName'))]"
                             }
                         }
@@ -540,5 +540,6 @@
             "type": "string",
             "value": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))).privateFQDN]"
         }
-    }
+    },
+    "functions": []
 }

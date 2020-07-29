@@ -1,82 +1,81 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "lbName": {
-        "type": "string",
-        "defaultValue": "myLB",
-        "metadata": {
-          "description": "Load Balancer name"
-        }
-      },
-      "lbfrontSubnetName": {
-        "type": "string",
-        "defaultValue": "sxx-wd-subnet-weu-x-005",
-        "metadata": {
-          "description": "cloud perimeter subnet for the LB front"
-        }
-      },
-      "lbIPAddress": {
-        "type": "string",
-        "defaultValue": "0.0.0.0",
-        "metadata": {
-          "description": "LB Front IP Addr"
-        }
-      },
-      "vnetName": {
-        "type": "string"
-      },
-      "parentResourceGroup":
-      {
-        "type": "string"
-      },
-      "tags": {
-            "type": "object",
-            "defaultValue": {
-            },
-            "metadata": {
-                "description": "Optional. Resource tags."
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "lbName": {
+      "type": "string",
+      "defaultValue": "myLB",
+      "metadata": {
+        "description": "Load Balancer name"
+      }
     },
-    "variables": {
-      "location": "[resourceGroup().location]",
-      "backendpoolName": "nva_internal_backendpool_01",
-      "vnetId": "[resourceId(parameters('parentResourceGroup'), 'Microsoft.Network/virtualNetworks',parameters('vnetName'))]", 
-      "lbfrontSubnetId": "[concat(variables('vnetId'), '/subnets/', parameters('lbfrontSubnetName'))]",
-      "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
-      "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
-      "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('backendpoolName'))]",
-      "lbProbeID": "[concat(variables('lbID'),'/probes/tcpProbe')]"
+    "lbfrontSubnetName": {
+      "type": "string",
+      "defaultValue": "sxx-wd-subnet-weu-x-005",
+      "metadata": {
+        "description": "cloud perimeter subnet for the LB front"
+      }
     },
-    "resources": [
+    "lbIPAddress": {
+      "type": "string",
+      "defaultValue": "0.0.0.0",
+      "metadata": {
+        "description": "LB Front IP Addr"
+      }
+    },
+    "vnetName": {
+      "type": "string"
+    },
+    "parentResourceGroup": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Resource tags."
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "backendpoolName": "nva_internal_backendpool_01",
+    "vnetId": "[resourceId(parameters('parentResourceGroup'), 'Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+    "lbfrontSubnetId": "[concat(variables('vnetId'), '/subnets/', parameters('lbfrontSubnetName'))]",
+    "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
+    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
+    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('backendpoolName'))]",
+    "lbProbeID": "[concat(variables('lbID'),'/probes/tcpProbe')]"
+  },
+  "resources": [
     {
-        "type":"Microsoft.Network/loadBalancers",
-        "apiVersion":"2019-11-01",
-        "name": "[parameters('lbName')]",
-        "location": "[variables('location')]",
-        "tags": "[parameters('tags')]",
-        "sku": {"name":"Standard"},
-        "properties":{
-          "frontendIPConfigurations":[
-                    {
-                        "name": "LoadBalancerFrontEnd",
-                        "properties": {
-                            "privateIPAddress": "[parameters('lbIPAddress')]",
-                            "privateIPAllocationMethod": "Static",
-                            "subnet": {
-                                "id": "[variables('lbfrontSubnetId')]"
-                            },
-                            "privateIPAddressVersion": "IPv4"
-                        }
-                    }
-          ],
-          "backendAddressPools": [
-            {
-              "name": "[variables('backendpoolName')]"
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2019-11-01",
+      "name": "[parameters('lbName')]",
+      "location": "[variables('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": { "name": "Standard" },
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "privateIPAddress": "[parameters('lbIPAddress')]",
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('lbfrontSubnetId')]"
+              },
+              "privateIPAddressVersion": "IPv4"
             }
-          ],
-          "loadBalancingRules": [
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('backendpoolName')]"
+          }
+        ],
+        "loadBalancingRules": [
           {
             "name": "LBRule",
             "properties": {
@@ -108,10 +107,11 @@
             }
           }
         ]
-        }
       }
-
-    ],
-    "outputs": {
     }
-  }
+
+  ],
+  "outputs": {
+  },
+  "functions": []
+}
