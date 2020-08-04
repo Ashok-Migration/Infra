@@ -68,12 +68,33 @@
       }
     },
     {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-aut-cpd-data-mon-dev-we-01",
+            "resourceGroup": "rg-cpd-data-mon-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-data-mon-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/Parameters/aut-cpd-data-mon-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
       "name": "DEP-log-cph-pltf-prd-we-01",
       "resourceGroup": "rg-cpd-data-mon-dev-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-mon-dev-we-01"
+        "DEP-aut-cpd-data-mon-dev-we-01"
       ],
       "properties": {
         "mode": "Incremental",
