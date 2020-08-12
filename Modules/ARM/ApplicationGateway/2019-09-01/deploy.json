@@ -70,6 +70,9 @@
         "description": "Optional. Resource tags."
       },
       "type": "object"
+    },
+    "privateIPAddress":{
+      "type": "string"
     }
   },
   "variables": {
@@ -106,12 +109,22 @@
         ],
         "frontendIPConfigurations": [
           {
-            "name": "appGwPublicFrontendIp",
+            "name": "[concat(parameters('applicationGatewayNamee'), '-publicip')]",
             "properties": {
               "PublicIPAddress": {
                 "id": "[variables('publicIPRef')]"
               }
             }
+          },
+          {
+              "name": "[concat(parameters('applicationGatewayName'), '-privateip')]",
+              "properties": {
+                  "privateIPAddress": "[parameters('privateIPAddress')]",
+                  "privateIPAllocationMethod": "Static",
+                  "subnet": {
+                      "id": "[variables('subnetRef')]"
+                  }
+              }
           }
         ],
         "frontendPorts": [
@@ -147,7 +160,7 @@
             "name": "[parameters('httpListenerName')]",
             "properties": {
               "frontendIPConfiguration": {
-                "id": "[concat(variables('applicationGatewayId'), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
+                "id": "[concat(variables('applicationGatewayId'), '/frontendIPConfigurations/',parameters('applicationGatewayName'), '-privateip')]"
               },
               "frontendPort": {
                 "id": "[concat(variables('applicationGatewayId'), '/frontendPorts/port_80')]"

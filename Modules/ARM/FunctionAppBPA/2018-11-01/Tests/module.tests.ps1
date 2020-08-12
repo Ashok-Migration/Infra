@@ -85,8 +85,10 @@ Describe "Template: $(Split-Path $($(Get-Item $PSScriptRoot).Parent.FullName) -L
 			'contentVersion',
 			'parameters' | Sort-Object
 			$templateFileProperties = (Get-Content (Join-Path -Path $($(Get-Item $PSScriptRoot).Parent.FullName) -ChildPath $ParameterFilePath -AdditionalChildPath $ParameterFileName) `
-			| ConvertFrom-Json -AsHashtable  -ErrorAction SilentlyContinue).Keys `
-			| Sort-Object
+				| ConvertFrom-Json -ErrorAction SilentlyContinue) `
+				| Get-Member -MemberType NoteProperty `
+				| Sort-Object -Property Name `
+				| ForEach-Object Name
 			$templateFileProperties | Should -Be $ExpectedProperties
 		}
 	}
@@ -102,8 +104,9 @@ Describe "Template: $(Split-Path $($(Get-Item $PSScriptRoot).Parent.FullName) -L
 				| Sort-Object -Property Name `
 				| ForEach-Object Name
 			$allParametersInParametersFile = (Get-Content (Join-Path -Path $($(Get-Item $PSScriptRoot).Parent.FullName) -ChildPath $ParameterFilePath -AdditionalChildPath $ParameterFileName) `
-			| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-			| Sort-Object
+				| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+				| Sort-Object -Property Name `
+				| ForEach-Object Name
 			if ($requiredParametersInTemplateFile.Count -gt $allParametersInParametersFile.Count) {
 				Write-Host "   [-] Required parameters are: $requiredParametersInTemplateFile"
 				$requiredParametersInTemplateFile.Count | Should -Not -BeGreaterThan $allParametersInParametersFile.Count
@@ -118,8 +121,9 @@ Describe "Template: $(Split-Path $($(Get-Item $PSScriptRoot).Parent.FullName) -L
 				| Sort-Object -Property Name `
 				| ForEach-Object Name
 			$allParametersInParametersFile = (Get-Content (Join-Path -Path $($(Get-Item $PSScriptRoot).Parent.FullName) -ChildPath $ParameterFilePath -AdditionalChildPath $ParameterFileName) `
-			| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-			| Sort-Object
+				| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+				| Sort-Object -Property Name `
+				| ForEach-Object Name
 			$result = @($allParametersInParametersFile | Where-Object { $allParametersInTemplateFile -notcontains $_ })
 			if ($result) { 
 				Write-Host "   [-] Following parameter does not exist: $result"
@@ -136,8 +140,9 @@ Describe "Template: $(Split-Path $($(Get-Item $PSScriptRoot).Parent.FullName) -L
 				| Sort-Object -Property Name `
 				| ForEach-Object Name
 			$allParametersInParametersFile = (Get-Content (Join-Path -Path $($(Get-Item $PSScriptRoot).Parent.FullName) -ChildPath $ParameterFilePath -AdditionalChildPath $ParameterFileName) `
-			| ConvertFrom-Json -AsHashtable -ErrorAction SilentlyContinue).parameters.Keys `
-			| Sort-Object
+				| ConvertFrom-Json -ErrorAction SilentlyContinue).Parameters.PSObject.Properties `
+				| Sort-Object -Property Name `
+				| ForEach-Object Name
 			$result = $requiredParametersInTemplateFile | Where-Object { $allParametersInParametersFile -notcontains $_ }
 			if ($result.Count -gt 0) {
 				Write-Host "   [-] Required parameters: $result"

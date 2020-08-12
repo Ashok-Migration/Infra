@@ -5,6 +5,9 @@
         "alwaysOn": {
             "type": "bool"
         },
+        "appConfigEndpoint": {
+            "type": "string"
+        },
         "appInsightsName": {
             "type": "string"
         },
@@ -19,6 +22,9 @@
             "metadata": {
                 "description": "Location for all resources."
             },
+            "type": "string"
+        },
+        "serviceBusSecretUri": {
             "type": "string"
         },
         "storageAccountName": {
@@ -54,12 +60,8 @@
                 "siteConfig": {
                     "appSettings": [
                         {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "dotnet"
+                            "name": "AppConfig",
+                            "value": "[parameters('appConfigEndpoint')]"
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -70,8 +72,40 @@
                             "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').ConnectionString]"
                         },
                         {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "NotificationQueue",
+                            "value": "notification"
+                        },
+                        {
+                            "name": "ServiceBusConnectionString",
+                            "value": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('serviceBusSecretUri'),')')]"
+                        },
+                        {
+                            "name": "TimeInterval",
+                            "value": "0 */30 * * * *"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(parameters('functionAppName'))]"
                         }
                     ],
                     "alwaysOn": "[parameters('alwaysOn')]"
