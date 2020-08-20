@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-bpm-mgmt-npd-we-01",
+            "name": "DEP-rg-cph-mgmt-itsm-npd-we-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -46,7 +46,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-bpm-mgmt-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-mgmt-itsm-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -54,9 +54,9 @@
             "apiVersion": "2019-08-01",
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-cph-bpm-mgmt-npd-we-01",
+            "resourceGroup": "rg-cph-mgmt-itsm-npd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-bpm-mgmt-npd-we-01"
+                "DEP-rg-cph-mgmt-itsm-npd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -70,10 +70,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-jmpbpmnpdwe01",
-            "resourceGroup": "rg-cph-bpm-mgmt-npd-we-01",
+            "name": "DEP-jmpitsmnpdwe01",
+            "resourceGroup": "rg-cph-mgmt-itsm-npd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-bpm-mgmt-npd-we-01"
+                "DEP-rg-cph-mgmt-itsm-npd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -84,17 +84,17 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpbpmnpdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpitsmnpdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-jmpbpmnpdwe02",
-            "resourceGroup": "rg-cph-bpm-mgmt-npd-we-01",
+            "name": "DEP-jmpitsmnpdwe02",
+            "resourceGroup": "rg-cph-mgmt-itsm-npd-we-01",
             "dependsOn": [
-                "DEP-rg-cph-bpm-mgmt-npd-we-01"
+                "DEP-rg-cph-mgmt-itsm-npd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -105,7 +105,7 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpbpmnpdwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpitsmnpdwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
