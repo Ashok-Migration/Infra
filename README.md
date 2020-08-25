@@ -46,7 +46,8 @@ All resources must be added to this sheet.
 1. AzureFirewall           
 1. CognitiveServices       
 1. ContainerRegistry       
-1. ContentDeliveryNetwork  
+1. ContentDeliveryNetwork       
+1. ContentDeliveryNetworkEndpoint  
 1. CosmosDB            
 1. DataFactory         
 1. DataShare           
@@ -76,7 +77,8 @@ All resources must be added to this sheet.
 1. SQLLogicalServer          
 1. ServiceBusNamespace       
 1. ServiceBusNamespaceQueue  
-1. ServiceBusNamespaceTopic  
+1. ServiceBusNamespaceTopic 
+1. ServiceBusNamespaceTopicSubscription
 1. SqlManagedInstance        
 1. StorageAccounts           
 1. StreamAnalytics           
@@ -105,7 +107,7 @@ All resources must be added to this sheet.
 1. Add deploy.json and pipeline.yml for Release in the DeploymentOrchestration\Environments
 1. Copy one of the existing resource group specific folder
 1. Change the folder name to new resource group
-1. In pipeline.yml and update templateFilePath with new resourec group name
+1. In pipeline.yml and update templateFilePath with new resource group name
 1. In deploy.json, first resource should be deployment of resource group (DEP-<Resource Group Name>) 
 1. Check the template link and parameters link (should be pointing to new resource group being deployed)
 ```
@@ -150,7 +152,7 @@ All resources must be added to this sheet.
         }
 ```
 9. Create a new pipeline in Azure DevOps using pipeline.yml (CD-<Resource Group Name>-Master-Release) and move it to Release/<env> folders
-10. Releae pipelines need to be run manually after merge to master.
+10. Release pipelines need to be run manually after merge to master.
 
 # Adding New Resource to RG
 1. Module of the required azure resource must be existing (Refer adding new module if not present)
