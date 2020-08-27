@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "defaultValue": "[concat('sql-', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "Cosmos DB account name, max length 44 characters"
+      }
+    },
+    "containerName": {
+      "type": "string",
+      "defaultValue": "myContainer",
+      "metadata": {
+        "description": "The name for the container"
+      }
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "myDatabase",
+      "metadata": {
+        "description": "The name for the database"
+      }
+    },
+    "partitionKey":{
+      "type": "string",
+      "defaultValue": "/myPartitionKey",
+      "metadata": {
+        "description": "The container partition key"
+      }
+    },
+    "throughput": {
+      "type": "int",
+      "defaultValue": 400,
+      "minValue": 400,
+      "maxValue": 1000000,
+      "metadata": {
+        "description": "The throughput for the container"
+      }
+    }
+  },
+  "variables": {
+    "accountName": "[toLower(parameters('accountName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "name": "[concat(variables('accountName'), '/', parameters('databaseName'), '/', parameters('containerName'))]",
+      "apiVersion": "2020-04-01",
+      "properties": {
+        "resource": {
+          "id": "[parameters('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "[parameters('partitionKey')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/myPathToNotIndex/*"
+              }
+            ],
+            "compositeIndexes": [
+              [
+                {
+                  "path": "/name",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/age",
+                  "order": "descending"
+                }
+              ]
+            ],
+            "spatialIndexes": [
+              {
+                "path": "/path/to/geojson/property/?",
+                "types": [
+                  "Point",
+                  "Polygon",
+                  "MultiPolygon",
+                  "LineString"
+                ]
+              }
+            ]
+          },
+          "defaultTtl": 86400,
+          "uniqueKeyPolicy": {
+            "uniqueKeys": [
+              {
+                "paths": [
+                  "/phoneNumber"
+                ]
+              }
+            ]
+          }
+        },
+        "options": { "throughput": "[parameters('throughput')]" }
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

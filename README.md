@@ -48,7 +48,10 @@ All resources must be added to this sheet.
 1. ContainerRegistry       
 1. ContentDeliveryNetwork       
 1. ContentDeliveryNetworkEndpoint  
-1. CosmosDB            
+1. CosmosDB - Account + SQL DB + Container
+1. CosmosDBAccount
+1. CosmosDBSQL
+1. CosmosDBSQLContainer         
 1. DataFactory         
 1. DataShare           
 1. Databricks          
