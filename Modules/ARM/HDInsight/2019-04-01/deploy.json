@@ -61,6 +61,13 @@
       "metadata": {
         "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
       }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
     }
   },
   "resources": [
@@ -72,7 +79,7 @@
       "dependsOn": [
         "Microsoft.Storage/storageAccounts/sthdiclusterdev01"
       ],
-      "tags": {},
+      "tags": "[parameters('tags')]",
       "properties": {
         "clusterVersion": "[parameters('clusterVersion')]",
         "osType": "Linux",

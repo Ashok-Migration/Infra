@@ -1,26 +1,33 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "zoneName": {
-            "type": "string",
-            "metadata": {
-                "description": "Required. The name of the private DNS zone."
-            }
-        },
-        "lockForDeletion": {
-            "type": "bool",
-            "metadata": {
-                "description": "Required. Whether resource sould or should not be protected from deletion."
-            }
-        },
-        "vNets": {
-            "type": "array",
-            "metadata": {
-                "description": "Required. Virtual networks to create links to."
-            }
-        }
+  "parameters": {
+    "zoneName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the private DNS zone."
+      }
     },
+    "lockForDeletion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Required. Whether resource sould or should not be protected from deletion."
+      }
+    },
+    "vNets": {
+      "type": "array",
+      "metadata": {
+        "description": "Required. Virtual networks to create links to."
+      }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
     "variables": {
         "vNetIDs": {
             "copy": [
@@ -33,57 +40,60 @@
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/privateDnsZones",
-            "apiVersion": "2018-09-01",
-            "name": "[parameters('zoneName')]",
-            "location": "global",
-            "properties": {
-                "maxNumberOfRecordSets": 25000,
-                "maxNumberOfVirtualNetworkLinks": 1000,
-                "maxNumberOfVirtualNetworkLinksWithRegistration": 100
-            }
+      {
+        "type": "Microsoft.Network/privateDnsZones",
+        "apiVersion": "2018-09-01",
+        "name": "[parameters('zoneName')]",
+        "location": "global",
+        "properties": {
+          "maxNumberOfRecordSets": 25000,
+          "maxNumberOfVirtualNetworkLinks": 1000,
+          "maxNumberOfVirtualNetworkLinksWithRegistration": 100
         },
-        {
-            "type": "Microsoft.Network/privateDnsZones/SOA",
-            "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('zoneName'), '/@')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
-            ],
-            "properties": {
-                "ttl": 3600,
-                "soaRecord": {
-                    "email": "azureprivatedns-host.microsoft.com",
-                    "expireTime": 2419200,
-                    "host": "azureprivatedns.net",
-                    "refreshTime": 3600,
-                    "retryTime": 300,
-                    "serialNumber": 1,
-                    "minimumTtl": 300
-                }
-            }
+        "tags": "[parameters('tags')]"
+      },
+      {
+        "type": "Microsoft.Network/privateDnsZones/SOA",
+        "apiVersion": "2018-09-01",
+        "name": "[concat(parameters('zoneName'), '/@')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
+        ],
+        "properties": {
+          "ttl": 3600,
+          "soaRecord": {
+            "email": "azureprivatedns-host.microsoft.com",
+            "expireTime": 2419200,
+            "host": "azureprivatedns.net",
+            "refreshTime": 3600,
+            "retryTime": 300,
+            "serialNumber": 1,
+            "minimumTtl": 300
+          }
         },
-        {
-            "copy": {
-                "name": "vNetIDsLoop",
-                "count": "[length(variables('vNetIDs').vNetIDs)]",
-                "mode": "Parallel"
-            },
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('zoneName'), '/dns-vnl-', parameters('vNets')[copyIndex('vNetIDsLoop')].vnetName)]",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
-            ],
-            "properties": {
-                "registrationEnabled": true,
-                "virtualNetwork": {
-                    "id": "[variables('vNetIDs').vNetIDs[copyIndex('vNetIDsLoop')]]"
-                }
-            }
-        }
+        "tags": "[parameters('tags')]"
+      },
+      {
+        "copy": {
+          "name": "vNetIDsLoop",
+          "count": "[length(variables('vNetIDs').vNetIDs)]",
+          "mode": "Parallel"
+        },
+        "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+        "apiVersion": "2018-09-01",
+        "name": "[concat(parameters('zoneName'), '/dns-vnl-', parameters('vNets')[copyIndex('vNetIDsLoop')].vnetName)]",
+        "location": "global",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/privateDnsZones', parameters('zoneName'))]"
+        ],
+        "properties": {
+          "registrationEnabled": true,
+          "virtualNetwork": {
+            "id": "[variables('vNetIDs').vNetIDs[copyIndex('vNetIDsLoop')]]"
+          }
+        },
+        "tags": "[parameters('tags')]"
+      }
     ],
     "outputs": {},
     "functions": []
