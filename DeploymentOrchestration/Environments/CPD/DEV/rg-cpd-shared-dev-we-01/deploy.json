@@ -171,7 +171,27 @@
                     "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/Parameters/dev-cdntasmu-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-srch-cpd-shared-dev-we-01",
+      "resourceGroup": "rg-cpd-shared-dev-we-01",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SearchService/2020-03-13/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SearchService/2020-03-13/Parameters/srch-cpd-shared-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
+      }
+    }
     ],
     "outputs": {}
 }

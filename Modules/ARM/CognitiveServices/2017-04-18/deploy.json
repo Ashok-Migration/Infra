@@ -8,6 +8,10 @@
         "description": "Required. Name of the Cognitive Service."
       }
     },
+    "kind": {
+        "type": "string",
+        "defaultValue": "CognitiveServices"
+    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -19,6 +23,7 @@
       "type": "string",
       "defaultValue": "S0",
       "allowedValues": [
+        "F0",
         "S0"
       ],
       "metadata": {
@@ -42,7 +47,7 @@
         "name": "[parameters('cognitiveServiceName')]",
         "location": "[parameters('location')]",
         "type": "Microsoft.CognitiveServices/accounts",
-        "kind": "CognitiveServices",
+        "kind": "[parameters('kind')]",
         "sku": {
           "name": "[parameters('sku')]"
         },

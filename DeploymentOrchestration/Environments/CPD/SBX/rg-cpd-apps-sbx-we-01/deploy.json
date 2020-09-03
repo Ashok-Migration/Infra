@@ -878,6 +878,150 @@
           "uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpd-apps-botst-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-app-cpd-apps-bot-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/Parameters/app-cpd-apps-bot-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-bot-cpd-apps-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+        "DEP-app-cpd-apps-bot-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'WebappBot/2018-07-12/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'WebappBot/2018-07-12/Parameters/bot-cpd-apps-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-appcog-cpd-apps-qna-prprty-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+        "DEP-appcog-cpd-apps-qna-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/Parameters/appcog-cpd-apps-qna-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-cog-cpd-apps-luisauth-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpd-apps-luisauth-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-cog-cpd-apps-luisrt-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+        "DEP-cog-cpd-apps-luisauth-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpd-apps-luisrt-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-appcog-cpd-apps-qna-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/Parameters/appcog-cpd-apps-qna-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-DEP-appcog-cpd-apps-qna-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-sbx-we-01",
+      "dependsOn": [
+        "DEP-appcog-cpd-apps-qna-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServicesQna/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServicesQna/2017-04-18/Parameters/appcog-cpd-apps-qna-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
   "outputs": {}

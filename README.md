@@ -39,12 +39,16 @@ All resources must be added to this sheet.
 1. AppConfigurationStore  
 1. AppServicePlan         
 1. ApplicationGateway     
-1. ApplicationInsights    
+1. ApplicationInsights   
+1. AppServiceManagement 
+1. AppServicePlan
+1. AppServicePropertiesQnA
 1. AutomationAccounts      
 1. AzureBastion            
 1. AzureDataExplorer       
 1. AzureFirewall           
-1. CognitiveServices       
+1. CognitiveServices  
+1. CognitiveServicesQna     
 1. ContainerRegistry       
 1. ContentDeliveryNetwork       
 1. ContentDeliveryNetworkEndpoint  
@@ -76,7 +80,8 @@ All resources must be added to this sheet.
 1. RecoveryServicesVaults    
 1. RedisCache                
 1. ResourceGroup             
-1. RouteTables               
+1. RouteTables       
+1. SearchService        
 1. SQLLogicalServer          
 1. ServiceBusNamespace       
 1. ServiceBusNamespaceQueue  
@@ -92,6 +97,7 @@ All resources must be added to this sheet.
 1. VirtualNetworkGatewayConnection
 1. VirtualNetworkLinks
 1. VirtualNetworkPeering
+1. WebappBot
 
 # Adding New Module
 1. Copy the entire folder of one of the existing module
