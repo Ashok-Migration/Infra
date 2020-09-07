@@ -1,0 +1,24 @@
+# Starter pipeline
+trigger:
+- master
+
+pool:
+  vmImage: 'tasmumsagent'
+
+steps:
+
+- powershell: |
+    
+    # Using the mapped env var:
+    Write-Host "This works: $env:MY_MAPPED_ENV_VAR"    # Recommended
+
+    Write-Host "$env:SYSTEM_DEFAULTWORKINGDIRECTORY"
+    Write-Host "enviromnment variable path $env:MAPPED_ENV_VAR"
+    Write-Host "$(Build.SourcesDirectory)"
+
+- task: PowerShell@2
+
+  inputs:
+    targetType: "filePath"
+    filePath: '$(Build.SourcesDirectory)\Scripts\CMS\ProvisioningScripts\MainScript.ps1'
+    arguments: "-tenant $(tenant) -TemplateParametersFile $(TemplateParametersFile) -sp_user $(sp_user) -sp_password $(sp_password) -scope $(scope)"
