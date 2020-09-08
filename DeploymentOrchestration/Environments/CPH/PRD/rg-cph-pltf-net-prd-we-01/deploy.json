@@ -112,11 +112,55 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
+            "name": "DEP-route-cph-pltf-adds-prd-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-net-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-adds-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-route-cph-pltf-adds-npd-we-01",
+            "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-net-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-adds-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
             "name": "DEP-vnet-cph-pltf-prd-we-01",
             "resourceGroup": "rg-cph-pltf-net-prd-we-01",
             "dependsOn": [
                 "DEP-route-cph-pltf-iacbl-prd-we-01",
-                "DEP-route-cph-pltf-mgmt-prd-we-01"
+                "DEP-route-cph-pltf-mgmt-prd-we-01",
+                "DEP-route-cph-pltf-adds-prd-we-01",
+                "DEP-route-cph-pltf-adds-npd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
