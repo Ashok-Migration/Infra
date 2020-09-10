@@ -5,7 +5,7 @@ variables:
   - name: PoolName
     value: "tasmumsagents"
   - name: keyVaultScriptPath
-    value: Scripts/KeyVault/Set-AzureKeyVaultSecret.ps1
+    value: Scripts/KeyVault/Set-AzKeyVaultSecret.ps1
   - name: serviceConnection
     value: sqcp-ado-spn-dev
 
@@ -55,6 +55,22 @@ stages:
       - deployment: Deploy
         displayName: Add tst Key Vault Secrets
         environment: tst
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: all-secrets.yml
+
+  - stage: Tra
+    displayName: Add Tra KV Secrets
+    variables:
+      - group: "tra"
+      - name: keyVaultName
+        value: kv-cpd-apps-tra-we-01
+    jobs:
+      - deployment: Deploy
+        displayName: Add tst Key Vault Secrets
+        environment: tra
         strategy:
           runOnce:
             deploy:

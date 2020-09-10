@@ -882,9 +882,10 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-app-cpd-apps-bot-dev-we-01",
-      "resourceGroup": "rg-cpd-apps-dev-we-01",
+      "name": "DEP-app-cpd-apps-bot-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -895,17 +896,18 @@
           "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/Parameters/app-cpd-apps-bot-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/Parameters/app-cpd-apps-bot-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-bot-cpd-apps-dev-we-01",
-      "resourceGroup": "rg-cpd-apps-dev-we-01",
+      "name": "DEP-bot-cpd-apps-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
-        "DEP-app-cpd-apps-bot-dev-we-01"
+        "DEP-rg-cpd-apps-tst-we-01",
+        "DEP-app-cpd-apps-bot-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -916,17 +918,18 @@
           "uri": "[concat(variables('modulesPath'), 'WebappBot/2018-07-12/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'WebappBot/2018-07-12/Parameters/bot-cpd-apps-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'WebappBot/2018-07-12/Parameters/bot-cpd-apps-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-appcog-cpd-apps-qna-prprty-dev-we-01",
-      "resourceGroup": "rg-cpd-apps-dev-we-01",
+      "name": "DEP-appcog-cpd-apps-qna-prprty-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
-        "DEP-appcog-cpd-apps-qna-dev-we-01"
+        "DEP-rg-cpd-apps-tst-we-01",
+        "DEP-app-cpd-apps-qna-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -937,7 +940,7 @@
           "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/Parameters/appcog-cpd-apps-qna-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/Parameters/appcog-cpd-apps-qna-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
@@ -947,6 +950,7 @@
       "name": "DEP-cog-cpd-apps-luisauth-tst-we-01",
       "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -967,6 +971,7 @@
       "name": "DEP-cog-cpd-apps-luisrt-tst-we-01",
       "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01",
         "DEP-cog-cpd-apps-luisauth-tst-we-01"
       ],
       "properties": {
@@ -981,13 +986,14 @@
           "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpd-apps-luisrt-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
-    },    
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-DEP-appcog-cpd-apps-qna-tst-we-01",
+      "name": "DEP-app-cpd-apps-qna-tst-we-01",
       "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -1005,10 +1011,11 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-appcog-cpd-apps-qna-tst-we-01",
+      "name": "DEP-cog-cpd-apps-qna-tst-we-01",
       "resourceGroup": "rg-cpd-apps-tst-we-01",
       "dependsOn": [
-        "DEP-DEP-appcog-cpd-apps-qna-tst-we-01"
+        "DEP-rg-cpd-apps-tst-we-01",
+        "DEP-app-cpd-apps-qna-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",

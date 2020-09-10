@@ -21,4 +21,4 @@ $ErrorActionPreference = "Stop"
 
 
 $secureSecretValue = ConvertTo-SecureString -String $secretValue -AsPlainText -Force
-Set-AzureKeyVaultSecret -VaultName $keyVaultName -Name $secretName -SecretValue $secureSecretValue
+Set-AzKeyVaultSecret -VaultName $keyVaultName -Name $secretName -SecretValue $secureSecretValue
