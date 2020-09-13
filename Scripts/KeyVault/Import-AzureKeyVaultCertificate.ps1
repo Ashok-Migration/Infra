@@ -5,12 +5,16 @@ param(
  
  [Parameter(Mandatory=$True)]
  [string]
- $secretName,
+ $certificateName,
 
 
  [Parameter(Mandatory=$True)]
  [string]
- $secretValue)
+ $filePath,
+
+ [Parameter(Mandatory=$True)]
+ [string]
+ $certificatePass)
 
 
 #******************************************************************************
@@ -20,5 +24,5 @@ param(
 $ErrorActionPreference = "Stop"
 
 
-$secureSecretValue = ConvertTo-SecureString -String $secretValue -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVaultName -Name $secretName -SecretValue $secureSecretValue
+$password = ConvertTo-SecureString -String $certificatePass -AsPlainText -Force
+Import-AzureKeyVaultCertificate -VaultName $keyVaultName -Name $certificateName -FilePath $filePath -Password $password
