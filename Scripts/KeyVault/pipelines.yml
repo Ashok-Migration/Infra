@@ -4,8 +4,6 @@ trigger:
 variables:
   - name: PoolName
     value: "tasmumsagents"
-  - name: keyVaultScriptPath
-    value: Scripts/KeyVault/Set-AzKeyVaultSecret.ps1
   - name: serviceConnection
     value: sqcp-ado-spn-dev
 
@@ -13,8 +11,25 @@ pool:
   name: $(PoolName)
 
 stages:
+  - stage: PublishArtifacts
+    jobs:
+    - job: PublishArtifacts
+      steps:
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: Scripts/KeyVault
+          Contents: "**"
+          TargetFolder: "$(build.artifactstagingdirectory)/scripts"
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: Scripts/KeyVault
+          artifact: "scripts"
+          publishLocation: "pipeline"
+  
+
   - stage: Sandbox
     displayName: Add Sandbox KV Secrets
+    dependsOn: PublishArtifacts
     variables:
       - group: "Sandbox"
       - name: keyVaultName
@@ -31,6 +46,7 @@ stages:
 
   - stage: Dev
     displayName: Add Dev KV Secrets
+    dependsOn: PublishArtifacts
     variables:
       - group: "Dev"
       - name: keyVaultName
@@ -47,6 +63,7 @@ stages:
 
   - stage: Tst
     displayName: Add Tst KV Secrets
+    dependsOn: PublishArtifacts
     variables:
       - group: "Tst"
       - name: keyVaultName
@@ -63,6 +80,7 @@ stages:
 
   - stage: Tra
     displayName: Add Tra KV Secrets
+    dependsOn: PublishArtifacts
     variables:
       - group: "tra"
       - name: keyVaultName
