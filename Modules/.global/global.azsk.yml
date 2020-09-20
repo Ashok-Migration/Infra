@@ -1,0 +1,16 @@
+parameters:
+  templateFile: $(modulePath)/deploy.json
+  parametersFile: $(modulePath)/Parameters/parameters.json
+
+jobs:
+  - job: AzSKARMTemplateScan
+    displayName: Az SK ARM Template Scan
+    pool:
+        name: $(PoolName)
+    steps:
+      - task: AzSKARMTemplateChecker@4
+        displayName: Az SK ARM Template Checker
+        continueOnError: true
+        inputs:
+              ARMTemplateFilePath: "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
+              parametersFile: "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"

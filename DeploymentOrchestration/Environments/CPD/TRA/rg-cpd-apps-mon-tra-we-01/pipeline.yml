@@ -13,6 +13,8 @@ variables:
     value: rg-cpd-apps-mon-tra-we-01
   - name: serviceConnection
     value: sqcp-ado-spn-dev
+  - name: subscriptionId
+    value: d0694def-b27e-4bb7-900d-437fbeb802da
 
 trigger: none
 #trigger:
@@ -84,3 +86,19 @@ stages:
                 }
                 New-AzDeployment @DeploymentInputs
               azurePowerShellVersion: LatestVersion
+
+  - stage: SecurityVerification
+    jobs:
+      - job: ScanResourceGroup
+        displayName: Scan Resource Group
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzSKSVTs@4
+            displayName: Scan $(resourceGroupName)
+            continueOnError: true
+            inputs:
+              ConnectedServiceNameARM: '$(serviceConnection)'
+              GenerateMethodParameterSetSelection: 'ResourceGroupName'
+              ResourceGroupName: '$(resourceGroupName)'
+              SubscriptionId: '$(subscriptionId)'

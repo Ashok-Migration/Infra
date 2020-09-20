@@ -68,12 +68,7 @@
       "type": "string"
     },
     "virtualNetworkType": {
-      "allowedValues": [
-        "External",
-        "Internal",
-        "None"
-      ],
-      "defaultValue": "None",
+      "defaultValue": "Internal",
       "metadata": {
         "description": "The virtual network type"
       },
@@ -139,6 +134,28 @@
           }
         }
       ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2019-12-01",
+      "name": "[concat(parameters('apiManagementServiceName'), '/echo-api')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementServiceName'))]"
+      ],
+      "properties": {
+        "displayName": "Echo API",
+        "apiRevision": "1",
+        "subscriptionRequired": true,
+        "serviceUrl": "",
+        "path": "echo",
+        "protocols": [
+          "https"
+        ],
+        "isCurrent": true
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      }
     }
   ],
   "functions": [],

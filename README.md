@@ -1,27 +1,42 @@
 <h1>Table of Contents </h1>
 
 - [Introduction](#introduction)
+- [PR Checklist](#pr-checklist)
 - [Solution Structure](#ssolution-structure)
 - [Conventions](#conventions)
 - [ARM Modules](#arm-modules)
 - [Adding New Module](#adding-new-module)
 - [Adding New Resource Group](#adding-new-resource-group)
 - [Adding New Resource to RG](#adding-new-resource-to-rg)
-
+- [Adding Secrets and Certificates to Key Vault](#adding-secrets-and-certificates-to-key-vault)
+- [Adding Configurations to App Config Store](#adding-configurations-to-app-config-store)
+- [Security Scan](#security-scan)
 # Introduction 
 Code for all infrastructure components.
+
+# PR Checklist
+- [ ] Resource naming conventions being followed as per wiki
+- [ ] Parameters added for all environments (sbx, dev, tst, tra, uat, etc)
+- [ ] Resource added to deployment files (DeploymentOrchestration\Environments) for all environments (sbx, dev, tst, tra)
+- [ ] Deployment tested on lower environment (sbx)
+- [ ] Related documentations added/updated
+- [ ] Security scans executed and violations fixed
+- [ ] Add successful runs for lower environments to the description
 
 # Solution structure
 ```
     DeploymentOrchestration/Environments
-        <subscription>/<env> Resource group sepcific deploy.json and pipeline.yml for Central Platform Hub Subscriptionl
+        <subscription>/<env> Resource group sepcific deploy.json and pipeline.yml for Central Platform Hub Subscriptions
     Modules  
       .global - global files to be used across all modules
       ARM - Contains all ARM templates for different azure Components
     QC - Quality Control or Sonar Pipeline
     Scripts
+        App Configurations - scripts, app settings and pipeline to update app config store
+        CMS - Sharepoint provisioning scripts and pipeline
         InternalRBAC - Powershell scripts implementing RBAC policies for Microsoft users
         InviteUsers - Powershell scripts to invite users to AAD
+        KeyVault - scripts and pipeline to add secrets and certificates to key vaults
 ```
 # Conventions
 - [Resource Naming Conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging)
@@ -74,7 +89,8 @@ All resources must be added to this sheet.
 1. ManagedClusters        
 1. ManagedClustersCNI     
 1. ManagedIdentity        
-1. NetworkSecurityGroups  
+1. NetworkSecurityGroups 
+1. NotificationHubNamespaces 
 1. Powerbi                
 1. PrivateDNSZones           
 1. RecoveryServicesVaults    
@@ -109,7 +125,9 @@ All resources must be added to this sheet.
 1. Add generic parameters.json specific to this module in parameters folder
 1. Add resource group specific parameter file following the naming convention to parameters folder
 1. Use the latest schemas and api versions of resources
-1. Create the new CI pipeline in Azure DevOps for the module using pipeline.yml (CI-<ModuleName>-Master-Build) and place it in CI folder of pipelines
+1. Create the new CI pipeline in Azure DevOps for the module using pipeline.yml (**CI-<ModuleName>-Master-Build**) and place it in CI folder of pipelines
+1. Pipeline must have three stages - Scan, Validate and Publish
+1. Run the pipeline from branch first to scan the templates and fix the violations if any.
 
 # Adding New Resource Group
 1. Add resource group specific file in ResourceGroup ARM module
@@ -117,7 +135,7 @@ All resources must be added to this sheet.
 1. Copy one of the existing resource group specific folder
 1. Change the folder name to new resource group
 1. In pipeline.yml and update templateFilePath with new resource group name
-1. In deploy.json, first resource should be deployment of resource group (DEP-<Resource Group Name>) 
+1. In deploy.json, first resource should be deployment of resource group (**DEP-<Resource Group Name>**) 
 1. Check the template link and parameters link (should be pointing to new resource group being deployed)
 ```
         {
@@ -160,13 +178,15 @@ All resources must be added to this sheet.
             }
         }
 ```
-9. Create a new pipeline in Azure DevOps using pipeline.yml (CD-<Resource Group Name>-Master-Release) and move it to Release/<env> folders
+9. Create a new pipeline in Azure DevOps using pipeline.yml (**CD-<Resource Group Name>-Master-Release**) and move it to Release/<env> folders
 10. Release pipelines need to be run manually after merge to master.
+11. Pipeline must contain three stages - Validate, DeployTemplate and SecurityVerification
+12. Violations reported as part of SecurityVerification must be reviewed and fixed asap
 
 # Adding New Resource to RG
 1. Module of the required azure resource must be existing (Refer adding new module if not present)
 1. Add parameter file for the resource being added to the module
-1. Add the section in resource group specific deployment orchestration with appropriate dependencies and deployment name following the convention (DEP-<resource name>)
+1. Add the section in resource group specific deployment orchestration with appropriate dependencies and deployment name following the convention (**DEP-<resource name>**)
 Below example deploys API Management instance apim-cpd-apps-dev-we-01 to Resource Group rg-cpd-apps-dev-we-01
 ```
         {
@@ -192,3 +212,77 @@ Below example deploys API Management instance apim-cpd-apps-dev-we-01 to Resourc
             }
         }
 ```
+# Adding Secrets and Certificates to Key Vault
+- Deploying Secrets to Key Vaults 
+    1. Add the secret to respective [variable group](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_library?itemType=VariableGroups) in Azure Devops for each environment
+    1. Give the variable name same as secret name
+    1. Mark the variable as secure
+    1. Add the step in Scripts/KeyVault/all-secrets.yml like below for each new secret
+        ```
+        - template: add-secrets.yml
+            parameters:
+            secretName: "AdminPortal-ADAuth-ClientSecret"
+            
+        ```
+    1. Follow the conventions of creating secret names
+    1. Run the pipeline after merge to master and selecting appropriate stages [CD-KeyVaultSecrets-Master-Release](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_build?definitionId=337)
+
+
+- Importing Certificates to Key Vaults
+    1. Upload Certificate to [Secure Files Library](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_library?itemType=SecureFiles) in Azure DevOps
+    1. Add the certificate password to [variable group](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_library?itemType=VariableGroups) in Azure Devops for each environment
+    1. Mark the variable as secure
+    1. Add the step in Scripts/KeyVault/all-secrets.yml like below for each new certificate
+    ```
+    - template: add-certificate.yml
+        parameters:
+        certificateName: "Cms-Api-ClientCertificate"
+        certificatePassword: "CMS-Certificate-Password"
+        downloadFileName: "cmsapiclientcertificate"
+        secureFile: "TASMUDev.pfx"
+    ```
+    1. Follow the conventions of creating certificate names
+    1. Run the pipeline after merge to master and selecting appropriate stages [CD-KeyVaultSecrets-Master-Release](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_build?definitionId=337)
+
+# Adding Configurations to App Config Store
+- Key Vault References should be added to the environment specific appsettings.json files at below path
+    Scripts/AppConfigurations/keyvaultref
+- Other Settings and Feature Flags must be added to environment specific appsettings.json files at below path
+    Scripts/AppConfigurations/settings
+
+    Feature Flags should be updated under Feature Management section only like below
+    ```
+    "FeatureManagement": {
+    "Mobile.Documents": false,
+    "Mobile.GetSupport": true,
+    "Mobile.ServiceCatalogue": true,
+    "Mobile.Settings": false
+  }
+  ````
+- Settings common to APIs like Instrumentation Key, Use Redis, must be reused and added to AppSettings section like below
+```
+ "AppSettings": {
+    "InstrumentationKey": "5ad30db6-ba76-415c-b114-b4027de0b7cb",
+    "UseRedis": true
+  }
+
+```
+- Environment References
+
+    1. sbx - Sandbox
+    2. dev - Development
+    3. tst - Test
+    4. tra - Training
+
+- Pipeline auto triggered by changes to appsettings.json files [CD-AppConfigurations-Master-Release](https://dev.azure.com/TASMUCP/TASMU%20Central%20Platform/_build?definitionId=406)
+
+# Security Scan
+
+The CICD Extension from the Secure DevOps Kit for Azure (AzSK) contains two tasks:
+
+1. ARM Template Checker 
+    - a task that can check security settings in ARM templates
+    - added to each ARM module and executed as part of CI pipelines
+1. Security Verification Tests (SVTs) 
+    - a task that can check deployed resources for secure configuration
+    - added to resource groups and executed after resource group deployment
