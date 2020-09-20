@@ -34,7 +34,7 @@ stages:
           publishLocation: "pipeline"
 
   - stage: Sbx
-    displayName: Add Sandbox KV Secrets
+    displayName: Update App Configurations for sbx
     dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
@@ -76,7 +76,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-tst-we-01"
       - name: env
-        value: "tra"   
+        value: "tst"   
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for tst
