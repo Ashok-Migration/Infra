@@ -84,6 +84,13 @@
       "metadata": {
         "description": "The throughput for the container"
       }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
     }
   },
   "variables": {
@@ -132,7 +139,8 @@
         "locations": "[variables('locations')]",
         "databaseAccountOfferType": "Standard",
         "enableAutomaticFailover": "[parameters('automaticFailover')]"
-      }
+      },
+      "tags": "[parameters('tags')]"
     },
     {
       "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",

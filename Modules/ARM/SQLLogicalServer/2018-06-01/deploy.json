@@ -48,6 +48,14 @@
             "metadata": {
                 "description": "Optional. SQL logical server connection type."
             }
+        },
+        "tags": {
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
         }
     },
     "variables": {
@@ -70,6 +78,7 @@
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
                 "version": "12.0"
             },
+            "tags": "[parameters('tags')]",
             "resources": [
                 {
                     "condition": "[parameters('allowAzureIPs')]",
@@ -139,6 +148,7 @@
                 "name": "Standard_LRS"
             },
             "kind": "StorageV2",
+            "tags": "[parameters('tags')]",
             "resources": [
                 {
                     "condition": "[parameters('enableADS')]",
