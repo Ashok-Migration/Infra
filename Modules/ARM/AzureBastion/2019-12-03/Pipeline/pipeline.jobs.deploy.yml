@@ -12,20 +12,20 @@ jobs:
   - template: pipeline.variables.yml
   steps:
     - task: AzurePowerShell@4
-      displayName: 'Deploy $(moduleName) in $(resourceGroupName) via $(serviceconnection)'
+      displayName: 'Deploy $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)'
       inputs:
-        azureSubscription: $(serviceConnection)
+        azureSubscription: $(serviceConnectionPrd)
         ScriptType: InlineScript
         inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupName) -ErrorAction SilentlyContinue))
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
             {
-              New-AzResourceGroup -Name $(resourceGroupName) -Location "$(location)"
+              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location "$(location)"
             }
 
             $timestamp = ([datetime]::UtcNow).tostring("yyyyMMddHHMMss")
             $DeploymentInputs = @{
               Name                  = "$(moduleName)-$(moduleVersion)-$timestamp"
-              ResourceGroupName     = "$(resourceGroupName)"
+              ResourceGroupName     = "$(resourceGroupNamePrd)"
               TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
               TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
               Mode                  = "Incremental"

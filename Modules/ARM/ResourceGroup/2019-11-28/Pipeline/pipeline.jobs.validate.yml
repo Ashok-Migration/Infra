@@ -37,9 +37,9 @@ jobs:
         testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
     - task: AzurePowerShell@4
-      displayName: 'Validate $(moduleName) in $(resourceGroupName) via $(serviceconnection)'
+      displayName: 'Validate $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)'
       inputs:
-        azureSubscription: $(serviceConnection)
+        azureSubscription: $(serviceConnectionPrd)
         ScriptType: InlineScript
         inline: |
           $ValidationErrors = $null
