@@ -38,13 +38,15 @@
         "hostingEnvironment": "",
         "serverFarmId": "[concat('/subscriptions/', Subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
         "siteConfig": {
-          "webSocketsEnabled": true,
           "cors": {
             "allowedOrigins": [
               "*"
             ]
           }
         }
+      },
+      "identity": {
+        "type": "SystemAssigned"
       },
       "dependsOn": [
       ],
