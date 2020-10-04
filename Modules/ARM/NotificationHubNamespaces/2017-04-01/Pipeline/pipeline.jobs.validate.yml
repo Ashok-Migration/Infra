@@ -1,5 +1,4 @@
 parameters:
-  moduleName: 
   templateFile: $(modulePath)/deploy.json
   parametersFile: $(modulePath)/Parameters/parameters.json
 
@@ -44,8 +43,7 @@ jobs:
           inline: |
             if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
             {
-              $Location = "$(location)" -replace " ",""
-              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location $Location
+              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location "$(location)"
             }
 
             $ValidationErrors = $null

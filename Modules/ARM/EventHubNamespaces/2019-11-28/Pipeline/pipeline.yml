@@ -2,6 +2,7 @@ name: $(moduleName)-$(moduleVersion)
 
 variables:
 - template: pipeline.variables.yml
+- template: /Modules/.global/global.variables.yml
 
 trigger:
   batch: true
@@ -10,9 +11,9 @@ trigger:
       - master
   paths:
     include:
-    - Modules/EventHubNamespaces/*
+    - Modules/ARM/EventHubNamespaces/*
     exclude:
-    - Modules/EventHubNamespaces/*/readme.md
+    - Modules/ARM/EventHubNamespaces/*/readme.md
     
 stages:  
 - stage: Scan

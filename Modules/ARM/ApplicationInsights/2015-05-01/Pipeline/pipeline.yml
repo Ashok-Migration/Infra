@@ -16,13 +16,6 @@ trigger:
       - Modules/ARM/ApplicationInsights/*/readme.md
 
 stages:  
-  - stage: Scan
-    jobs:
-      - template: /Modules/.global/global.azsk.yml
-        parameters:
-          templateFile: $(modulePath)/deploy.json
-          parametersFile: $(modulePath)/Parameters/parameters.json
-          
   - stage: Validate
     jobs:
       - template: pipeline.jobs.validate.yml

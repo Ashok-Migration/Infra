@@ -3,12 +3,12 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "metadata": {
-                "description": "The location in which the Notification Hubs resources should be deployed."
-            }
-        },
+			"type": "string",
+			"defaultValue": "[resourceGroup().location]",
+			"metadata": {
+				"description": "The location in which the Notification Hubs resources should be deployed."
+			}
+		},
 		"namespaceName": {
 			"type": "String"
 		},
@@ -22,6 +22,8 @@
 			"defaultValue": {},
 			"type": "Object"
 		}
+	},
+	"variables": {
 	},
 	"resources": [
 		{
@@ -40,8 +42,8 @@
 			"resources": [
 				{
 					"type": "Microsoft.NotificationHubs/namespaces/notificationHubs",
-                    "apiVersion": "2017-04-01",
-					"name": "[parameters('notificationHubName')]",
+					"apiVersion": "2017-04-01",
+					"name": "[concat(parameters('namespaceName'),'/',parameters('notificationHubName'))]",
 					"location": "[parameters('location')]",
 					"dependsOn": [
 						"[concat('Microsoft.NotificationHubs/namespaces/', parameters('namespaceName'))]"
@@ -56,5 +58,8 @@
 				}
 			]
 		}
-	]
+	],
+	"outputs": {
+	},
+	"functions": []
 }

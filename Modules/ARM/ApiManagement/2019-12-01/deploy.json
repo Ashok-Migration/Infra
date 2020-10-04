@@ -8,7 +8,7 @@
       },
       "type": "string"
     },
-    "appInsightsName": {
+    "appInsightsId": {
       "type": "string"
     },
     "location": {
@@ -79,7 +79,6 @@
     }
   },
   "variables": {
-    "appInsightsId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Insights/components/', parameters('appInsightsName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
   },
@@ -104,15 +103,15 @@
         {
           "apiVersion": "2019-01-01",
           "type": "loggers",
-          "name": "[parameters('appInsightsName')]",
+          "name": "[concat('appi-',parameters('apiManagementServiceName'))]",
           "dependsOn": [
             "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]"
           ],
           "properties": {
             "loggerType": "applicationInsights",
-            "resourceId": "[variables('appInsightsId')]",
+            "resourceId": "[parameters('appInsightsId')]",
             "credentials": {
-              "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+              "instrumentationKey": "[reference(parameters('appInsightsId'), '2015-05-01').InstrumentationKey]"
             }
           }
         },
@@ -122,10 +121,10 @@
           "name": "applicationinsights",
           "dependsOn": [
             "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]",
-            "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', parameters('appInsightsName'))]"
+            "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', 'appi-',parameters('apiManagementServiceName'))]"
           ],
           "properties": {
-            "loggerId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', parameters('appInsightsName'))]",
+            "loggerId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'), '/loggers/', 'appi-',parameters('apiManagementServiceName'))]",
             "alwaysLog": "allErrors",
             "sampling": {
               "percentage": 100,

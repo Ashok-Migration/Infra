@@ -15,14 +15,7 @@ trigger:
     exclude:
     - Modules/ARM/LogAnalytics/*/readme.md
     
-stages:  
-- stage: Scan
-  jobs:
-    - template: /Modules/.global/global.azsk.yml
-      parameters:
-        templateFile: $(modulePath)/deploy.json
-        parametersFile: $(modulePath)/Parameters/parameters.json
-
+stages:
 - stage: Validate
   jobs:
   - template: pipeline.jobs.validate.yml
