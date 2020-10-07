@@ -126,8 +126,8 @@ stages:
             displayName: Link to blob datasource
             inputs:
               azureSubscription: "$(serviceConnection)"
-              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
-              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(dataSourceSchemaFile)" -url "$(dataSourceUrl)"'
+              ScriptPath: "$(Build.Repository.LocalPath)/$(datasourceScriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -storageResourceGroup "$(storageResourceGroup)" -storageAccountName "$(storageAccountName)" -schemaFile "$(Build.Repository.LocalPath)/$(dataSourceSchemaFile)" -url "$(dataSourceUrl)"'
               azurePowerShellVersion: LatestVersion
 
           - task: AzurePowerShell@3
