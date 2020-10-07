@@ -1,0 +1,615 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workflowName": {
+			"value": "logic-cpd-apps-cogsrch-tra-we-01"
+		},
+		"workflowLocation": {
+			"value": "westeurope"
+		},
+		"workflowSchema": {
+			"value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+		},
+		"workflowTriggers": {
+			"value": {
+				"When_a_resource_event_occurs": {
+					"splitOn": "@triggerBody()",
+					"type": "ApiConnectionWebhook",
+					"inputs": {
+						"body": {
+							"properties": {
+								"destination": {
+									"endpointType": "webhook",
+									"properties": {
+										"endpointUrl": "@{listCallbackUrl()}"
+									}
+								},
+								"filter": {
+									"includedEventTypes": [
+										"new-product",
+										"product-update",
+										"new-kbarticle",
+										"kbarticle-update",
+										"new-news"
+									]
+								},
+								"topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-temp-tra-we-02/providers/Microsoft.EventGrid/topics/evg-cpd-temp-tra-we-01"
+							}
+						},
+						"host": {
+							"connection": {
+								"name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+							}
+						},
+						"path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Topics')}/resource/eventSubscriptions",
+						"queries": {
+							"x-ms-api-version": "2017-09-15-preview"
+						}
+					}
+				}
+			}
+		},
+		"workflowActions": {
+			"value": {
+				"Perform_action_as_per_eventtype": {
+					"actions": {
+						"Get_Product_Details": {
+							"runAfter": {},
+							"type": "Http",
+							"inputs": {
+								"method": "GET",
+								"uri": "@{triggerBody()?['data']['apiurl']}"
+							}
+						},
+						"Get_Product_Details_AR": {
+							"runAfter": {
+								"Send_Product_Details_to_Azure_Search": [
+									"Succeeded"
+								]
+							},
+							"type": "Http",
+							"inputs": {
+								"method": "GET",
+								"queries": {
+									"lang": "ar"
+								},
+								"uri": "@{triggerBody()?['data']['apiurl']}"
+							}
+						},
+						"Parse_Product_JSON": {
+							"runAfter": {
+								"Get_Product_Details": [
+									"Succeeded"
+								]
+							},
+							"type": "ParseJson",
+							"inputs": {
+								"content": "@body('Get_Product_Details')",
+								"schema": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"imageUrl": {
+											"type": "string"
+										},
+										"longDescription": {
+											"type": "string"
+										},
+										"modifiedOn": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"productPrice": {
+											"type": "integer"
+										},
+										"providerName": {
+											"type": "string"
+										},
+										"rating": {
+											"type": "number"
+										},
+										"shortDescription": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								}
+							}
+						},
+						"Parse_Product_JSON_AR": {
+							"runAfter": {
+								"Get_Product_Details_AR": [
+									"Succeeded"
+								]
+							},
+							"type": "ParseJson",
+							"inputs": {
+								"content": "@body('Get_Product_Details_AR')",
+								"schema": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"imageUrl": {
+											"type": "string"
+										},
+										"longDescription": {
+											"type": "string"
+										},
+										"modifiedOn": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"productPrice": {
+											"type": "integer"
+										},
+										"providerName": {
+											"type": "string"
+										},
+										"rating": {
+											"type": "number"
+										},
+										"shortDescription": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								}
+							}
+						},
+						"Select_Product_Details": {
+							"runAfter": {
+								"Parse_Product_JSON": [
+									"Succeeded"
+								]
+							},
+							"type": "Select",
+							"inputs": {
+								"from": "@createArray(body('Parse_Product_JSON'))",
+								"select": {
+									"@@search.action": "mergeOrUpload",
+									"average_rating": "@concat(body('Parse_Product_JSON')?['rating'],'')",
+									"entity_type": "Products&Services",
+									"id": "@body('Parse_Product_JSON')?['id']",
+									"merged_content": "@concat(body('Parse_Product_JSON')?['longDescription'],body('Parse_Product_JSON')?['shortDescription'])",
+									"metadata_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
+									"metadata_storage_file_extension": "JSON",
+									"metadata_storage_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
+									"metadata_storage_name": "@body('Parse_Product_JSON')?['name']",
+									"price": "@concat(body('Parse_Product_JSON')?['productPrice'],'')",
+									"provider_name": "@body('Parse_Product_JSON')?['providerName']",
+									"search_id": "@concat('ProductsServices-',body('Parse_Product_JSON')['id'])",
+									"short_description": "@body('Parse_Product_JSON')?['shortDescription']",
+									"thumbnail_url": "@body('Parse_Product_JSON')?['imageUrl']"
+								}
+							}
+						},
+						"Select_Product_Details_AR": {
+							"runAfter": {
+								"Parse_Product_JSON_AR": [
+									"Succeeded"
+								]
+							},
+							"type": "Select",
+							"inputs": {
+								"from": "@createArray(body('Parse_Product_JSON_AR'))",
+								"select": {
+									"@@search.action": "mergeOrUpload",
+									"average_rating": "@concat(body('Parse_Product_JSON_AR')?['rating'],'')",
+									"entity_type": "Products&Services",
+									"id": "@body('Parse_Product_JSON_AR')?['id']",
+									"merged_content": "@concat(body('Parse_Product_JSON_AR')?['longDescription'],body('Parse_Product_JSON_AR')?['shortDescription'])",
+									"metadata_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
+									"metadata_storage_file_extension": "JSON",
+									"metadata_storage_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
+									"metadata_storage_name": "@body('Parse_Product_JSON_AR')?['name']",
+									"price": "@concat(body('Parse_Product_JSON_AR')?['productPrice'],'')",
+									"provider_name": "@body('Parse_Product_JSON_AR')?['providerName']",
+									"search_id": "@concat('ProductsServicesAr-',body('Parse_Product_JSON_AR')['id'])",
+									"short_description": "@body('Parse_Product_JSON_AR')?['shortDescription']",
+									"thumbnail_url": "@body('Parse_Product_JSON_AR')?['imageUrl']"
+								}
+							}
+						},
+						"Send_Product_Details_to_Azure_Search": {
+							"runAfter": {
+								"Select_Product_Details": [
+									"Succeeded"
+								]
+							},
+							"type": "Http",
+							"inputs": {
+								"body": {
+									"value": "@body('Select_Product_Details')"
+								},
+								"headers": {
+									"api-key": "95C6081EA9641D51D42AF4B2C8576F00",
+									"content-type": "application/json"
+								},
+								"method": "POST",
+								"uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
+							}
+						},
+						"Send_Product_Details_to_Azure_Search_AR": {
+							"runAfter": {
+								"Select_Product_Details_AR": [
+									"Succeeded"
+								]
+							},
+							"type": "Http",
+							"inputs": {
+								"body": {
+									"value": "@body('Select_Product_Details_AR')"
+								},
+								"headers": {
+									"api-key": "95C6081EA9641D51D42AF4B2C8576F00",
+									"content-type": "application/json"
+								},
+								"method": "POST",
+								"uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
+							}
+						}
+					},
+					"runAfter": {},
+					"else": {
+						"actions": {
+							"Condition": {
+								"actions": {
+									"Get_KB_Details": {
+										"runAfter": {},
+										"type": "Http",
+										"inputs": {
+											"method": "GET",
+											"uri": "@{triggerBody()['data']['apiurl']}"
+										}
+									},
+									"Parse_KB_JSON": {
+										"runAfter": {
+											"Get_KB_Details": [
+												"Succeeded"
+											]
+										},
+										"type": "ParseJson",
+										"inputs": {
+											"content": "@body('Get_KB_Details')",
+											"schema": {
+												"properties": {
+													"content": {
+														"type": "string"
+													},
+													"description": {
+														"type": "string"
+													},
+													"id": {
+														"type": "string"
+													},
+													"rating": {
+														"type": "string"
+													},
+													"title": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											}
+										}
+									},
+									"Select_KB_Details": {
+										"runAfter": {
+											"Parse_KB_JSON": [
+												"Succeeded"
+											]
+										},
+										"type": "Select",
+										"inputs": {
+											"from": "@createArray(body('Parse_KB_JSON'))",
+											"select": {
+												"@@search.action": "mergeOrUpload",
+												"average_rating": "@body('Parse_KB_JSON')?['rating']",
+												"content": "@body('Parse_KB_JSON')?['content']",
+												"entity_type": "KbArticle",
+												"id": "@body('Parse_KB_JSON')?['id']",
+												"merged_content": "@concat(body('Parse_KB_JSON')?['content'],body('Parse_KB_JSON')?['description'])",
+												"metadata_creation_date": "@utcNow()",
+												"metadata_last_modified": "@utcNow()",
+												"metadata_storage_file_extension": "JSON",
+												"metadata_storage_last_modified": "@utcNow()",
+												"metadata_storage_name": "@body('Parse_KB_JSON')?['title']",
+												"search_id": "@concat('KbArticle-',body('Parse_KB_JSON')['id'])",
+												"short_description": "@body('Parse_KB_JSON')?['description']"
+											}
+										}
+									},
+									"Send_KB_Details_to_Azure_Search": {
+										"runAfter": {
+											"Select_KB_Details": [
+												"Succeeded"
+											]
+										},
+										"type": "Http",
+										"inputs": {
+											"body": {
+												"value": "@body('Select_KB_Details')"
+											},
+											"headers": {
+												"api-key": "95C6081EA9641D51D42AF4B2C8576F00",
+												"content-type": "application/json"
+											},
+											"method": "POST",
+											"uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
+										}
+									}
+								},
+								"runAfter": {},
+								"else": {
+									"actions": {
+										"Get_News_Details": {
+											"runAfter": {},
+											"type": "Http",
+											"inputs": {
+												"headers": {
+													"Ocp-Apim-Subscription-Key": "58290da37c3e42fe928a23e74c2781cc"
+												},
+												"method": "GET",
+												"queries": {
+													"Language": "en",
+													"api-version": "1.0"
+												},
+												"uri": "@{concat('https://tra-api.tasmu.gov.qa/cmscontent/api/articles/',triggerBody()['data']['Id'])}"
+											}
+										},
+										"Get_News_Details_AR": {
+											"runAfter": {
+												"Send_News_Details_to_Azure_Search": [
+													"Succeeded"
+												]
+											},
+											"type": "Http",
+											"inputs": {
+												"headers": {
+													"Ocp-Apim-Subscription-Key": "58290da37c3e42fe928a23e74c2781cc"
+												},
+												"method": "GET",
+												"queries": {
+													"Language": "ar",
+													"api-version": "1.0"
+												},
+												"uri": "@{concat('https://tra-api.tasmu.gov.qa/cmscontent/api/articles/',triggerBody()['data']['Id'])}"
+											}
+										},
+										"Parse_News_JSON": {
+											"runAfter": {
+												"Get_News_Details": [
+													"Succeeded"
+												]
+											},
+											"type": "ParseJson",
+											"inputs": {
+												"content": "@body('Get_News_Details')",
+												"schema": {
+													"properties": {
+														"id": {
+															"type": "string"
+														},
+														"longDescription": {
+															"type": "string"
+														},
+														"modified": {
+															"type": "string"
+														},
+														"publishedDate": {
+															"type": "string"
+														},
+														"shortDescription": {
+															"type": "string"
+														},
+														"thumbnailImage": {
+															"type": "string"
+														},
+														"title": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												}
+											}
+										},
+										"Parse_News_JSON_AR": {
+											"runAfter": {
+												"Get_News_Details_AR": [
+													"Succeeded"
+												]
+											},
+											"type": "ParseJson",
+											"inputs": {
+												"content": "@body('Get_News_Details_AR')",
+												"schema": {
+													"properties": {
+														"id": {
+															"type": "string"
+														},
+														"longDescription": {
+															"type": "string"
+														},
+														"modified": {
+															"type": "string"
+														},
+														"publishedDate": {
+															"type": "string"
+														},
+														"shortDescription": {
+															"type": "string"
+														},
+														"thumbnailImage": {
+															"type": "string"
+														},
+														"title": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												}
+											}
+										},
+										"Select_News_Details": {
+											"runAfter": {
+												"Parse_News_JSON": [
+													"Succeeded"
+												]
+											},
+											"type": "Select",
+											"inputs": {
+												"from": "@createArray(body('Parse_News_JSON'))",
+												"select": {
+													"@@search.action": "mergeOrUpload",
+													"entity_type": "News",
+													"id": "@body('Parse_News_JSON')?['id']",
+													"merged_content": "@concat(body('Parse_News_JSON')?['longDescription'],body('Parse_News_JSON')?['shortDescription'])",
+													"metadata_creation_date": "@body('Parse_News_JSON')?['publishedDate']",
+													"metadata_last_modified": "@body('Parse_News_JSON')?['modified']",
+													"metadata_storage_file_extension": "JSON",
+													"metadata_storage_last_modified": "@body('Parse_News_JSON')?['modified']",
+													"metadata_storage_name": "@body('Parse_News_JSON')?['title']",
+													"search_id": "@concat('News-',body('Parse_News_JSON')?['id'])",
+													"short_description": "@body('Parse_News_JSON')?['shortDescription']",
+													"thumbnail_url": "@body('Parse_News_JSON')?['thumbnailImage']"
+												}
+											}
+										},
+										"Select_News_Details_AR": {
+											"runAfter": {
+												"Parse_News_JSON_AR": [
+													"Succeeded"
+												]
+											},
+											"type": "Select",
+											"inputs": {
+												"from": "@createArray(body('Parse_News_JSON_AR'))",
+												"select": {
+													"@@search.action": "mergeOrUpload",
+													"entity_type": "News",
+													"id": "@body('Parse_News_JSON_AR')?['id']",
+													"merged_content": "@concat(body('Parse_News_JSON_AR')?['longDescription'],body('Parse_News_JSON_AR')?['shortDescription'])",
+													"metadata_creation_date": "@body('Parse_News_JSON_AR')?['publishedDate']",
+													"metadata_last_modified": "@body('Parse_News_JSON_AR')?['modified']",
+													"metadata_storage_name": "@body('Parse_News_JSON_AR')?['title']",
+													"search_id": "@concat('NewsAR-',body('Parse_News_JSON')?['id'])",
+													"short_description": "@body('Parse_News_JSON_AR')?['shortDescription']",
+													"thumbnail_url": "@body('Parse_News_JSON_AR')?['thumbnailImage']"
+												}
+											}
+										},
+										"Send_News_Details_to_Azure_Search": {
+											"runAfter": {
+												"Select_News_Details": [
+													"Succeeded"
+												]
+											},
+											"type": "Http",
+											"inputs": {
+												"body": {
+													"value": "@body('Select_News_Details')"
+												},
+												"headers": {
+													"api-key": "95C6081EA9641D51D42AF4B2C8576F00",
+													"content-type": "application/json"
+												},
+												"method": "POST",
+												"uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index-lps/docs/index?api-version=2020-06-30"
+											}
+										},
+										"Send_News_Details_to_Azure_Search_AR": {
+											"runAfter": {
+												"Select_News_Details_AR": [
+													"Succeeded"
+												]
+											},
+											"type": "Http",
+											"inputs": {
+												"body": {
+													"value": "@body('Select_News_Details_AR')"
+												},
+												"headers": {
+													"api-key": "95C6081EA9641D51D42AF4B2C8576F00",
+													"content-type": "application/json"
+												},
+												"method": "POST",
+												"uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
+											}
+										}
+									}
+								},
+								"expression": {
+									"or": [
+										{
+											"equals": [
+												"@triggerBody()?['eventType']",
+												"new-kbarticle"
+											]
+										},
+										{
+											"equals": [
+												"@triggerBody()?['eventType']",
+												"kbarticle-update"
+											]
+										}
+									]
+								},
+								"type": "If"
+							}
+						}
+					},
+					"expression": {
+						"or": [
+							{
+								"equals": [
+									"@triggerBody()?['eventType']",
+									"new-product"
+								]
+							},
+							{
+								"equals": [
+									"@triggerBody()?['eventType']",
+									"product-update"
+								]
+							}
+						]
+					},
+					"type": "If"
+				}
+			}
+		},
+		"workflowParameters": {
+			"value": {
+				"$connections": {
+					"defaultValue": {},
+					"type": "Object"
+				}
+			}
+		},
+		"tags": {
+			"value": {
+				"Environment": "Development"
+			}
+		},
+		"connectionParameters": {
+			"value": {
+				"$connections": {
+					"value": {
+						"azureeventgrid": {
+							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-temp-sandbox/providers/Microsoft.Web/connections/azureeventgrid",
+							"connectionName": "azureeventgrid",
+							"id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+						}
+					}
+				}
+			}
+		}
+	}
+}

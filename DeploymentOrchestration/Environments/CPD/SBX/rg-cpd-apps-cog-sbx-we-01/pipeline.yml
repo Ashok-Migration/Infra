@@ -15,7 +15,33 @@ variables:
     value: sqcp-ado-spn-dev
   - name: subscriptionId
     value: d0694def-b27e-4bb7-900d-437fbeb802da
-
+  - name: storageResourceGroup
+    value: rg-cpd-apps-sbx-we-01
+  - name: storageAccountName
+    value: stcpdappssbxwe01 
+  - name: datasourceScriptPath
+    value: Modules/ARM/SearchService/2020-03-13/Scripts/link.datasource.indexer.ps1
+  - name: scriptPath
+    value: Modules/ARM/SearchService/2020-03-13/Scripts/create.index.indexer.ps1
+  - name: searchServicesName
+    value: srch-cpd-apps-cog-sbx-we-01
+  - name: indexSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/Parameters/index-content-schema-parameters.json
+  - name: indexerSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/Parameters/indexer-blob-sbx-schema-parameters.json
+  - name: dataSourceSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/Parameters/ds-blob-sbx-schema-paramaters.json
+  - name: skillSetSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/Parameters/ss-blob-sbx-schema-paramaters.json
+  - name: indexUrl
+    value: https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexes/content-index?api-version=2020-06-30
+  - name: indexerUrl
+    value: https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexers/azureblob-indexer?api-version=2020-06-30
+  - name: dataSourceUrl
+    value: https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/datasources/azureblob?api-version=2020-06-30
+  - name: skillSetUrl
+    value: https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/skillsets/azureblob-skillset?api-version=2020-06-30
+    
 trigger: none
 #trigger:
 #  batch: true
@@ -86,6 +112,38 @@ stages:
                   ErrorAction             = "Stop"
                 }
                 New-AzDeployment @DeploymentInputs
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@3
+            displayName: Create Index in Search
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(indexSchemaFile)" -url "$(indexUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@3
+            displayName: Link to blob datasource
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(datasourceScriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -storageResourceGroup "$(storageResourceGroup)" -storageAccountName "$(storageAccountName)" -schemaFile "$(Build.Repository.LocalPath)/$(dataSourceSchemaFile)" -url "$(dataSourceUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@3
+            displayName: Link to blob skillset
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(skillSetSchemaFile)" -url "$(skillSetUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@3
+            displayName: Create Indexer in Search
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(indexerSchemaFile)" -url "$(indexerUrl)"'
               azurePowerShellVersion: LatestVersion
 
   - stage: SecurityVerification
