@@ -115,6 +115,12 @@
 										"reviewsCount": {
 											"type": "number"
 										},
+										"sectorNames": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
 										"shortDescription": {
 											"type": "string"
 										}
@@ -161,6 +167,12 @@
 										"reviewsCount": {
 											"type": "number"
 										},
+										"sectorNames": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
 										"shortDescription": {
 											"type": "string"
 										}
@@ -192,6 +204,7 @@
 									"price": "@concat(body('Parse_Product_JSON')?['productPrice'],'')",
 									"provider_name": "@body('Parse_Product_JSON')?['providerName']",
 									"search_id": "@concat('ProductsServices-',body('Parse_Product_JSON')['id'])",
+									"sector": "@body('Parse_Product_JSON')?['sectorNames']",
 									"short_description": "@body('Parse_Product_JSON')?['shortDescription']",
 									"thumbnail_url": "@body('Parse_Product_JSON')?['imageUrl']"
 								}
@@ -220,6 +233,7 @@
 									"price": "@concat(body('Parse_Product_JSON_AR')?['productPrice'],'')",
 									"provider_name": "@body('Parse_Product_JSON_AR')?['providerName']",
 									"search_id": "@concat('ProductsServicesAr-',body('Parse_Product_JSON_AR')['id'])",
+									"sector": "@body('Parse_Product_JSON_AR')?['sectorNames']",
 									"short_description": "@body('Parse_Product_JSON_AR')?['shortDescription']",
 									"thumbnail_url": "@body('Parse_Product_JSON_AR')?['imageUrl']"
 								}
@@ -414,6 +428,12 @@
 														"publishedDate": {
 															"type": "string"
 														},
+														"sectors": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
 														"shortDescription": {
 															"type": "string"
 														},
@@ -451,6 +471,12 @@
 														"publishedDate": {
 															"type": "string"
 														},
+														"sectors": {
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														},
 														"shortDescription": {
 															"type": "string"
 														},
@@ -485,6 +511,7 @@
 													"metadata_storage_last_modified": "@body('Parse_News_JSON')?['modified']",
 													"metadata_storage_name": "@body('Parse_News_JSON')?['title']",
 													"search_id": "@concat('News-',body('Parse_News_JSON')?['id'])",
+													"sector": "@body('Parse_News_JSON')?['sectors']",
 													"short_description": "@body('Parse_News_JSON')?['shortDescription']",
 													"thumbnail_url": "@body('Parse_News_JSON')?['thumbnailImage']"
 												}
@@ -508,6 +535,7 @@
 													"metadata_last_modified": "@body('Parse_News_JSON_AR')?['modified']",
 													"metadata_storage_name": "@body('Parse_News_JSON_AR')?['title']",
 													"search_id": "@concat('NewsAR-',body('Parse_News_JSON')?['id'])",
+													"sector": "@body('Parse_News_JSON_AR')?['sectors']",
 													"short_description": "@body('Parse_News_JSON_AR')?['shortDescription']",
 													"thumbnail_url": "@body('Parse_News_JSON_AR')?['thumbnailImage']"
 												}
@@ -529,7 +557,7 @@
 													"content-type": "application/json"
 												},
 												"method": "POST",
-												"uri": "https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexes/content-index-lps/docs/index?api-version=2020-06-30"
+												"uri": "https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
 											}
 										},
 										"Send_News_Details_to_Azure_Search_AR": {
@@ -603,7 +631,7 @@
 		},
 		"tags": {
 			"value": {
-				"Environment": "Development"
+				"Environment": "Sandbox"
 			}
 		},
 		"connectionParameters": {
