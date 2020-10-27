@@ -2,6 +2,24 @@
 	"$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
+		"authorizationRules": {
+			"type": "array",
+			"defaultValue": [
+				{
+					"name": "RootManageSharedAccessKey",
+					"properties": {
+						"rights": [
+							"Listen",
+							"Manage",
+							"Send"
+						]
+					}
+				}
+			],
+			"metadata": {
+				"description": "Optional. Authorization Rules for the Event Hub namespace"
+			}
+		},
 		"location": {
 			"type": "string",
 			"defaultValue": "[resourceGroup().location]",
@@ -24,6 +42,7 @@
 		}
 	},
 	"variables": {
+		"namespaceResourceId": "[resourceId('Microsoft.NotificationHubs/namespaces', parameters('namespaceName'))]"
 	},
 	"resources": [
 		{
@@ -38,25 +57,40 @@
 				"name": "[parameters('namespaceName')]",
 				"region": "[parameters('location')]",
 				"namespaceType": "NotificationHub"
+			}
+		},
+		{
+			"type": "Microsoft.NotificationHubs/namespaces/notificationHubs",
+			"apiVersion": "2017-04-01",
+			"name": "[concat(parameters('namespaceName'),'/',parameters('notificationHubName'))]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[concat('Microsoft.NotificationHubs/namespaces/', parameters('namespaceName'))]"
+			],
+			"tags": "[parameters('tags')]",
+			"sku": {
+				"name": "[parameters('sku')]"
 			},
-			"resources": [
-				{
-					"type": "Microsoft.NotificationHubs/namespaces/notificationHubs",
-					"apiVersion": "2017-04-01",
-					"name": "[concat(parameters('namespaceName'),'/',parameters('notificationHubName'))]",
-					"location": "[parameters('location')]",
-					"dependsOn": [
-						"[concat('Microsoft.NotificationHubs/namespaces/', parameters('namespaceName'))]"
-					],
-					"tags": "[parameters('tags')]",
-					"sku": {
-						"name": "[parameters('sku')]"
-					},
-					"properties": {
-						"name": "[parameters('notificationHubName')]"
-					}
-				}
-			]
+			"properties": {
+				"name": "[parameters('notificationHubName')]"
+			}
+		},
+		{
+			"type": "Microsoft.NotificationHubs/namespaces/AuthorizationRules",
+			"apiVersion": "2017-04-01",
+			"name": "[concat(parameters('namespaceName'),'/', parameters('authorizationRules')[copyIndex()].name)]",
+			"condition": "[greater(length(parameters('authorizationRules')),0)]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('namespaceResourceId')]"
+			],
+			"copy": {
+				"name": "authorizationRules",
+				"count": "[length(parameters('authorizationRules'))]"
+			},
+			"properties": {
+				"rights": "[parameters('authorizationRules')[copyIndex()].properties.rights]"
+			}
 		}
 	],
 	"outputs": {

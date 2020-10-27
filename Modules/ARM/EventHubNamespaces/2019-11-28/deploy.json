@@ -2,76 +2,6 @@
 	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"namespaceName": {
-			"type": "string",
-			"metadata": {
-				"description": "Required. The name of the EventHub namespace"
-			}
-		},
-		"location": {
-			"type": "string",
-			"defaultValue": "[resourceGroup().location]",
-			"metadata": {
-				"description": "Optional. Location for all resources."
-			}
-		},
-		"skuName": {
-			"type": "string",
-			"defaultValue": "Standard",
-			"allowedValues":[
-				"Basic",
-				"Standard"
-			],
-			"metadata": {
-				"description": "Optional. EventHub Plan sku name"
-			}
-		},
-		"skuCapacity": {
-			"type": "int",
-			"defaultValue": 1,
-			"minValue": 1,
-			"maxValue": 20,
-			"metadata": {
-				"description": "Optional. Event Hub Plan scale-out capacity of the resource"
-			}
-		},
-		"zoneRedundant": {
-			"type": "bool",
-			"defaultValue": false,
-			"metadata": {
-				"description": "Optional. Switch to make the Event Hub Namespace zone redundant."
-			}
-		},
-		"isAutoInflateEnabled": {
-			"type": "bool",
-			"defaultValue": false,
-			"metadata": {
-				"description": "Optional. Switch to enable the Auto Inflate feature of Event Hub."
-			}
-		},
-		"maximumThroughputUnits": {
-			"type": "int",
-			"defaultValue": 1,
-			"minValue": 0,
-			"maxValue": 20,
-			"metadata": {
-				"description": "Optional. Upper limit of throughput units when AutoInflate is enabled, value should be within 0 to 20 throughput units."
-			}
-		},
-		"partnerNamespaceId": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "Optional. ARM Id of the Primary/Secondary eventhub namespace name, which is part of GEO DR pairing"
-			}
-		},
-		"namespaceAlias": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "Optional. The Disaster Recovery configuration name"
-			}
-		},
 		"authorizationRules": {
 			"type": "array",
 			"defaultValue": [
@@ -90,21 +20,6 @@
 				"description": "Optional. Authorization Rules for the Event Hub namespace"
 			}
 		},
-		"networkAcls": {
-			"type": "object",
-			"defaultValue": {
-			},
-			"metadata": {
-				"description": "Optional. Service endpoint object information"
-			}
-		},
-		"vNetId": {
-			"type": "string",
-			"defaultValue": "",
-			"metadata": {
-				"description": "Optional. Virtual Network Id to lock down the Event Hub."
-			}
-		},
 		"diagnosticLogsRetentionInDays": {
 			"type": "int",
 			"defaultValue": 365,
@@ -120,10 +35,26 @@
 				"description": "Optional. Resource identifier of the Diagnostic Storage Account."
 			}
 		},
-		"workspaceId": {
-			"type": "string",
+		"eventHubName": {
+			"type": "array",
+			"defaultValue": [
+			],
 			"metadata": {
-				"description": "Optional. Resource identifier of Log Analytics."
+				"description": "Optional. List of specific Event Hubs to create."
+			}
+		},
+		"isAutoInflateEnabled": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Optional. Switch to enable the Auto Inflate feature of Event Hub."
+			}
+		},
+		"location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().location]",
+			"metadata": {
+				"description": "Optional. Location for all resources."
 			}
 		},
 		"lockForDeletion": {
@@ -133,12 +64,89 @@
 				"description": "Optional. Switch to lock Key Vault from deletion."
 			}
 		},
+		"maximumThroughputUnits": {
+			"type": "int",
+			"defaultValue": 1,
+			"minValue": 0,
+			"maxValue": 20,
+			"metadata": {
+				"description": "Optional. Upper limit of throughput units when AutoInflate is enabled, value should be within 0 to 20 throughput units."
+			}
+		},
+		"namespaceAlias": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Optional. The Disaster Recovery configuration name"
+			}
+		},
+		"namespaceName": {
+			"type": "string",
+			"metadata": {
+				"description": "Required. The name of the EventHub namespace"
+			}
+		},
+		"networkAcls": {
+			"type": "object",
+			"defaultValue": {
+			},
+			"metadata": {
+				"description": "Optional. Service endpoint object information"
+			}
+		},
+		"partnerNamespaceId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Optional. ARM Id of the Primary/Secondary eventhub namespace name, which is part of GEO DR pairing"
+			}
+		},
+		"skuCapacity": {
+			"type": "int",
+			"defaultValue": 1,
+			"minValue": 1,
+			"maxValue": 20,
+			"metadata": {
+				"description": "Optional. Event Hub Plan scale-out capacity of the resource"
+			}
+		},
+		"skuName": {
+			"type": "string",
+			"defaultValue": "Standard",
+			"allowedValues": [
+				"Basic",
+				"Standard"
+			],
+			"metadata": {
+				"description": "Optional. EventHub Plan sku name"
+			}
+		},
 		"tags": {
 			"type": "object",
 			"defaultValue": {
 			},
 			"metadata": {
 				"description": "Optional. Tags of the Key Vault resource."
+			}
+		},
+		"vNetId": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Optional. Virtual Network Id to lock down the Event Hub."
+			}
+		},
+		"workspaceId": {
+			"type": "string",
+			"metadata": {
+				"description": "Optional. Resource identifier of Log Analytics."
+			}
+		},
+		"zoneRedundant": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Optional. Switch to make the Event Hub Namespace zone redundant."
 			}
 		}
 	},
@@ -289,6 +297,39 @@
 			]
 		},
 		{
+			"apiVersion": "2017-04-01",
+			"type": "Microsoft.EventHub/namespaces/eventhubs",
+			"condition": "[not(empty(parameters('eventHubName')))]",
+			"name": "[concat(parameters('namespaceName'), '/', parameters('eventHubName')[copyIndex('eventHubNameLoop')].name)]",
+			"location": "[parameters('location')]",
+			"copy": {
+				"name": "eventHubNameLoop",
+				"count": "[if(empty(parameters('eventHubName')) , 1, length(parameters('eventHubName')))]"
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.EventHub/namespaces', parameters('namespaceName'))]"
+			],
+			"properties": {
+				"messageRetentionInDays": "[parameters('eventHubName')[copyIndex('eventHubNameLoop')].messageRetentionInDays]",
+				"partitionCount": 1,
+				"status": "Active",
+				"captureDescription": {
+					"enabled": "[parameters('eventHubName')[copyIndex('eventHubNameLoop')].captureDescription]",
+					"encoding": "Avro",
+					"destination": {
+						"name": "EventHubArchive.AzureBlockBlob",
+						"properties": {
+							"storageAccountResourceId": "[parameters('diagnosticStorageAccountId')]",
+							"blobContainer": "diagnostics",
+							"archiveNameFormat": "{Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}"
+						}
+					},
+					"intervalInSeconds": 300,
+					"sizeLimitInBytes": 314572800
+				}
+			}
+		},
+		{
 			"type": "Microsoft.EventHub/namespaces/disasterRecoveryConfigs",
 			"apiVersion": "2017-04-01",
 			"name": "[concat(parameters('namespaceName'), '/', variables('namespaceAlias'))]",
@@ -320,7 +361,7 @@
 			}
 		}
 	],
-  "functions": [],
+	"functions": [],
 	"outputs": {
 		"namespaceName": {
 			"type": "string",

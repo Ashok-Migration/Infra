@@ -92,7 +92,8 @@ All resources must be added to this sheet.
 1. NetworkSecurityGroups 
 1. NotificationHubNamespaces 
 1. Powerbi                
-1. PrivateDNSZones           
+1. PrivateDNSZones 
+1. PrivateEndpoint          
 1. RecoveryServicesVaults    
 1. RedisCache                
 1. ResourceGroup             

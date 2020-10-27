@@ -13,7 +13,6 @@
     "variables": {
         "lockForDeletion": false,
         "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
-
         "accountSasProperties": {
             "signedServices": "bt",
             "signedPermission": "racuw",
@@ -27,7 +26,6 @@
         "containerName": "components",
         "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
         "location": "[deployment().location]"
-
     },
     "resources": [
         {
@@ -35,8 +33,7 @@
             "apiVersion": "2019-08-01",
             "name": "DEP-rg-cpd-apps-mon-sbx-we-01",
             "location": "[variables('location')]",
-            "dependsOn": [
-            ],
+            "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
                 "debugSetting": {
@@ -112,7 +109,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-stcpdappsdiagdevwe01",
+            "name": "DEP-stcpdappsdiagsbxwe01",
             "resourceGroup": "rg-cpd-apps-mon-sbx-we-01",
             "dependsOn": [
                 "DEP-rg-cpd-apps-mon-sbx-we-01"
@@ -126,7 +123,7 @@
                     "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsdiagdevwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsdiagsbxwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -150,9 +147,53 @@
                     "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-apps-mon-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-evhns-cpd-apps-mon-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-mon-sbx-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-mon-sbx-we-01",
+                "DEP-stcpdappsdiagsbxwe01",
+                "DEP-log-cpd-apps-mon-sbx-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/Parameters/evhns-cpd-apps-mon-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-evhns-cpd-apps-mon-sbx-we-01",
+            "resourceGroup": "rg-cpd-apps-mon-sbx-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-mon-sbx-we-01",
+                "DEP-stcpdappsdiagsbxwe01",
+                "DEP-log-cpd-apps-mon-sbx-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/Parameters/evhns-cpd-apps-mon-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
-
     ],
-    "outputs": {
-    }
+    "outputs": {}
 }
