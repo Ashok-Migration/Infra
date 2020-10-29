@@ -54,7 +54,9 @@ function Create-ContentTypeAddColumns()
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    $client.Context.Cloud.RoleName = $RoleName
+    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+        $client.Context.Cloud.RoleName = $RoleName
+    }
 
     $siteContentTypePath = $PSScriptRoot + '\resources\ContentType.xml'
     $scXML = Get-SiteColumsToImport $siteContentTypePath

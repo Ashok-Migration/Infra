@@ -66,7 +66,9 @@ function Provision-ComponentsForSites()
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.ApplicationInsights.dll')
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    $client.Context.Cloud.RoleName = $RoleName
+    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+        $client.Context.Cloud.RoleName = $RoleName
+    }
 
     $filePath = $PSScriptRoot + '\resources\Site.xml'
     [xml]$sitefile = Get-Content -Path $filePath
@@ -280,7 +282,7 @@ Function CreateLookupColumn()
         $web = Get-PnPWeb
         $LookupWebID=$web.Id
 
-        $lookupColumnId = [GUID]::NewGuid() 
+        $lookupColumnId=[GUID]::NewGuid() 
         $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='Lookup'
         ID='{$lookupColumnId}' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
@@ -288,7 +290,7 @@ Function CreateLookupColumn()
 
         foreach($columnItem in $sitefile.sites.ProductDocumentsList.ListAndContentTypes.projectedField){
             # create the projected field
-            $newID = [GUID]::NewGuid() 
+            $newID=[GUID]::NewGuid() 
             $ColumnTitle=$columnItem.ColumnTitle
             $ColumnName=$columnItem.ColumnName
             $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='Lookup' DisplayName='$ColumnTitle' Name='$ColumnName' 
@@ -839,7 +841,7 @@ function ApplyTheme($themeName, $url)
     try
     {
         $client.TrackEvent("Apply Theme started.")
-        Set-PnPWebTheme -Theme $themeName –WebUrl $url
+        Set-PnPWebTheme -Theme $themeName -WebUrl $url
         $client.TrackEvent("Apply Theme completed.")
     }
     catch
@@ -1076,7 +1078,7 @@ function ListandLibrary($url, $nodeLevel) {
         #create all List & Libraries
         $client.TrackEvent("List and Library creation started.")
         
-        foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+        foreach($itemList in $nodeLevel.ListAndContentTypes) {
             if ($itemList.ListName -eq "Documents" -or $itemList.ListName -eq "Site Pages" -or $itemList.ListName -eq "Image Gallery") {
                 $ListURL = $itemList.ListName
             }
@@ -1116,7 +1118,7 @@ function GrantPermissionOnListToGroup($url, $nodeLevel)
     #GrantPermissionOnListToGroup List & Libraries
     $client.TrackEvent("List and Library creation started.")
         
-     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+     foreach($itemList in $nodeLevel.ListAndContentTypes) {
         #Grant permission on list to Group
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
@@ -1848,19 +1850,19 @@ function RemoveColumnsAndContentType($url)
 {   
     
     #remove all the fields from each content type from given site
-    foreach ($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
     {
         RemoveFieldFromContentType $url $objcolumnItem.ColumnName $objcolumnItem.ContentTypeName
     }
     
     #remove all the content types from given site
-    foreach ($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
     {
         RemovePnPContentType $url $objcolumnItem.ContentTypeName
     }
     
     #remove all all the fields from given site
-    foreach ($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
     {
         RemovePnPField $url $objcolumnItem.ColumnName
     }

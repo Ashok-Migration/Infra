@@ -61,21 +61,22 @@ $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $contenttypehub="https://"+ $tenant+".sharepoint.com/sites/contentTypeHub"
 Write-host $contenttypehub -ForegroundColor Yellow
 
-
 #region --Taxonomy Creation ---
 function Create-Taxanomy() {
 
 try
 {
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Taxonomy.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.ApplicationInsights.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Taxonomy.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     
-    $client.InstrumentationKey = $InstrumentationKey 
-    $client.Context.Cloud.RoleName = $RoleName
+    $client.InstrumentationKey = $InstrumentationKey
+    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+        $client.Context.Cloud.RoleName = $RoleName
+    }
 
     $client.TrackEvent("Main function started...")
 
@@ -99,7 +100,7 @@ try
 
     $client.TrackEvent("Authentication success...")
 
-    $termsPath = $PSScriptRoot + '\resources\Taxonomy.xml'
+    $termsPath = Resolve-Path $PSScriptRoot'.\resources\Taxonomy.xml'
 
     $client.TrackEvent("Reading Term Store Info & Terms started")
 

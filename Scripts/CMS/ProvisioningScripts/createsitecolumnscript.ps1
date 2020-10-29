@@ -55,7 +55,9 @@ function Create-SiteColumns()
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    $client.Context.Cloud.RoleName = $RoleName
+    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+        $client.Context.Cloud.RoleName = $RoleName
+    }
 
     $filePath = $PSScriptRoot + '\resources\SiteColumns.xml'
 
@@ -157,7 +159,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 
             if ($ColumnType -eq "Choice") {
                 # Create new site column if site column does not exist                
-                $Id = [GUID]::NewGuid()
+                $Id=[GUID]::NewGuid()
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
                 } 
@@ -187,7 +189,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
             elseif ($columnType -eq "Note") {
                 if($isRichText -eq $True)
                 {
-                    $Id = [GUID]::NewGuid() 
+                    $Id=[GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
@@ -207,7 +209,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
                 else
                 {
-                    $Id = [GUID]::NewGuid() 
+                    $Id=[GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
@@ -225,7 +227,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
             } 
          elseif ($columnType -eq "Number") {
-                $Id = [GUID]::NewGuid() 
+                $Id=[GUID]::NewGuid() 
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				DisplayName='$ColumnTitle' 
                 Required='$Required' 
@@ -242,7 +244,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 		        </Field>"
             }
             elseif ($columnType -eq "Boolean") {
-                $Id = [GUID]::NewGuid()
+                $Id=[GUID]::NewGuid()
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
                 }
@@ -262,7 +264,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 		        </Field>"
             }
             else {
-                $Id = [GUID]::NewGuid()
+                $Id=[GUID]::NewGuid()
                 $fieldXML = ""
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"

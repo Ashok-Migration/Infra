@@ -33,6 +33,7 @@ param (
     $TemplateParametersFile,
     $sp_user,
     $sp_password,
+    $scope,
     $InstrumentationKey
 )
 
@@ -52,7 +53,9 @@ function Create-NewSiteCollection()
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    $client.Context.Cloud.RoleName = $RoleName
+    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+        $client.Context.Cloud.RoleName = $RoleName
+    }
 
     $filePath = $PSScriptRoot + '\resources\Site.xml'
 

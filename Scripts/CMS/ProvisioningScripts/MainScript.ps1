@@ -45,28 +45,41 @@ Write-host $tenant -ForegroundColor Yellow
 Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
 Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
 
+$paramslogin = @{tenant=$tenant; sp_user=$sp_user; sp_password=$sp_password;}
+$psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
+$loginResult = .$psspologin  @paramslogin
+
 $params = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey}
 $paramsnewsite = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; scope=$scope; InstrumentationKey=$InstrumentationKey}
+if($null -ne $loginResult){
+    $webparams = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; fedAuth=$loginResult.FedAuth; rtFA=$loginResult.RtFa}
+}
 
-$psfile = $PSScriptRoot + ".\createtaxanomyscript.ps1"
-$psfilecreatesitecolumnscript = $PSScriptRoot + ".\createsitecolumnscript.ps1"
-$psfilecreatecontenttypescript = $PSScriptRoot + ".\createcontenttypescript.ps1"
-$psfilecreatenewsitescript = $PSScriptRoot + ".\createnewsitescript.ps1"
-$psfileprovisionnewsitecollectionscript = $PSScriptRoot + ".\provisionnewsitecollectionscript.ps1"
+$psfileensuretermstoreadminscript = Resolve-Path $PSScriptRoot".\ensuretermstoreadmin.ps1"
+$psfile = Resolve-Path $PSScriptRoot".\createtaxanomyscript.ps1"
+$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
+$psfilecreatecontenttypescript = Resolve-Path $PSScriptRoot".\createcontenttypescript.ps1"
+$psfilepublishcontenttypescript = Resolve-Path $PSScriptRoot".\publishcontenttypes.ps1"
+$psfilecreatenewsitescript = Resolve-Path $PSScriptRoot".\createnewsitescript.ps1"
+$psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsitecollectionscript.ps1"
 
+if($null -ne $webparams){
+    .$psfileensuretermstoreadminscript @webparams
+}
 .$psfile @params
 .$psfilecreatesitecolumnscript @params
 .$psfilecreatecontenttypescript @params
+if($null -ne $webparams){
+    .$psfilepublishcontenttypescript @webparams
+}
 .$psfilecreatenewsitescript @paramsnewsite
-
-
 
 #region To check if all Content type exists in Global site 
 
 function checkContentTypeExists()
 {
     Write-host "Check if Content Type Exists started..." -ForegroundColor Green
-    $filePath = $PSScriptRoot + '\Site.xml'
+    $filePath = $PSScriptRoot + '.\resources\Site.xml'
 
     [xml]$sitefile = Get-Content -Path $filePath
     $secstr = New-Object -TypeName System.Security.SecureString
@@ -83,7 +96,7 @@ function checkContentTypeExists()
     $connection = Get-PnPConnection
 
     $isContentTypeAvailable=$true
-    foreach ($itemList in $sitefile.sites.globalSPList.ListAndContentTypes) {
+    foreach ($itemList in $sitefile.sites.globalSPList.ListAndContentTypes) {
         $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
         if($ListBase -eq $null)
         {
