@@ -22,21 +22,21 @@
     },
     "customVirtualNetworkId": {
       "type": "string",
-      "defaultValue": "vnet-cpd-pltf-dev-we-01",
+      "defaultValue": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01",
       "metadata": {
         "description": "The complete ARM resource Id of the custom virtual network."
       }
     },
     "customPublicSubnetName": {
       "type": "string",
-      "defaultValue": "snet-cpd-pltf-dbr-dev-we-01",
+      "defaultValue": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-dbrpub-dev-we-01",
       "metadata": {
         "description": "The name of the public subnet in the custom VNet."
       }
     },
     "customPrivateSubnetName": {
       "type": "string",
-      "defaultValue": "snet-cpd-pltf-dbr-dev-we-02",
+      "defaultValue": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-dbrpri-dev-we-01",
       "metadata": {
         "description": "The name of the private subnet in the custom VNet."
       }
@@ -57,8 +57,7 @@
     }
   },
   "variables": {
-    "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', variables('managedResourceGroupName'))]",
-    "managedResourceGroupName": "rg-databricks-cpd-dev-01"
+    "managedResourceGroupName": "[concat('databricks-rg-', parameters('workspaceName'), '-', uniqueString(parameters('workspaceName'), resourceGroup().id))]"
   },
   "resources": [
     {
@@ -70,7 +69,7 @@
       },
       "comments": "The resource group specified will be locked after deployment.",
       "properties": {
-        "ManagedResourceGroupId": "[variables('managedResourceGroupId')]",
+        "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('managedResourceGroupName'))]",
         "parameters": {
           "customVirtualNetworkId": {
             "value": "[parameters('customVirtualNetworkId')]"

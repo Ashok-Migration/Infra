@@ -1,19 +1,26 @@
-# Databricks
+# Azure Data Explorer
 
-This module deploys Databricks Premium.
+This module deploys Azure Data Explorer and two public IP addresses.
 
 ## Resources
 
-- Microsoft.Databricks/workspaces
+- Microsoft.Kusto/Clusters
+- Microsoft.Network/publicIPAddresses 
 
 ## Parameters
 
 | Parameter Name | Type | Default Value | Possible values | Description |
 | :-             | :-   | :-            | :-              | :-          |
-| `WorkspaceName` | string | | | Required. Name of the Azure Databricks Workspace
-| `pricingTier` | string | `[resourceGroup().location]` | | Optional. Location for all resources.
-| `vnetAddressPrefix` | string | `{}` | Complex structure, see below. | Optional. Access policies object
-| `location` | string | `{}` | Complex structure, see below. | Optional. All secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object
+| `clusterName` | string | | | Required. 
+| `skuName` | string | "Standard_D13_v2" | | Required. 
+| `skuTier` | string | "Standard" | | Required. 
+| `virtualNetworkName` | string | | | Required. 
+| `subnetName` | string | | | Required. 
+| `enginePublicIpName` | string | "engine-pip" | | Required. 
+| `dataManagementPublicIpName` | string | "dm-pip" | | Required. 
+| `publicIpAllocationMethod` | string | "Static" | | Required. 
+| `location` | string | `[resourceGroup().location]` | | Required. 
+| `tags` | string | `{}` | Complex structure, see below. | Optional. 
 | 
 ### Parameter Usage: `tags`
 
@@ -32,85 +39,12 @@ Tag names and tag values can be provided as needed. A tag can be left without a 
 }
 ```
 
-### Parameter Usage: `networkAcls`
-
-```json
-"networkAcls": {
-    "value": {
-        "bypass": "AzureServices",
-        "defaultAction": "Deny",
-        "virtualNetworkRules": [
-            {
-                "subnet": "sharedsvcs"
-            }
-        ],
-        "ipRules": []
-    }
-}
-```
-
-### Parameter Usage: `vNetId`
-
-```json
-"vNetId": {
-    "value": "/subscriptions/00000000/resourceGroups/resourceGroup"
-}
-```
-
-### Parameter Usage: `accessPolicies`
-
-```json
-"accessPolicies": {
-    "value": [
-        {
-            "tenantId": null,
-            "objectId": null,
-            "permissions": {
-                "certificates": [
-                    "All"
-                ],
-                "keys": [
-                    "All"
-                ],
-                "secrets": [
-                    "All"
-                ]
-            }
-        }
-    ]
-}
-```
-
-### Parameter Usage: `secretsObject`
-
-```json
-"secretsObject": {
-    "value": {
-        "secrets": [
-            {
-                "secretName": "Secret--AzureAd--Domain",
-                "secretValue": "Some value"
-            }
-        ]
-    }
-}
-```
-
 ## Outputs
 
-| Output Name | Description |
-| :-          | :-          |
-| `keyVaultResourceId` | The Resource Id of the Key Vault.
-| `keyVaultResourceGroup` | The name of the Resource Group the Key Vault was created in.
-| `keyVaultName` | The Name of the Key Vault.
-| `keyVaultUrl` | The Name of the Key Vault.
 
 ## Considerations
 
-*N/A*
-
 ## Additional resources
 
-- [What is Azure Key Vault?](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis)
-- [Microsoft.KeyVault vaults template reference](https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/2018-02-14/vaults)
+- [Azure Data Explorer template reference?](https://docs.microsoft.com/en-us/azure/templates/microsoft.kusto/clusters)
 - [Use tags to organize your Azure resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-using-tags)

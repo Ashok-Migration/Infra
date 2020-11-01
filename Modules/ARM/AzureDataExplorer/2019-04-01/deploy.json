@@ -3,8 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "clusterName": {
-      "type": "string",
-      "defaultValue": "adx-cpd-data-dev-we-01"
+      "type": "string"
     },
     "skuName": {
       "type": "string",
@@ -15,12 +14,10 @@
       "defaultValue": "Standard"
     },
     "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "vnet-cpd-pltf-dev-we-01"
+      "type": "string"
     },
     "subnetName": {
-      "type": "string",
-      "defaultValue": "snet-cpd-pltf-daisvc-dev-we-01"
+      "type": "string"
     },
     "enginePublicIpName": {
       "type": "string",
@@ -29,6 +26,10 @@
     "dataManagementPublicIpName": {
       "type": "string",
       "defaultValue": "dm-pip"
+    },
+    "publicIpAllocationMethod": {
+      "type": "string",
+      "defaultValue": "Static"
     },
     "location": {
       "type": "string",
@@ -46,39 +47,12 @@
     }
   },
   "variables": {
-    "publicIpAllocationMethod": "Static",
-    "nsgName": "adxcpddatadevwe01Nsg",
-    "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnetId": "IpAdxcpddatadevwe01",
+    "subnetId": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'),parameters('subnetName'))]",
     "enginePublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('enginePublicIpName'))]",
     "dataManagementPublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('dataManagementPublicIpName'))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('nsgName')]",
-      "apiVersion": "2019-07-01",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "AllowHTTPS",
-            "properties": {
-              "description": "Allow access using HTTPS",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
     {
       "apiVersion": "2019-07-01",
       "type": "Microsoft.Network/publicIPAddresses",
@@ -88,7 +62,7 @@
       },
       "location": "[parameters('location')]",
       "properties": {
-        "publicIPAllocationMethod": "[variables('publicIpAllocationMethod')]",
+        "publicIPAllocationMethod": "[parameters('publicIpAllocationMethod')]",
         "publicIPAddressVersion": "IPv4"
       }
     },
@@ -101,7 +75,7 @@
       },
       "location": "[parameters('location')]",
       "properties": {
-        "publicIPAllocationMethod": "[variables('publicIpAllocationMethod')]",
+        "publicIPAllocationMethod": "[parameters('publicIpAllocationMethod')]",
         "publicIPAddressVersion": "IPv4"
       }
     },
@@ -115,8 +89,7 @@
       "apiVersion": "2019-05-15",
       "dependsOn": [
         "[variables('enginePublicIpId')]",
-        "[variables('dataManagementPublicIpId')]",
-        "[variables('vnetId')]"
+        "[variables('dataManagementPublicIpId')]"
       ],
       "location": "[parameters('location')]",
       "properties": {
