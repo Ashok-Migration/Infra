@@ -1,0 +1,591 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "utcYear": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy')]",
+      "metadata": {
+        "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+      }
+    }
+  },
+  "variables": {
+    "lockForDeletion": false,
+    "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+
+    "accountSasProperties": {
+      "signedServices": "bt",
+      "signedPermission": "racuw",
+      "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+      "signedResourceTypes": "co",
+      "signedProtocol": "https"
+    },
+    "componentStorageAccountId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-iacstg-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgnpdwe01",
+    "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+    "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+    "containerName": "components",
+    "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+    "location": "[deployment().location]"
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-rg-cpd-data-uat-we-01",
+      "location": "[variables('location')]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "name": "[variables('CUA')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-adx-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AzureDataExplorer/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AzureDataExplorer/2019-04-01/Parameters/rg-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-stcpddatauatwe01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpddatauatwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-stcpddatauatwe02",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpddatauatwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-dlsrawzoneuatwe01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'Datalakes/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'Datalakes/2019-04-01/Parameters/dlsrawzoneuatwe01.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-dlsgoldzoneuatwe01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'Datalakes/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'Datalakes/2019-04-01/Parameters/dlsgoldzoneuatwe01.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-kv-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-adf-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'DataFactory/2018-06-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'DataFactory/2018-06-01/Parameters/adf-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-08-01",
+    //  "name": "DEP-dsh-cpd-data-tst-we-01",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    //    "DEP-rg-cpd-data-tst-we-01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    //      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'DataShare/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'DataShare/2019-04-01/Parameters/dsh-cpd-data-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+    //},
+  //  {
+  //    "type": "Microsoft.Resources/deployments",
+  //    "apiVersion": "2019-08-01",
+  //    "name": "DEP-asa-cpd-data-uat-we-01",
+  //    "resourceGroup": "rg-cpd-data-uat-we-01",
+  //    "dependsOn": [
+  //      "DEP-rg-cpd-data-uat-we-01"
+  //    ],
+  //    "properties": {
+  //      "mode": "Incremental",
+  //      "debugSetting": {
+  //        "detailLevel": "requestContent,responseContent"
+  //      },
+  //      "templateLink": {
+  //        "uri": "[concat(variables('modulesPath'), 'StreamAnalytics/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+  //      },
+  //      "parametersLink": {
+  //        "uri": "[concat(variables('modulesPath'), 'StreamAnalytics/2019-11-28/Parameters/asa-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+   //     }
+    //  }
+    //},
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-logic-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-cog-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-evh-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubs/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubs/2019-04-01/Parameters/evh-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-iot-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'IoTHub/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'IoTHub/2019-04-01/Parameters/iot-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sql-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-kv-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLLogicalServer/2018-06-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLLogicalServer/2018-06-01/Parameters/sql-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqldw-smartcity-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-sql-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/Parameters/sqldw-smartcity-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqldw-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-sql-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/Parameters/sqldw-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqldb-cpd-dynamics-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-sql-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/Parameters/sqldb-cpd-dynamics-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqldb-cpd-data-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-sql-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/Parameters/sqldb-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-aascpddatauatwe01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AnalysisServices/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AnalysisServices/2019-04-01/Parameters/aascpddatauatwe01.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    }
+    //,
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-10-01",
+    //  "name": "DEP-appi-cpd-data-tst-we-01",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    //    "DEP-rg-cpd-data-tst-we-01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    //      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-data-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+    //},
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-10-01",
+    //  "name": "DEP-plan-cpd-data-tst-we-01",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    //    "DEP-rg-cpd-data-tst-we-01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    //      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/Parameters/plan-cpd-data-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+    //},
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-10-01",
+    //  "name": "DEP-func-cpd-data-tst-we-01",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    //    "DEP-rg-cpd-data-tst-we-01",
+    //    "DEP-plan-cpd-data-tst-we-01",
+    //    "DEP-appi-cpd-data-tst-we-01",
+    //    "DEP-stcpddatatstwe01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    //      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/Parameters/func-cpd-data-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+    //},
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-10-01",
+    //  "name": "DEP-func-cpd-data-tst-we-02",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    //    "DEP-rg-cpd-data-tst-we-01",
+    //    "DEP-plan-cpd-data-tst-we-01",
+    //    "DEP-appi-cpd-data-tst-we-01",
+    //    "DEP-stcpddatatstwe01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    //      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/Parameters/func-cpd-data-tst-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+    //}
+    //{
+    //  "type": "Microsoft.Resources/deployments",
+    //  "apiVersion": "2019-10-01",
+    //  "name": "DEP-func-cpd-data-tst-we-03",
+    //  "resourceGroup": "rg-cpd-data-tst-we-01",
+    //  "dependsOn": [
+    ///    "DEP-rg-cpd-data-tst-we-01"
+    //  ],
+    //  "properties": {
+    //    "mode": "Incremental",
+    //    "debugSetting": {
+    ///      "detailLevel": "requestContent,responseContent"
+    //    },
+    //    "templateLink": {
+    ///      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    },
+    //    "parametersLink": {
+    //      "uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/Parameters/func-cpd-data-tst-we-03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //    }
+    //  }
+   // }
+
+  ],
+  "outputs": {
+  }
+}
