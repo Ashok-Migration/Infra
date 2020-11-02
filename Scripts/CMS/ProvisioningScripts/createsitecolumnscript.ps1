@@ -124,10 +124,12 @@ function Get-SiteColumsToImport($xmlTermsPath){
             $showInNewEditForm= $fieldNode.showInNewEditForm
             $isRichText= $fieldNode.isRichText
             $defaultValue= $fieldNode.DefaultValue
+            $enforceUniqueValues = $fieldNode.EnforceUniqueValues
+            $indexed = $fieldNode.Indexed
 
             if($columnName -ne '')
             {
-              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue
+              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue $enforceUniqueValues $indexed
             }        
 
      }
@@ -145,11 +147,19 @@ function Get-SiteColumsToImport($xmlTermsPath){
     Disconnect-PnPOnline
 }
 
-function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue) {
+function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue, $enforceUniqueValues, $indexed) {
     Try {
 
         Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
         $connection = Get-PnPConnection
+
+        if([string]::IsNullOrWhiteSpace($enforceUniqueValues)){
+            $enforceUniqueValues = 'FALSE'  
+		}
+
+        if([string]::IsNullOrWhiteSpace($indexed)){
+            $indexed = 'FALSE'  
+		}
 
         $fieldExists = Get-PNPField -identity $ColumnName -ErrorAction SilentlyContinue
         #Check for existence of Institution Name site column
@@ -166,7 +176,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$columnType'
                 DisplayName='$ColumnTitle'
                 Required='$Required'
-                Indexed='FALSE'
+                Indexed='$indexed'
                 Format='$Format'
 				Group='$GroupName'                
                 ShowInEditForm='$showInNewEditForm'
@@ -189,12 +199,12 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
             elseif ($columnType -eq "Note") {
                 if($isRichText -eq $True)
                 {
-                    $Id=[GUID]::NewGuid() 
+                    $Id = [GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
-				    EnforceUniqueValues='FALSE' 
-				    Indexed='FALSE' Format='$Format' 
+				    EnforceUniqueValues='$enforceUniqueValues' 
+				    Indexed='$indexed' Format='$Format' 
 				    Group='$GroupName' 
 				    FriendlyDisplayFormat='Disabled' 
 				    StaticName='$ColumnName'
@@ -209,12 +219,12 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
                 else
                 {
-                    $Id=[GUID]::NewGuid() 
+                    $Id = [GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
-				    EnforceUniqueValues='FALSE' 
-				    Indexed='FALSE' Format='$Format' 
+				    EnforceUniqueValues='$enforceUniqueValues' 
+				    Indexed='$indexed' Format='$Format' 
 				    Group='$GroupName' 
 				    FriendlyDisplayFormat='Disabled' 
 				    StaticName='$ColumnName'
@@ -227,13 +237,13 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
             } 
          elseif ($columnType -eq "Number") {
-                $Id=[GUID]::NewGuid() 
+                $Id = [GUID]::NewGuid() 
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				DisplayName='$ColumnTitle' 
                 Required='$Required' 
                 Decimals= '$defaultValue'
-				EnforceUniqueValues='FALSE' 
-				Indexed='FALSE' Format='$Format' 
+				EnforceUniqueValues='$enforceUniqueValues' 
+				Indexed='$indexed' Format='$Format' 
 				Group='$GroupName' 
 				FriendlyDisplayFormat='Disabled' 
 				StaticName='$ColumnName'
@@ -244,15 +254,15 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 		        </Field>"
             }
             elseif ($columnType -eq "Boolean") {
-                $Id=[GUID]::NewGuid()
+                $Id = [GUID]::NewGuid()
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
                 }
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				DisplayName='$ColumnTitle' 
 				Required='$Required' 
-				EnforceUniqueValues='FALSE' 
-				Indexed='FALSE' 
+				EnforceUniqueValues='$enforceUniqueValues' 
+				Indexed='$indexed' 
 				Group='$GroupName' 
 				FriendlyDisplayFormat='Disabled' 
                 StaticName='$ColumnName'
@@ -264,19 +274,19 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 		        </Field>"
             }
             else {
-                $Id=[GUID]::NewGuid()
+                $Id = [GUID]::NewGuid()
                 $fieldXML = ""
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
                 }
                 if($null -eq $defaultValue){
                 
-                  $fieldXML =  "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Required='$Required' EnforceUniqueValues='FALSE' Indexed='FALSE' Format='$Format' Group='$GroupName' FriendlyDisplayFormat='Disabled' StaticName='$ColumnName' ShowInEditForm='$showInNewEditForm' ShowInNewForm='$showInNewEditForm' ID='$Id' Name='$ColumnName'></Field>"
+                  $fieldXML =  "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Format='$Format' Group='$GroupName' FriendlyDisplayFormat='Disabled' StaticName='$ColumnName' ShowInEditForm='$showInNewEditForm' ShowInNewForm='$showInNewEditForm' ID='$Id' Name='$ColumnName'></Field>"
 
                 }
                 else
                 {
-                   $fieldXML =  "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Required='$Required' EnforceUniqueValues='FALSE' Indexed='FALSE' Format='$Format' Group='$GroupName' FriendlyDisplayFormat='Disabled' StaticName='$ColumnName' ShowInEditForm='$showInNewEditForm' ShowInNewForm='$showInNewEditForm' ID='$Id' Name='$ColumnName'><Default>$defaultValue</Default></Field>"
+                   $fieldXML =  "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Format='$Format' Group='$GroupName' FriendlyDisplayFormat='Disabled' StaticName='$ColumnName' ShowInEditForm='$showInNewEditForm' ShowInNewForm='$showInNewEditForm' ID='$Id' Name='$ColumnName'><Default>$defaultValue</Default></Field>"
                 }
                 $addNewField = Add-PnPFieldFromXml -Connection $connection $fieldXML -ErrorAction Stop
             }
