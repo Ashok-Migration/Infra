@@ -76,7 +76,7 @@ function Provision-ComponentsForSites()
     $tenantUrl="https://"+$tenant+"-admin.sharepoint.com/"
     $urlprefix = "https://"+$tenant+".sharepoint.com/sites/"
 
-    $isExists = ProvisionSiteCollections $sitefile
+    $isExists = ProvisionSiteCollections $sitefile $tenantUrl
 
     Write-host "Completed" -ForegroundColor Green
     $client.TrackEvent("Completed.")
@@ -84,7 +84,7 @@ function Provision-ComponentsForSites()
    }
 
 
-function ProvisionSiteCollections($sitefile) 
+function ProvisionSiteCollections($sitefile, $tenantUrl) 
 {
     $secstr = New-Object -TypeName System.Security.SecureString
     $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
@@ -123,13 +123,18 @@ function ProvisionSiteCollections($sitefile)
             AddUsersToDefaultSPGroup $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
 
             AddCustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
-            #ApplyTheme $sitefile.sites.globaltheme.Name $globalhubSiteUrl            
+            ApplyTheme $sitefile.sites.globaltheme.Name $globalhubSiteUrl $tenantAdmin $tenantUrl         
             CreateModernPage $globalhubSiteUrl $sitefile.sites.globalPageWebpart
             AddWebpartToPage $globalhubSiteUrl $sitefile.sites.globalPageWebpart
             #UploadFiles $globalhubSiteUrl $sitefile.sites.globalUploadFiles
             Update-SiteColumns $globalhubSiteUrl $sitefile.sites.updateSiteColumns.globalChangeContentTierChoice
             UpdateViewForTasksList 'My Tasks' $globalhubSiteUrl
 
+            #Check and add the app catalog             
+            CheckAndCreateAppCatalog $globalhubSiteUrl             
+            #Check and add the spfx webpart      
+            $appName = "global-custom-style-client-side-solution"     
+            AddSPFxWebPart $globalhubSiteUrl $tenantAdmin $appName
             #Uncomment and run below line on new site creation only, else keep commented
             #AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
                     
@@ -156,13 +161,19 @@ function ProvisionSiteCollections($sitefile)
                AddUsersToDefaultSPGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
                AddCustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
                AddCustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
-               #ApplyTheme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl
+               ApplyTheme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
                            
                CreateModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
                AddWebpartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
                #UploadFiles $sectorhubSiteUrl $sitefile.sites.sectorUploadFiles
                Update-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChangeContentTierChoice
                UpdateViewForTasksList 'My Tasks' $sectorhubSiteUrl
+
+               #Check and add the app catalog             
+               CheckAndCreateAppCatalog $sectorhubSiteUrl             
+               #Check and add the spfx webpart    
+               $appName = "sector-custom-style-client-side-solution" 
+               AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
                
                #Uncomment and run below line on new site creation only, else keep commented
                #AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
@@ -191,7 +202,7 @@ function ProvisionSiteCollections($sitefile)
                    CreateNewGroupAddUsers $orgSiteUrl $sitefile.sites.orgSPGroup
                    AddUsersToDefaultSPGroup $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
                    AddCustomQuickLaunchNavigationSector $orgSiteUrl $sitefile.sites.orgNav.QuickLaunchNav
-                   #ApplyTheme $sitefile.sites.orgtheme.Name $orgSiteUrl
+                   ApplyTheme $sitefile.sites.orgtheme.Name $orgSiteUrl $tenantAdmin $tenantUrl
                                     
                    CreateModernPage $orgSiteUrl $sitefile.sites.orgPageWebpart
                    AddWebpartToPage $orgSiteUrl $sitefile.sites.orgPageWebpart
@@ -199,6 +210,12 @@ function ProvisionSiteCollections($sitefile)
                    Update-SiteColumns $orgSiteUrl $sitefile.sites.updateSiteColumns.orgChangeContentTierChoice
                    UpdateViewForTasksList 'My Tasks' $orgSiteUrl
                    
+                   #Check and add the app catalog             
+                   CheckAndCreateAppCatalog $orgSiteUrl             
+                   #Check and add the spfx webpart   
+                   $appName = "sector-custom-style-client-side-solution"          
+                   AddSPFxWebPart $orgSiteUrl $tenantAdmin $appName
+
                    #Uncomment and run below line on new site creation only, else keep commented
                    #AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
                    
@@ -282,7 +299,7 @@ Function CreateLookupColumn()
         $web = Get-PnPWeb
         $LookupWebID=$web.Id
 
-        $lookupColumnId=[GUID]::NewGuid() 
+        $lookupColumnId = [GUID]::NewGuid() 
         $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='Lookup'
         ID='{$lookupColumnId}' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
@@ -836,12 +853,85 @@ function AddPnPNavigationNode($Title, $Url, $Parent){
 
 #region Apply theme block
 
-function ApplyTheme($themeName, $url)
+function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
 {
+    $themeGlobal = @{    
+        "themePrimary" = "#ffd100";    
+        "themeLighterAlt" = "#fffdf5";    
+        "themeLighter" = "#fff8d6";    
+        "themeLight" = "#fff1b3";    
+        "themeTertiary" = "#ffe366";    
+        "themeSecondary" = "#ffd61f";    
+        "themeDarkAlt" = "#e6bb00";    
+        "themeDark" = "#c29e00";    
+        "themeDarker" = "#8f7500";    
+        "neutralLighterAlt" = "#faf9f8";    
+        "neutralLighter" = "#F5F5F5";    
+        "neutralLight" = "#edebe9";    
+        "neutralQuaternaryAlt" = "#e1dfdd";    
+        "neutralQuaternary" = "#d0d0d0";    
+        "neutralTertiaryAlt" = "#c8c6c4"; 
+        "neutralTertiary" = "#c2c2c2";    
+        "neutralSecondary" = "#858585";    
+        "neutralPrimaryAlt" = "#4b4b4b";    
+        "neutralPrimary" = "#333333";    
+        "neutralDark" = "#272727";    
+        "black" = "#1d1d1d";    
+        "white" = "#ffffff";
+    }
+    
+    $themeSector = @{
+        "themePrimary" = "#009cad";
+        "themeLighterAlt" = "#f2fbfc";
+        "themeLighter" = "#cbeef2";
+        "themeLight" = "#a1e0e7";
+        "themeTertiary" = "#52c2ce";
+        "themeSecondary" = "#16a7b7";
+        "themeDarkAlt" = "#008c9c";
+        "themeDark" = "#007784";
+        "themeDarker" = "#005761";
+        "neutralLighterAlt" = "#faf9f8";
+        "neutralLighter" = "#f3f2f1";
+        "neutralLight" = "#edebe9";
+        "neutralQuaternaryAlt" = "#e1dfdd";
+        "neutralQuaternary" = "#d0d0d0";
+        "neutralTertiaryAlt" = "#c8c6c4";
+        "neutralTertiary" = "#c2c2c2";
+        "neutralSecondary" = "#858585";
+        "neutralPrimaryAlt" = "#4b4b4b";
+        "neutralPrimary" = "#333333";
+        "neutralDark" = "#272727";
+        "black" = "#1d1d1d";
+        "white" = "#ffffff";
+    }
+
     try
     {
         $client.TrackEvent("Apply Theme started.")
-        Set-PnPWebTheme -Theme $themeName -WebUrl $url
+        if($themeName -eq "TASMU Global"){
+            try{
+                $theme = Get-SPOTheme -Name $themeName
+            } catch{
+                Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
+                Add-SPOTheme -Identity $themeName -Palette $themeGlobal -IsInverted $false -Overwrite
+                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+                Set-PnPWebTheme -Theme $themeName -WebUrl $url
+                Write-Host "Theme updated for the site " $url
+            }
+        } elseif($themeName -eq "TASMU Sector") {
+            try{
+                $theme = Get-SPOTheme -Name $themeName
+            } catch{
+                Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
+                Add-SPOTheme -Identity $themeName -Palette $themeGlobal -IsInverted $false -Overwrite
+                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+                Set-PnPWebTheme -Theme $themeName -WebUrl $url
+                Write-Host "Theme updated for the site " $url
+            }
+        } 
+        #else {
+            #Set-PnPWebTheme -Theme $themeName –WebUrl $url
+        #}
         $client.TrackEvent("Apply Theme completed.")
     }
     catch
@@ -1078,7 +1168,7 @@ function ListandLibrary($url, $nodeLevel) {
         #create all List & Libraries
         $client.TrackEvent("List and Library creation started.")
         
-        foreach($itemList in $nodeLevel.ListAndContentTypes) {
+        foreach ($itemList in $nodeLevel.ListAndContentTypes) {
             if ($itemList.ListName -eq "Documents" -or $itemList.ListName -eq "Site Pages" -or $itemList.ListName -eq "Image Gallery") {
                 $ListURL = $itemList.ListName
             }
@@ -1118,7 +1208,7 @@ function GrantPermissionOnListToGroup($url, $nodeLevel)
     #GrantPermissionOnListToGroup List & Libraries
     $client.TrackEvent("List and Library creation started.")
         
-     foreach($itemList in $nodeLevel.ListAndContentTypes) {
+     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
         #Grant permission on list to Group
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
@@ -1472,6 +1562,43 @@ function UpdateViewForTasksList($listNameForView, $siteUrlNew)
         DeleteListOnFailure $siteUrlNew $listNameForView
     }
     #Disconnect-PnPOnline
+}
+
+function AddSPFxWebPart($siteUrl, $tenantAdmin, $appTitle){
+    try{
+        Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+        $tenantApps = Get-PnPApp -Scope Tenant
+        if($tenantApps -ne $null){
+            foreach($app in $tenantApps){
+                if($app.Title -eq $appTitle){
+                    Install-PnPApp -Identity $app.Id
+                    Write-Host "App $spp.Title deployed for the site $SiteUrl " 
+                }
+            }
+        }
+    }
+    catch{
+        $ErrorMessage = $_.Exception.Message
+        Write-Host $ErrorMessage "Unable to install the app to the site $siteUrl. Check package path $path " -foreground Yellow
+
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
+    }
+}
+
+function CheckAndCreateAppCatalog($siteUrl){     
+    try{         
+        Write-Host "Creating app catalog for the site url  $SiteUrl "             
+        Add-SPOSiteCollectionAppCatalog -Site $siteUrl             
+        Write-Host "App catalog for the site url  $SiteUrl is created "         
+    }     
+    catch{         
+        $ErrorMessage = $_.Exception.Message         
+        Write-Host $ErrorMessage "In Site $siteUrl " -foreground Yellow         
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"        $telemtryException.Exception = $_.Exception.Message
+        $client.TrackException($telemtryException)     
+    } 
 }
 
 function Add-ColumnToDefaultView($SiteUrl, $Fields, $ListName) {
