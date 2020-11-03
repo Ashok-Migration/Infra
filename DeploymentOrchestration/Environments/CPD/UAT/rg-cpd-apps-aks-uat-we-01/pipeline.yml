@@ -4,17 +4,17 @@ variables:
   - name: PoolName
     value: "tasmumsagents"
   - name: templateFilePath
-    value: DeploymentOrchestration/Environments/CPH/GLB/rg-cph-glob-acm-we-01/deploy.json
+    value: DeploymentOrchestration/Environments/CPD/UAT/rg-cpd-apps-aks-uat-we-01/deploy.json
   - name: parameterFilePath
     value:
   - name: location
     value: westeurope
   - name: resourceGroupName
-    value: rg-cph-glob-acm-we-01
+    value: rg-cpd-apps-aks-uat-we-01
   - name: serviceConnection
-    value: sqcp-ado-spn-hub
+    value: sqcp-ado-spn-dev
   - name: subscriptionId
-    value: d8c326fb-f8b4-4854-a2af-dd55e86f6117
+    value: d0694def-b27e-4bb7-900d-437fbeb802da
 
 trigger: none
 
@@ -56,6 +56,7 @@ stages:
     jobs:
       - job: DeployTemplate
         displayName: Deploy Template
+        timeoutInMinutes: 90
         pool:
           name: $(PoolName)
         steps:
@@ -78,20 +79,3 @@ stages:
                 }
                 New-AzDeployment @DeploymentInputs
               azurePowerShellVersion: LatestVersion
-
-  - stage: SecurityVerification
-    jobs:
-      - job: ScanResourceGroup
-        displayName: Scan Resource Group
-        pool:
-          name: $(PoolName)
-        steps:
-          - task: AzSKSVTs@4
-            displayName: Scan $(resourceGroupName)
-            continueOnError: true
-            inputs:
-              ConnectedServiceNameARM: "$(serviceConnection)"
-              GenerateMethodParameterSetSelection: "ResourceGroupName"
-              ResourceGroupName: "$(resourceGroupName)"
-              SubscriptionId: "$(subscriptionId)"
-              EnableGSSscan: true

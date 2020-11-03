@@ -26,11 +26,11 @@
       "type": "object"
     }
   },
-    "variables": {
-        "appInsightsResourceId": "[resourceId(resourceGroup().name, 'microsoft.insights/components',parameters('appInsightsName'))]",
-        "endpointvalue": "[resourceId(resourceGroup().name, 'Microsoft.Web/sites',parameters('botWebappName'))]"
-    },
-  "resources": [    
+  "variables": {
+    "appInsightsResourceId": "[resourceId(resourceGroup().name, 'microsoft.insights/components',parameters('appInsightsName'))]",
+    "endpointvalue": "[resourceId(resourceGroup().name, 'Microsoft.Web/sites',parameters('botWebappName'))]"
+  },
+  "resources": [
     {
       "comments": "bot service",
       "type": "Microsoft.BotService/botServices",
@@ -49,10 +49,9 @@
         "developerAppInsightKey": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
         "developerAppInsightsApplicationId": "[reference(variables('appInsightsResourceId'), '2015-05-01').ApplicationId]"
       },
-    "tags": "[parameters('tags')]"
+      "tags": "[parameters('tags')]"
     }
   ],
   "functions": [],
-  "outputs": {
-  }
+  "outputs": {}
 }

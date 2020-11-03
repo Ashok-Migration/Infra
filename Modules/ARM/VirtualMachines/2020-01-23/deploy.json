@@ -32,8 +32,7 @@
         },
         "standardImage": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "OS image used for the VM"
             }
@@ -46,16 +45,14 @@
         },
         "imageResourceId": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. ResourceID of the image to be used."
             }
         },
         "dataDisks": {
             "type": "array",
-            "defaultValue": [
-            ],
+            "defaultValue": [],
             "metadata": {
                 "description": "Optional. Specifies the data disks."
             }
@@ -89,24 +86,21 @@
         },
         "windowsConfiguration": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Specifies Windows operating system settings on the virtual machine."
             }
         },
         "linuxConfiguration": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Specifies the Linux operating system settings on the virtual machine."
             }
         },
         "certificatesToBeInstalled": {
             "type": "array",
-            "defaultValue": [
-            ],
+            "defaultValue": [],
             "metadata": {
                 "description": "Optional. Specifies set of certificates that should be installed onto the virtual machine."
             }
@@ -459,16 +453,14 @@
         },
         "tags": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Tags of the VM resource."
             }
         },
         "NetworkDetails": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Network details of the VM resource."
             }
@@ -725,8 +717,8 @@
                                 "createOption": "[parameters('dataDisks')[copyIndex('dataDisks')].createOption]",
                                 "caching": "[parameters('dataDisks')[copyIndex('dataDisks')].caching]",
                                 "managedDisk": {
-                                "storageAccountType": "[parameters('dataDisks')[copyIndex('dataDisks')].managedDisk.storageAccountType]"
-                        }
+                                    "storageAccountType": "[parameters('dataDisks')[copyIndex('dataDisks')].managedDisk.storageAccountType]"
+                                }
                             }
                         }
                     ]
@@ -795,8 +787,7 @@
                         "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
                         "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
                         "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
-                        "logs": [
-                        ]
+                        "logs": []
                     }
                 },
                 {
@@ -922,6 +913,5 @@
             }
         }
     ],
-    "outputs": {
-    }
+    "outputs": {}
 }

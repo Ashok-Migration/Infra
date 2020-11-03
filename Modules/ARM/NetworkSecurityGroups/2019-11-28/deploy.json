@@ -71,8 +71,7 @@
         },
         "tags": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Tags of the NSG resource."
             }
@@ -83,14 +82,12 @@
         }
     },
     "variables": {
-        "emptyArray": [
-        ],
+        "emptyArray": [],
         "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
         "nsgFlowLogsStorageAccountId": "[resourceId(parameters('NSGFlowsubscriptionid'), parameters('flowLogStorageAccountRGName'), 'Microsoft.Storage/storageAccounts', parameters('flowLogStorageAccountName'))]",
         "workspaceId": "[resourceId(parameters('NSGFlowsubscriptionid'), parameters('workspaceRGName'),'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
         "nsgFlowLogName": "[concat('NetworkWatcher_',parameters('location'),'/Microsoft.Network', resourceGroup().name, parameters('networkSecurityGroupName'))]",
-        "diagnosticsMetrics": [
-        ],
+        "diagnosticsMetrics": [],
         "diagnosticsLogs": [
             {
                 "category": "NetworkSecurityGroupEvent",
@@ -109,7 +106,6 @@
                 }
             }
         ]
-
     },
     "resources": [
         {
@@ -118,8 +114,7 @@
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('tags')]",
-            "dependsOn": [
-            ],
+            "dependsOn": [],
             "properties": {
                 "copy": [
                     {

@@ -1,6 +1,6 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "cognitiveServiceName": {
       "type": "string",
@@ -9,11 +9,11 @@
       }
     },
     "qnawebappName": {
-        "type": "string"
+      "type": "string"
     },
     "kind": {
-        "type": "string",
-        "defaultValue": "CognitiveServices"
+      "type": "string",
+      "defaultValue": "CognitiveServices"
     },
     "location": {
       "type": "string",
@@ -40,45 +40,44 @@
       "type": "object"
     }
   },
-    "variables": {
-    },
-    "resources": [
-      {
-        "apiVersion": "2017-04-18",
-        "name": "[parameters('cognitiveServiceName')]",
-        "location": "[parameters('location')]",
-        "type": "Microsoft.CognitiveServices/accounts",
-        "kind": "[parameters('kind')]",
-        "sku": {
-          "name": "[parameters('sku')]"
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2017-04-18",
+      "name": "[parameters('cognitiveServiceName')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.CognitiveServices/accounts",
+      "kind": "[parameters('kind')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "statisticsEnabled": false,
+        "apiProperties": {
+          "qnaRuntimeEndpoint": "[concat('https://',parameters('qnawebappName'), '.azurewebsites.net')]"
         },
-        "properties": {
-          "statisticsEnabled": false,          
-          "apiProperties": {
-            "qnaRuntimeEndpoint": "[concat('https://',parameters('qnawebappName'), '.azurewebsites.net')]"
-          },
-                "customSubDomainName": "[parameters('qnawebappName')]",
-                "privateEndpointConnections": [],
-                "publicNetworkAccess": "Enabled"
-        },
-        "tags": "[parameters('tags')]"
-      }
-    ],
-  "functions": [],
-    "outputs": {
-        "CognitiveServiceRegion": {
-            "type": "string",
-            "value": "[parameters('location')]",
-            "metadata": {
-                "description": "The Region of the resource."
-            }
-        },
-        "CognitiveServiceResourceGroup": {
-            "type": "string",
-            "value": "[resourceGroup().name]",
-            "metadata": {
-                "description": "The name of the Resource Group the resource was created in."
-            }
-        }
+        "customSubDomainName": "[parameters('qnawebappName')]",
+        "privateEndpointConnections": [],
+        "publicNetworkAccess": "Enabled"
+      },
+      "tags": "[parameters('tags')]"
     }
+  ],
+  "functions": [],
+  "outputs": {
+    "CognitiveServiceRegion": {
+      "type": "string",
+      "value": "[parameters('location')]",
+      "metadata": {
+        "description": "The Region of the resource."
+      }
+    },
+    "CognitiveServiceResourceGroup": {
+      "type": "string",
+      "value": "[resourceGroup().name]",
+      "metadata": {
+        "description": "The name of the Resource Group the resource was created in."
+      }
+    }
+  }
 }

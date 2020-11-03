@@ -31,7 +31,13 @@
     "defaultConsistencyLevel": {
       "type": "string",
       "defaultValue": "Session",
-      "allowedValues": [ "Eventual", "ConsistentPrefix", "Session", "BoundedStaleness", "Strong" ],
+      "allowedValues": [
+        "Eventual",
+        "ConsistentPrefix",
+        "Session",
+        "BoundedStaleness",
+        "Strong"
+      ],
       "metadata": {
         "description": "The default consistency level of the Cosmos DB account."
       }
@@ -57,7 +63,10 @@
     "automaticFailover": {
       "type": "bool",
       "defaultValue": true,
-      "allowedValues": [ true, false ],
+      "allowedValues": [
+        true,
+        false
+      ],
       "metadata": {
         "description": "Enable automatic failover for regions"
       }
@@ -146,7 +155,9 @@
       "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
       "name": "[concat(variables('accountName'), '/', parameters('databaseName'))]",
       "apiVersion": "2020-03-01",
-      "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]" ],
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+      ],
       "properties": {
         "resource": {
           "id": "[parameters('databaseName')]"
@@ -157,7 +168,9 @@
       "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
       "name": "[concat(variables('accountName'), '/', parameters('databaseName'), '/', parameters('containerName'))]",
       "apiVersion": "2020-03-01",
-      "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), parameters('databaseName'))]" ],
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), parameters('databaseName'))]"
+      ],
       "properties": {
         "resource": {
           "id": "[parameters('containerName')]",
@@ -214,7 +227,9 @@
             ]
           }
         },
-        "options": { "throughput": "[parameters('throughput')]" }
+        "options": {
+          "throughput": "[parameters('throughput')]"
+        }
       }
     }
   ],

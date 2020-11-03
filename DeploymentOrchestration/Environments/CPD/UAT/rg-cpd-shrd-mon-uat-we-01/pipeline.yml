@@ -86,19 +86,3 @@ stages:
                 }
                 New-AzDeployment @DeploymentInputs
               azurePowerShellVersion: LatestVersion
-
-  - stage: SecurityVerification
-    jobs:
-      - job: ScanResourceGroup
-        displayName: Scan Resource Group
-        pool:
-          name: $(PoolName)
-        steps:
-          - task: AzSKSVTs@4
-            displayName: Scan $(resourceGroupName)
-            continueOnError: true
-            inputs:
-              ConnectedServiceNameARM: '$(serviceConnection)'
-              GenerateMethodParameterSetSelection: 'ResourceGroupName'
-              ResourceGroupName: '$(resourceGroupName)'
-              SubscriptionId: '$(subscriptionId)'

@@ -43,7 +43,7 @@
                 "description": "The name of the Managed Cluster resource."
             }
         },
-        "configStoreName": {
+        "configStoreResourceId": {
             "type": "string",
             "metadata": {
                 "description": "The name of the app configuration store."
@@ -204,8 +204,7 @@
             "defaultValue": "[newGuid()]"
         },
         "tags": {
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Resource tags."
             },
@@ -240,7 +239,7 @@
                 "description": "Boolean flag to turn on and off of VM scale sets"
             }
         },
-        "workspaceName": {
+        "omsWorkspaceId": {
             "type": "string",
             "metadata": {
                 "description": "Specify the name of the OMS workspace."
@@ -252,17 +251,18 @@
             "metadata": {
                 "description": "Specify the region for your OMS workspace."
             }
+        },
+        "zones": {
+            "type": "array"
         }
     },
     "variables": {
-        "omsWorkspaceId": "[resourceId(resourceGroup().name, 'microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
         "vnetSubnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
     },
     "resources": [
         {
             "apiVersion": "2020-03-01",
-            "dependsOn": [
-            ],
+            "dependsOn": [],
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
@@ -282,7 +282,8 @@
                         "type": "VirtualMachineScaleSets",
                         "mode": "System",
                         "maxPods": "[parameters('maxPods')]",
-                        "vnetSubnetID": "[variables('vnetSubnetID')]"
+                        "vnetSubnetID": "[variables('vnetSubnetID')]",
+                        "availabilityZones": "[parameters('zones')]"
                     }
                 ],
                 "networkProfile": {
@@ -303,7 +304,7 @@
                     "omsagent": {
                         "enabled": "[parameters('enableOmsAgent')]",
                         "config": {
-                            "logAnalyticsWorkspaceResourceID": "[variables('omsWorkspaceId')]"
+                            "logAnalyticsWorkspaceResourceID": "[parameters('omsWorkspaceId')]"
                         }
                     }
                 }
@@ -317,28 +318,26 @@
             "type": "Microsoft.Resources/deployments",
             "name": "[concat('DEP-', parameters('clusterName'), '-Solution')]",
             "apiVersion": "2017-05-10",
-            "resourceGroup": "[split(variables('omsWorkspaceId'),'/')[4]]",
-            "subscriptionId": "[split(variables('omsWorkspaceId'),'/')[2]]",
+            "resourceGroup": "[split(parameters('omsWorkspaceId'),'/')[4]]",
+            "subscriptionId": "[split(parameters('omsWorkspaceId'),'/')[2]]",
             "properties": {
                 "mode": "Incremental",
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
-                    "parameters": {
-                    },
-                    "variables": {
-                    },
+                    "parameters": {},
+                    "variables": {},
                     "resources": [
                         {
                             "apiVersion": "2015-11-01-preview",
                             "type": "Microsoft.OperationsManagement/solutions",
                             "location": "[parameters('workspaceRegion')]",
-                            "name": "[concat('ContainerInsights', '(', split(variables('omsWorkspaceId'),'/')[8], ')')]",
+                            "name": "[concat('ContainerInsights', '(', split(parameters('omsWorkspaceId'),'/')[8], ')')]",
                             "properties": {
-                                "workspaceResourceId": "[variables('omsWorkspaceId')]"
+                                "workspaceResourceId": "[parameters('omsWorkspaceId')]"
                             },
                             "plan": {
-                                "name": "[concat('ContainerInsights', '(', split(variables('omsWorkspaceId'),'/')[8], ')')]",
+                                "name": "[concat('ContainerInsights', '(', split(parameters('omsWorkspaceId'),'/')[8], ')')]",
                                 "product": "[concat('OMSGallery/', 'ContainerInsights')]",
                                 "promotionCode": "",
                                 "publisher": "Microsoft"
@@ -348,8 +347,7 @@
                     ]
                 }
             },
-            "dependsOn": [
-            ]
+            "dependsOn": []
         },
         {
             "name": "[concat('DEP-', parameters('clusterName'), '-AKStoACR')]",
@@ -398,13 +396,13 @@
                         {
                             "apiVersion": "2018-09-01-preview",
                             "type": "Microsoft.AppConfiguration/configurationStores/providers/roleAssignments",
-                            "name": "[concat(parameters('configStoreName'), '/Microsoft.Authorization/', parameters('configStoreRoleGuidValue'))]",
+                            "name": "[concat('(', split(parameters('omsWorkspaceId'),'/')[8], '), '/Microsoft.Authorization/', parameters('configStoreRoleGuidValue'))]",
                             "properties": {
                                 "principalId": "[reference(parameters('clusterName'), '2020-03-01').identityProfile.kubeletidentity.objectId]",
                                 "principalType": "ServicePrincipal",
                                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')]",
                                 "roleDefinitionName": "App Configuration Data Reader",
-                                "scope": "[resourceId(resourceGroup().name,'Microsoft.AppConfiguration/configurationStores/', parameters('configStoreName'))]"
+                                "scope": "[paramters('configStoreResourceId')]"
                             }
                         }
                     ]
@@ -481,10 +479,8 @@
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
-                    "parameters": {
-                    },
-                    "variables": {
-                    },
+                    "parameters": {},
+                    "variables": {},
                     "resources": [
                         {
                             "type": "Microsoft.ContainerService/managedClusters/providers/roleAssignments",
@@ -513,10 +509,8 @@
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
-                    "parameters": {
-                    },
-                    "variables": {
-                    },
+                    "parameters": {},
+                    "variables": {},
                     "resources": [
                         {
                             "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
@@ -531,11 +525,9 @@
                     ]
                 }
             },
-            "dependsOn": [
-            ]
+            "dependsOn": []
         }
     ],
-    "outputs": {
-    },
+    "outputs": {},
     "functions": []
 }

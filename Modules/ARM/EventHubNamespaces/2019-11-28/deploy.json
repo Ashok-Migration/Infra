@@ -37,8 +37,7 @@
 		},
 		"eventHubName": {
 			"type": "array",
-			"defaultValue": [
-			],
+			"defaultValue": [],
 			"metadata": {
 				"description": "Optional. List of specific Event Hubs to create."
 			}
@@ -88,8 +87,7 @@
 		},
 		"networkAcls": {
 			"type": "object",
-			"defaultValue": {
-			},
+			"defaultValue": {},
 			"metadata": {
 				"description": "Optional. Service endpoint object information"
 			}
@@ -123,8 +121,7 @@
 		},
 		"tags": {
 			"type": "object",
-			"defaultValue": {
-			},
+			"defaultValue": {},
 			"metadata": {
 				"description": "Optional. Tags of the Key Vault resource."
 			}
@@ -168,8 +165,7 @@
 				}
 			]
 		},
-		"emptyArray": [
-		],
+		"emptyArray": [],
 		"networkAcls": {
 			"bypass": "[if(not(variables('deployServiceEndpoint')), json('null'), parameters('networkAcls').bypass)]",
 			"defaultAction": "[if(not(variables('deployServiceEndpoint')), json('null'), parameters('networkAcls').defaultAction)]",
@@ -334,7 +330,6 @@
 			"apiVersion": "2017-04-01",
 			"name": "[concat(parameters('namespaceName'), '/', variables('namespaceAlias'))]",
 			"location": "[parameters('location')]",
-
 			"condition": "[if(and(not(empty(parameters('partnerNamespaceId'))),not(empty(parameters('namespaceAlias')))), bool('true') , bool('false'))]",
 			"dependsOn": [
 				"[variables('namespaceResourceId')]"
