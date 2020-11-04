@@ -8,7 +8,7 @@
         "appConfigEndpoint": {
             "type": "string"
         },
-        "appInsightsName": {
+        "appInsightsResourceId": {
             "type": "string"
         },
         "functionAppName": {
@@ -30,6 +30,9 @@
         "storageAccountName": {
             "type": "string"
         },
+        "storageResourceGroup": {
+            "type": "string"
+        },
         "tags": {
             "defaultValue": {},
             "metadata": {
@@ -38,9 +41,7 @@
             "type": "object"
         }
     },
-    "variables": {
-        "appInsightsResourceId": "[resourceId(resourceGroup().name, 'microsoft.insights/components',parameters('appInsightsName'))]"
-    },
+    "variables": {},
     "resources": [
         {
             "apiVersion": "2018-11-01",
@@ -63,11 +64,11 @@
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
+                            "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').ConnectionString]"
+                            "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').ConnectionString]"
                         },
                         {
                             "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
@@ -75,7 +76,7 @@
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -99,7 +100,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",

@@ -53,7 +53,7 @@ stages:
 
   - stage: Dev
     displayName: Update App Configurations for dev
-    dependsOn: Sbx
+    dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-dev-we-01"
@@ -71,7 +71,7 @@ stages:
 
   - stage: Tst
     displayName: Update App Configurations for tst
-    dependsOn: Dev
+    dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-tst-we-01"
@@ -89,7 +89,7 @@ stages:
 
   - stage: Tra
     displayName: Update App Configurations for tra
-    dependsOn: Tst
+    dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-tra-we-01"
@@ -99,6 +99,24 @@ stages:
       - deployment: Deploy
         displayName: Update App Configurations for tra
         environment: tra
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+
+  - stage: uat
+    displayName: Update App Configurations for uat
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-cpd-apps-uat-we-01"
+      - name: env
+        value: "uat"   
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for uat
+        environment: uat
         strategy:
           runOnce:
             deploy:

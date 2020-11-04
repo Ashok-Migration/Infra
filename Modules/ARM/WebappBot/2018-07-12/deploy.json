@@ -8,7 +8,7 @@
     "botWebappName": {
       "type": "String"
     },
-    "appInsightsName": {
+    "appInsightsResourceId": {
       "type": "String"
     },
     "sku": {
@@ -27,7 +27,6 @@
     }
   },
   "variables": {
-    "appInsightsResourceId": "[resourceId(resourceGroup().name, 'microsoft.insights/components',parameters('appInsightsName'))]",
     "endpointvalue": "[resourceId(resourceGroup().name, 'Microsoft.Web/sites',parameters('botWebappName'))]"
   },
   "resources": [
@@ -46,8 +45,8 @@
         "msaAppId": "[parameters('appId')]",
         "isStreamingSupported": true,
         "endpoint": "[concat('https://', reference(variables('endpointvalue'), '2018-11-01').hostNames[0], '/api/messages')]",
-        "developerAppInsightKey": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
-        "developerAppInsightsApplicationId": "[reference(variables('appInsightsResourceId'), '2015-05-01').ApplicationId]"
+        "developerAppInsightKey": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
+        "developerAppInsightsApplicationId": "[reference(parameters('appInsightsResourceId'), '2015-05-01').ApplicationId]"
       },
       "tags": "[parameters('tags')]"
     }

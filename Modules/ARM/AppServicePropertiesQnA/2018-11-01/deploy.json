@@ -5,7 +5,7 @@
         "cognitiveServiceName": {
             "type": "String"
         },
-        "appInsightsName": {
+        "appInsightsResourceId": {
             "type": "String"
         },
         "searchName": {
@@ -14,13 +14,12 @@
         "webAppName": {
             "type": "String"
         },
-        "sharedResourceGroupName": {
+        "cognitiveResourceGroupName": {
             "type": "String"
         }
     },
     "variables": {
-        "SearchServiceId": "[resourceId(parameters('sharedResourceGroupName'), 'Microsoft.Search/searchServices/',parameters('searchName'))]",
-        "appInsightsResourceId": "[resourceId(resourceGroup().name, 'microsoft.insights/components',parameters('appInsightsName'))]"
+        "SearchServiceId": "[resourceId(parameters('cognitiveResourceGroupName'), 'Microsoft.Search/searchServices/',parameters('searchName'))]"
     },
     "resources": [
         {
@@ -31,9 +30,9 @@
             "properties": {
                 "AzureSearchName": "[parameters('searchName')]",
                 "AzureSearchAdminKey": "[listAdminKeys(variables('SearchServiceId'), '2015-08-19').primaryKey]",
-                "UserAppInsightsKey": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
+                "UserAppInsightsKey": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
                 "UserAppInsightsName": "[parameters('appInsightsName')]",
-                "UserAppInsightsAppId": "[reference(variables('appInsightsResourceId'), '2015-05-01').AppId]",
+                "UserAppInsightsAppId": "[reference(parameters('appInsightsResourceId'), '2015-05-01').AppId]",
                 "PrimaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-PrimaryEndpointKey')]",
                 "SecondaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-SecondaryEndpointKey')]",
                 "DefaultAnswer": "No good match found in KB.",
