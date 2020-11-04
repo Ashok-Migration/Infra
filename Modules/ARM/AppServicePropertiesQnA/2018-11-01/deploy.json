@@ -31,7 +31,7 @@
                 "AzureSearchName": "[parameters('searchName')]",
                 "AzureSearchAdminKey": "[listAdminKeys(variables('SearchServiceId'), '2015-08-19').primaryKey]",
                 "UserAppInsightsKey": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
-                "UserAppInsightsName": "[parameters('appInsightsName')]",
+                "UserAppInsightsName": "[split(parameters('appInsightsResourceId'),'/')[8]]",
                 "UserAppInsightsAppId": "[reference(parameters('appInsightsResourceId'), '2015-05-01').AppId]",
                 "PrimaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-PrimaryEndpointKey')]",
                 "SecondaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-SecondaryEndpointKey')]",
