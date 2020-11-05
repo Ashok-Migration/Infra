@@ -75,7 +75,7 @@
                   {
                       "name": "Route",
                       "type": "string",
-                      "value": "@{toLower(triggerOutputs()['relativePathParameters']['EventSubject'])}"
+                      "value": "@{concat('events.',toLower(triggerOutputs()['relativePathParameters']['EventSubject']))}"
                   }
               ]
           }
@@ -108,11 +108,11 @@
               },
               "host": {
                   "connection": {
-                      "name": "@parameters('$connections')['apicon-cpd-apps-sb-dev-we-01']['connectionId']"
+                      "name": "@parameters('$connections')['apicon-cpd-apps-intsb-dev-we-01']['connectionId']"
                   }
               },
               "method": "post",
-              "path": "/@{encodeURIComponent(encodeURIComponent(concat('events.',variables('Route'))))}/messages",
+              "path": "/@{encodeURIComponent(encodeURIComponent(variables('Route')))}/messages",
               "queries": {
                   "systemProperties": "None"
               }
@@ -137,7 +137,7 @@
       "value": {
         "$connections": {
           "value": {
-            "apicon-cpd-apps-sb-tst-we-01": {
+            "apicon-cpd-apps-intsb-dev-we-01": {
               "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-dev-we-01",
               "connectionName": "apicon-cpd-apps-intsb-dev-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
