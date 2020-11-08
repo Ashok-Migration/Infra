@@ -132,8 +132,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 
             #Check and add the app catalog             
             CheckAndCreateAppCatalog $globalhubSiteUrl             
-            #Check and add the spfx webpart      
-            $appName = "global-custom-style-client-side-solution"     
+            #Check and add the spfx webpart   
+            # appName will be the title of the application customizer from tenant app catalog
+            $appName = "tasmu-spfx-global-client-side-solution"     
             AddSPFxWebPart $globalhubSiteUrl $tenantAdmin $appName
             #Uncomment and run below line on new site creation only, else keep commented
             #AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
@@ -172,7 +173,8 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                #Check and add the app catalog             
                CheckAndCreateAppCatalog $sectorhubSiteUrl             
                #Check and add the spfx webpart    
-               $appName = "sector-custom-style-client-side-solution" 
+               # appName will be the title of the application customizer from tenant app catalog
+               $appName = "tasmu-spfx-sector-client-side-solution" 
                AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
                
                #Uncomment and run below line on new site creation only, else keep commented
@@ -310,9 +312,57 @@ Function CreateLookupColumn()
             $newID=[GUID]::NewGuid() 
             $ColumnTitle=$columnItem.ColumnTitle
             $ColumnName=$columnItem.ColumnName
+            $showField = $columnItem.ShowField
             $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='Lookup' DisplayName='$ColumnTitle' Name='$ColumnName' 
-            ShowField='$columnItem.ShowField' EnforceUniqueValues='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
+            ShowField='$showField' EnforceUniqueValues='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
             ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
+        }
+    }
+}
+
+Function CreateLookupColumnForList()
+{
+    param
+    (
+        [Parameter(Mandatory=$true)] [string] $SiteURL,
+        [Parameter(Mandatory=$true)] [string] $ListName,
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$true)] [string] $DisplayName,
+        [Parameter(Mandatory=$false)] [string] $IsRequired = "FALSE",
+        [Parameter(Mandatory=$false)] [string] $EnforceUniqueValues = "FALSE",
+        [Parameter(Mandatory=$true)] [string] $LookupListName,
+        [Parameter(Mandatory=$true)] [string] $LookupField,
+        [Parameter(Mandatory=$true)] [object] $ProjectedFields,
+        $connection
+    )
+    
+    $fieldExists = Get-PNPField -identity $Name -ErrorAction SilentlyContinue
+    $LookupListExist = Get-PnPList -Identity $LookupListName -Connection $connection -ErrorAction Stop
+    if ([bool] ($fieldExists) -eq $false) {
+        
+        $LookupListID= $LookupListExist.id
+        
+        $web = Get-PnPWeb
+        $LookupWebID=$web.Id
+
+        $lookupColumnId = [GUID]::NewGuid() 
+        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='LookupMulti'
+        ID='{$lookupColumnId}' Mult='TRUE' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
+        Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
+        WebId='$LookupWebID' ShowField='$LookupField' />"
+
+        foreach($columnItem in $ProjectedFields){
+            $columnExists = Get-PNPField -identity $columnItem.ColumnName -ErrorAction SilentlyContinue
+            if ([bool] ($columnExists) -eq $false) {
+                # create the projected field
+                $newID=[GUID]::NewGuid() 
+                $ColumnTitle=$columnItem.ColumnTitle
+                $ColumnName=$columnItem.ColumnName
+                $showField = $columnItem.ShowField
+                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='LookupMulti' DisplayName='$ColumnTitle' Name='$ColumnName' 
+                ShowField='$showField' EnforceUniqueValues='FALSE' Mult='TRUE' Sortable='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
+                ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
+            }
         }
     }
 }
@@ -912,6 +962,9 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
         if($themeName -eq "TASMU Global"){
             try{
                 $theme = Get-SPOTheme -Name $themeName
+                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+                Set-PnPWebTheme -Theme $themeName -WebUrl $url
+                Write-Host "Theme updated for the site " $url
             } catch{
                 Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
                 Add-SPOTheme -Identity $themeName -Palette $themeGlobal -IsInverted $false -Overwrite
@@ -922,6 +975,9 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
         } elseif($themeName -eq "TASMU Sector") {
             try{
                 $theme = Get-SPOTheme -Name $themeName
+                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+                Set-PnPWebTheme -Theme $themeName -WebUrl $url
+                Write-Host "Theme updated for the site " $url
             } catch{
                 Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
                 Add-SPOTheme -Identity $themeName -Palette $themeGlobal -IsInverted $false -Overwrite
@@ -1179,7 +1235,7 @@ function ListandLibrary($url, $nodeLevel) {
             
             $ListURL = $ListURL -replace '\s', ''
             
-            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName
+            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.columnItem
             if(Get-PnPList -Identity $itemList.ListName)
             {        
                 ViewCreation $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
@@ -1245,10 +1301,21 @@ function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
     }
 }
 
-function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName) {
+function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $ColumnItems) {
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+
+    $admin = $tenantAdmin.UserName
+    $password = $tenantAdmin.Password
+    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+
     try {
         # Connect with the tenant admin credentials to the tenant
         $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
+
+        if($LookupFieldColumnName -ne '' -and $LookupListName -ne '' -and $LookupField -ne '' -and [bool]($ProjectedFields) -eq $true){
+            CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -ProjectedFields $ProjectedFields $connection
+        }
         
         $ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
         if ([bool]($ListExist) -eq $false) {
@@ -1271,6 +1338,44 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
 
             $ListBase = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
             Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
+            
+            # make the content type read-only false
+            Try {
+                #Setup the context
+                $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrlNew)
+                $Ctx.Credentials = $credentials
+         
+                #Get the content type from the web
+                $ContentTypeColl = $Ctx.Web.ContentTypes
+                $Ctx.Load($ContentTypeColl)
+                $Ctx.ExecuteQuery()
+  
+                #Get the content type to Add
+                $CType = $ContentTypeColl | Where {$_.Name -eq $ContentTypeName}
+                If($CType -ne $Null)
+                {
+                    $CType.ReadOnly=$false
+                    $CType.Update($True)
+                    $Ctx.ExecuteQuery()
+ 
+                    Write-host "Content Type $ContentTypeName is Set to Read Only False!" -ForegroundColor Green
+                }
+                else
+                {
+                    Write-host "Content Type $ContentTypeName Doesn't Exist!" -ForegroundColor Yellow
+                }
+            }
+            Catch {
+                write-host -f Red "Error Setting Content Type $ContentTypeName to Read Only false!" $_.Exception.Message
+            }
+
+            # Add the lookup columns to the list
+            foreach($columnItem in $ColumnItems){
+                Add-PnPFieldToContentType -Field $columnItem.ColumnName -ContentType $ContentTypeName
+                $siteColumn = $columnItem.ColumnName
+                Write-host "Site Column '$siteColumn' Added to List '$ListName' Successfully!" -f Green
+            } 
+
             $contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
             $client.TrackEvent("Content Type, $ContentTypeName added to List, $ListName")
 

@@ -70,7 +70,7 @@ if($null -ne $webparams){
 .$psfilecreatesitecolumnscript @params
 .$psfilecreatecontenttypescript @params
 if($null -ne $webparams){
-    .$psfilepublishcontenttypescript @webparams
+   .$psfilepublishcontenttypescript @webparams
 }
 .$psfilecreatenewsitescript @paramsnewsite
 
@@ -101,7 +101,7 @@ function checkContentTypeExists()
         if($ListBase -eq $null)
         {
             $isContentTypeAvailable=$false
-            Write-host "$itemList.ContentTypeName not available in $globalhubSiteUrl" -ForegroundColor Yellow
+            Write-host $itemList.ContentTypeName "not available in" $globalhubSiteUrl -ForegroundColor Yellow
         }
     }
     Write-host "Check if Content Type Exists completed..." -ForegroundColor Green
@@ -113,8 +113,9 @@ function checkContentTypeExists()
 do
 {
     Write-host "Sleep started for 1 minute..." -ForegroundColor Green
-    start-sleep -s 60
+    #start-sleep -s 60
     Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
+    $isExists= $true
     $isExists= checkContentTypeExists
 }
 until ($isExists -eq $true)
@@ -122,5 +123,5 @@ until ($isExists -eq $true)
 if($isExists -eq $true)
 {
      Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
-    #.$psfileprovisionnewsitecollectionscript @paramsnewsite
+     .$psfileprovisionnewsitecollectionscript @paramsnewsite
 }
