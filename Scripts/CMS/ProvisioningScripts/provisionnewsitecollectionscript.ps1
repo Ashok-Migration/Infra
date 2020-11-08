@@ -330,6 +330,7 @@ function Create-ContentType($contenttypehub, $ContentTypeName, $ContentTypeDesc,
         else {
             Write-Host "$ContentTypeName already exists"
             $client.TrackEvent("$ContentTypeName already exists")
+
         }  
     }
     catch {
