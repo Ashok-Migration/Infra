@@ -23,8 +23,7 @@
         },
         "tags": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Optional. Tags of the Storage Account resource."
             }
@@ -49,7 +48,7 @@
             "name": "[concat(parameters('eventGridDomainName'), '/', parameters('eventGridDomainTopics')[copyIndex()])]",
             "copy": {
                 "name": "eventdomaintopic",
-                "count": "[length(parameters('eventGridDomainTopics'))]" 
+                "count": "[length(parameters('eventGridDomainTopics'))]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.EventGrid/domains', parameters('eventGridDomainName'))]"

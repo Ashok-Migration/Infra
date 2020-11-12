@@ -109,7 +109,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-stcpdappsdiagdevwe01",
+            "name": "DEP-stcpdappsdiagtrawe01",
             "resourceGroup": "rg-cpd-apps-mon-tra-we-01",
             "dependsOn": [
                 "DEP-rg-cpd-apps-mon-tra-we-01"
@@ -123,7 +123,7 @@
                     "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsdiagdevwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsdiagtrawe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -145,29 +145,6 @@
                 },
                 "parametersLink": {
                     "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-apps-mon-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "name": "DEP-evhns-cpd-apps-mon-tra-we-01",
-            "resourceGroup": "rg-cpd-apps-mon-tra-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-apps-mon-tra-we-01",
-                "DEP-stcpdappsdiagtrawe01",
-                "DEP-log-cpd-apps-mon-tra-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/Parameters/evhns-cpd-apps-mon-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
