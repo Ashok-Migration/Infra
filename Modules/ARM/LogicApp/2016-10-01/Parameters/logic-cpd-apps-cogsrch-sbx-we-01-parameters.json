@@ -89,40 +89,61 @@
 								"schema": {
 									"properties": {
 										"id": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"imageUrl": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"longDescription": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"modifiedOn": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"name": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"productPrice": {
-											"type": "integer"
+											"type": ["integer", "null"]
 										},
 										"providerName": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"rating": {
-											"type": "number"
+											"type": ["number", "null"]
 										},
 										"reviewsCount": {
-											"type": "number"
+											"type": ["number", "null"]
 										},
 										"sectorNames": {
 											"items": {
-												"type": "string"
+												"type": ["string", "null"]
 											},
 											"type": "array"
 										},
 										"shortDescription": {
-											"type": "string"
+											"type": ["string", "null"]
+										},
+										"featuredProduct": {
+											"type": ["boolean", "null"]
+										},
+										"popularProduct": {
+											"type": ["boolean", "null"]
+										},
+										"popularityRating": {
+											"type": ["number", "null"]
+										},
+										"priceOverview": {
+											"type": ["string", "null"]
+										},
+										"productCategoryName": {
+											"type": ["string", "null"]
+										},
+										"productSubCategoryName": {
+												"type": ["string", "null"]
+										},
+										"typeOfServiceId": {
+											"type": ["number", "null"]
 										}
 									},
 									"type": "object"
@@ -141,40 +162,63 @@
 								"schema": {
 									"properties": {
 										"id": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"imageUrl": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"longDescription": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"modifiedOn": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"name": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"productPrice": {
-											"type": "integer"
+											"type": ["integer", "null"]
 										},
 										"providerName": {
-											"type": "string"
+											"type": ["string", "null"]
 										},
 										"rating": {
-											"type": "number"
+											"type": ["number", "null"]
 										},
 										"reviewsCount": {
-											"type": "number"
+											"type": ["number", "null"]
 										},
 										"sectorNames": {
 											"items": {
-												"type": "string"
+												"type": ["string", "null"]
 											},
 											"type": "array"
 										},
 										"shortDescription": {
-											"type": "string"
+											"type": ["string", "null"]
+										},
+										"featuredProduct" :
+										{
+											"type": ["boolean", "null"]
+										},
+										"popularProduct": {
+											"type": ["boolean", "null"]
+										},
+										"popularityRating" :
+										{
+											"type": ["number", "null"]
+										},
+										"priceOverview" : {
+											"type": ["string", "null"]
+										},
+										"productCategoryName" : {
+											"type": ["string", "null"]
+										},
+										"productSubCategoryName": {
+												"type": ["string", "null"]
+										},
+										"typeOfServiceId": {
+											"type": ["number", "null"]
 										}
 									},
 									"type": "object"
@@ -194,8 +238,10 @@
 									"@@search.action": "mergeOrUpload",
 									"average_rating": "@concat(body('Parse_Product_JSON')?['rating'],'')",
 									"entity_type": "Products & Services",
+									"language": "en",
 									"id": "@body('Parse_Product_JSON')?['id']",
 									"merged_content": "@concat(body('Parse_Product_JSON')?['longDescription'],body('Parse_Product_JSON')?['shortDescription'])",
+									"metadata_creation_date": "@utcNow()",
 									"metadata_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
 									"metadata_storage_file_extension": "JSON",
 									"metadata_storage_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
@@ -206,7 +252,14 @@
 									"search_id": "@concat('ProductsServices-',body('Parse_Product_JSON')['id'])",
 									"sector": "@body('Parse_Product_JSON')?['sectorNames']",
 									"short_description": "@body('Parse_Product_JSON')?['shortDescription']",
-									"thumbnail_url": "@body('Parse_Product_JSON')?['imageUrl']"
+									"thumbnail_url": "@body('Parse_Product_JSON')?['imageUrl']",
+									"featuredProduct" : "@body('Parse_Product_JSON')?['featuredProduct']",
+									"popularProduct" : "@body('Parse_Product_JSON')?['popularProduct']",
+									"popularityRating" : "@body('Parse_Product_JSON')?['popularityRating']",
+									"priceOverview" : "@body('Parse_Product_JSON')?['priceOverview']",
+									"productCategoryName" : "@body('Parse_Product_JSON')?['productCategoryName']",
+									"productSubCategoryName": "@body('Parse_Product_JSON')?['productSubCategoryName']",
+									"typeOfServiceId": "@body('Parse_Product_JSON')?['typeOfServiceId']"
 								}
 							}
 						},
@@ -223,8 +276,10 @@
 									"@@search.action": "mergeOrUpload",
 									"average_rating": "@concat(body('Parse_Product_JSON_AR')?['rating'],'')",
 									"entity_type": "Products & Services",
+									"language": "ar",
 									"id": "@body('Parse_Product_JSON_AR')?['id']",
 									"merged_content": "@concat(body('Parse_Product_JSON_AR')?['longDescription'],body('Parse_Product_JSON_AR')?['shortDescription'])",
+									"metadata_creation_date": "@utcNow()",
 									"metadata_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
 									"metadata_storage_file_extension": "JSON",
 									"metadata_storage_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
@@ -235,7 +290,14 @@
 									"search_id": "@concat('ProductsServicesAr-',body('Parse_Product_JSON_AR')['id'])",
 									"sector": "@body('Parse_Product_JSON_AR')?['sectorNames']",
 									"short_description": "@body('Parse_Product_JSON_AR')?['shortDescription']",
-									"thumbnail_url": "@body('Parse_Product_JSON_AR')?['imageUrl']"
+									"thumbnail_url": "@body('Parse_Product_JSON_AR')?['imageUrl']",
+									"featuredProduct": "@body('Parse_Product_JSON_AR')?['featuredProduct']",
+									"popularProduct": "@body('Parse_Product_JSON_AR')?['popularProduct']",
+									"popularityRating": "@body('Parse_Product_JSON_AR')?['popularityRating']",
+									"priceOverview": "@body('Parse_Product_JSON_AR')?['priceOverview']",
+									"productCategoryName": "@body('Parse_Product_JSON_AR')?['productCategoryName']",
+									"productSubCategoryName": "@body('Parse_Product_JSON_AR')?['productSubCategoryName']",
+									"typeOfServiceId": "@body('Parse_Product_JSON_AR')?['typeOfServiceId']"
 								}
 							}
 						},
@@ -252,7 +314,8 @@
 								},
 								"headers": {
 									"api-key": "5BB816FE81305A3747DA086A0C2F59F9",
-									"content-type": "application/json"
+									"content-type": "application/json",
+									"Accept": "*/*"
 								},
 								"method": "POST",
 								"uri": "https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
@@ -271,7 +334,8 @@
 								},
 								"headers": {
 									"api-key": "5BB816FE81305A3747DA086A0C2F59F9",
-									"content-type": "application/json"
+									"content-type": "application/json",
+									"Accept": "*/*"
 								},
 								"method": "POST",
 								"uri": "https://srch-cpd-apps-cog-sbx-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
@@ -303,19 +367,19 @@
 											"schema": {
 												"properties": {
 													"content": {
-														"type": "string"
+														"type": ["string", "null"]
 													},
 													"description": {
-														"type": "string"
+														"type": ["string", "null"]
 													},
 													"id": {
-														"type": "string"
+														"type": ["string", "null"]
 													},
 													"rating": {
-														"type": "string"
+														"type": ["string", "null"]
 													},
 													"title": {
-														"type": "string"
+														"type": ["string", "null"]
 													}
 												},
 												"type": "object"
@@ -417,31 +481,31 @@
 												"schema": {
 													"properties": {
 														"id": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"longDescription": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"modified": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"publishedDate": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"sectors": {
 															"items": {
-																"type": "string"
+																"type": ["string", "null"]
 															},
 															"type": "array"
 														},
 														"shortDescription": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"thumbnailImage": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"title": {
-															"type": "string"
+															"type": ["string", "null"]
 														}
 													},
 													"type": "object"
@@ -460,31 +524,31 @@
 												"schema": {
 													"properties": {
 														"id": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"longDescription": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"modified": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"publishedDate": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"sectors": {
 															"items": {
-																"type": "string"
+																"type": ["string", "null"]
 															},
 															"type": "array"
 														},
 														"shortDescription": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"thumbnailImage": {
-															"type": "string"
+															"type": ["string", "null"]
 														},
 														"title": {
-															"type": "string"
+															"type": ["string", "null"]
 														}
 													},
 													"type": "object"
