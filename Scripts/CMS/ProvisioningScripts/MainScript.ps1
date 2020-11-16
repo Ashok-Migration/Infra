@@ -56,7 +56,7 @@ if($null -ne $loginResult){
 }
 
 $psfileensuretermstoreadminscript = Resolve-Path $PSScriptRoot".\ensuretermstoreadmin.ps1"
-$psfile = Resolve-Path $PSScriptRoot".\createtaxanomyscript.ps1"
+$psfilecreatetaxanomyscript = Resolve-Path $PSScriptRoot".\createtaxanomyscript.ps1"
 $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
 $psfilecreatecontenttypescript = Resolve-Path $PSScriptRoot".\createcontenttypescript.ps1"
 $psfilepublishcontenttypescript = Resolve-Path $PSScriptRoot".\publishcontenttypes.ps1"
@@ -66,7 +66,7 @@ $psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provision
 if($null -ne $webparams){
     .$psfileensuretermstoreadminscript @webparams
 }
-.$psfile @params
+.$psfilecreatetaxanomyscript @params
 .$psfilecreatesitecolumnscript @params
 .$psfilecreatecontenttypescript @params
 if($null -ne $webparams){

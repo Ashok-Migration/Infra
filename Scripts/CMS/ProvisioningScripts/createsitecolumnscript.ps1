@@ -199,7 +199,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
             elseif ($columnType -eq "Note") {
                 if($isRichText -eq $True)
                 {
-                    $Id = [GUID]::NewGuid() 
+                    $Id=[GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
@@ -219,7 +219,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
                 else
                 {
-                    $Id = [GUID]::NewGuid() 
+                    $Id=[GUID]::NewGuid() 
                     $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
 				    DisplayName='$ColumnTitle' 
 				    Required='$Required' 
@@ -237,24 +237,12 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 }
             } 
          elseif ($columnType -eq "Number") {
-                $Id = [GUID]::NewGuid() 
-                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
-				DisplayName='$ColumnTitle' 
-                Required='$Required' 
-                Decimals= '$defaultValue'
-				EnforceUniqueValues='$enforceUniqueValues' 
-				Indexed='$indexed' Format='$Format' 
-				Group='$GroupName' 
-				FriendlyDisplayFormat='Disabled' 
-				StaticName='$ColumnName'
-                ShowInEditForm='$showInNewEditForm'
-                ShowInNewForm='$showInNewEditForm'
-                ID='$Id' 
-				Name='$ColumnName'>
-		        </Field>"
+                $Id=[GUID]::NewGuid() 
+                $fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName'></Field>"
+                $addNewField = Add-PnPFieldFromXml -Connection $connection $fieldXml
             }
             elseif ($columnType -eq "Boolean") {
-                $Id = [GUID]::NewGuid()
+                $Id=[GUID]::NewGuid()
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
                 }
@@ -274,7 +262,7 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
 		        </Field>"
             }
             else {
-                $Id = [GUID]::NewGuid()
+                $Id=[GUID]::NewGuid()
                 $fieldXML = ""
                 if ($null -eq $showInNewEditForm) {
                     $showInNewEditForm = "TRUE"
