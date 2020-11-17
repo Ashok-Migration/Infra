@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-6dhook-dev-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "HTTP_Webhook": {
+          "type": "HttpWebhook",
+          "inputs": {
+              "subscribe": {
+                  "method": "POST",
+                  "uri": "https://www.bing.com"
+              },
+              "unsubscribe": {}
+          }
+      }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "HTTP": {
+          "runAfter": {},
+          "type": "Http",
+          "inputs": {
+              "body": "@triggerBody()",
+              "method": "POST",
+              "uri": "https://temp.name.for.api.com"
+          }
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+        }
+      }
+    }
+  }
+}

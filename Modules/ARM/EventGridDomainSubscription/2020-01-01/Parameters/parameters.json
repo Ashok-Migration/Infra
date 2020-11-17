@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventDomainName": {
+            "value": "tmp-domain"
+        },
+        "eventSubscriptionName": {
+            "value": "tmp-domain-subscription"
+        },
+        "eventDestination":{
+            "value": {
+                "endpointType": "ServiceBusQueue",
+                "properties": {
+                    "resourceId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-temp-sandbox/providers/Microsoft.ServiceBus/namespaces/tmp-int-events/queues/crmevents"
+                }
+            }
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "tags": {
+            "value": {
+              "Environment": "Development"
+            }
+        }
+    }
+}
