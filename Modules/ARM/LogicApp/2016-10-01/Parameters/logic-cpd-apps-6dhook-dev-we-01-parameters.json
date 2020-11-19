@@ -13,16 +13,33 @@
     },
     "workflowTriggers": {
       "value": {
-        "HTTP_Webhook": {
-          "type": "HttpWebhook",
+        "When_a_resource_event_occurs": {
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook",
           "inputs": {
-              "subscribe": {
-                  "method": "POST",
-                  "uri": "https://www.bing.com"
-              },
-              "unsubscribe": {}
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-dev-we-01/topics/6dbilling"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-integd-dev-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpd-apps-6dhook-dev-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
           }
-      }
+        }
       }
     },
     "workflowActions": {
@@ -31,9 +48,9 @@
           "runAfter": {},
           "type": "Http",
           "inputs": {
-              "body": "@triggerBody()",
-              "method": "POST",
-              "uri": "https://temp.name.for.api.com"
+            "body": "@triggerBody()",
+            "method": "POST",
+            "uri": "https://temp.name.for.api.com"
           }
         }
       }
@@ -54,6 +71,13 @@
     "connectionParameters": {
       "value": {
         "$connections": {
+          "value": {
+            "apicon-cpd-apps-integd-dev-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integd-dev-we-01",
+              "connectionName": "apicon-cpd-apps-integd-dev-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
+            }
+          }
         }
       }
     }
