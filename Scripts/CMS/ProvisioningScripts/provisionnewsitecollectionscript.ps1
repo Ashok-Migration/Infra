@@ -119,7 +119,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
             ListandLibrary $globalhubSiteUrl $sitefile.sites.globalSPList
             CreateColumnsAndListProductDocuments($globalhubSiteUrl)
 
-            CreateNewGroupAddUsers $globalhubSiteUrl $sitefile.sites.globalSPGroup
+            CreateNewGroupAddUsers $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
             AddUsersToDefaultSPGroup $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
 
             AddCustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
@@ -158,7 +158,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                Register-PnPHubSite -Site $sectorhubSiteUrl
                EnableMegaMenu $sectorhubSiteUrl
                ListandLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
-               CreateNewGroupAddUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup  
+               CreateNewGroupAddUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
                AddUsersToDefaultSPGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
                AddCustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
                AddCustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
@@ -201,7 +201,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                    Write-Verbose "Association succeeded" -Verbose
                    EnableMegaMenu $orgSiteUrl
                    ListandLibrary $orgSiteUrl $sitefile.sites.orgSPList
-                   CreateNewGroupAddUsers $orgSiteUrl $sitefile.sites.orgSPGroup
+                   CreateNewGroupAddUsers $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
                    AddUsersToDefaultSPGroup $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
                    AddCustomQuickLaunchNavigationSector $orgSiteUrl $sitefile.sites.orgNav.QuickLaunchNav
                    ApplyTheme $sitefile.sites.orgtheme.Name $orgSiteUrl $tenantAdmin $tenantUrl
@@ -333,6 +333,7 @@ Function CreateLookupColumnForList()
         [Parameter(Mandatory=$true)] [string] $LookupListName,
         [Parameter(Mandatory=$true)] [string] $LookupField,
         [Parameter(Mandatory=$true)] [object] $ProjectedFields,
+        [Parameter(Mandatory=$true)] [string] $LookupType,
         $connection
     )
     
@@ -346,7 +347,7 @@ Function CreateLookupColumnForList()
         $LookupWebID=$web.Id
 
         $lookupColumnId = [GUID]::NewGuid() 
-        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='LookupMulti'
+        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='{$LookupType}'
         ID='{$lookupColumnId}' Mult='TRUE' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
         WebId='$LookupWebID' ShowField='$LookupField' />"
@@ -359,7 +360,8 @@ Function CreateLookupColumnForList()
                 $ColumnTitle=$columnItem.ColumnTitle
                 $ColumnName=$columnItem.ColumnName
                 $showField = $columnItem.ShowField
-                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='LookupMulti' DisplayName='$ColumnTitle' Name='$ColumnName' 
+                $projectedType = $columnItem.Type
+                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='{$projectedType}' DisplayName='$ColumnTitle' Name='$ColumnName' 
                 ShowField='$showField' EnforceUniqueValues='FALSE' Mult='TRUE' Sortable='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
                 ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
             }
@@ -906,7 +908,7 @@ function AddPnPNavigationNode($Title, $Url, $Parent){
 
 function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
 {
-    $themeGlobal = @{    
+    $themeGlobal = @{
         "themePrimary" = "#ffd100";    
         "themeLighterAlt" = "#fffdf5";    
         "themeLighter" = "#fff8d6";    
@@ -1006,7 +1008,7 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
 
 #region --CreateNewGroup --
 
-function CreateNewGroupAddUsers($url, $nodeLevel) {
+function CreateNewGroupAddUsers($url, $nodeLevel, $siteAlias) {
 
    $siteUrl = $url
    $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
@@ -1015,7 +1017,7 @@ function CreateNewGroupAddUsers($url, $nodeLevel) {
    try {
 
       foreach($SPGroup in $nodeLevel.group){
-        $SPGroupName= $SPGroup.Name
+        $SPGroupName= $siteAlias+' '+$SPGroup.Name
         $groupExists = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
         
         if ([bool]($groupExists) -eq $false) {
@@ -1235,16 +1237,13 @@ function ListandLibrary($url, $nodeLevel) {
             
             $ListURL = $ListURL -replace '\s', ''
             
-            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.columnItem
-            if(Get-PnPList -Identity $itemList.ListName)
-            {        
+            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem
+            if(Get-PnPList -Identity $itemList.ListName){     
                 ViewCreation $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
             }
 
-            if($itemList.customView -ne '')
-            {
-                if(Get-PnPList -Identity $itemList.ListName)
-                {
+            if($itemList.customView -ne ''){
+                if(Get-PnPList -Identity $itemList.ListName){
                     CustomViewCreation $itemList.ListName $siteUrlNew $itemList.customView $itemList.customViewfields
                 }
             }
@@ -1258,7 +1257,6 @@ function ListandLibrary($url, $nodeLevel) {
             }            
         }
 }
-
 
 function GrantPermissionOnListToGroup($url, $nodeLevel)
 {
@@ -1301,7 +1299,7 @@ function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
     }
 }
 
-function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $ColumnItems) {
+function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems) {
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
@@ -1314,7 +1312,7 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
         $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
 
         if($LookupFieldColumnName -ne '' -and $LookupListName -ne '' -and $LookupField -ne '' -and [bool]($ProjectedFields) -eq $true){
-            CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -ProjectedFields $ProjectedFields $connection
+            CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -ProjectedFields $ProjectedFields $LookupFieldType $connection
         }
         
         $ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
@@ -1441,8 +1439,6 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
         DeleteListOnFailure $siteUrlNew $ListName
     }
 }
-
-
 
 function Remove-ContentTypeFromListLibrary($SiteUrl, $ListName, $ContentType) {
     
@@ -1579,7 +1575,6 @@ function ViewCreation($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
         DeleteListOnFailure $siteUrlNew $listNameForView
     }
     #Disconnect-PnPOnline
-
 }
 
 function CustomViewCreation($listNameForView, $siteUrlNew, $customViewName, $fields)
@@ -1857,7 +1852,6 @@ function AddWebpartToPage($url, $nodeLevel)
                         $item10Title=$webpartSection.items.item[10].Title
                         $item10Url=$url+"/Lists/"+$webpartSection.items.item[10].ListUrl
 
-
 $jsonProps = '
 {"controlType":3,"id":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"layoutIndex":1},"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","webPartData":{"id":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","instanceId":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","title":"Quick links","description":"Add links to important documents and pages.","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick Links","items[0].title":"'+$item0Title+'","items[1].title":"'+$item1Title+'","items[2].title":"'+$item2Title+'","items[3].title":"'+$item3Title+'","items[4].title":"'+$item4Title+'","items[5].title":"'+$item5Title+'","items[6].title":"'+$item6Title+'","items[7].title":"'+$item7Title+'","items[8].title":"'+$item8Title+'","items[9].title":"'+$item9Title+'","items[10].title":"'+$item10Title+'"},"imageSources":{},"links":{"baseUrl":"'+$url+'","items[0].sourceItem.url":"'+$item0Url+'","items[1].sourceItem.url":"'+$item1Url+'","items[2].sourceItem.url":"'+$item2Url+'","items[3].sourceItem.url":"'+$item3Url+'","items[4].sourceItem.url":"'+$item4Url+'","items[5].sourceItem.url":"'+$item5Url+'","items[6].sourceItem.url":"'+$item6Url+'","items[7].sourceItem.url":"'+$item7Url+'","items[8].sourceItem.url":"'+$item8Url+'","items[9].sourceItem.url":"'+$item9Url+'","items[10].sourceItem.url":"'+$item10Url+'"},"componentDependencies":{"layoutComponentId":"706e33c8-af37-4e7b-9d22-6e5694d92a6f"}},"dataVersion":"2.2","properties":{"items":[{"sourceItem":{"itemType":5,"fileExtension":"","progId":""},"thumbnailType":3,"id":11,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":10,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":9,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":8,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":7,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":6,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":5,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":4,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":3,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":2,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":1,"description":"","altText":""}],"isMigrated":true,"layoutId":"List","shouldShowThumbnail":true,"imageWidth":100,"buttonLayoutOptions":{"showDescription":false,"buttonTreatment":2,"iconPositionType":2,"textAlignmentVertical":2,"textAlignmentHorizontal":2,"linesOfText":2},"listLayoutOptions":{"showDescription":false,"showIcon":false},"waffleLayoutOptions":{"iconSize":1,"onlyShowThumbnail":false},"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","webId":"93012ab1-1675-4c10-a48d-9318b877ab5e","siteId":"8051fa3b-1aeb-4793-8354-d5c2eb571b6d"}},"emphasis":{},"reservedHeight":270,"reservedWidth":744,"addedFromPersistedData":true}
 '
@@ -2005,7 +1999,6 @@ function DeletePageOnFailure($pagename)
         $telemtryException.Exception = $_.Exception.Message  
         $client.TrackException($telemtryException)
     }
-
 }
 
 function RemoveCustomNavigationQuickLaunchOnfailure($url, $nodeLevel)
@@ -2380,8 +2373,6 @@ function Update-ColumnToDefaultView($ListName,$ViewName,$url)
     catch {
         write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
     }
-
-
 }
 
 Provision-ComponentsForSites

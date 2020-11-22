@@ -113,7 +113,7 @@ function checkContentTypeExists()
 do
 {
     Write-host "Sleep started for 1 minute..." -ForegroundColor Green
-    #start-sleep -s 60
+    start-sleep -s 60
     Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
     $isExists= $true
     $isExists= checkContentTypeExists

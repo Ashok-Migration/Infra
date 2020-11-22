@@ -1,25 +1,25 @@
 ﻿<sites>
 	<!--Site structure for Global/Sector/Org-->
 	<globalhubsite>
-		<site Title="MarketPlace" Alias="cms-dev-marketplace" Type="CommunicationSite">
+		<site Title="TASMU CMS" Alias="cms-marketplace" Type="CommunicationSite">
 			<sectorhubsite>
-				<site Title="Transport" Alias="cms-dev-transportsector" Type="CommunicationSite">
+				<site Title="Transport" Alias="cms-transportsector" Type="CommunicationSite">
 					<orgassociatedsite>
-						<site Title="Fedex" Alias="cms-dev-transportsector-fedexorg" Type="CommunicationSite"/>
-						<site Title="Swift" Alias="cms-dev-transportsector-swiftorg" Type="CommunicationSite"/>
+						<site Title="Fedex" Alias="cms-transportsector-fedexorg" Type="CommunicationSite"/>
+						<site Title="Swift" Alias="cms-transportsector-swiftorg" Type="CommunicationSite"/>
 					</orgassociatedsite>
 				</site>
-				<site Title="Health" Alias="cms-dev-healthsector" Type="CommunicationSite">
+				<site Title="Health" Alias="cms-healthsector" Type="CommunicationSite">
 					<orgassociatedsite>
-						<site Title="Easthide" Alias="cms-dev-healthsector-easthideorg" Type="CommunicationSite"/>
-						<site Title="Treejoy" Alias="cms-dev-healthsector-treejoyorg" Type="CommunicationSite"/>
+						<site Title="Easthide" Alias="cms-healthsector-easthideorg" Type="CommunicationSite"/>
+						<site Title="Treejoy" Alias="cms-healthsector-treejoyorg" Type="CommunicationSite"/>
 					</orgassociatedsite>
 				</site>
 			</sectorhubsite>
 		</site>
 	</globalhubsite>
 	<Configsite>
-		<site Title="Global" Alias="cms-dev-global" Type="CommunicationSite"></site>
+		<site Title="Global" Alias="cms-global" Type="CommunicationSite"></site>
 	</Configsite>
 
 	<!--Theme Config for Global/Sector/Org-->
@@ -103,7 +103,7 @@
 		</ListAndContentTypes>
 	</ConfigurationSPList>
 	<ProductDocumentsList>
-		<ListAndContentTypes ListName="Product Asset" ContentTypeName="TASMU Product Documents" ListTemplate="DocumentLibrary" ParentCTName="Document" GroupName="TASMU" customView="">
+		<ListAndContentTypes ListName="Product Assets" ContentTypeName="TASMU Product Assets" ListTemplate="DocumentLibrary" ParentCTName="Document" GroupName="TASMU" customView="">
 			<Field ColumnName="ProductName" ColumnTitle="Product Name" LookupListName="Products" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 
 			<projectedField ColumnName="Product_x003a_ProductId" ColumnTitle="Product:Product Id" LookupListName="Products" LookupField="ProductName" ShowField="ProductId" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -111,15 +111,15 @@
 			<projectedField ColumnName="Product_x003a_ProductShortDescription" ColumnTitle="Product:Product Short Description" LookupListName="Products" LookupField="ProductName" ShowField="ProductShortDescription" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 			<projectedField ColumnName="Product_x003a_arProductShortDescription" ColumnTitle="Product:Arabic Product Short Description" LookupListName="Products" LookupField="ProductName" ShowField="arProductShortDescription" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="ProductName" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="Product_x003a_ProductId" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="Product_x003a_arProductName" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="Product_x003a_ProductShortDescription" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="Product_x003a_arProductShortDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ProductName" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="Product_x003a_ProductId" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="Product_x003a_arProductName" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="Product_x003a_ProductShortDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="Product_x003a_arProductShortDescription" Required="False"></columnItem>
 
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="ContentStatus" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="ApprovedDate" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU Product Documents" ColumnName="ApproverComments" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ContentStatus" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ApprovedDate" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ApproverComments" Required="False"></columnItem>
 
 			<defaultviewfields name="ProductName"></defaultviewfields>
 			<defaultviewfields name="Product_x003a_arProductName"></defaultviewfields>
@@ -136,31 +136,24 @@
 			<defaultviewfields name="Created"></defaultviewfields>
 			<defaultviewfields name="Modified"></defaultviewfields>
 		</ListAndContentTypes>
-		
+<ListAndContentTypes ListName="Page" ListTemplate="GenericList" customView="">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+		</ListAndContentTypes>
 		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU MyTask" ListTemplate="GenericList" customView="Home">
-			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sectors:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sectors:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
 			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="AssignedTo"></defaultviewfields>
 			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
 			<defaultviewfields name="TaskComments"></defaultviewfields>
 			<defaultviewfields name="ParentItemLink"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="TASMUTaskStatus"></customViewfields>
 			<customViewfields name="TaskComments"></customViewfields>
 		</ListAndContentTypes>
-
-		<ListAndContentTypes ListName="Documents Respository" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
+		<ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -220,8 +213,7 @@
 			<customViewfields name="ContentStatus"></customViewfields>
 			<customViewfields name="EventTypes"></customViewfields>
 
-		</ListAndContentTypes>
-
+		</ListAndContentTypes>		
 		<ListAndContentTypes ListName="Entities" ContentTypeName="TASMU Entities" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -249,8 +241,7 @@
 			<customViewfields name="EntityTypes"></customViewfields>
 
 
-		</ListAndContentTypes>
-
+		</ListAndContentTypes>		
 		<ListAndContentTypes ListName="Announcements" ContentTypeName="TASMU Announcements" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -283,8 +274,7 @@
 			<customViewfields name="AnnouncementCategories"></customViewfields>
 
 
-		</ListAndContentTypes>
-
+		</ListAndContentTypes>	
 		<ListAndContentTypes ListName="Sponsors" ContentTypeName="TASMU Sponsors" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -310,8 +300,7 @@
 			<customViewfields name="arSponsorName"></customViewfields>
 			<customViewfields name="ContentStatus"></customViewfields>		
 						
-		</ListAndContentTypes>
-		
+		</ListAndContentTypes>	
 		<ListAndContentTypes ListName="Media Assets" ContentTypeName="TASMU Media Assets" ListTemplate="PictureLibrary" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -341,8 +330,7 @@
 			<customViewfields name="ContentStatus"></customViewfields>
 			<customViewfields name="MediaTypes"></customViewfields>			
 						
-		</ListAndContentTypes>
-		
+		</ListAndContentTypes>	
 		<ListAndContentTypes ListName="Projects" ContentTypeName="TASMU Projects" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -375,7 +363,6 @@
 			<customViewfields name="ProjectTypes"></customViewfields>			
 					
 		</ListAndContentTypes>
-		
 		<ListAndContentTypes ListName="Videos" ContentTypeName="TASMU Videos" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -405,7 +392,7 @@
 			<customViewfields name="ContentStatus"></customViewfields>
 			<customViewfields name="MediaTypes"></customViewfields>			
 						
-		</ListAndContentTypes>
+		</ListAndContentTypes>	
 		<ListAndContentTypes ListName="Products" ContentTypeName="TASMU Products" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -430,15 +417,18 @@
 			<customViewfields name="arProductName"></customViewfields>
 			<customViewfields name="ContentStatus"></customViewfields>			
 					
-		</ListAndContentTypes>
+		</ListAndContentTypes>	
 		<ListAndContentTypes ListName="Generic Page" ContentTypeName="TASMU Generic Page" ListTemplate="GenericList" customView="Home">
-			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" Type="LookupMulti" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" Type="LookupMulti" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" Type="LookupMulti" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			
+			<Field ColumnName="PageName" ColumnTitle="Page Name" Type="Lookup" LookupListName="Page" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			
 			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="SectorLookupMulti" Required="False"></columnItem>
 			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
 			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="PageName" Required="False"></columnItem>
 			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
@@ -449,13 +439,13 @@
 			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
 			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
 			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="PageName"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="cmsGenericPageName"></customViewfields>
 			<customViewfields name="ContentStatus"></customViewfields>
 
 		</ListAndContentTypes>
-		
 		<ListAndContentTypes ListName="Contact Information" ContentTypeName="TASMU Contact Information" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -483,7 +473,6 @@
 			<customViewfields name="ContentStatus"></customViewfields>		
 					
 		</ListAndContentTypes>
-		
 		<ListAndContentTypes ListName="Campaigns" ContentTypeName="TASMU Campaigns" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -514,8 +503,7 @@
 			<customViewfields name="ContentStatus"></customViewfields>
 			<customViewfields name="CampaignCategories"></customViewfields>			
 					
-		</ListAndContentTypes>
-		
+		</ListAndContentTypes>		
 		<ListAndContentTypes ListName="Articles" ContentTypeName="TASMU Articles" ListTemplate="GenericList" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -545,8 +533,7 @@
 			<customViewfields name="ContentStatus"></customViewfields>
 			<customViewfields name="ArticleCategories"></customViewfields>			
 					
-		</ListAndContentTypes>
-
+		</ListAndContentTypes>		
 		<ListAndContentTypes ListName="HeroWeb" ContentTypeName="TASMU Hero Web" ListTemplate="DocumentLibrary" customView="Home">
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
@@ -557,8 +544,7 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="SequenceNumber"></defaultviewfields>
 			<defaultviewfields name="UserType"></defaultviewfields>
-		</ListAndContentTypes>
-
+		</ListAndContentTypes>		
 		<ListAndContentTypes ListName="HeroMobile" ContentTypeName="TASMU Hero Mobile" ListTemplate="DocumentLibrary" customView="Home">
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
@@ -570,7 +556,6 @@
 			<defaultviewfields name="SequenceNumber"></defaultviewfields>
 			<defaultviewfields name="UserType"></defaultviewfields>
 		</ListAndContentTypes>
-
 	</globalSPList>
 	<sectorSPList>
 		<ListAndContentTypes ListName="Sectors" ContentTypeName="TASMU Sector" ListTemplate="GenericList" customView="">
@@ -581,29 +566,18 @@
 			<defaultviewfields name="Modified"></defaultviewfields>
 		</ListAndContentTypes>
 		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU MyTask" ListTemplate="GenericList" customView="Home">
-			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-			<columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="AssignedTo"></defaultviewfields>
 			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
 			<defaultviewfields name="TaskComments"></defaultviewfields>	
 			<defaultviewfields name="ParentItemLink"></defaultviewfields>
 			<defaultviewfields name="ParentItemLink"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="TASMUTaskStatus"></customViewfields>
 			<customViewfields name="TaskComments"></customViewfields>
 		</ListAndContentTypes>
-		<ListAndContentTypes ListName="Documents Respository" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
+		<ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
 			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -920,35 +894,25 @@
 			<defaultviewfields name="Modified"></defaultviewfields>
 		</ListAndContentTypes>
 		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU MyTask" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-
-      <columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU MyTask" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="AssignedTo"></defaultviewfields>
 			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
 			<defaultviewfields name="TaskComments"></defaultviewfields>
 			<defaultviewfields name="ParentItemLink"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="TASMUTaskStatus"></customViewfields>
 			<customViewfields name="TaskComments"></customViewfields>
 		</ListAndContentTypes>
-		<ListAndContentTypes ListName="Documents Respository" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+		<ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="DocumentTypes"></defaultviewfields>
@@ -960,9 +924,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -970,14 +934,14 @@
 			<customViewfields name="DocumentTypes"></customViewfields>
 		</ListAndContentTypes>
 		<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="EventTypes"></defaultviewfields>
@@ -990,9 +954,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1001,14 +965,14 @@
 
 		</ListAndContentTypes>
 		<ListAndContentTypes ListName="Announcements" ContentTypeName="TASMU Announcements" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="AnnouncementCategories"></defaultviewfields>
@@ -1022,9 +986,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1035,14 +999,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Sponsors" ContentTypeName="TASMU Sponsors" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arSponsorName"></defaultviewfields>
 			<defaultviewfields name="ContentTier"></defaultviewfields>
@@ -1051,9 +1015,9 @@
 			<defaultviewfields name="Modified"></defaultviewfields>
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arSponsorName"></customViewfields>
@@ -1062,14 +1026,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Media Assets" ContentTypeName="TASMU Media Assets" ListTemplate="PictureLibrary" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="MediaTypes"></defaultviewfields>
@@ -1081,9 +1045,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1093,14 +1057,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Projects" ContentTypeName="TASMU Projects" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="ProjectTypes"></defaultviewfields>
@@ -1114,9 +1078,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1126,14 +1090,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Videos" ContentTypeName="TASMU Videos" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="MediaTypes"></defaultviewfields>
@@ -1145,9 +1109,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1157,14 +1121,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Contact Information" ContentTypeName="TASMU Contact Information" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="cmsFirstName"></defaultviewfields>
 			<defaultviewfields name="arFirstName"></defaultviewfields>
 			<defaultviewfields name="LastName"></defaultviewfields>
@@ -1174,9 +1138,9 @@
 			<defaultviewfields name="Created"></defaultviewfields>
 			<defaultviewfields name="Modified"></defaultviewfields>
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="cmsFirstName"></customViewfields>
 			<customViewfields name="arFirstName"></customViewfields>
@@ -1185,14 +1149,14 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Campaigns" ContentTypeName="TASMU Campaigns" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
-      
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="CampaignCategories"></defaultviewfields>
@@ -1205,9 +1169,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1217,15 +1181,15 @@
 		</ListAndContentTypes>
 
 		<ListAndContentTypes ListName="Articles" ContentTypeName="TASMU Articles" ListTemplate="GenericList" customView="Home">
-      <Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
-      <projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
-      <projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 
-      <columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
-      <columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
 
-      <defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="ArticleCategories"></defaultviewfields>
 			<defaultviewfields name="ContentTier"></defaultviewfields>
@@ -1236,9 +1200,9 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="GeoLocation"></defaultviewfields>
 			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
-      <defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
 
 			<customViewfields name="Title"></customViewfields>
 			<customViewfields name="arTitle"></customViewfields>
@@ -1268,7 +1232,7 @@
 			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events List" ListTitleDisplay="Events" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Campaigns" ListTitleDisplay="Campaigns" ViewName="Home"></webpart>
-			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Documents Respository" ListTitleDisplay="Documents" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Documents" ViewName="Home"></webpart>
 
 			<webpart DefaultWebPartType="QuickLinks" layoutId="GridNews" Section="1" Column="2">
 				<items>
@@ -1282,7 +1246,7 @@
 					<item Title="Media Assets" ListUrl="MediaAssets"></item>
 					<item Title="Projects" ListUrl="Projects"></item>
 					<item Title="Sponsors" ListUrl="Sponsors"></item>
-					<item Title="Documents" ListUrl="DocumentsRespository"></item>
+					<item Title="Documents" ListUrl="PublicDocuments"></item>
 				</items>
 			</webpart>
 			<webpart DefaultWebPartType="ContentRollup" Section="1" Column="2" ListTitle="Recent Documents"></webpart>
@@ -1290,7 +1254,6 @@
 		</webpartSection>
 
 	</globalPageWebpart>
-
 	<sectorPageWebpart>
 		<page name="Sector-Home"></page>
 
@@ -1301,7 +1264,7 @@
 			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events List" ListTitleDisplay="Events" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Campaigns" ListTitleDisplay="Campaigns" ViewName="Home"></webpart>
-			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Documents Respository" ListTitleDisplay="Documents" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Documents" ViewName="Home"></webpart>
 
 			<webpart DefaultWebPartType="QuickLinks" layoutId="GridNews" Section="1" Column="2" items0title="">
 				<items>
@@ -1313,7 +1276,7 @@
 					<item Title="Media Assets" ListUrl="MediaAssets"></item>
 					<item Title="Projects" ListUrl="Projects"></item>
 					<item Title="Sponsors" ListUrl="Sponsors"></item>
-					<item Title="Documents" ListUrl="DocumentsRespository"></item>
+					<item Title="Documents" ListUrl="PublicDocuments"></item>
 				</items>
 			</webpart>
 			<webpart DefaultWebPartType="ContentRollup" Section="1" Column="2" ListTitle="Recent Documents"></webpart>
@@ -1321,7 +1284,6 @@
 
 		</webpartSection>
 	</sectorPageWebpart>
-
 	<orgPageWebpart>
 		<page name="Entity-Home"></page>
 
@@ -1333,7 +1295,7 @@
 			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events List" ListTitleDisplay="Events" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Campaigns" ListTitleDisplay="Campaigns" ViewName="Home"></webpart>
-			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Documents Respository" ListTitleDisplay="Documents" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Documents" ViewName="Home"></webpart>
 
 			<webpart DefaultWebPartType="QuickLinks" layoutId="GridNews" Section="1" Column="2">
 				<items>
@@ -1345,7 +1307,7 @@
 					<item Title="Media Assets" ListUrl="MediaAssets"></item>
 					<item Title="Projects" ListUrl="Projects"></item>
 					<item Title="Sponsors" ListUrl="Sponsors"></item>
-					<item Title="Documents" ListUrl="DocumentsRespository"></item>
+					<item Title="Documents" ListUrl="PublicDocuments"></item>
 				</items>
 			</webpart>
 			<webpart DefaultWebPartType="ContentRollup" Section="1" Column="2" ListTitle="Recent Documents"></webpart>
@@ -1383,12 +1345,12 @@
 			<Level2 nodeName="Campaigns" url="Campaigns"></Level2>
 			<Level2 nodeName="Contact Information" url="ContactInformation"></Level2>
 			<Level2 nodeName="Entities" url="Entities"></Level2>
-			<Level2 nodeName="Product Asset" url="ProductAsset"></Level2>
+			<Level2 nodeName="Product Assets" url="ProductAssets"></Level2>
 			<Level2 nodeName="Videos" url="Videos"></Level2>
 			<Level2 nodeName="Media Assets" url="MediaAssets"></Level2>
 			<Level2 nodeName="Projects" url="Projects"></Level2>
 			<Level2 nodeName="Sponsors" url="Sponsors"></Level2>
-			<Level2 nodeName="Documents Respository" url="DocumentsRespository"></Level2>
+			<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
 			<Level2 nodeName="Events" url="EventsList"></Level2>
 			<Level2 nodeName="Generic Pages" url="Generic%20Page"></Level2>
 			<Level2 nodeName="Hero Web" url="HeroWeb"></Level2>
@@ -1418,7 +1380,7 @@
 				<Level2 nodeName="Media Assets" url="MediaAssets"></Level2>
 				<Level2 nodeName="Projects" url="Projects"></Level2>
 				<Level2 nodeName="Sponsors" url="Sponsors"></Level2>
-				<Level2 nodeName="Documents Respository" url="DocumentsRespository"></Level2>
+				<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
 				<Level2 nodeName="Events" url="EventsList"></Level2>
 			</Level1>
 			<Level1 nodeName="My Tasks" url="MyTasks" count="3">
@@ -1452,7 +1414,7 @@
 				<Level2 nodeName="Media Assets" url="MediaAssets"></Level2>
 				<Level2 nodeName="Projects" url="Projects"></Level2>
 				<Level2 nodeName="Sponsors" url="Sponsors"></Level2>
-				<Level2 nodeName="Documents Respository" url="DocumentsRespository"></Level2>
+				<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
 				<Level2 nodeName="Events" url="EventsList"></Level2>
 			</Level1>
 			<Level1 nodeName="My Tasks" url="MyTasks" count="3">
@@ -1479,7 +1441,7 @@
 		<globalChangeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Entities" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Announcements" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Documents Respository" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Public Documents" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Sponsors" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Media Assets" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Projects" Format="None" ></changeContentTierChoice>
@@ -1494,7 +1456,7 @@
 		</globalChangeContentTierChoice>
 		<sectorChangeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Announcements" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Documents Respository" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Public Documents" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Sponsors" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Media Assets" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector" DefaultValue="Sector" ListName="Projects" Format="None" ></changeContentTierChoice>
@@ -1506,7 +1468,7 @@
 		</sectorChangeContentTierChoice>
 		<orgChangeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Announcements" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Documents Respository" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Public Documents" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Sponsors" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Media Assets" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global,Sector,Entity" DefaultValue="Entity" ListName="Projects" Format="None"></changeContentTierChoice>
@@ -1519,14 +1481,14 @@
 	</updateSiteColumns>
 
 	<globalAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Global" ListNames="Entities;Announcements;Documents Respository;Sponsors;Media Assets;Projects;Videos;Contact Information;Events List;Campaigns;Articles"></item>
+		<item configListName="Configuration" SiteLevel="Global" ListNames="Sectors;Page;My Tasks;Public Document;Events List;Entities;Announcements;Sponsors;Media Assets;Projects;Videos;Products;Generic Page;Contact Information;Articles;HeroWeb;HeroMobile"></item>
 	</globalAddItemConfigurationList>
 
 	<sectorAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Sector" ListNames="Announcements;Documents Respository;Sponsors;Media Assets;Projects;Videos;Contact Information;Events List;Campaigns;Articles"></item>
+		<item configListName="Configuration" SiteLevel="Sector" ListNames="Sectors;My Tasks;Public Document;Events List;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
 	</sectorAddItemConfigurationList>
 
 	<orgAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Entity" ListNames="Announcements;Documents Respository;Sponsors;Media Assets;Projects;Videos;Contact Information;Events List;Campaigns;Articles"></item>
+		<item configListName="Configuration" SiteLevel="Entity" ListNames="Sectors;My Tasks;Public Document;Events List;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
 	</orgAddItemConfigurationList>
 </sites>
