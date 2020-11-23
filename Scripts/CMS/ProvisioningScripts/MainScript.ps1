@@ -70,7 +70,7 @@ if($null -ne $webparams){
 .$psfilecreatesitecolumnscript @params
 .$psfilecreatecontenttypescript @params
 if($null -ne $webparams){
-   .$psfilepublishcontenttypescript @webparams
+  .$psfilepublishcontenttypescript @webparams
 }
 .$psfilecreatenewsitescript @paramsnewsite
 
@@ -113,7 +113,7 @@ function checkContentTypeExists()
 do
 {
     Write-host "Sleep started for 1 minute..." -ForegroundColor Green
-    start-sleep -s 60
+    #start-sleep -s 60
     Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
     $isExists= $true
     $isExists= checkContentTypeExists
@@ -123,5 +123,19 @@ until ($isExists -eq $true)
 if($isExists -eq $true)
 {
      Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
+     #add the custom script command 
+     $tenantUrl="https://"+$tenant+"-admin.sharepoint.com/"
+     $rootSiteColUrl = "https://"+$tenant+".sharepoint.com/"
+
+     $secstr = New-Object -TypeName System.Security.SecureString
+     $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
+     Connect-SPOService -url $tenantUrl -credential $tenantAdmin
+     $isEnabled = Get-SPOTenantCdnEnabled -CdnType Public
+     if([string] ($isEnabled.Value) -eq "False"){
+          Set-SPOTenantCdnEnabled -CdnType Public
+     }
+
+     Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0
      .$psfileprovisionnewsitecollectionscript @paramsnewsite
 }

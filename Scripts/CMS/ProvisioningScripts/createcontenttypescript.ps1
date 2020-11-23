@@ -85,7 +85,14 @@ function Get-SiteColumsToImport($xmlTermsPath){
  }
 }
 function ContentType($scXML) {
-        
+
+    #Connect to SPO Service and add the site collection admin 
+    $tenantUrl = "https://"+$tenant+"-admin.sharepoint.com/"
+    Connect-SPOService -url $tenantUrl -credential $tenantAdmin
+ 
+    #Add Site collection Admin
+    Set-SPOUser -site $contenttypehub -LoginName $sp_user -IsSiteCollectionAdmin $True
+
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection

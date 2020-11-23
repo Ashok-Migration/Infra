@@ -109,6 +109,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 
     foreach($globalhubsite in $sitefile.sites.globalhubsite.site)
      {
+        Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+        $connection = Get-PnPConnection
+
         $isGlobalHubSite = $True
         $globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
         $siteExits = Get-PnPTenantSite -Url $globalhubSiteUrl -ErrorAction SilentlyContinue
@@ -137,7 +140,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
             $appName = "tasmu-spfx-global-client-side-solution"     
             AddSPFxWebPart $globalhubSiteUrl $tenantAdmin $appName
             #Uncomment and run below line on new site creation only, else keep commented
-            #AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
+            AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
                     
         }
                 
@@ -178,7 +181,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
                
                #Uncomment and run below line on new site creation only, else keep commented
-               #AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
+               AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
            }           
 
            foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
@@ -219,7 +222,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                    AddSPFxWebPart $orgSiteUrl $tenantAdmin $appName
 
                    #Uncomment and run below line on new site creation only, else keep commented
-                   #AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
+                   AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
                    
                }               
              }
@@ -332,8 +335,8 @@ Function CreateLookupColumnForList()
         [Parameter(Mandatory=$false)] [string] $EnforceUniqueValues = "FALSE",
         [Parameter(Mandatory=$true)] [string] $LookupListName,
         [Parameter(Mandatory=$true)] [string] $LookupField,
-        [Parameter(Mandatory=$true)] [object] $ProjectedFields,
         [Parameter(Mandatory=$true)] [string] $LookupType,
+        [Parameter(Mandatory=$false)] [object] $ProjectedFields,
         $connection
     )
     
@@ -347,7 +350,7 @@ Function CreateLookupColumnForList()
         $LookupWebID=$web.Id
 
         $lookupColumnId = [GUID]::NewGuid() 
-        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='{$LookupType}'
+        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$LookupType'
         ID='{$lookupColumnId}' Mult='TRUE' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
         WebId='$LookupWebID' ShowField='$LookupField' />"
@@ -361,7 +364,7 @@ Function CreateLookupColumnForList()
                 $ColumnName=$columnItem.ColumnName
                 $showField = $columnItem.ShowField
                 $projectedType = $columnItem.Type
-                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='{$projectedType}' DisplayName='$ColumnTitle' Name='$ColumnName' 
+                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$projectedType' DisplayName='$ColumnTitle' Name='$ColumnName' 
                 ShowField='$showField' EnforceUniqueValues='FALSE' Mult='TRUE' Sortable='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
                 ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
             }
@@ -1238,6 +1241,11 @@ function ListandLibrary($url, $nodeLevel) {
             $ListURL = $ListURL -replace '\s', ''
             
             Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem
+            
+            if($itemList.ListName -eq "Generic Page"){
+                Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field2.LookupListName $itemList.Field2.LookupField $null $itemList.Field2.ColumnName $itemList.Field2.ColumnTitle $itemList.Field2.Type $itemList.columnItem2
+            }
+
             if(Get-PnPList -Identity $itemList.ListName){     
                 ViewCreation $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
             }
@@ -1311,9 +1319,11 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
         # Connect with the tenant admin credentials to the tenant
         $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
 
-        if($LookupFieldColumnName -ne '' -and $LookupListName -ne '' -and $LookupField -ne '' -and [bool]($ProjectedFields) -eq $true){
-            CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -ProjectedFields $ProjectedFields $LookupFieldType $connection
-        }
+        #foreach ($field in $fields) {
+            if([bool]$LookupFieldColumnName -eq $true -and [bool]$LookupListName -eq $true -and [bool]$LookupField -eq $true){
+                CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields $connection
+            }
+       # }
         
         $ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
         if ([bool]($ListExist) -eq $false) {
@@ -1337,34 +1347,36 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
             $ListBase = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
             Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
             
-            # make the content type read-only false
-            Try {
-                #Setup the context
-                $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrlNew)
-                $Ctx.Credentials = $credentials
+            if($ContentTypeName -ne 'Item'){
+                # make the content type read-only false
+                Try {
+                    #Setup the context
+                    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrlNew)
+                    $Ctx.Credentials = $credentials
          
-                #Get the content type from the web
-                $ContentTypeColl = $Ctx.Web.ContentTypes
-                $Ctx.Load($ContentTypeColl)
-                $Ctx.ExecuteQuery()
-  
-                #Get the content type to Add
-                $CType = $ContentTypeColl | Where {$_.Name -eq $ContentTypeName}
-                If($CType -ne $Null)
-                {
-                    $CType.ReadOnly=$false
-                    $CType.Update($True)
+                    #Get the content type from the web
+                    $ContentTypeColl = $Ctx.Web.ContentTypes
+                    $Ctx.Load($ContentTypeColl)
                     $Ctx.ExecuteQuery()
+  
+                    #Get the content type to Add
+                    $CType = $ContentTypeColl | Where {$_.Name -eq $ContentTypeName}
+                    If($CType -ne $Null)
+                    {
+                        $CType.ReadOnly=$false
+                        $CType.Update($True)
+                        $Ctx.ExecuteQuery()
  
-                    Write-host "Content Type $ContentTypeName is Set to Read Only False!" -ForegroundColor Green
+                        Write-host "Content Type $ContentTypeName is Set to Read Only False!" -ForegroundColor Green
+                    }
+                    else
+                    {
+                        Write-host "Content Type $ContentTypeName Doesn't Exist!" -ForegroundColor Yellow
+                    }
                 }
-                else
-                {
-                    Write-host "Content Type $ContentTypeName Doesn't Exist!" -ForegroundColor Yellow
+                Catch {
+                    write-host -f Red "Error Setting Content Type $ContentTypeName to Read Only false!" $_.Exception.Message
                 }
-            }
-            Catch {
-                write-host -f Red "Error Setting Content Type $ContentTypeName to Read Only false!" $_.Exception.Message
             }
 
             # Add the lookup columns to the list
