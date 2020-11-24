@@ -144,7 +144,35 @@
                     },
                     "typeOfServiceId": {
                       "type": ["number", "null"]
+                    },
+                    "providerId": {
+                      "type": ["string", "null"]
+                    },
+                    "productStructureId": {
+                      "type": ["number", "null"]
+                    },
+                    "catalogueTypeId": {
+                      "type": ["number", "null"]
+                    },
+                    "customerSegmentIds": {
+                      "items": {
+                        "type": ["number", "null"]
+                      },
+                      "type": "array"
+                    },
+                    "content":{
+                      "type": ["string", "null"]
+                    },
+                    "metadata_title":{
+                      "type": ["string", "null"]
+                    },
+                    "personas": {
+                      "items": {
+                        "type": ["string", "null"]
+                      },
+                      "type": "array"
                     }
+                    
                   },
                   "type": "object"
                 }
@@ -217,6 +245,33 @@
                     },
                     "typeOfServiceId": {
                       "type": ["number", "null"]
+                    },
+                    "providerId": {
+                      "type": ["string", "null"]
+                    },
+                    "productStructureId": {
+                      "type": ["number", "null"]
+                    },
+                    "catalogueTypeId": {
+                      "type": ["number", "null"]
+                    },
+                    "customerSegmentIds": {
+                      "items": {
+                        "type": ["number", "null"]
+                      },
+                      "type": "array"
+                    },
+                    "content":{
+                      "type": ["string", "null"]
+                    },
+                    "metadata_title":{
+                      "type": ["string", "null"]
+                    },
+                    "personas": {
+                      "items": {
+                        "type": ["string", "null"]
+                      },
+                      "type": "array"
                     }
                   },
                   "type": "object"
@@ -257,7 +312,14 @@
                   "priceOverview": "@body('Parse_Product_JSON')?['priceOverview']",
                   "productCategoryName": "@body('Parse_Product_JSON')?['productCategoryName']",
                   "productSubCategoryName": "@body('Parse_Product_JSON')?['productSubCategoryName']",
-                  "typeOfServiceId": "@body('Parse_Product_JSON')?['typeOfServiceId']"
+                  "typeOfServiceId": "@body('Parse_Product_JSON')?['typeOfServiceId']",
+                  "providerId":"@body('Parse_Product_JSON')?['providerId']",
+                  "productStructureId":"@body('Parse_Product_JSON')?['productStructureId']",
+                  "catalogueTypeId":"@body('Parse_Product_JSON')?['catalogueTypeId']",
+                  "customerSegmentIds":"@body('Parse_Product_JSON')?['customerSegmentIds']",
+                  "content":"@body('Parse_Product_JSON')?['longDescription']",
+                  "metadata_title":"@body('Parse_Product_JSON')?['name']",
+                  "personas": "@body('Parse_Product_JSON')?['personas']"
                 }
               }
             },
@@ -295,7 +357,14 @@
                   "priceOverview": "@body('Parse_Product_JSON_AR')?['priceOverview']",
                   "productCategoryName": "@body('Parse_Product_JSON_AR')?['productCategoryName']",
                   "productSubCategoryName": "@body('Parse_Product_JSON_AR')?['productSubCategoryName']",
-                  "typeOfServiceId": "@body('Parse_Product_JSON_AR')?['typeOfServiceId']"
+                  "typeOfServiceId": "@body('Parse_Product_JSON_AR')?['typeOfServiceId']",
+                  "providerId":"@body('Parse_Product_JSON')?['providerId']",
+                  "productStructureId":"@body('Parse_Product_JSON')?['productStructureId']",
+                  "catalogueTypeId":"@body('Parse_Product_JSON')?['catalogueTypeId']",
+                  "customerSegmentIds":"@body('Parse_Product_JSON')?['customerSegmentIds']",
+                  "content":"@body('Parse_Product_JSON')?['longDescription']",
+                  "metadata_title":"@body('Parse_Product_JSON')?['name']",
+                  "personas": "@body('Parse_Product_JSON')?['personas']"
                 }
               }
             },
@@ -504,7 +573,19 @@
                             },
                             "title": {
                               "type": ["string", "null"]
-                            }
+                            },
+														"personas": {
+                              "items": {
+															  "type": ["string", "null"]
+															},
+															"type": "array"
+														},
+														"keywords": {
+															"items": {
+															  "type": ["string", "null"]
+															},
+															"type": "array"
+														}
                           },
                           "type": "object"
                         }
@@ -547,7 +628,19 @@
                             },
                             "title": {
                               "type": ["string", "null"]
-                            }
+                            },
+														"personas": {
+                              "items": {
+															  "type": ["string", "null"]
+															},
+															"type": "array"
+														},
+														"keywords": {
+															"items": {
+															  "type": ["string", "null"]
+															},
+															"type": "array"
+														}
                           },
                           "type": "object"
                         }
@@ -575,7 +668,9 @@
                           "search_id": "@concat('News-',body('Parse_News_JSON')?['id'])",
                           "sector": "@body('Parse_News_JSON')?['sectors']",
                           "short_description": "@body('Parse_News_JSON')?['shortDescription']",
-                          "thumbnail_url": "@body('Parse_News_JSON')?['thumbnailImage']"
+                          "thumbnail_url": "@body('Parse_News_JSON')?['thumbnailImage']",
+													"personas": "@body('Parse_News_JSON')?['personas']",
+													"keywords": "@body('Parse_News_JSON')?['keywords']"
                         }
                       }
                     },
@@ -599,7 +694,9 @@
                           "search_id": "@concat('NewsAR-',body('Parse_News_JSON')?['id'])",
                           "sector": "@body('Parse_News_JSON_AR')?['sectors']",
                           "short_description": "@body('Parse_News_JSON_AR')?['shortDescription']",
-                          "thumbnail_url": "@body('Parse_News_JSON_AR')?['thumbnailImage']"
+                          "thumbnail_url": "@body('Parse_News_JSON_AR')?['thumbnailImage']",
+													"personas": "@body('Parse_News_JSON')?['personas']",
+													"keywords": "@body('Parse_News_JSON')?['keywords']"
                         }
                       }
                     },
