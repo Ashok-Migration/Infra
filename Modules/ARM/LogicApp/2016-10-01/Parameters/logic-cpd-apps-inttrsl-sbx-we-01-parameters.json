@@ -1,0 +1,2067 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpd-apps-inttrsl-sbx-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "When_a_message_is_received_in_a_queue_(auto-complete)": {
+                    "recurrence": {
+                        "frequency": "Second",
+                        "interval": 10
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/@{encodeURIComponent(encodeURIComponent('changelog'))}/messages/head",
+                        "queries": {
+                            "queueType": "Main"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Get_Items_From_Global_Level_Task_List": {
+                    "runAfter": {
+                        "Get_Items_From_Task_List": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": {
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata"
+                            },
+                            "method": "GET",
+                            "uri": "/_api/web/lists/getByTitle('@{parameters('myTasksList')}')/items?$select=ParentItemId,Id&$filter=(ParentSiteUrl eq '@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}' ) and (ParentItemId eq '@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}') and TASMUTaskStatusInternal eq 'Active'"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                    }
+                },
+                "Get_Items_From_Task_List": {
+                    "runAfter": {
+                        "Parse_Service_Bus_Message_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": {
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata"
+                            },
+                            "method": "GET",
+                            "uri": "/_api/web/lists/getByTitle('@{parameters('myTasksList')}')/items?$select=ParentItemId,Id&$filter=(ParentSiteUrl eq '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}' ) and (ParentItemId eq '@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}') and TASMUTaskStatusInternal eq 'Active'"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                    }
+                },
+                "If_Task_List_And_Global_Task_List_Has_Items": {
+                    "actions": {
+                        "Add_Users_To_Task_For_Translation": {
+                            "runAfter": {
+                                "Loop_To_Get_TranslationContentTypeId": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata",
+                                        "Content-Type": "application/json"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/items?$select=Id"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            }
+                        },
+                        "Delay_5_Seconds_After_Finish_Translation": {
+                            "runAfter": {
+                                "Until_Task_Status_Is_Set_Finish_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 5,
+                                    "unit": "Second"
+                                }
+                            }
+                        },
+                        "Delay_5_Seconds_After_Start_Translation": {
+                            "runAfter": {
+                                "Until_Task_Status_Is_Start_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 5,
+                                    "unit": "Second"
+                                }
+                            }
+                        },
+                        "Get_ContentTypeID_For_Translation_Task": {
+                            "runAfter": {
+                                "Loop_For_Adding_Users_To_Variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata"
+                                    },
+                                    "method": "GET",
+                                    "uri": "/_api/web/Lists/getbytitle('@{parameters('myTasksList')}')/contenttypes?$filter=Name eq 'TASMU MyTask Translator'&$top=1&$select=StringId"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            }
+                        },
+                        "Get_List_columns_for_auto_translation": {
+                            "runAfter": {
+                                "Update_Item_Status_To_Pending_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json"
+                                    },
+                                    "method": "GET",
+                                    "uri": "/_api/web/lists/getbytitle('@{parameters('TranslateConfigListName')}')/items?$select=EngColumnName,ArColumnName,TextType&$filter=ListName eq '@{body('Parse_Service_Bus_Message_JSON')?['ListName']}'"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL']))}/httprequest"
+                            }
+                        },
+                        "Get_Users_From_Translators_Group": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata"
+                                    },
+                                    "method": "GET",
+                                    "uri": "_api/web/SiteGroups/GetByName('@{parameters('TranslatorsGroupName')}')/users?$select=Email,Id"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            }
+                        },
+                        "If_Task_Status_Is_Finish_Translation": {
+                            "actions": {
+                                "Send_an_email_(V2)_Translation_Completed": {
+                                    "runAfter": {
+                                        "Set_EditorEmailBody_Translation_Completed": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "Body": "<p>@{variables('EmailBody')}</p>",
+                                            "Subject": "Translation Completed - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                            "To": "@variables('TranslatorsEmail')"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v2/Mail"
+                                    }
+                                },
+                                "Send_an_email_(V2)_Translation_Completed_Notification": {
+                                    "runAfter": {
+                                        "Send_an_email_(V2)_Translation_Completed": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                            "Subject": "Translation Completed - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                            "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v2/Mail"
+                                    }
+                                },
+                                "Send_message_To_Approval_Queue": {
+                                    "runAfter": {
+                                        "Send_an_email_(V2)_Translation_Completed_Notification": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "ContentData": "@{base64(concat('{','\n','    \"SiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['SiteURL'],'\",','\n','    \"ItemTitle\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemTitle'],'\",','\n','    \"ItemGUID\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemGUID'],'\",','\n','    \"ItemId\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemId'],'\",','\n','    \"ListName\": \"',body('Parse_Service_Bus_Message_JSON')?['ListName'],'\",','\n','    \"EditorEmail\": \"',body('Parse_Service_Bus_Message_JSON')?['EditorEmail'],'\",','\n','    \"TranslatorId\": \"',body('Parse_Users_Task_For_Translation_JSON')?['ID'],'\"','\n','}'))}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/@{encodeURIComponent(encodeURIComponent('approval'))}/messages",
+                                        "queries": {
+                                            "systemProperties": "None"
+                                        }
+                                    }
+                                },
+                                "Set_EditorEmailBody_Translation_Completed": {
+                                    "runAfter": {
+                                        "Set_EmailBody_Translation_Completed": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "EditorEmailBody",
+                                        "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been translated.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                    }
+                                },
+                                "Set_EmailBody_Translation_Completed": {
+                                    "runAfter": {
+                                        "Update_Task_Status_And_Comments": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "EmailBody",
+                                        "value": "<p>Hello Translator,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been translated.\n<br><br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view the translated content. \n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                    }
+                                },
+                                "Update_Task_Internal_Status_To_Active": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "body": "{\n\"TASMUTaskStatusInternal\":\"Active\"\n}",
+                                            "headers": {
+                                                "Accept": "application/json;odata=verbose",
+                                                "Content-Type": "application/json",
+                                                "If-Match": "*",
+                                                "X-HTTP-Method": "MERGE"
+                                            },
+                                            "method": "POST",
+                                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_Task_For_Translation_JSON')?['ID']})"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                },
+                                "Update_Task_Status_And_Comments": {
+                                    "runAfter": {
+                                        "Update_Task_Internal_Status_To_Active": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "body": "{\n\"ApproverComments\":\"@{variables('TranslatorTaskComments')}\",\n\"RequiresTranslation\":\"False\",\n\"ContentStatus\":\"Translated\"\n}",
+                                            "headers": {
+                                                "Accept": "application/json;odata=verbose",
+                                                "Content-Type": "application/json",
+                                                "If-Match": "*",
+                                                "X-HTTP-Method": "MERGE"
+                                            },
+                                            "method": "POST",
+                                            "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "If_Task_Status_is_Start_Translation_Then_Reassign": [
+                                    "Succeeded"
+                                ],
+                                "Set_FinishTranslationReminder": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {
+                                    "Set_the_Status_To_Rejected": {
+                                        "runAfter": {},
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "body": "{\n\"TASMUTaskStatusInternal\":\"Rejected\",\n\"TASMUTaskStatus\":\"Rejected\"\n}",
+                                                "headers": {
+                                                    "Accept": "application/json;odata=verbose",
+                                                    "Content-Type": "application/json",
+                                                    "If-Match": "*",
+                                                    "X-HTTP-Method": "MERGE"
+                                                },
+                                                "method": "POST",
+                                                "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_Task_For_Translation_JSON')?['ID']})"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "or": [
+                                    {
+                                        "equals": [
+                                            "@variables('TranslatorTaskStatus')",
+                                            "Finish Translation"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "If_Task_Status_is_Start_Translation_Then_Reassign": {
+                            "actions": {
+                                "Reassign_Task_To_One_Translator": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "body": "{\n\"AssignedToId\":[@{variables('TranslationOwnershipEmail')}]\n}",
+                                            "headers": {
+                                                "Accept": "application/json;odata=nometadata",
+                                                "Content-Type": "application/json",
+                                                "If-Match": "*",
+                                                "X-HTTP-Method": "MERGE"
+                                            },
+                                            "method": "POST",
+                                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_Task_For_Translation_JSON')?['ID']})"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Set_TranslationOwnershipCompleted_Start_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@variables('TranslationOwnership')",
+                                            "Start Translation"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "If_there_are_any_columns_for_auto_translation": {
+                            "actions": {
+                                "Final_TranslationColumnString": {
+                                    "runAfter": {
+                                        "Until_Loop_to_set_TranslationColumnString": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Compose",
+                                    "inputs": "@substring(variables('TranslateColumnsString'),0,sub(length(variables('TranslateColumnsString')),1))"
+                                },
+                                "Get_column_data_for_AutoTranslation": {
+                                    "runAfter": {
+                                        "Final_TranslationColumnString": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "headers": {
+                                                "Accept": "application/json",
+                                                "Content-Type": "application/json"
+                                            },
+                                            "method": "GET",
+                                            "uri": "/_api/web/lists/getbytitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/items(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})?$select=@{outputs('Final_TranslationColumnString')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                },
+                                "Send_Arabic_translated_data_of_plain_type_to_sharepoint": {
+                                    "runAfter": {
+                                        "Until_AutoTranslation_is_done": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "body": "@{variables('TranslatedObject')}",
+                                            "headers": {
+                                                "Accept": "application/json;odata=verbose",
+                                                "Content-Type": "application/json",
+                                                "If-Match": "*",
+                                                "X-HTTP-Method": "MERGE"
+                                            },
+                                            "method": "POST",
+                                            "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                },
+                                "Set_IncrementVariable_to_0": {
+                                    "runAfter": {
+                                        "Get_column_data_for_AutoTranslation": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "IncrementVariableForUntilLoop",
+                                        "value": 0
+                                    }
+                                },
+                                "Set_TranslatedObject": {
+                                    "runAfter": {
+                                        "Set_IncrementVariable_to_0": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslatedObject",
+                                        "value": {}
+                                    }
+                                },
+                                "Until_AutoTranslation_is_done": {
+                                    "actions": {
+                                        "ArabicColumnData": {
+                                            "runAfter": {
+                                                "EnglishColumnData": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@body('Get_column_data_for_AutoTranslation')?[outputs('ArabicColumnName')]"
+                                        },
+                                        "ArabicColumnName": {
+                                            "runAfter": {
+                                                "EnglishColumnName": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@body('Parse_List_Columns_for_auto_translation')?['value'][variables('IncrementVariableForUntilLoop')]?['ArColumnName']"
+                                        },
+                                        "EnglishColumnData": {
+                                            "runAfter": {
+                                                "TextTypeOfColumn": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@body('Get_column_data_for_AutoTranslation')?[outputs('EnglishColumnName')]"
+                                        },
+                                        "EnglishColumnName": {
+                                            "runAfter": {},
+                                            "type": "Compose",
+                                            "inputs": "@body('Parse_List_Columns_for_auto_translation')?['value'][variables('IncrementVariableForUntilLoop')]?['EngColumnName']"
+                                        },
+                                        "If_Arabic_Column_is_empty": {
+                                            "actions": {
+                                                "Check_column_text_type": {
+                                                    "actions": {
+                                                        "Compose_set_and_add_property_for_Translation_plain_text_object": {
+                                                            "runAfter": {
+                                                                "Set_variable_TranslatedPlain": [
+                                                                    "Succeeded",
+                                                                    "Failed"
+                                                                ]
+                                                            },
+                                                            "type": "Compose",
+                                                            "inputs": "@addProperty(variables('TranslatedObject'),outputs('ArabicColumnName'),variables('TranslatedPlain'))"
+                                                        },
+                                                        "Set_TranslatedPlain_to_empty_string": {
+                                                            "runAfter": {
+                                                                "Compose_set_and_add_property_for_Translation_plain_text_object": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "SetVariable",
+                                                            "inputs": {
+                                                                "name": "TranslatedPlain",
+                                                                "value": "@{trim('')}"
+                                                            }
+                                                        },
+                                                        "Set_Translated_Plain_text_object": {
+                                                            "runAfter": {
+                                                                "Set_TranslatedPlain_to_empty_string": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "SetVariable",
+                                                            "inputs": {
+                                                                "name": "TranslatedObject",
+                                                                "value": "@outputs('Compose_set_and_add_property_for_Translation_plain_text_object')"
+                                                            }
+                                                        },
+                                                        "Set_variable_TranslatedPlain": {
+                                                            "runAfter": {
+                                                                "Translate_plain_text_type": [
+                                                                    "Succeeded",
+                                                                    "Failed"
+                                                                ]
+                                                            },
+                                                            "type": "SetVariable",
+                                                            "inputs": {
+                                                                "name": "TranslatedPlain",
+                                                                "value": "@body('Translate_plain_text_type')"
+                                                            }
+                                                        },
+                                                        "Translate_plain_text_type": {
+                                                            "runAfter": {},
+                                                            "type": "ApiConnection",
+                                                            "inputs": {
+                                                                "body": {
+                                                                    "Text": "@{outputs('EnglishColumnData')}"
+                                                                },
+                                                                "host": {
+                                                                    "connection": {
+                                                                        "name": "@parameters('$connections')['apicon-cpd-apps-intcog-sbx-we-01']['connectionId']"
+                                                                    }
+                                                                },
+                                                                "method": "post",
+                                                                "path": "/Translate",
+                                                                "queries": {
+                                                                    "to": "ar"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "runAfter": {},
+                                                    "else": {
+                                                        "actions": {
+                                                            "Send_enriched_text_html_translated_data_to_sharepoint": {
+                                                                "runAfter": {
+                                                                    "Set_TranslatedHTML_string": [
+                                                                        "Succeeded",
+                                                                        "Failed"
+                                                                    ]
+                                                                },
+                                                                "type": "ApiConnection",
+                                                                "inputs": {
+                                                                    "body": {
+                                                                        "body": "{\"@{outputs('ArabicColumnName')}\":'@{replace(variables('TranslatedHTML'),'''','&apos;')}'}",
+                                                                        "headers": {
+                                                                            "Accept": "application/json;odata=verbose",
+                                                                            "Content-Type": "application/json",
+                                                                            "If-Match": "*",
+                                                                            "X-HTTP-Method": "MERGE"
+                                                                        },
+                                                                        "method": "POST",
+                                                                        "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                                                    },
+                                                                    "host": {
+                                                                        "connection": {
+                                                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                                        }
+                                                                    },
+                                                                    "method": "post",
+                                                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                                                }
+                                                            },
+                                                            "Set_TranslatedHTML_string": {
+                                                                "runAfter": {
+                                                                    "Translate_text_HTML_type": [
+                                                                        "Succeeded",
+                                                                        "Failed"
+                                                                    ]
+                                                                },
+                                                                "type": "SetVariable",
+                                                                "inputs": {
+                                                                    "name": "TranslatedHTML",
+                                                                    "value": "@body('Translate_text_HTML_type')"
+                                                                }
+                                                            },
+                                                            "Set_TranslatedHTML_string_to_empty": {
+                                                                "runAfter": {
+                                                                    "Send_enriched_text_html_translated_data_to_sharepoint": [
+                                                                        "Succeeded"
+                                                                    ]
+                                                                },
+                                                                "type": "SetVariable",
+                                                                "inputs": {
+                                                                    "name": "TranslatedHTML",
+                                                                    "value": "@{trim('')}"
+                                                                }
+                                                            },
+                                                            "Translate_text_HTML_type": {
+                                                                "runAfter": {},
+                                                                "type": "ApiConnection",
+                                                                "inputs": {
+                                                                    "body": {
+                                                                        "Text": "@{trim(replace(outputs('EnglishColumnData'),'''','&apos;'))}"
+                                                                    },
+                                                                    "host": {
+                                                                        "connection": {
+                                                                            "name": "@parameters('$connections')['apicon-cpd-apps-intcog-sbx-we-01']['connectionId']"
+                                                                        }
+                                                                    },
+                                                                    "method": "post",
+                                                                    "path": "/Translate",
+                                                                    "queries": {
+                                                                        "textType": "@{outputs('TextTypeOfColumn')}",
+                                                                        "to": "ar"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "expression": {
+                                                        "and": [
+                                                            {
+                                                                "equals": [
+                                                                    "@outputs('TextTypeOfColumn')",
+                                                                    "plain"
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "type": "If"
+                                                },
+                                                "Increment_variable_2": {
+                                                    "runAfter": {
+                                                        "Check_column_text_type": [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type": "IncrementVariable",
+                                                    "inputs": {
+                                                        "name": "IncrementVariableForUntilLoop",
+                                                        "value": 1
+                                                    }
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "ArabicColumnData": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "else": {
+                                                "actions": {
+                                                    "Increment_variable_for_until_loop": {
+                                                        "runAfter": {},
+                                                        "type": "IncrementVariable",
+                                                        "inputs": {
+                                                            "name": "IncrementVariableForUntilLoop",
+                                                            "value": 1
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "expression": {
+                                                "and": [
+                                                    {
+                                                        "equals": [
+                                                            "@body('Get_column_data_for_AutoTranslation')?[outputs('ArabicColumnName')]",
+                                                            "@null"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "type": "If"
+                                        },
+                                        "TextTypeOfColumn": {
+                                            "runAfter": {
+                                                "ArabicColumnName": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@body('Parse_List_Columns_for_auto_translation')?['value'][variables('IncrementVariableForUntilLoop')]?['TextType']"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Set_TranslatedObject": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "expression": "@equals(variables('IncrementVariableForUntilLoop'), variables('NumberOfColumnsToTranslate'))",
+                                    "limit": {
+                                        "count": 60,
+                                        "timeout": "PT1H"
+                                    },
+                                    "type": "Until"
+                                },
+                                "Until_Loop_to_set_TranslationColumnString": {
+                                    "actions": {
+                                        "Append_to_TranslateColumnsString": {
+                                            "runAfter": {},
+                                            "type": "AppendToStringVariable",
+                                            "inputs": {
+                                                "name": "TranslateColumnsString",
+                                                "value": "@{body('Parse_List_Columns_for_auto_translation')?['value'][variables('IncrementVariableForUntilLoop')]?['EngColumnName']},@{body('Parse_List_Columns_for_auto_translation')?['value'][variables('IncrementVariableForUntilLoop')]?['ArColumnName']},"
+                                            }
+                                        },
+                                        "Increment_variable": {
+                                            "runAfter": {
+                                                "Append_to_TranslateColumnsString": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "IncrementVariable",
+                                            "inputs": {
+                                                "name": "IncrementVariableForUntilLoop",
+                                                "value": 1
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {},
+                                    "expression": "@equals(variables('IncrementVariableForUntilLoop'), variables('NumberOfColumnsToTranslate'))",
+                                    "limit": {
+                                        "count": 60,
+                                        "timeout": "PT1H"
+                                    },
+                                    "type": "Until"
+                                }
+                            },
+                            "runAfter": {
+                                "Set_NumberOfColumnsToTranslatate": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "greater": [
+                                            "@variables('NumberOfColumnsToTranslate')",
+                                            0
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Loop_For_Adding_Users_To_Variable": {
+                            "foreach": "@body('Parse_Users_From_Translators_Group_JSON')?['value']",
+                            "actions": {
+                                "Append_TranslatorsUserId": {
+                                    "runAfter": {
+                                        "Set_TranslatorsEmail": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "TranslatorsUserId",
+                                        "value": "@items('Loop_For_Adding_Users_To_Variable')?['Id']"
+                                    }
+                                },
+                                "Set_TranslatorsEmail": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslatorsEmail",
+                                        "value": "@{items('Loop_For_Adding_Users_To_Variable')?['Email']};"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_Users_From_Translators_Group_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Loop_To_Get_TranslationContentTypeId": {
+                            "foreach": "@body('Parse_ContentTypeID_For_Translation_Task_JSON')?['value']",
+                            "actions": {
+                                "Set_TranslationContentTypeId": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslationContentTypeId",
+                                        "value": "@items('Loop_To_Get_TranslationContentTypeId')?['StringId']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_ContentTypeID_For_Translation_Task_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Parse_ContentTypeID_For_Translation_Task_JSON": {
+                            "runAfter": {
+                                "Get_ContentTypeID_For_Translation_Task": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Get_ContentTypeID_For_Translation_Task')",
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "items": {
+                                                "properties": {
+                                                    "StringId": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "StringId"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "Parse_List_Columns_for_auto_translation": {
+                            "runAfter": {
+                                "Get_List_columns_for_auto_translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Get_List_columns_for_auto_translation')",
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "items": {
+                                                "properties": {
+                                                    "ArColumnName": {
+                                                        "type": "string"
+                                                    },
+                                                    "EngColumnName": {
+                                                        "type": "string"
+                                                    },
+                                                    "TextType": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "EngColumnName",
+                                                    "ArColumnName",
+                                                    "TextType"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "Parse_Users_From_Translators_Group_JSON": {
+                            "runAfter": {
+                                "Get_Users_From_Translators_Group": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Get_Users_From_Translators_Group')",
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "items": {
+                                                "properties": {
+                                                    "Email": {
+                                                        "type": "string"
+                                                    },
+                                                    "Id": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "Id",
+                                                    "Email"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "Parse_Users_Task_For_Translation_JSON": {
+                            "runAfter": {
+                                "Add_Users_To_Task_For_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Add_Users_To_Task_For_Translation')",
+                                "schema": {
+                                    "properties": {
+                                        "ID": {
+                                            "type": "integer"
+                                        },
+                                        "Id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "Send_an_email_(V2)_Translation_Request": {
+                            "runAfter": {
+                                "Set_EditorEmailBody_Translation_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EmailBody')}</p>",
+                                    "Importance": "High",
+                                    "Subject": "Translation Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@variables('TranslatorsEmail')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            }
+                        },
+                        "Send_an_email_(V2)_Translation_Request_Notification": {
+                            "runAfter": {
+                                "Send_an_email_(V2)_Translation_Request": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                    "Subject": "Translation Request- @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            }
+                        },
+                        "Set_EditorEmailBody_Translation_Request_Notification": {
+                            "runAfter": {
+                                "Set_EmailBody_Translation_Request": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "EditorEmailBody",
+                                "value": "<p>Hello Editor,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            }
+                        },
+                        "Set_EmailBody_Translation_Request": {
+                            "runAfter": {
+                                "If_there_are_any_columns_for_auto_translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "EmailBody",
+                                "value": "<p>Hello Translator,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.<br>\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review or update translation.\n<br><br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_Task_For_Translation_JSON')?['ID']}\">here</a> to view the task\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            }
+                        },
+                        "Set_FinishTranslationReminder": {
+                            "runAfter": {
+                                "Set_TranslationOwnershipCompleted_Finish_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "FinishTranslationReminder",
+                                "value": false
+                            }
+                        },
+                        "Set_NumberOfColumnsToTranslatate": {
+                            "runAfter": {
+                                "Parse_List_Columns_for_auto_translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "NumberOfColumnsToTranslate",
+                                "value": "@length(body('Parse_List_Columns_for_auto_translation')?['value'])"
+                            }
+                        },
+                        "Set_StartTranslationReminder": {
+                            "runAfter": {
+                                "Delay_5_Seconds_After_Start_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "StartTranslationReminder",
+                                "value": false
+                            }
+                        },
+                        "Set_TranslationOwnershipCompleted_Finish_Translation": {
+                            "runAfter": {
+                                "Delay_5_Seconds_After_Finish_Translation": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "TranslationOwnershipCompleted",
+                                "value": "Yes"
+                            }
+                        },
+                        "Set_TranslationOwnershipCompleted_Start_Translation": {
+                            "runAfter": {
+                                "Set_StartTranslationReminder": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                                "name": "TranslationOwnershipCompleted",
+                                "value": "Yes"
+                            }
+                        },
+                        "Until_Task_Status_Is_Finish_Translation_Reminder": {
+                            "actions": {
+                                "Delay_10_Seconds_Finish_Translation_Reminder": {
+                                    "runAfter": {},
+                                    "type": "Wait",
+                                    "inputs": {
+                                        "interval": {
+                                            "count": 10,
+                                            "unit": "Second"
+                                        }
+                                    }
+                                },
+                                "If_Task_Status_Is_Finish_Translation_Reminder": {
+                                    "actions": {},
+                                    "runAfter": {
+                                        "Delay_10_Seconds_Finish_Translation_Reminder": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Delay_1_Day_Finish_Translation_Reminder": {
+                                                "runAfter": {},
+                                                "type": "Wait",
+                                                "inputs": {
+                                                    "interval": {
+                                                        "count": 1,
+                                                        "unit": "Day"
+                                                    }
+                                                }
+                                            },
+                                            "Send_an_email_(V2)_Finish_Translation_Reminder": {
+                                                "runAfter": {
+                                                    "Delay_1_Day_Finish_Translation_Reminder": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "ApiConnection",
+                                                "inputs": {
+                                                    "body": {
+                                                        "Body": "<p>@{variables('EmailBody')}</p>",
+                                                        "Subject": "Gentle Reminder-Translation Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                                        "To": "@variables('TranslatorsEmail')"
+                                                    },
+                                                    "host": {
+                                                        "connection": {
+                                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                                        }
+                                                    },
+                                                    "method": "post",
+                                                    "path": "/v2/Mail"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@variables('FinishTranslationReminder')",
+                                                    false
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type": "If"
+                                }
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Translation_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": "@equals(variables('FinishTranslationReminder'), false)",
+                            "limit": {
+                                "count": 100,
+                                "timeout": "P1M"
+                            },
+                            "type": "Until"
+                        },
+                        "Until_Task_Status_Is_Set_Finish_Translation": {
+                            "actions": {
+                                "Delay_10_Seconds_Set_Finish_Translation": {
+                                    "runAfter": {},
+                                    "type": "Wait",
+                                    "inputs": {
+                                        "interval": {
+                                            "count": 10,
+                                            "unit": "Second"
+                                        }
+                                    }
+                                },
+                                "Get_Task_Translation_Status_-_Finish_Translation": {
+                                    "runAfter": {
+                                        "Delay_10_Seconds_Set_Finish_Translation": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "headers": {
+                                                "Accept": "application/json;odata=nometadata",
+                                                "Content-Type": "application/json"
+                                            },
+                                            "method": "GET",
+                                            "uri": "/_api/web/lists/getbytitle('@{parameters('myTasksList')}')/items(@{body('Parse_Users_Task_For_Translation_JSON')?['ID']})?$select=TASMUTaskStatusInternal,TaskComments,TASMUTaskStatus,Translation"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                },
+                                "Parse_Task_Translation_Status_JSON": {
+                                    "runAfter": {
+                                        "Get_Task_Translation_Status_-_Finish_Translation": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('Get_Task_Translation_Status_-_Finish_Translation')",
+                                        "schema": {
+                                            "properties": {
+                                                "TASMUTaskStatus": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "TASMUTaskStatusInternal": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "TaskComments": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "Translation": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "Set_TranslatorTaskComments": {
+                                    "runAfter": {
+                                        "Set_TranslatorTaskStatus": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslatorTaskComments",
+                                        "value": "@body('Parse_Task_Translation_Status_JSON')?['TASMUTaskStatusInternal']"
+                                    }
+                                },
+                                "Set_TranslatorTaskStatus": {
+                                    "runAfter": {
+                                        "Parse_Task_Translation_Status_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslatorTaskStatus",
+                                        "value": "@body('Parse_Task_Translation_Status_JSON')?['Translation']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Translation_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": "@equals(variables('TranslatorTaskStatus'), 'Finish Translation')",
+                            "limit": {
+                                "count": 3000,
+                                "timeout": "P1M"
+                            },
+                            "type": "Until"
+                        },
+                        "Until_Task_Status_Is_Start_Translation": {
+                            "actions": {
+                                "Delay_10_Seconds_Start_Translation": {
+                                    "runAfter": {},
+                                    "type": "Wait",
+                                    "inputs": {
+                                        "interval": {
+                                            "count": 10,
+                                            "unit": "Second"
+                                        }
+                                    }
+                                },
+                                "Get_Translation_Status_And_Ownership": {
+                                    "runAfter": {
+                                        "Delay_10_Seconds_Start_Translation": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "headers": {
+                                                "Accept": "application/json;odata=nometadata"
+                                            },
+                                            "method": "GET",
+                                            "uri": "/_api/web/Lists/getbytitle('@{parameters('myTasksList')}')/items(@{body('Parse_Users_Task_For_Translation_JSON')?['ID']})?$select=Editor/Id,Translation&$expand=Editor/Id"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    }
+                                },
+                                "Parse_Translation_Status_And_Ownership_JSON": {
+                                    "runAfter": {
+                                        "Get_Translation_Status_And_Ownership": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('Get_Translation_Status_And_Ownership')",
+                                        "schema": {
+                                            "properties": {
+                                                "Editor": {
+                                                    "properties": {
+                                                        "Id": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Translation": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "Set_TranslationOwnership": {
+                                    "runAfter": {
+                                        "Set_TranslationOwnershipEmail": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslationOwnership",
+                                        "value": "@{body('Parse_Translation_Status_And_Ownership_JSON')?['Translation']}"
+                                    }
+                                },
+                                "Set_TranslationOwnershipEmail": {
+                                    "runAfter": {
+                                        "Parse_Translation_Status_And_Ownership_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TranslationOwnershipEmail",
+                                        "value": "@{body('Parse_Translation_Status_And_Ownership_JSON')?['Editor']?['Id']}"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Translation_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": "@equals(or(equals(variables('TranslationOwnership'), 'Start Translation'), equals(variables('TranslationOwnershipCompleted'), 'Yes')), true)",
+                            "limit": {
+                                "count": 3000,
+                                "timeout": "P1M"
+                            },
+                            "type": "Until"
+                        },
+                        "Until_Task_Status_is_Start_Translation_Reminder": {
+                            "actions": {
+                                "Delay_10_Seconds_Until_Translation_Started": {
+                                    "runAfter": {},
+                                    "type": "Wait",
+                                    "inputs": {
+                                        "interval": {
+                                            "count": 10,
+                                            "unit": "Second"
+                                        }
+                                    }
+                                },
+                                "If_TranslationOwnershipCompleted_Start_Translation": {
+                                    "actions": {},
+                                    "runAfter": {
+                                        "Delay_10_Seconds_Until_Translation_Started": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Delay_1_Day_Start_Translation_Reminder": {
+                                                "runAfter": {},
+                                                "type": "Wait",
+                                                "inputs": {
+                                                    "interval": {
+                                                        "count": 1,
+                                                        "unit": "Day"
+                                                    }
+                                                }
+                                            },
+                                            "Send_an_email_(V2)_Translation_Request_Reminder": {
+                                                "runAfter": {
+                                                    "Delay_1_Day_Start_Translation_Reminder": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "ApiConnection",
+                                                "inputs": {
+                                                    "body": {
+                                                        "Body": "<p>@{variables('EmailBody')}</p>",
+                                                        "Subject": "Gentle Reminder-Translation Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                                        "To": "@variables('TranslatorsEmail')"
+                                                    },
+                                                    "host": {
+                                                        "connection": {
+                                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                                        }
+                                                    },
+                                                    "method": "post",
+                                                    "path": "/v2/Mail"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@variables('StartTranslationReminder')",
+                                                    false
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type": "If"
+                                }
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Translation_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": "@equals(variables('StartTranslationReminder'), false)",
+                            "limit": {
+                                "count": 100,
+                                "timeout": "P1M"
+                            },
+                            "type": "Until"
+                        },
+                        "Update_Item_Status_To_Pending_Translation": {
+                            "runAfter": {
+                                "Parse_Users_Task_For_Translation_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"ContentStatus\":\"Pending Translation\",\n\"RequiresTranslation\":\"false\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            }
+                        }
+                    },
+                    "runAfter": {
+                        "Parse_Items_From_Global_Level_Task_List_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@length(body('Parse_Items_From_Task_List_JSON')?['value'])",
+                                    0
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@length(body('Parse_Items_From_Global_Level_Task_List_JSON')?['value'])",
+                                    0
+                                ]
+                            }
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Initialize_EditorEmailBody": {
+                    "runAfter": {
+                        "Initialize_EmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EditorEmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_EmailBody": {
+                    "runAfter": {
+                        "Initialize_TranslationOwnershipEmail": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_FinishTranslationReminder": {
+                    "runAfter": {
+                        "Initialize_StartTranslationReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "FinishTranslationReminder",
+                                "type": "boolean",
+                                "value": true
+                            }
+                        ]
+                    }
+                },
+                "Initialize_IncrementVariableForUntilLoop": {
+                    "runAfter": {
+                        "Initialize_NumberOfColumnsToTranslate": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "IncrementVariableForUntilLoop",
+                                "type": "integer",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                "Initialize_NumberOfColumnsToTranslate": {
+                    "runAfter": {
+                        "Initialize_FinishTranslationReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "NumberOfColumnsToTranslate",
+                                "type": "integer"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_StartTranslationReminder": {
+                    "runAfter": {
+                        "Initialize_EditorEmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "StartTranslationReminder",
+                                "type": "boolean",
+                                "value": true
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslateColumnsString": {
+                    "runAfter": {
+                        "Initialize_IncrementVariableForUntilLoop": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslateColumnsString",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatedHTMLstring": {
+                    "runAfter": {
+                        "Initialize_TranslatedObject": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatedHTML",
+                                "type": "string",
+                                "value": "@{trim('')}"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatedObject": {
+                    "runAfter": {
+                        "Initialize_TranslateColumnsString": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatedObject",
+                                "type": "object"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatedPlainTextstring": {
+                    "runAfter": {
+                        "Initialize_TranslatedHTMLstring": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatedPlain",
+                                "type": "string",
+                                "value": "@{trim('')}"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslationContentTypeId": {
+                    "runAfter": {
+                        "Initialize_TranslatorsUserId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslationContentTypeId",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslationOwnership": {
+                    "runAfter": {
+                        "Initialize_TranslationContentTypeId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslationOwnership",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslationOwnershipCompleted": {
+                    "runAfter": {
+                        "Initialize_TranslatorTaskComments": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslationOwnershipCompleted",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslationOwnershipEmail": {
+                    "runAfter": {
+                        "Initialize_TranslationOwnershipCompleted": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslationOwnershipEmail",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatorTaskComments": {
+                    "runAfter": {
+                        "Initialize_TranslatorTaskStatus": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatorTaskComments",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatorTaskStatus": {
+                    "runAfter": {
+                        "Initialize_TranslationOwnership": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatorTaskStatus",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatorsEmail": {
+                    "runAfter": {},
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatorsEmail",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TranslatorsUserId": {
+                    "runAfter": {
+                        "Initialize_TranslatorsEmail": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatorsUserId",
+                                "type": "array"
+                            }
+                        ]
+                    }
+                },
+                "Parse_Items_From_Global_Level_Task_List_JSON": {
+                    "runAfter": {
+                        "Parse_Items_From_Task_List_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson",
+                    "inputs": {
+                        "content": "@body('Get_Items_From_Global_Level_Task_List')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "ID": {
+                                                "type": "integer"
+                                            },
+                                            "Id": {
+                                                "type": "integer"
+                                            },
+                                            "ParentItemId": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "Id",
+                                            "ParentItemId",
+                                            "ID"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "Parse_Items_From_Task_List_JSON": {
+                    "runAfter": {
+                        "Get_Items_From_Global_Level_Task_List": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson",
+                    "inputs": {
+                        "content": "@body('Get_Items_From_Task_List')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "ID": {
+                                                "type": "integer"
+                                            },
+                                            "Id": {
+                                                "type": "integer"
+                                            },
+                                            "ParentItemId": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "Id",
+                                            "ParentItemId",
+                                            "ID"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "Parse_Service_Bus_Message_JSON": {
+                    "runAfter": {
+                        "Initialize_TranslatedPlainTextstring": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson",
+                    "inputs": {
+                        "content": "@decodeBase64(triggerBody()?['ContentData'])",
+                        "schema": {
+                            "properties": {
+                                "ChangeType": {
+                                    "type": "string"
+                                },
+                                "EditorEmail": {
+                                    "type": "string"
+                                },
+                                "GlobalConfigList": {
+                                    "type": "string"
+                                },
+                                "GlobalSiteTitle": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "GlobalSiteURL": {
+                                    "type": "string"
+                                },
+                                "ItemGUID": {
+                                    "type": "string"
+                                },
+                                "ItemId": {
+                                    "type": "string"
+                                },
+                                "ItemTitle": {
+                                    "type": "string"
+                                },
+                                "ListId": {
+                                    "type": "string"
+                                },
+                                "ListName": {
+                                    "type": "string"
+                                },
+                                "MarketplaceSiteURL": {
+                                    "type": "string"
+                                },
+                                "SiteTitle": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "SiteURL": {
+                                    "type": "string"
+                                },
+                                "StringValue": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "outputs": {}
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                },
+                "TranslateConfigListName": {
+                    "defaultValue": "TranslateConfig",
+                    "type": "String"
+                },
+                "TranslatorsGroupName": {
+                    "defaultValue": "Translators",
+                    "type": "String"
+                },
+                "myTasksList": {
+                    "defaultValue": "My%20Tasks",
+                    "type": "String"
+                }
+            }
+        },
+        "tags": {
+            "value": {
+                "Environment": "Sandbox"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "apicon-cpd-apps-into365-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-into365-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-into365-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
+                        },
+                        "apicon-cpd-apps-intsb-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intsb-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+                        },
+                        "apicon-cpd-apps-intspo-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intspo-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intspo-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline"
+                        },
+                        "apicon-cpd-apps-intcog-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intcog-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intcog-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/translatorv2"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

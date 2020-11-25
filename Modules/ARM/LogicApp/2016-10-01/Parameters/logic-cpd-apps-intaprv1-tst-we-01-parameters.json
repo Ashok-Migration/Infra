@@ -1,0 +1,1077 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpd-apps-intaprv1-tst-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "When_a_message_is_received_in_a_queue_(auto-complete)": {
+                    "recurrence": {
+                        "frequency": "Second",
+                        "interval": 10
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/@{encodeURIComponent(encodeURIComponent('approval'))}/messages/head",
+                        "queries": {
+                            "queueType": "Main"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Create_Task_in_MyTasks_for_Approval": {
+                    "inputs": {
+                        "body": {
+                            "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata",
+                                "Content-Type": "application/json;odata=nometadata"
+                            },
+                            "method": "POST",
+                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/items?$select=Id"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                    },
+                    "runAfter": {
+                        "Loop_Approvers_Group": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "Delay_10_Seconds_After_Approved_Or_Rejected": {
+                    "inputs": {
+                        "interval": {
+                            "count": 10,
+                            "unit": "Second"
+                        }
+                    },
+                    "runAfter": {
+                        "Set_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Wait"
+                },
+                "Get_Users_from_SharePoint_Approvers_Group": {
+                    "inputs": {
+                        "body": {
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata"
+                            },
+                            "method": "GET",
+                            "uri": "_api/web/SiteGroups/GetByName('@{parameters('approversGroupName')}')/users?$select=Email,Id"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                    },
+                    "runAfter": {
+                        "Initialize_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "If_Task_Status_Is_Approved_Or_Rejected": {
+                    "actions": {
+                        "If_Translation_Task_Is_Present_-_Approved": {
+                            "actions": {
+                                "Update_Internal_Task_Status_Approved_-_Translation_Task": {
+                                    "inputs": {
+                                        "body": {
+                                            "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
+                                            "headers": {
+                                                "Accept": "application/json;odata=verbose",
+                                                "Content-Type": "application/json",
+                                                "If-Match": "*",
+                                                "X-HTTP-Method": "MERGE"
+                                            },
+                                            "method": "POST",
+                                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                    },
+                                    "runAfter": {},
+                                    "type": "ApiConnection"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@body('Parse_Service_Bus_Message_JSON')?['TranslatorId']",
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@body('Parse_Service_Bus_Message_JSON')?['TranslatorId']",
+                                                "@null"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Update_Item_Status_And_Comments_-_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Send_an_email_(V2)_Approved": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EmailBody')}</p>",
+                                    "Subject": "Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@variables('ApproverEmail')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Set_EditorEmailBody_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Send_an_email_(V2)_Approved_Notification": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                    "Subject": "Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Set_EditorEmailBody_Approved": {
+                            "inputs": {
+                                "name": "EditorEmailBody",
+                                "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Set_EmailBody_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_EmailBody_Approved": {
+                            "inputs": {
+                                "name": "EmailBody",
+                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Update_Internal_Task_Status_And_Comments_-_Approval_Task": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Update_Internal_Task_Status_And_Comments_-_Approval_Task": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {
+                                "If_Translation_Task_Is_Present_-_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Update_Item_Status_And_Comments_-_Approved": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Approved\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "If_Translation_Task_Is_Present_-_Rejected": {
+                                "actions": {
+                                    "Update_Internal_Task_Status_Rejected_-_Translation_Task": {
+                                        "inputs": {
+                                            "body": {
+                                                "body": "{\n\"TASMUTaskStatusInternal\":\"Rejected\"\n}",
+                                                "headers": {
+                                                    "Accept": "application/json;odata=verbose",
+                                                    "Content-Type": "application/json",
+                                                    "If-Match": "*",
+                                                    "X-HTTP-Method": "MERGE"
+                                                },
+                                                "method": "POST",
+                                                "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                        },
+                                        "runAfter": {},
+                                        "type": "ApiConnection"
+                                    }
+                                },
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "not": {
+                                                "equals": [
+                                                    "@body('Parse_Service_Bus_Message_JSON')?['TranslatorId']",
+                                                    ""
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "not": {
+                                                "equals": [
+                                                    "@body('Parse_Service_Bus_Message_JSON')?['TranslatorId']",
+                                                    "@null"
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "runAfter": {
+                                    "Update_Item_Status_And_Comments_-_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "If"
+                            },
+                            "Send_an_email_(V2)_Rejected": {
+                                "inputs": {
+                                    "body": {
+                                        "Body": "<p>@{variables('EmailBody')}</p>",
+                                        "Subject": "Approval Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "To": "@variables('ApproverEmail')"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/v2/Mail"
+                                },
+                                "runAfter": {
+                                    "Set_EditorEmailBody_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Send_an_email_(V2)_Rejected_Notification": {
+                                "inputs": {
+                                    "body": {
+                                        "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                        "Subject": "Approval Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/v2/Mail"
+                                },
+                                "runAfter": {
+                                    "Send_an_email_(V2)_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Set_EditorEmailBody_Rejected": {
+                                "inputs": {
+                                    "name": "EditorEmailBody",
+                                    "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                },
+                                "runAfter": {
+                                    "Set_EmailBody_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            },
+                            "Set_EmailBody_Rejected": {
+                                "inputs": {
+                                    "name": "EmailBody",
+                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                },
+                                "runAfter": {
+                                    "Update_Internal_Task_Status_Rejected_-_Approval_Task": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            },
+                            "Update_Internal_Task_Status_Rejected_-_Approval_Task": {
+                                "inputs": {
+                                    "body": {
+                                        "body": "{\n\"TASMUTaskStatusInternal\":\"Rejected\",\n\"TASMUTaskStatus\":\"Rejected\"\n}",
+                                        "headers": {
+                                            "Accept": "application/json;odata=verbose",
+                                            "Content-Type": "application/json",
+                                            "If-Match": "*",
+                                            "X-HTTP-Method": "MERGE"
+                                        },
+                                        "method": "POST",
+                                        "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                },
+                                "runAfter": {
+                                    "If_Translation_Task_Is_Present_-_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Update_Item_Status_And_Comments_-_Rejected": {
+                                "inputs": {
+                                    "body": {
+                                        "body": "{\n\"ApproverComments\":\"Task action Rejected at 1 level.\",\n\"ContentStatus\":\"Rejected\"\n}",
+                                        "headers": {
+                                            "Accept": "application/json;odata=verbose",
+                                            "Content-Type": "application/json",
+                                            "If-Match": "*",
+                                            "X-HTTP-Method": "MERGE"
+                                        },
+                                        "method": "POST",
+                                        "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                },
+                                "runAfter": {},
+                                "type": "ApiConnection"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@variables('ApproverTaskStatus')",
+                                    "Approved"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Delay_10_Seconds_After_Approved_Or_Rejected": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Initialize_ApprovalRejectionReminder": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApprovalRejectionReminder",
+                                "type": "boolean",
+                                "value": "@true"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Parse_Service_Bus_Message_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverEmail": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverEmail",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_TranslatorsEmail": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverTaskComments": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTaskComments",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTaskStatus": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverTaskStatus": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTaskStatus",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverUserId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverUserId": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverUserId",
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverEmail": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_EditorEmailBody": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EditorEmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_EmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_EmailBody": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTaskComments": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_TranslatorsEmail": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TranslatorsEmail",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {},
+                    "type": "InitializeVariable"
+                },
+                "Loop_Approvers_Group": {
+                    "actions": {
+                        "Append_to_ApproverEmail": {
+                            "inputs": {
+                                "name": "ApproverEmail",
+                                "value": "@{items('Loop_Approvers_Group')?['Email']};"
+                            },
+                            "runAfter": {},
+                            "type": "AppendToStringVariable"
+                        },
+                        "Append_to_ApproverUserId": {
+                            "inputs": {
+                                "name": "ApproverUserId",
+                                "value": "@items('Loop_Approvers_Group')?['Id']"
+                            },
+                            "runAfter": {
+                                "Append_to_ApproverEmail": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "AppendToArrayVariable"
+                        }
+                    },
+                    "foreach": "@body('Parse_Users_From_SharePoint_Approvers_Group_JSON')?['value']",
+                    "runAfter": {
+                        "Parse_Users_From_SharePoint_Approvers_Group_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Foreach"
+                },
+                "Parse_Service_Bus_Message_JSON": {
+                    "inputs": {
+                        "content": "@decodeBase64(triggerBody()?['ContentData'])",
+                        "schema": {
+                            "properties": {
+                                "ApproversGroupName": {
+                                    "type": "string"
+                                },
+                                "EditorEmail": {
+                                    "type": "string"
+                                },
+                                "ItemGUID": {
+                                    "type": "string"
+                                },
+                                "ItemId": {
+                                    "type": "string"
+                                },
+                                "ItemTitle": {
+                                    "type": "string"
+                                },
+                                "ListId": {
+                                    "type": "string"
+                                },
+                                "ListName": {
+                                    "type": "string"
+                                },
+                                "SiteURL": {
+                                    "type": "string"
+                                },
+                                "TranslatorId": {
+                                    "type": "string"
+                                },
+                                "TranslatorsEmail": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Initialize_EditorEmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Parse_Users_From_SharePoint_Approvers_Group_JSON": {
+                    "inputs": {
+                        "content": "@body('Get_Users_from_SharePoint_Approvers_Group')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "Email": {
+                                                "type": "string"
+                                            },
+                                            "Id": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "Id",
+                                            "Email"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Get_Users_from_SharePoint_Approvers_Group": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Parse_Users_from_MyTasks_for_Approval": {
+                    "inputs": {
+                        "content": "@body('Create_Task_in_MyTasks_for_Approval')",
+                        "schema": {
+                            "properties": {
+                                "ID": {
+                                    "type": "integer"
+                                },
+                                "Id": {
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Create_Task_in_MyTasks_for_Approval": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Send_an_email_(V2)_-_Approval_Request": {
+                    "inputs": {
+                        "body": {
+                            "Body": "<p>@{variables('EmailBody')}</p>",
+                            "Importance": "High",
+                            "Subject": "Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                            "To": "@variables('ApproverEmail')"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/v2/Mail"
+                    },
+                    "runAfter": {
+                        "Set_EditorEmailBody_Approval_Request_Notification": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "Send_an_email_(V2)_-_Approval_Request_Notification": {
+                    "inputs": {
+                        "body": {
+                            "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                            "Subject": "Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                            "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/v2/Mail"
+                    },
+                    "runAfter": {
+                        "Send_an_email_(V2)_-_Approval_Request": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "Set_ApprovalRejectionReminder": {
+                    "inputs": {
+                        "name": "ApprovalRejectionReminder",
+                        "value": "@false"
+                    },
+                    "runAfter": {
+                        "Until_Task_Is_Approved_Or_Rejected": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Set_EditorEmailBody_Approval_Request_Notification": {
+                    "inputs": {
+                        "name": "EditorEmailBody",
+                        "value": "<p>Hello Editor,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                    },
+                    "runAfter": {
+                        "Set_EmailBody_Approval_Request": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Set_EmailBody_Approval_Request": {
+                    "inputs": {
+                        "name": "EmailBody",
+                        "value": "<p>Hello Approver,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                    },
+                    "runAfter": {
+                        "Update_Item_Status_to_Pending_Approval": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Until_Task_Is_Approved_Or_Rejected": {
+                    "actions": {
+                        "Delay_10_Seconds_Approved": {
+                            "inputs": {
+                                "interval": {
+                                    "count": 10,
+                                    "unit": "Second"
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Wait"
+                        },
+                        "Get_Task_Status": {
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata"
+                                    },
+                                    "method": "GET",
+                                    "uri": "/_api/web/lists/getbytitle('@{parameters('myTasksList')}')/items(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})?$select=TASMUTaskStatusInternal,TaskComments,TASMUTaskStatus"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {
+                                "Delay_10_Seconds_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Parse_Task_Status_JSON": {
+                            "inputs": {
+                                "content": "@body('Get_Task_Status')",
+                                "schema": {
+                                    "properties": {
+                                        "TASMUTaskStatus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "TASMUTaskStatusInternal": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "TaskComments": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "runAfter": {
+                                "Get_Task_Status": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson"
+                        },
+                        "Set_ApproverTaskComments": {
+                            "inputs": {
+                                "name": "ApproverTaskComments",
+                                "value": "@body('Parse_Task_Status_JSON')?['TaskComments']"
+                            },
+                            "runAfter": {
+                                "Set_ApproverTaskStatus": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_ApproverTaskStatus": {
+                            "inputs": {
+                                "name": "ApproverTaskStatus",
+                                "value": "@body('Parse_Task_Status_JSON')?['TASMUTaskStatus']"
+                            },
+                            "runAfter": {
+                                "Parse_Task_Status_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        }
+                    },
+                    "expression": "@equals(or(equals(variables('ApproverTaskStatus'), 'Approved'), equals(variables('ApproverTaskStatus'), 'Rejected')), true)",
+                    "limit": {
+                        "count": 3000,
+                        "timeout": "P1M"
+                    },
+                    "runAfter": {
+                        "Send_an_email_(V2)_-_Approval_Request_Notification": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Until"
+                },
+                "Until_Task_Is_Approved_Or_Rejected_Reminder": {
+                    "actions": {
+                        "Delay_10_Seconds_Reminder": {
+                            "inputs": {
+                                "interval": {
+                                    "count": 10,
+                                    "unit": "Second"
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Wait"
+                        },
+                        "If_Task_Status_Is_Approved_Or_Rejected_Reminder": {
+                            "actions": {},
+                            "else": {
+                                "actions": {
+                                    "Delay_1_Day_Reminder": {
+                                        "inputs": {
+                                            "interval": {
+                                                "count": 1,
+                                                "unit": "Day"
+                                            }
+                                        },
+                                        "runAfter": {},
+                                        "type": "Wait"
+                                    },
+                                    "Send_an_email_(V2)_Approval_Rejection_Reminder": {
+                                        "inputs": {
+                                            "body": {
+                                                "Body": "<p>@{variables('EmailBody')}</p>",
+                                                "Subject": "Gentle Reminder- Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                                "To": "@variables('ApproverEmail')"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-into365-tst-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/v2/Mail"
+                                        },
+                                        "runAfter": {
+                                            "Delay_1_Day_Reminder": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "ApiConnection"
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@variables('ApprovalRejectionReminder')",
+                                            "@false"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Delay_10_Seconds_Reminder": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        }
+                    },
+                    "expression": "@equals(variables('ApprovalRejectionReminder'), false)",
+                    "limit": {
+                        "count": 100,
+                        "timeout": "P1M"
+                    },
+                    "runAfter": {
+                        "Send_an_email_(V2)_-_Approval_Request_Notification": [
+                            "Succeeded",
+                            "TimedOut"
+                        ]
+                    },
+                    "type": "Until"
+                },
+                "Update_Item_Status_to_Pending_Approval": {
+                    "inputs": {
+                        "body": {
+                            "body": "{\n\"ContentStatus\":\"Pending Approval\"\n}",
+                            "headers": {
+                                "Accept": "application/json;odata=verbose",
+                                "Content-Type": "application/json",
+                                "If-Match": "*",
+                                "X-HTTP-Method": "MERGE"
+                            },
+                            "method": "POST",
+                            "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tst-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                    },
+                    "runAfter": {
+                        "Parse_Users_from_MyTasks_for_Approval": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                }
+            }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                },
+                "approversGroupName": {
+                    "defaultValue": "Approvers",
+                    "type": "String"
+                },
+                "myTasksList": {
+                    "defaultValue": "My Tasks",
+                    "type": "String"
+                }
+            }
+        },
+        "tags": {
+            "value": {
+                "Environment": "Test"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "apicon-cpd-apps-into365-tst-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tst-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-into365-tst-we-01",
+                            "connectionName": "apicon-cpd-apps-into365-tst-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
+                        },
+                        "apicon-cpd-apps-intsb-tst-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tst-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-tst-we-01",
+                            "connectionName": "apicon-cpd-apps-intsb-tst-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+                        },
+                        "apicon-cpd-apps-intspo-tst-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tst-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intspo-tst-we-01",
+                            "connectionName": "apicon-cpd-apps-intspo-tst-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
