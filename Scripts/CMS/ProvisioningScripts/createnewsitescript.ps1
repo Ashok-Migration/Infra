@@ -111,20 +111,21 @@ function ProvisionSiteCollections($sitefile)
            
            Create-SiteCollection $sectorhubsite.Type $sectorhubsite.Title $sectorhubsite.Alias $isGlobalHubSite $globalhubSiteUrl $isSectorHubSite $sectorhubSiteUrl '' ''
 
-           foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
-            {
-
-               Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-               $connection = Get-PnPConnection
-
-               $isGlobalHubSite = $False
-               $isSectorHubSite = $False
-               $isOrgSite = $True
-               $orgSiteUrl = $urlprefix + $orgassociatedsite.Alias
-               
-               Create-SiteCollection $orgassociatedsite.Type $orgassociatedsite.Title $orgassociatedsite.Alias $isGlobalHubSite $globalhubSiteUrl $isSectorHubSite $sectorhubSiteUrl $isOrgSite $orgSiteUrl
-                                      
-               }
+           # Entity provisioning 
+           #foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
+           # {
+           #
+           #    Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+           #    $connection = Get-PnPConnection
+           #
+           #    $isGlobalHubSite = $False
+           #    $isSectorHubSite = $False
+           #    $isOrgSite = $True
+           #    $orgSiteUrl = $urlprefix + $orgassociatedsite.Alias
+           #    
+           #    Create-SiteCollection $orgassociatedsite.Type $orgassociatedsite.Title $orgassociatedsite.Alias $isGlobalHubSite $globalhubSiteUrl $isSectorHubSite $sectorhubSiteUrl $isOrgSite $orgSiteUrl
+           #                           
+           #    }
            }
        }   
 }
@@ -168,18 +169,19 @@ function Create-SiteCollection($Type, $Title, $Alias, $isGlobalHubSite, $globalh
         if($isSectorHubSite -eq $true){
             $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
         }
-        if($isOrgSite -eq $true){
-            $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
-        }
+        # if($isOrgSite -eq $true){
+        #     $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
+        # }
         
         #Check for existence of SPE Admin Site 
         if ([bool] ($siteExits) -eq $false) {
-            Write-Host "Site collection not found ,so creating a new $globalhubSiteUrl....."
-            $client.TrackEvent("Site collection not found ,so creating a new $globalhubSiteUrl.....")
             #Create new site if site collection does not exist      
             
                 if($isGlobalHubSite){
                   try{
+                    Write-Host "Site collection not found ,so creating a new $globalhubSiteUrl ....."
+                    $client.TrackEvent("Site collection not found ,so creating a new $globalhubSiteUrl .....")
+        
                      New-PnPSite -Type $Type -Title $Title -Url $globalhubSiteUrl -SiteDesign Blank
                      $client.TrackEvent("Site collection created.. $globalhubSiteUrl") 
                   }
@@ -196,6 +198,9 @@ function Create-SiteCollection($Type, $Title, $Alias, $isGlobalHubSite, $globalh
                 
                 if($isSectorHubSite){
                     try {
+                        Write-Host "Site collection not found ,so creating a new $sectorhubSiteUrl ....."
+                        $client.TrackEvent("Site collection not found ,so creating a new $sectorhubSiteUrl .....")
+            
                         New-PnPSite -Type $Type -Title $Title -Url $sectorhubSiteUrl -SiteDesign Blank
                         $client.TrackEvent("Site collection created.. $sectorhubSiteUrl") 
                     }
@@ -208,23 +213,22 @@ function Create-SiteCollection($Type, $Title, $Alias, $isGlobalHubSite, $globalh
                          $client.TrackException($telemtryException)
                     }
                 }
+                
+                # if($isOrgSite){
+                #     try {
+                #         New-PnPSite -Type $Type -Title $Title -Url $orgSiteUrl -SiteDesign Blank
+                #         $client.TrackEvent("Site collection created.. $orgSiteUrl")
+                #     }
+                #     catch 
+                #     {
+                #         $ErrorMessage = $_.Exception.Message
+                #         Write-Host $ErrorMessage -foreground Yellow
 
-                if($isOrgSite){
-                    try {
-                        New-PnPSite -Type $Type -Title $Title -Url $orgSiteUrl -SiteDesign Blank
-                        $client.TrackEvent("Site collection created.. $orgSiteUrl")
-                    }
-                    catch 
-                    {
-                        $ErrorMessage = $_.Exception.Message
-                        Write-Host $ErrorMessage -foreground Yellow
-
-                         $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                         $telemtryException.Exception = $_.Exception.Message  
-                         $client.TrackException($telemtryException)
-                    }
-                }
-                        
+                #          $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+                #          $telemtryException.Exception = $_.Exception.Message  
+                #          $client.TrackException($telemtryException)
+                #     }
+                # }      
         }
         else {
             Write-Host "Site Collection- $siteTitle already exists"

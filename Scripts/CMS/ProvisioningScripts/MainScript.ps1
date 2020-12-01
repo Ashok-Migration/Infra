@@ -67,12 +67,12 @@ if($null -ne $webparams){
     .$psfileensuretermstoreadminscript @webparams
 }
 .$psfilecreatetaxanomyscript @params
-.$psfilecreatesitecolumnscript @params
-.$psfilecreatecontenttypescript @params
-if($null -ne $webparams){
-  .$psfilepublishcontenttypescript @webparams
-}
-.$psfilecreatenewsitescript @paramsnewsite
+ .$psfilecreatesitecolumnscript @params
+  .$psfilecreatecontenttypescript @params
+  if($null -ne $webparams){
+     .$psfilepublishcontenttypescript @webparams
+  }
+ .$psfilecreatenewsitescript @paramsnewsite
 
 #region To check if all Content type exists in Global site 
 
@@ -104,6 +104,24 @@ function checkContentTypeExists()
             Write-host $itemList.ContentTypeName "not available in" $globalhubSiteUrl -ForegroundColor Yellow
         }
     }
+    if($isContentTypeAvailable -eq $true){
+        
+        $configsite=$sitefile.sites.Configsite.site.Alias
+        $configSiteUrl = $urlprefix + $configsite
+
+        Connect-PnPOnline -Url $configSiteUrl -Credentials $tenantAdmin
+        $connection = Get-PnPConnection
+
+        foreach ($itemList in $sitefile.sites.ConfigurationSPList.ListAndContentTypes) {
+            $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
+            if($ListBase -eq $null)
+            {
+                $isContentTypeAvailable=$false
+                Write-host $itemList.ContentTypeName "not available in" $configSiteUrl -ForegroundColor Yellow
+            }
+        }
+    }
+
     Write-host "Check if Content Type Exists completed..." -ForegroundColor Green
     return $isContentTypeAvailable
 }
@@ -113,7 +131,7 @@ function checkContentTypeExists()
 do
 {
     Write-host "Sleep started for 1 minute..." -ForegroundColor Green
-    #start-sleep -s 60
+    start-sleep -s 60
     Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
     $isExists= $true
     $isExists= checkContentTypeExists
@@ -133,7 +151,7 @@ if($isExists -eq $true)
      Connect-SPOService -url $tenantUrl -credential $tenantAdmin
      $isEnabled = Get-SPOTenantCdnEnabled -CdnType Public
      if([string] ($isEnabled.Value) -eq "False"){
-          Set-SPOTenantCdnEnabled -CdnType Public
+          Set-SPOTenantCdnEnabled -CdnType Public -Confirm:$false
      }
 
      Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0

@@ -3,17 +3,23 @@
 	<globalhubsite>
 		<site Title="TASMU CMS" Alias="cms-marketplace" Type="CommunicationSite">
 			<sectorhubsite>
-				<site Title="Transport" Alias="cms-transportsector" Type="CommunicationSite">
-					<orgassociatedsite>
-						<site Title="Fedex" Alias="cms-transportsector-fedexorg" Type="CommunicationSite"/>
-						<site Title="Swift" Alias="cms-transportsector-swiftorg" Type="CommunicationSite"/>
-					</orgassociatedsite>
+				<site Title="Transportation" Alias="cms-sector-transportation" Type="CommunicationSite">
+					<!-- <orgassociatedsite>
+						<site Title="Fedex" Alias="cms-transportation-fedexorg" Type="CommunicationSite"/>
+						<site Title="Swift" Alias="cms-transportation-swiftorg" Type="CommunicationSite"/>
+					</orgassociatedsite> -->
 				</site>
-				<site Title="Health" Alias="cms-healthsector" Type="CommunicationSite">
-					<orgassociatedsite>
-						<site Title="Easthide" Alias="cms-healthsector-easthideorg" Type="CommunicationSite"/>
-						<site Title="Treejoy" Alias="cms-healthsector-treejoyorg" Type="CommunicationSite"/>
-					</orgassociatedsite>
+				<site Title="Healthcare" Alias="cms-sector-healthcare" Type="CommunicationSite">
+					<!-- <orgassociatedsite>
+						<site Title="Easthide" Alias="cms-healthcare-easthideorg" Type="CommunicationSite"/>
+						<site Title="Treejoy" Alias="cms-healthcare-treejoyorg" Type="CommunicationSite"/>
+					</orgassociatedsite> -->
+				</site>
+				<site Title="Logistics" Alias="cms-sector-logistics" Type="CommunicationSite">
+				</site>
+				<site Title="Sports" Alias="cms-sector-sports" Type="CommunicationSite">
+				</site>
+				<site Title="Environment" Alias="cms-sector-environment" Type="CommunicationSite">
 				</site>
 			</sectorhubsite>
 		</site>
@@ -28,24 +34,25 @@
 	<orgtheme Name="TASMU Sector"></orgtheme>
 
 	<!--Sharepoint Group Config for Global/Sector/Org-->
+		
 	<globalSPGroup>
-		<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
-			<ADGroup Name="Marketing Managers"></ADGroup>
-		</group>
-		<group Name="Translators" Description="Use this group to grant people Translators permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-			<users email="ms.sanketh.bappal@tasmusqcp.onmicrosoft.com"></users>
-		</group>
-		<defaultgroup Name="Members" Description="" isUsers="True" Role="Contribute" isADGroup="False"  SecurityGroup="">
-			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
-		</defaultgroup>
-		<defaultgroup Name="Visitors" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
-		</defaultgroup>
-		<defaultgroup Name="Owners" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
-			<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
-		</defaultgroup>
+			<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+				<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+				<ADGroup Name="Marketing Managers"></ADGroup>
+			</group>
+			<group Name="Translators" Description="Use this group to grant people Translators permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+				<users email="ms.sanketh.bappal@tasmusqcp.onmicrosoft.com"></users>
+			</group>
+			<defaultgroup Name="Members" Description="" isUsers="True" Role="Contribute" isADGroup="False"  SecurityGroup="">
+				<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			</defaultgroup>
+			<defaultgroup Name="Visitors" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+				<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			</defaultgroup>
+			<defaultgroup Name="Owners" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+				<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+				<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
+			</defaultgroup>
 	</globalSPGroup>
 	<sectorSPGroup>
 		<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
@@ -66,7 +73,7 @@
 			<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
 		</defaultgroup>
 	</sectorSPGroup>
-	<orgSPGroup>
+  <orgSPGroup>
 		<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
 			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
 			<ADGroup Name="Marketing Managers"></ADGroup>
@@ -85,7 +92,7 @@
 			<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
 		</defaultgroup>
 	</orgSPGroup>
-
+	
 	<!--SharePoint List Config for Global/Sector/Org-->
 	<ConfigurationSPList>
 		<ListAndContentTypes ListName="Configuration" ContentTypeName="TASMU Configuration" ListTemplate="GenericList" customView="">
@@ -100,6 +107,41 @@
 			<defaultviewfields name="ListId"></defaultviewfields>
 			<defaultviewfields name="ListName"></defaultviewfields>
 			<defaultviewfields name="SiteURL"></defaultviewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="TranslateConfig" ContentTypeName="TASMU Translate Config" ListTemplate="GenericList" customView="">
+			<defaultviewfields name="ListName"></defaultviewfields>
+			<defaultviewfields name="EngColumnName"></defaultviewfields>
+			<defaultviewfields name="ArColumnName"></defaultviewfields>
+			<defaultviewfields name="TextType"></defaultviewfields>
+			<Data>
+				<Item ListName="Articles" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Articles" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Articles" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Generic Page" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Generic Page" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Hero Mobile" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Hero Mobile" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Hero Web" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Hero Web" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Announcements" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Announcements" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Announcements" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Campaigns" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Campaigns" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Campaigns" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Projects" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Projects" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Projects" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Sponsors" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Sponsors" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Sponsors" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="EventsList" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="EventsList" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="EventsList" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+				<Item ListName="Videos" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+				<Item ListName="Videos" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+				<Item ListName="Videos" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+			</Data>
 		</ListAndContentTypes>
 	</ConfigurationSPList>
 	<ProductDocumentsList>
@@ -534,7 +576,7 @@
 			<customViewfields name="ArticleCategories"></customViewfields>			
 					
 		</ListAndContentTypes>	
-		<ListAndContentTypes ListName="HeroWeb" ContentTypeName="TASMU Hero Web" ListTemplate="DocumentLibrary" customView="Home">
+		<ListAndContentTypes ListName="Hero Web" ContentTypeName="TASMU Hero Web" ListTemplate="DocumentLibrary" customView="Home">
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="ContentTier"></defaultviewfields>
@@ -544,8 +586,13 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="SequenceNumber"></defaultviewfields>
 			<defaultviewfields name="UserType"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="SequenceNumber"></customViewfields>
 		</ListAndContentTypes>	
-		<ListAndContentTypes ListName="HeroMobile" ContentTypeName="TASMU Hero Mobile" ListTemplate="DocumentLibrary" customView="Home">
+		<ListAndContentTypes ListName="Hero Mobile" ContentTypeName="TASMU Hero Mobile" ListTemplate="DocumentLibrary" customView="Home">
 			<defaultviewfields name="Title"></defaultviewfields>
 			<defaultviewfields name="arTitle"></defaultviewfields>
 			<defaultviewfields name="ContentTier"></defaultviewfields>
@@ -555,7 +602,12 @@
 			<defaultviewfields name="ContentStatus"></defaultviewfields>
 			<defaultviewfields name="SequenceNumber"></defaultviewfields>
 			<defaultviewfields name="UserType"></defaultviewfields>
-		</ListAndContentTypes>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="SequenceNumber"></customViewfields>
+		</ListAndContentTypes> 
 	</globalSPList>
 	<sectorSPList>
 		<ListAndContentTypes ListName="Sectors" ContentTypeName="TASMU Sector" ListTemplate="GenericList" customView="">
@@ -1211,6 +1263,40 @@
 		</ListAndContentTypes>
 	</orgSPList>
 
+<!-- Lists which need unique permission and with unique group permissions-->
+<UniquePermissions>
+<List ListName="Changelog">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="TranslateConfig">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="Configuration">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="Sectors">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="Products">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+</UniquePermissions>
+
 	<!--Upload Files Config for Global/Sector/Org, Uncomment & add appropriate data to proceed. -->
 	<!-- SourceFolder="{Source Path of the documents}" DestinationFolder="{Destination Path: Name of the Sharepoint library} -->
 	<globalUploadFiles>
@@ -1317,25 +1403,37 @@
 	<!--Custom Navigation config for Global/Sector/Org-->
 	<globalConfigNav>
 		<Level1 nodeName="Sectors" count="1">
-			<Level2 nodeName="Transport" url="cms-dev-transportsector">
-				<Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
-				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/>
+			<Level2 nodeName="Transportation" url="cms-sector-transportation">
+				<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
 			</Level2>
-			<Level2 nodeName="Health" url="cms-dev-healthsector">
-				<Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
-				<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/>
+			<Level2 nodeName="Healthcare" url="cms-sector-healthcare">
+				<!-- <Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
+				<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/> -->
+			</Level2>
+			<Level2 nodeName="Logistics" url="cms-sector-logistics">
+			</Level2>
+			<Level2 nodeName="Sports" url="cms-sector-sports">
+			</Level2>
+			<Level2 nodeName="Environment" url="cms-sector-environment">
 			</Level2>
 		</Level1>
 	</globalConfigNav>
 	<globalNav>
 		<Level1 nodeName="Sectors" count="1">
-			<Level2 nodeName="Transport" url="cms-dev-transportsector">
-				<Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
-				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/>
+			<Level2 nodeName="Transportation" url="cms-sector-transportation">
+				<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
 			</Level2>
-			<Level2 nodeName="Health" url="cms-dev-healthsector">
-				<Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
-				<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/>
+			<Level2 nodeName="Healthcare" url="cms-sector-healthcare">
+				<!-- <Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
+				<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/> -->
+			</Level2>
+			<Level2 nodeName="Logistics" url="cms-sector-logistics">
+			</Level2>
+			<Level2 nodeName="Sports" url="cms-sector-sports">
+			</Level2>
+			<Level2 nodeName="Environment" url="cms-sector-environment">
 			</Level2>
 		</Level1>
 		<Level1 nodeName="Manage Content" count="2">
@@ -1351,7 +1449,7 @@
 			<Level2 nodeName="Sponsors" url="Sponsors"></Level2>
 			<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
 			<Level2 nodeName="Events" url="EventsList"></Level2>
-			<Level2 nodeName="Generic Pages" url="Generic%20Page"></Level2>
+			<Level2 nodeName="Generic Pages" url="GenericPage"></Level2>
 			<Level2 nodeName="Hero Web" url="HeroWeb"></Level2>
 			<Level2 nodeName="Hero Mobile" url="HeroMobile"></Level2>
 		</Level1>
@@ -1365,10 +1463,10 @@
 	<sectorNav>
 		<QuickLaunchNav>
 			<Level1 nodeName="Entities" count="1">
-				<Level2 nodeName="Fedex" sector="cms-dev-transportsector" url="cms-dev-transportsector-fedexorg"></Level2>
+				<!-- <Level2 nodeName="Fedex" sector="cms-dev-transportsector" url="cms-dev-transportsector-fedexorg"></Level2>
 				<Level2 nodeName="Swift" sector="cms-dev-transportsector" url="cms-dev-transportsector-swiftorg"></Level2>
 				<Level2 nodeName="Easthide" sector="cms-dev-healthsector" url="cms-dev-healthsector-easthideorg"></Level2>
-				<Level2 nodeName="Treejoy" sector="cms-dev-healthsector" url="cms-dev-healthsector-treejoyorg"></Level2>
+				<Level2 nodeName="Treejoy" sector="cms-dev-healthsector" url="cms-dev-healthsector-treejoyorg"></Level2> -->
 			</Level1>
 			<Level1 nodeName="Manage Content" count="2">
 				<Level2 nodeName="Articles" url="Articles"></Level2>
@@ -1391,14 +1489,20 @@
 		</QuickLaunchNav>
 		<TopNav>
 			<Level1 nodeName="Sectors">
-				<Level2 nodeName="Transport" url="cms-dev-transportsector">
-					<Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
-					<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/>
+				<Level2 nodeName="Transportation" url="cms-sector-transportation">
+					<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+					<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
 				</Level2>
-				<Level2 nodeName="Health" url="cms-dev-healthsector">
-					<Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
-					<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/>
+				<Level2 nodeName="Healthcare" url="cms-sector-healthcare">
+					<!-- <Level3 nodeName="Easthide" url="cms-dev-healthsector-easthideorg"/>
+					<Level3 nodeName="Treejoy" url="cms-dev-healthsector-treejoyorg"/> -->
 				</Level2>
+				<Level2 nodeName="Logistics" url="cms-sector-logistics">
+			</Level2>
+			<Level2 nodeName="Sports" url="cms-sector-sports">
+			</Level2>
+			<Level2 nodeName="Environment" url="cms-sector-environment">
+			</Level2>
 			</Level1>
 		</TopNav>
 	</sectorNav>
@@ -1449,8 +1553,8 @@
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Events List" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Campaigns" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Articles" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="HeroWeb" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="HeroMobile" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Hero Web" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Hero Mobile" Format="None" ></changeContentTierChoice>
 			<updateUserSelectionMode ColumnInternalName="AssignedTo" AllowMultipleValues="TRUE" ListName="My Tasks"  ></updateUserSelectionMode>
 		</globalChangeContentTierChoice>
 		<sectorChangeContentTierChoice>
@@ -1480,11 +1584,11 @@
 	</updateSiteColumns>
 
 	<globalAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Global" ListNames="Sectors;Page;My Tasks;Public Document;Events List;Entities;Announcements;Sponsors;Media Assets;Projects;Videos;Products;Generic Page;Contact Information;Articles;HeroWeb;HeroMobile"></item>
+		<item configListName="Configuration" SiteLevel="Global" ListNames="Articles;Announcements;Campaigns;Contact Information;Events List;Entities;Media Assets;Projects;Public Documents;Videos;Product Assets;Generic Page;Hero Web;Hero Mobile"></item>
 	</globalAddItemConfigurationList>
 
 	<sectorAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Sector" ListNames="Sectors;My Tasks;Public Document;Events List;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
+		<item configListName="Configuration" SiteLevel="Sector" ListNames="Articles;Announcements;Campaigns;Contact Information;Events List;Media Assets;Projects;Public Documents;Videos"></item>
 	</sectorAddItemConfigurationList>
 
 	<orgAddItemConfigurationList>

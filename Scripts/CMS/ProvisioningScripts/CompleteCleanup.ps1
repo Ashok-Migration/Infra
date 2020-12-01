@@ -29,7 +29,7 @@ Date:       Version: Changed By:         Info:
 #>
 [CmdletBinding()]
 param (
-    $tenant, # Enter the tenant name
+    $tenant,
     $TemplateParametersFile,
     $sp_user,
     $sp_password,
@@ -208,6 +208,35 @@ function DeleteSiteCollections($sitefile)
 
        }
 
+       foreach($globalsite in $sitefile.sites.Configsite.site)
+     {
+        try
+        {
+        $globalSiteUrl = $urlprefix + $globalsite.Alias
+        $siteExits = Get-PnPTenantSite -Url $globalSiteUrl -ErrorAction SilentlyContinue
+            
+        if ([bool] ($siteExits) -eq $true) {
+            
+            Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl"
+            $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl")
+            
+            Remove-PnPTenantSite -Url $globalSiteUrl -Force -SkipRecycleBin
+            
+            Write-Host "Remove-PnPTenantSite Completed for $globalSiteUrl"
+            $client.TrackEvent("Remove-PnPTenantSite Completed for $globalSiteUrl")
+        }
+    }
+    catch
+    {
+       $ErrorMessage = $_.Exception.Message
+       Write-Host $ErrorMessage -foreground Yellow
+
+       $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+       $telemtryException.Exception = $_.Exception.Message  
+       $client.TrackException($telemtryException)
+    }
+}
+
     Disconnect-PnPOnline
 }
 
@@ -238,6 +267,9 @@ function DeleteContentTypes($scXML)
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
 
+    Write-Host "Delete Content Types Started..."
+    $client.TrackEvent("Delete Content Types Started...")
+
     foreach($contentItem in $scXML.Main.siteContentTypes.contentItem)
      {
         try
@@ -245,13 +277,14 @@ function DeleteContentTypes($scXML)
             $ContentTypeExist = Get-PnPContentType -Identity $contentItem.ContentTypeName -ErrorAction SilentlyContinue
         
             if ([bool] ($ContentTypeExist) -eq $true) {
-                Write-Host "ContentType '$contentItem.ContentTypeName' Exists so, Remove-PnPContentType Started."
-                $client.TrackEvent("ContentType '$contentItem.ContentTypeName' Exists so, Remove-PnPContentType Started.")
+                $ct=$contentItem.ContentTypeName
+                Write-Host "ContentType $ct Exists so, Remove-PnPContentType Started."
+                $client.TrackEvent("ContentType $ct Exists so, Remove-PnPContentType Started.")
                 
                 Remove-PnPContentType -Identity $contentItem.ContentTypeName -Force -Connection $connection
                 
-                Write-Host "ContentType '$contentItem.ContentTypeName' Removed."
-                $client.TrackEvent("ContentType '$contentItem.ContentTypeName' Removed.")
+                Write-Host "ContentType $ct Removed."
+                $client.TrackEvent("ContentType $ct Removed.")
             }
          
          }
@@ -295,6 +328,9 @@ function DeleteSiteColumns($siteColumnfilePathfile)
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
+
+    Write-Host "Delete Site Columns Started..."
+    $client.TrackEvent("Delete Site Columns Started...")
      
     foreach($field in $siteColumnfilePathfile.SiteFields.Field)
      {
@@ -303,13 +339,14 @@ function DeleteSiteColumns($siteColumnfilePathfile)
             $getField = Get-PNPField -identity $field.ColumnName -ErrorAction SilentlyContinue
         
             if ([bool] ($getField) -eq $true) {
-                Write-Host "Field '$field.ColumnName' Exists so, Remove-PnPField Started."
-                $client.TrackEvent("Field '$field.ColumnName' Exists so, Remove-PnPField Started.")
+                $colName=$field.ColumnName
+                Write-Host "Field $colName Exists so, Remove-PnPField Started."
+                $client.TrackEvent("Field  $colName Exists so, Remove-PnPField Started.")
                 
                 Remove-PnPField -Identity $field.ColumnName -Force -Connection $connection
                 
-                Write-Host "Field '$field.ColumnName' Removed."
-                $client.TrackEvent("Field '$field.ColumnName' Removed.")
+                Write-Host "Field  $colName  Removed."
+                $client.TrackEvent("Field  $colName  Removed.")
             }
          
          }
@@ -353,6 +390,9 @@ function DeleteTaxanomyGroup($termsfile)
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
+
+    Write-Host "Delete Taxonomy Started..."
+    $client.TrackEvent("Delete Taxonomy Started...")
      
     foreach($Group in $termsfile.TermStores.TermStore.Groups.Group)
      {
@@ -361,13 +401,14 @@ function DeleteTaxanomyGroup($termsfile)
             $groupExists = Get-PnPTermGroup -identity $Group.Name -ErrorAction SilentlyContinue
         
             if ([bool] ($groupExists) -eq $true) {
-                Write-Host "Taxanomy Group '$Group.Name' Exists so, Remove-PnPTermGroup Started."
-                $client.TrackEvent("Taxanomy Group '$Group.Name' Exists so, Remove-PnPTermGroup Started.")
+                $groupName=$Group.Name
+                Write-Host "Taxanomy Group $groupName Exists so, Remove-PnPTermGroup Started."
+                $client.TrackEvent("Taxanomy Group $groupName Exists so, Remove-PnPTermGroup Started.")
                 
                 Remove-PnPTermGroup -GroupName $Group.Name -Force -Connection $connection
                 
-                Write-Host "Taxanomy Group '$Group.Name' Removed."
-                $client.TrackEvent("Taxanomy Group '$Group.Name' Removed.")
+                Write-Host "Taxanomy Group $groupName Removed."
+                $client.TrackEvent("Taxanomy Group $groupName Removed.")
             }
          
          }

@@ -105,6 +105,8 @@ function Get-SiteColumsToImport($xmlTermsPath){
             $columnTitle = $fieldNode.ColumnTitle
             $groupName = $fieldNode.GroupName
             $columnType = $fieldNode.ColumnType
+            $columnFormatting=$fieldNode.ColumnFormatting
+
             $columnChoices=''
 
             if($columnType -eq 'Choice')
@@ -129,7 +131,7 @@ function Get-SiteColumsToImport($xmlTermsPath){
 
             if($columnName -ne '')
             {
-              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue $enforceUniqueValues $indexed
+              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue $enforceUniqueValues $indexed $columnFormatting
             }        
 
      }
@@ -147,7 +149,7 @@ function Get-SiteColumsToImport($xmlTermsPath){
     Disconnect-PnPOnline
 }
 
-function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue, $enforceUniqueValues, $indexed) {
+function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue, $enforceUniqueValues, $indexed, $columnFormatting) {
     Try {
 
         Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
@@ -280,6 +282,11 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
             }
             
             $getField = Get-PNPField -identity $ColumnName -ErrorAction SilentlyContinue
+
+            if($null -ne $columnFormatting)
+            {
+                $getField | Set-PnPField -Values @{CustomFormatter = $columnFormatting}
+            }
         }
         else {
             Write-Host "$ColumnTitle already exists"

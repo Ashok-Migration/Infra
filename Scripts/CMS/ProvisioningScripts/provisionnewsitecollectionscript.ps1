@@ -102,6 +102,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
         if ([bool] ($siteExits) -eq $true) {            
             Write-host "site exists, starting creation of other components." -ForegroundColor Green
             ListandLibrary $globalconfigSiteUrl $sitefile.sites.ConfigurationSPList
+            AssignUniquePermission $sitefile.sites.UniquePermissions.List $globalconfigSiteUrl
             AddCustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
             
         }
@@ -124,6 +125,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 
             CreateNewGroupAddUsers $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
             AddUsersToDefaultSPGroup $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
+            AssignUniquePermission $sitefile.sites.UniquePermissions.List $globalhubSiteUrl
 
             AddCustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
             ApplyTheme $sitefile.sites.globaltheme.Name $globalhubSiteUrl $tenantAdmin $tenantUrl         
@@ -163,6 +165,8 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                ListandLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
                CreateNewGroupAddUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
                AddUsersToDefaultSPGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+               AssignUniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
+               
                AddCustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
                AddCustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
                ApplyTheme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
@@ -182,55 +186,127 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                
                #Uncomment and run below line on new site creation only, else keep commented
                AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
-           }           
+           } 
+       
+        # Entity provisioning   
+        #    foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
+        #     {
 
-           foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
-            {
+        #        Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+        #        $connection = Get-PnPConnection
 
-               Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-               $connection = Get-PnPConnection
-
-               $isGlobalHubSite = $False
-               $isSectorHubSite = $False
-               $isOrgSite = $True
-               $orgSiteUrl = $urlprefix + $orgassociatedsite.Alias
+        #        $isGlobalHubSite = $False
+        #        $isSectorHubSite = $False
+        #        $isOrgSite = $True
+        #        $orgSiteUrl = $urlprefix + $orgassociatedsite.Alias
                                        
-               $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
+        #        $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
                     
-               if ([bool] ($siteExits) -eq $true) {
+        #        if ([bool] ($siteExits) -eq $true) {
                    
-                   #Register the created Team Site as Associated Site for SectorHubSite
-                   Add-PnPHubSiteAssociation -Site $orgSiteUrl -HubSite $sectorhubSiteUrl
-                   Write-Verbose "Association succeeded" -Verbose
-                   EnableMegaMenu $orgSiteUrl
-                   ListandLibrary $orgSiteUrl $sitefile.sites.orgSPList
-                   CreateNewGroupAddUsers $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
-                   AddUsersToDefaultSPGroup $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
-                   AddCustomQuickLaunchNavigationSector $orgSiteUrl $sitefile.sites.orgNav.QuickLaunchNav
-                   ApplyTheme $sitefile.sites.orgtheme.Name $orgSiteUrl $tenantAdmin $tenantUrl
+        #            #Register the created Team Site as Associated Site for SectorHubSite
+        #            Add-PnPHubSiteAssociation -Site $orgSiteUrl -HubSite $sectorhubSiteUrl
+        #            Write-Verbose "Association succeeded" -Verbose
+        #            EnableMegaMenu $orgSiteUrl
+        #            ListandLibrary $orgSiteUrl $sitefile.sites.orgSPList
+        #            CreateNewGroupAddUsers $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
+        #            AddUsersToDefaultSPGroup $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
+        #            AddCustomQuickLaunchNavigationSector $orgSiteUrl $sitefile.sites.orgNav.QuickLaunchNav
+        #            ApplyTheme $sitefile.sites.orgtheme.Name $orgSiteUrl $tenantAdmin $tenantUrl
                                     
-                   CreateModernPage $orgSiteUrl $sitefile.sites.orgPageWebpart
-                   AddWebpartToPage $orgSiteUrl $sitefile.sites.orgPageWebpart
-                   #UploadFiles $orgSiteUrl $sitefile.sites.orgUploadFiles
-                   Update-SiteColumns $orgSiteUrl $sitefile.sites.updateSiteColumns.orgChangeContentTierChoice
-                   UpdateViewForTasksList 'My Tasks' $orgSiteUrl
+        #            CreateModernPage $orgSiteUrl $sitefile.sites.orgPageWebpart
+        #            AddWebpartToPage $orgSiteUrl $sitefile.sites.orgPageWebpart
+        #            #UploadFiles $orgSiteUrl $sitefile.sites.orgUploadFiles
+        #            Update-SiteColumns $orgSiteUrl $sitefile.sites.updateSiteColumns.orgChangeContentTierChoice
+        #            UpdateViewForTasksList 'My Tasks' $orgSiteUrl
                    
-                   #Check and add the app catalog             
-                   CheckAndCreateAppCatalog $orgSiteUrl             
-                   #Check and add the spfx webpart   
-                   $appName = "sector-custom-style-client-side-solution"          
-                   AddSPFxWebPart $orgSiteUrl $tenantAdmin $appName
+        #            #Check and add the app catalog             
+        #            CheckAndCreateAppCatalog $orgSiteUrl             
+        #            #Check and add the spfx webpart   
+        #            $appName = "sector-custom-style-client-side-solution"          
+        #            AddSPFxWebPart $orgSiteUrl $tenantAdmin $appName
 
-                   #Uncomment and run below line on new site creation only, else keep commented
-                   AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
+        #            #Uncomment and run below line on new site creation only, else keep commented
+        #            AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
                    
-               }               
-             }
+        #        }               
+        #      }          
+
           }
        }
     #set at Search Configuration tenant level, Uncomment to execute it
     SearchConfiguration $scope $serchConfigPath
     #Disconnect-PnPOnline   
+}
+
+<#
+Break permission inheritance for the list
+Assign full control to owners group
+Assign read access to other groups
+#>
+function AssignUniquePermission($lists, $siteUrl)
+{
+    try {
+        Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+
+         foreach($list in $lists)
+          {
+            $ListName=$list.ListName
+            $spList = Get-PnPList -Identity $ListName
+        try {
+    
+            If($spList)
+            {
+
+             #Break Permission Inheritance of the List
+             Set-PnPList -Identity $ListName -BreakRoleInheritance 
+             Write-Host -f Green "Permission Inheritance Broken for $ListName"
+             $client.TrackEvent("Permission Inheritance Broken for $ListName")
+
+	        $spGroups=Get-PnPGroup
+            foreach($spGroup in $spGroups)
+            {
+                $grpPermission=$null
+                foreach ($group in $list.Permissions.Group) {
+                    if($spGroup.Title.Contains($group.Name))
+                    {
+                        $grpPermission=$group.Role
+                        break;
+                    }
+                }
+                if($null -ne $grpPermission)
+                {
+                   Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $grpPermission
+                   Write-Host -f Green "Assigned permission $grpPermission for Group "$spGroup.Title" in the list $ListName"
+             $client.TrackEvent("Assigned permission $grpPermission for Group $spGroup.Title in the list $ListName")
+                }
+                else {
+                    $defaultPermission=$list.Permissions.Group | Where-Object {$_.Name -eq "*"}[0]
+                    Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $defaultPermission.Role
+                    Write-Host -f Green "Assigned permission "$defaultPermission.Role" for Group "$spGroup.Title" in the list  $ListName"
+                    $client.TrackEvent("Assigned permission $defaultPermission.Role for Group $spGroup.Title in the list  $ListName")
+                }
+           }
+          }
+        }
+        catch {
+            $ErrorMessage = $_.Exception.Message
+            Write-Host $ErrorMessage -foreground Yellow
+            $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+            $telemtryException.Exception = $_.Exception.Message  
+            $client.TrackException($telemtryException)
+        }
+        
+        }
+        Disconnect-PnPOnline
+    }
+    catch {
+        $ErrorMessage = $_.Exception.Message
+        Write-Host $ErrorMessage -foreground Yellow
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
+    }
 }
 
 function CreateColumnsAndListProductDocuments($globalhubSiteUrl){
@@ -304,7 +380,7 @@ Function CreateLookupColumn()
         $web = Get-PnPWeb
         $LookupWebID=$web.Id
 
-        $lookupColumnId = [GUID]::NewGuid() 
+        $lookupColumnId = [GUID]::NewGuid() 
         $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='Lookup'
         ID='{$lookupColumnId}' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
@@ -349,7 +425,7 @@ Function CreateLookupColumnForList()
         $web = Get-PnPWeb
         $LookupWebID=$web.Id
 
-        $lookupColumnId = [GUID]::NewGuid() 
+        $lookupColumnId = [GUID]::NewGuid() 
         $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$LookupType'
         ID='{$lookupColumnId}' Mult='TRUE' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
         Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
@@ -992,7 +1068,7 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
             }
         } 
         #else {
-            #Set-PnPWebTheme -Theme $themeName –WebUrl $url
+            #Set-PnPWebTheme -Theme $themeName -WebUrl $url
         #}
         $client.TrackEvent("Apply Theme completed.")
     }
@@ -1230,7 +1306,7 @@ function ListandLibrary($url, $nodeLevel) {
         #create all List & Libraries
         $client.TrackEvent("List and Library creation started.")
         
-        foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+        foreach ($itemList in $nodeLevel.ListAndContentTypes) {
             if ($itemList.ListName -eq "Documents" -or $itemList.ListName -eq "Site Pages" -or $itemList.ListName -eq "Image Gallery") {
                 $ListURL = $itemList.ListName
             }
@@ -1240,10 +1316,10 @@ function ListandLibrary($url, $nodeLevel) {
             
             $ListURL = $ListURL -replace '\s', ''
             
-            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem
+            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem $itemList.Data.Item
             
             if($itemList.ListName -eq "Generic Page"){
-                Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field2.LookupListName $itemList.Field2.LookupField $null $itemList.Field2.ColumnName $itemList.Field2.ColumnTitle $itemList.Field2.Type $itemList.columnItem2
+                Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field2.LookupListName $itemList.Field2.LookupField $null $itemList.Field2.ColumnName $itemList.Field2.ColumnTitle $itemList.Field2.Type $itemList.columnItem2 $null
             }
 
             if(Get-PnPList -Identity $itemList.ListName){     
@@ -1262,7 +1338,7 @@ function ListandLibrary($url, $nodeLevel) {
                 {
                     EnabledocsetFeatureOnTargetSite $siteUrlNew $itemList.ListName
                 }
-            }            
+            } 
         }
 }
 
@@ -1271,7 +1347,7 @@ function GrantPermissionOnListToGroup($url, $nodeLevel)
     #GrantPermissionOnListToGroup List & Libraries
     $client.TrackEvent("List and Library creation started.")
         
-     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
         #Grant permission on list to Group
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
         Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
@@ -1307,7 +1383,7 @@ function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
     }
 }
 
-function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems) {
+function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems, $Items) {
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
@@ -1319,7 +1395,7 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
         # Connect with the tenant admin credentials to the tenant
         $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
 
-        #foreach ($field in $fields) {
+        #foreach ($field in $fields) {
             if([bool]$LookupFieldColumnName -eq $true -and [bool]$LookupListName -eq $true -and [bool]$LookupField -eq $true){
                 CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields $connection
             }
@@ -1432,6 +1508,19 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
                     $client.TrackEvent("Default Content Type, $BasePicContentType deleted from picture Library, $ListName")
                 }
             }
+            }
+
+            #Adding data to the created list
+            foreach ($item in $Items) {
+                $hash = $null
+                $hash = @{}
+                foreach($attr in $item.Attributes)
+                {
+                $hash.add($attr.Name,$attr.Value)
+                }
+                Write-Host "Adding item to " $ListName
+                $client.TrackEvent("Adding item to $ListName")
+                Add-PnPListItem -List  'TranslateConfig' -Values $hash
             }
         }
         else {
