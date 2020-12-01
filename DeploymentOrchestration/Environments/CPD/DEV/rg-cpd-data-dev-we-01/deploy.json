@@ -173,6 +173,27 @@
           "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/Parameters/sqldw-smartcity-data-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-evh-cpd-data-dev-we-02",
+      "resourceGroup": "rg-cpd-data-dev-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-dev-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubs/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubs/2019-04-01/Parameters/evh-cpd-data-dev-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
     //{
     //  "type": "Microsoft.Resources/deployments",
