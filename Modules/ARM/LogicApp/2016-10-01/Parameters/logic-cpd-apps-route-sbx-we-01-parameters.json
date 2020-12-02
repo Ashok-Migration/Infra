@@ -18,44 +18,57 @@
           "kind": "Http",
           "inputs": {
             "method": "POST",
-            "relativePath": "/{EventSubject}",
             "schema": {
               "properties": {
-                "message": {
+                "data": {
                   "properties": {
-                    "EventTime": {
-                      "type": "string"
-                    },
-                    "EventType": {
-                      "type": "string"
-                    },
-                    "Id": {
-                      "type": "string"
-                    },
-                    "Subject": {
-                      "type": "string"
-                    },
-                    "Topic": {
+                    "id": {
                       "type": "string"
                     }
                   },
                   "type": "object"
+                },
+                "dataVersion": {
+                  "type": "string"
+                },
+                "eventTime": {
+                  "type": "string"
+                },
+                "eventType": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "metadataVersion": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "topic": {
+                  "type": "string"
                 }
               },
+              "required": [
+                "topic",
+                "subject",
+                "id",
+                "eventType",
+                "eventTime",
+                "data"
+              ],
               "type": "object"
             }
-          }
+          },
+          "operationOptions": "EnableSchemaValidation"
         }
       }
     },
     "workflowActions": {
       "value": {
         "Convert_Message_Into_JSON_Object": {
-          "runAfter": {
-            "Convert_Route_To_LowerCase_Variable": [
-              "Succeeded"
-            ]
-          },
+          "runAfter": {},
           "type": "InitializeVariable",
           "inputs": {
             "variables": [
@@ -67,15 +80,19 @@
             ]
           }
         },
-        "Convert_Route_To_LowerCase_Variable": {
-          "runAfter": {},
+        "Create_Queue_Route_From_Topic_": {
+          "runAfter": {
+            "Convert_Message_Into_JSON_Object": [
+              "Succeeded"
+            ]
+          },
           "type": "InitializeVariable",
           "inputs": {
             "variables": [
               {
                 "name": "Route",
                 "type": "string",
-                "value": "@{concat('events.',toLower(triggerOutputs()['relativePathParameters']['EventSubject']))}"
+                "value": "@{concat('events.',toLower(variables('InsertedMessage').topic))}"
               }
             ]
           }
@@ -123,7 +140,7 @@
               {
                 "name": "BlobFileName",
                 "type": "string",
-                "value": "@{concat(toLower(triggerOutputs()['relativePathParameters']['EventSubject']),'-',utcNow(), '.json')}"
+                "value": "@{concat(toLower(variables('InsertedMessage').topic),'-',utcNow(), '.json')}"
               }
             ]
           }
@@ -140,7 +157,7 @@
               {
                 "name": "BlobFolderPath",
                 "type": "string",
-                "value": "@{toLower(triggerOutputs()['relativePathParameters']['EventSubject'])}/@{formatDateTime(utcNow(), 'yyyy-MM-dd')}"
+                "value": "@{toLower(variables('InsertedMessage').topic)}/@{formatDateTime(utcNow(), 'yyyy-MM-dd')}"
               }
             ]
           }
@@ -160,7 +177,7 @@
         },
         "Send_Message_To_Queue": {
           "runAfter": {
-            "Convert_Message_Into_JSON_Object": [
+            "Create_Queue_Route_From_Topic_": [
               "Succeeded"
             ]
           },

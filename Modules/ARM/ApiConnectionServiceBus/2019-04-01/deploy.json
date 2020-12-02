@@ -37,7 +37,7 @@
     }
   },
   "variables": {
-    "resourceId": "[resourceId(subscription().subscriptionId, parameters('serviceBusRG'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusName'), parameters('serviceBusSASKeyName'))]"
+    "authRuleResourceId": "[resourceId(subscription().subscriptionId, parameters('serviceBusRG'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusName'), parameters('serviceBusSASKeyName'))]"
   },
   "resources": [
     {
@@ -49,7 +49,7 @@
       "properties": {
         "displayName": "[parameters('displayName')]",
         "parameterValues": {
-          "connectionString":  "[listKeys(variables('resourceId'), parameters('serviceBusAPIVersion'))]"
+          "connectionString": "[listkeys(variables('authRuleResourceId'), parameters('serviceBusAPIVersion')).primaryConnectionString]"
         },
         "customParameterValues": {},
         "api": {
