@@ -88,7 +88,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-stcpdglobnpdwe01",
+            "name": "DEP-kv-cpd-glob-npd-we-01",
             "resourceGroup": "rg-cpd-glob-npd-we-01",
             "dependsOn": [
                 "DEP-rg-cpd-glob-npd-we-01"
@@ -99,17 +99,17 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdglobnpdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-glob-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "DEP-cdn-cpd-glob-npd-we-01",
+            "name": "DEP-mi-cpd-glob-npd-we-01",
             "resourceGroup": "rg-cpd-glob-npd-we-01",
             "dependsOn": [
                 "DEP-rg-cpd-glob-npd-we-01"
@@ -120,33 +120,10 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetwork/2020-04-15/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetwork/2020-04-15/Parameters/cdn-cpd-glob-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "name": "DEP-npd-cdntasmu",
-            "resourceGroup": "rg-cpd-glob-npd-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-glob-npd-we-01",
-                "DEP-cdn-cpd-glob-npd-we-01",
-                "DEP-stcpdglobnpdwe01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/Parameters/npd-cdntasmu-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/Parameters/mi-cpd-glob-npd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
