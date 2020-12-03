@@ -21,6 +21,20 @@
                 "description": "Specifies the Azure location for all resources."
             }
         },
+        "logAnalyticsWorkspace": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Specifies the log Analytics Workspace to use for Diagnostic Settings. Leave empty if not required."
+            }
+        },
+        "logAnalyticsWorkspaceRG": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Specifies the Resource Group log Analytics Workspace to use for Diagnostic Settings. Leave empty if not required."
+            }
+        },
         "tags": {
             "type": "object",
             "defaultValue": {},
@@ -40,7 +54,39 @@
             "properties": {
                 "inputSchema": "EventGridSchema",
                 "publicNetworkAccess": "Enabled"
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.EventGrid/domains/providers/diagnosticSettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('eventGridDomainName'),'/Microsoft.Insights/',parameters('eventGridDomainName'),'-diag')]",
+                    "condition": "[and(not(empty(parameters('logAnalyticsWorkspace'))),not(empty(parameters('logAnalyticsWorkspaceRG'))))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.EventGrid/domains', parameters('eventGridDomainName'))]"
+                    ],
+                    "properties": {
+                        "metrics": [
+                            {
+                                "category": "AllMetrics",
+                                "timeGrain": null,
+                                "enabled": true
+                            }
+                        ],
+                        "logs": [
+                            {
+                                "category": "DeliveryFailures",
+                                "enabled": true
+                            },
+                            {
+                                "category": "PublishFailures",
+                                "enabled": true
+                            }
+                        ],
+                        "workspaceId": "[resourceId(subscription().subscriptionId,parameters('logAnalyticsWorkspaceRG'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+                    }
+                }
+            ]
         },
         {
             "type": "Microsoft.EventGrid/domains/topics",
