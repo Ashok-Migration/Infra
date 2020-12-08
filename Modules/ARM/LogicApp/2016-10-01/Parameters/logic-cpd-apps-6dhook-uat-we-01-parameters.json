@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflowName": {
-      "value": "logic-cpd-apps-6dhook-dev-we-01"
+      "value": "logic-cpd-apps-6dhook-uat-we-01"
     },
     "workflowLocation": {
       "value": "westeurope"
@@ -50,17 +50,17 @@
                     "organisation-deleted"
                   ]
                 },
-                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-dev-we-01/topics/d365"
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-uat-we-01/topics/d365"
               }
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['apicon-cpd-apps-integ-dev-we-01']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-uat-we-01']['connectionId']"
               }
             },
             "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
             "queries": {
-              "subscriptionName": "logic-cpd-apps-6dhook-dev-we-01-sub",
+              "subscriptionName": "logic-cpd-apps-6dhook-uat-we-01-sub",
               "x-ms-api-version": "2017-09-15-preview"
             }
           }
@@ -116,7 +116,7 @@
               "event_type": "@{variables('EventMessage').eventType}"
             },
             "method": "POST",
-            "uri": "https://api.dev.sqcp.qa/eventmanagement/apiInterface/eventManagement/getEventDetails"
+            "uri": "https://api.uat.sqcp.qa/eventmanagement/apiInterface/eventManagement/getEventDetails"
           }
         }
       }
@@ -131,16 +131,16 @@
     },
     "tags": {
       "value": {
-        "Environment": "Development"
+        "Environment": "UAT"
       }
     },
     "connectionParameters": {
       "value": {
         "$connections": {
           "value": {
-            "apicon-cpd-apps-integ-dev-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-dev-we-01",
-              "connectionName": "apicon-cpd-apps-integ-dev-we-01",
+            "apicon-cpd-apps-integ-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-uat-we-01",
+              "connectionName": "apicon-cpd-apps-integ-uat-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
             }
           }

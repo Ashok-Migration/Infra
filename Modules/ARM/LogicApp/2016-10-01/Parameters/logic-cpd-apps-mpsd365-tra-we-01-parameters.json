@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflowName": {
-      "value": "logic-cpd-apps-6dhook-sbx-we-01"
+      "value": "logic-cpd-apps-mpsd365-tra-we-01"
     },
     "workflowLocation": {
       "value": "westeurope"
@@ -30,38 +30,23 @@
                     "product-created",
                     "product-updated",
                     "product-deleted",
-                    "productplanbenefit-created",
-                    "productplanbenefit-updated",
-                    "productplanbenefit-deleted",
-                    "productlifecycle-created",
-                    "productlifecycle-updated",
-                    "productlifecycle-deleted",
-                    "productplantariff-created",
-                    "productplantariff-updated",
-                    "productplantariff-deleted",
-                    "productplancharge-created",
-                    "productplancharge-updated",
-                    "productplancharge-deleted",
-                    "profile-created",
-                    "profile-updated",
-                    "profile-deleted",
-                    "organisation-created",
-                    "organisation-updated",
-                    "organisation-deleted"
+                    "kbarticle-created",
+                    "kbarticle-updated",
+                    "kbarticle-deleted"
                   ]
                 },
-                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-sbx-we-01/topics/d365"
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-tra-we-01/topics/d365"
               }
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['apicon-cpd-apps-integ-sbx-we-01']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-tra-we-01']['connectionId']"
               }
             },
             "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
             "queries": {
-              "subscriptionName": "logic-cpd-apps-6dhook-sbx-we-01-sub",
-              "x-ms-api-version": "2017-09-15-preview"
+              "subscriptionName": "logic-cpd-apps-mpsd365-tra-we-01-sub",
+              "x-ms-api-version": "2017-06-15-preview"
             }
           }
         }
@@ -82,23 +67,30 @@
             ]
           }
         },
-        "Initialize_message_to_be_sent": {
+        "logic-cpd-apps-mpsidx-tra-we-01": {
           "runAfter": {
             "Convert_Message_To_Object": [
               "Succeeded"
             ]
           },
-          "type": "InitializeVariable",
+          "type": "Workflow",
           "inputs": {
-            "variables": [
-              {
-                "name": "PostMessage",
-                "type": "object",
-                "value": {
-                  "body": "@{base64(variables('EventMessage'))}"
-                }
+            "body": {
+              "data": "@variables('EventMessage').data",
+              "dataVersion": "@{variables('EventMessage').dataVersion}",
+              "eventTime": "@triggerBody()?['eventTime']",
+              "eventType": "@triggerBody()?['eventType']",
+              "id": "@triggerBody()?['id']",
+              "metadataVersion": "@{variables('EventMessage').metadataVersion}",
+              "subject": "@triggerBody()?['subject']",
+              "topic": "@triggerBody()?['topic']"
+            },
+            "host": {
+              "triggerName": "manual",
+              "workflow": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Logic/workflows/logic-cpd-apps-mpsidx-tra-we-01"
               }
-            ]
+            }
           }
         }
       }
@@ -111,22 +103,22 @@
         }
       }
     },
-    "tags": {
-      "value": {
-        "Environment": "Sandbox"
-      }
-    },
     "connectionParameters": {
       "value": {
         "$connections": {
           "value": {
-            "apicon-cpd-apps-integ-sbx-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-sbx-we-01",
-              "connectionName": "apicon-cpd-apps-integ-sbx-we-01",
+            "apicon-cpd-apps-integ-tra-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-tra-we-01",
+              "connectionName": "apicon-cpd-apps-integ-tra-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
             }
           }
         }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Training"
       }
     }
   }

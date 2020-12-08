@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflowName": {
-      "value": "logic-cpd-apps-6dhook-dev-we-01"
+      "value": "logic-cpd-apps-mpsd365-dev-we-01"
     },
     "workflowLocation": {
       "value": "westeurope"
@@ -30,24 +30,9 @@
                     "product-created",
                     "product-updated",
                     "product-deleted",
-                    "productplanbenefit-created",
-                    "productplanbenefit-updated",
-                    "productplanbenefit-deleted",
-                    "productlifecycle-created",
-                    "productlifecycle-updated",
-                    "productlifecycle-deleted",
-                    "productplantariff-created",
-                    "productplantariff-updated",
-                    "productplantariff-deleted",
-                    "productplancharge-created",
-                    "productplancharge-updated",
-                    "productplancharge-deleted",
-                    "profile-created",
-                    "profile-updated",
-                    "profile-deleted",
-                    "organisation-created",
-                    "organisation-updated",
-                    "organisation-deleted"
+                    "kbarticle-created",
+                    "kbarticle-updated",
+                    "kbarticle-deleted"
                   ]
                 },
                 "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-dev-we-01/topics/d365"
@@ -60,8 +45,8 @@
             },
             "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
             "queries": {
-              "subscriptionName": "logic-cpd-apps-6dhook-dev-we-01-sub",
-              "x-ms-api-version": "2017-09-15-preview"
+              "subscriptionName": "logic-cpd-apps-mpsd365-dev-we-01-sub",
+              "x-ms-api-version": "2017-06-15-preview"
             }
           }
         }
@@ -82,41 +67,30 @@
             ]
           }
         },
-        "Initialize_message_to_be_sent": {
+        "logic-cpd-apps-mpsidx-dev-we-01": {
           "runAfter": {
             "Convert_Message_To_Object": [
               "Succeeded"
             ]
           },
-          "type": "InitializeVariable",
+          "type": "Workflow",
           "inputs": {
-            "variables": [
-              {
-                "name": "PostMessage",
-                "type": "object",
-                "value": {
-                  "body": "@{base64(variables('EventMessage'))}"
-                }
-              }
-            ]
-          }
-        },
-        "Send_To_6DBilling_API": {
-          "runAfter": {
-            "Initialize_message_to_be_sent": [
-              "Succeeded"
-            ]
-          },
-          "type": "Http",
-          "inputs": {
-            "body": "@variables('PostMessage')",
-            "headers": {
-              "Cache-Control": "no-cache",
-              "Content-Type": "application/json",
-              "event_type": "@{variables('EventMessage').eventType}"
+            "body": {
+              "data": "@variables('EventMessage').data",
+              "dataVersion": "@{variables('EventMessage').dataVersion}",
+              "eventTime": "@triggerBody()?['eventTime']",
+              "eventType": "@triggerBody()?['eventType']",
+              "id": "@triggerBody()?['id']",
+              "metadataVersion": "@{variables('EventMessage').metadataVersion}",
+              "subject": "@triggerBody()?['subject']",
+              "topic": "@triggerBody()?['topic']"
             },
-            "method": "POST",
-            "uri": "https://api.dev.sqcp.qa/eventmanagement/apiInterface/eventManagement/getEventDetails"
+            "host": {
+              "triggerName": "manual",
+              "workflow": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Logic/workflows/logic-cpd-apps-mpsidx-dev-we-01"
+              }
+            }
           }
         }
       }
@@ -127,11 +101,6 @@
           "defaultValue": {},
           "type": "Object"
         }
-      }
-    },
-    "tags": {
-      "value": {
-        "Environment": "Development"
       }
     },
     "connectionParameters": {
@@ -145,6 +114,11 @@
             }
           }
         }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development"
       }
     }
   }
