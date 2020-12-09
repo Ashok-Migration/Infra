@@ -7,10 +7,10 @@ steps:
       scriptLocation: "inlineScript"
       inlineScript: 'az appconfig kv import -n "$(appConfigName)" -s file --path "$(Pipeline.Workspace)/configurations/settings/$(env)/appsettings.json" --format json --yes --separator ":"'
 
-  # - task: AzureCLI@2
-  #   displayName: Update App Key Vault reference $(appConfigName)
-  #   inputs:
-  #     azureSubscription: $(azureSubscription)
-  #     scriptType: "ps"
-  #     scriptLocation: "inlineScript"
-  #     inlineScript: 'az appconfig kv import -n "$(appConfigName)" -s file --path "$(Pipeline.Workspace)/configurations/keyvaultref/$(env)/appsettings.json" --format json --content-type "application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8" --yes --separator ":"'
+  - task: AzureCLI@2
+    displayName: Update App Key Vault reference $(appConfigName)
+    inputs:
+      azureSubscription: $(azureSubscription)
+      scriptType: "ps"
+      scriptLocation: "inlineScript"
+      inlineScript: 'az appconfig kv import -n "$(appConfigName)" -s file --path "$(Pipeline.Workspace)/configurations/keyvaultref/$(env)/appsettings.json" --format json --content-type "application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8" --yes'

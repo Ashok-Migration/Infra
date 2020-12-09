@@ -20,18 +20,18 @@ pool:
 stages:
   - stage: PublishArtifacts
     jobs:
-    - job: PublishArtifacts
-      steps:
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: Scripts/AppConfigurations
-          Contents: "**"
-          TargetFolder: "$(build.artifactstagingdirectory)/configurations"
-      - task: PublishPipelineArtifact@1
-        inputs:
-          targetPath: Scripts/AppConfigurations
-          artifact: "configurations"
-          publishLocation: "pipeline"
+      - job: PublishArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: Scripts/AppConfigurations
+              Contents: "**"
+              TargetFolder: "$(build.artifactstagingdirectory)/configurations"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: Scripts/AppConfigurations
+              artifact: "configurations"
+              publishLocation: "pipeline"
 
   - stage: Sbx
     displayName: Update App Configurations for sbx
@@ -40,7 +40,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-sbx-we-01"
       - name: env
-        value: "sbx"    
+        value: "sbx"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for sbx
@@ -50,7 +50,6 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
-
   - stage: Dev
     displayName: Update App Configurations for dev
     dependsOn: PublishArtifacts
@@ -58,7 +57,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-dev-we-01"
       - name: env
-        value: "dev"   
+        value: "dev"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for dev
@@ -68,7 +67,6 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
-
   - stage: Tst
     displayName: Update App Configurations for tst
     dependsOn: PublishArtifacts
@@ -76,7 +74,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-tst-we-01"
       - name: env
-        value: "tst"   
+        value: "tst"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for tst
@@ -86,7 +84,6 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
-
   - stage: Tra
     displayName: Update App Configurations for tra
     dependsOn: PublishArtifacts
@@ -94,7 +91,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-tra-we-01"
       - name: env
-        value: "tra"   
+        value: "tra"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for tra
@@ -104,7 +101,6 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
-
   - stage: uat
     displayName: Update App Configurations for uat
     dependsOn: PublishArtifacts
@@ -112,7 +108,7 @@ stages:
       - name: appConfigName
         value: "acst-cpd-apps-str-uat-we-01"
       - name: env
-        value: "uat"   
+        value: "uat"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for uat
