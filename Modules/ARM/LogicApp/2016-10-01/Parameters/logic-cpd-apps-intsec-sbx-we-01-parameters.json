@@ -30,15 +30,15 @@
 										"sector-deleted"
 									]
 								},
-								"topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-temp-sbx-we-02/providers/Microsoft.EventGrid/topics/evg-cpd-temp-sbx-we-01"
+								"topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-sbx-we-01"
 							}
 						},
 						"host": {
 							"connection": {
-								"name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+								"name": "@parameters('$connections')['apicon-cpd-apps-integ-sbx-we-01']['connectionId']"
 							}
 						},
-						"path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Topics')}/resource/eventSubscriptions",
+						"path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
 						"queries": {
 							"x-ms-api-version": "2017-09-15-preview"
 						}
@@ -50,48 +50,40 @@
 		},
 		"workflowActions": {
 			"value": {
-				"Initialize_Sector_AR": {
-					"inputs": {
-						"variables": [
-							{
-								"name": "SectorAR",
-								"type": "string"
-							}
-						]
-					},
-					"runAfter": {
-						"Initialize_Sector_EN": [
-							"Succeeded"
-						]
-					},
-					"type": "InitializeVariable"
-				},
-				"Initialize_Sector_EN": {
-					"inputs": {
-						"variables": [
-							{
-								"name": "SectorEN",
-								"type": "string"
-							}
-						]
-					},
-					"runAfter": {
-						"Parse_JSON": [
-							"Succeeded"
-						]
-					},
-					"type": "InitializeVariable"
-				},
-				"Parse_JSON": {
+				"Parse_Event_Grid_Data_JSON": {
 					"inputs": {
 						"content": "@triggerBody()?['data']",
 						"schema": {
 							"properties": {
-								"ApiUrl": {
-									"type": "string"
-								},
 								"Id": {
 									"type": "string"
+								},
+								"LocalizedValues": {
+									"properties": {
+										"Ar": {
+											"properties": {
+												"id": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										}
+									},
+									"type": "object"
+								},
+								"Value": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										}
+									},
+									"type": "object"
 								}
 							},
 							"type": "object"
@@ -102,127 +94,18 @@
 				},
 				"Perform_on_Event_Type": {
 					"actions": {
-						"Get_Configuration_List_Items": {
-							"inputs": {
-								"host": {
-									"connection": {
-										"name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
-									}
-								},
-								"method": "get",
-								"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('tenantUrl'),'/sites/cms-dev-global'))}/tables/@{encodeURIComponent(encodeURIComponent('Configuration'))}/items",
-								"queries": {
-									"viewScopeOption": "Default"
-								}
-							},
-							"runAfter": {
-								"Set_Sector_AR": [
-									"Succeeded"
-								]
-							},
-							"type": "ApiConnection"
-						},
-						"Get_Sector_Details_AR": {
-							"inputs": {
-								"method": "GET",
-								"uri": "@{body('Parse_JSON')?['ApiUrl']}?lang=1025"
-							},
-							"runAfter": {
-								"Parse_Sector_Details_EN_JSON": [
-									"Succeeded"
-								]
-							},
-							"type": "Http"
-						},
-						"Get_Sector_Details_EN": {
-							"inputs": {
-								"method": "GET",
-								"uri": "@{body('Parse_JSON')?['ApiUrl']}?lang=1033"
-							},
-							"runAfter": {},
-							"type": "Http"
-						},
-						"Loop_Site_Collections_URLs": {
+						"Check_If_Sector_Exists": {
 							"actions": {
-								"Check_If_Item_Exists": {
-									"actions": {
-										"Create_Sector_List_Item": {
-											"inputs": {
-												"body": {
-													"body": "{\n\"SectorID\": \"@{body('Parse_JSON')?['Id']}\",\n\"Title\": \"@{variables('SectorEN')}\",\n\"arTitle\": \"@{variables('SectorAR')}\"\n}",
-													"headers": {
-														"Accept": "application/json;odata=nometadata",
-														"Content-Type": "application/json"
-													},
-													"method": "POST",
-													"uri": "_api/web/lists/GetByTitle('@{parameters('sectorListName')}')/items"
-												},
-												"host": {
-													"connection": {
-														"name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
-													}
-												},
-												"method": "post",
-												"path": "/datasets/@{encodeURIComponent(encodeURIComponent(items('Loop_Site_Collections_URLs')?['SiteURL']))}/httprequest"
-											},
-											"runAfter": {},
-											"type": "ApiConnection"
-										}
-									},
-									"else": {
-										"actions": {
-											"Update_Delete_Sector_List_Item": {
-												"inputs": {
-													"body": {
-														"body": "{\n\"SectorID\": \"@{body('Parse_JSON')?['Id']}\",\n\"Title\": \"@{variables('SectorEN')}\",\n\"arTitle\": \"@{variables('SectorAR')}\"\n}",
-														"headers": {
-															"Accept": "application/json;odata=nometadata",
-															"Content-Type": "application/json",
-															"If-Match": "*",
-															"X-HTTP-Method": "@{if(equals(triggerBody()?['eventType'], 'sector-updated'), 'MERGE', 'DELETE')}"
-														},
-														"method": "POST",
-														"uri": "_api/web/lists/GetByTitle('@{parameters('sectorListName')}')/items(@{first(body('Parse_Sector_List_Item_JSON')?['value'])?['ID']})"
-													},
-													"host": {
-														"connection": {
-															"name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
-														}
-													},
-													"method": "post",
-													"path": "/datasets/@{encodeURIComponent(encodeURIComponent(items('Loop_Site_Collections_URLs')?['SiteURL']))}/httprequest"
-												},
-												"runAfter": {},
-												"type": "ApiConnection"
-											}
-										}
-									},
-									"expression": {
-										"and": [
-											{
-												"equals": [
-													"@length(body('Parse_Sector_List_Item_JSON')?['value'])",
-													0
-												]
-											}
-										]
-									},
-									"runAfter": {
-										"Parse_Sector_List_Item_JSON": [
-											"Succeeded"
-										]
-									},
-									"type": "If"
-								},
-								"Get_Sector_List_Item": {
+								"Create_Sector_List_Item": {
 									"inputs": {
 										"body": {
+											"body": "{\n\"SectorID\": \"@{body('Parse_Event_Grid_Data_JSON')?['Id']}\",\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"arTitle\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\"\n}",
 											"headers": {
 												"Accept": "application/json;odata=nometadata",
 												"Content-Type": "application/json"
 											},
-											"method": "GET",
-											"uri": "_api/web/lists/GetByTitle('@{parameters('sectorListName')}')/items?$filter=SectorID eq '@{body('Parse_JSON')?['Id']}'"
+											"method": "POST",
+											"uri": "/_api/web/lists/GetByTitle('@{parameters('SectorsList')}')/items"
 										},
 										"host": {
 											"connection": {
@@ -230,148 +113,110 @@
 											}
 										},
 										"method": "post",
-										"path": "/datasets/@{encodeURIComponent(encodeURIComponent(items('Loop_Site_Collections_URLs')?['SiteURL']))}/httprequest"
+										"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('GlobalSiteUrl')))}/httprequest"
 									},
 									"runAfter": {},
 									"type": "ApiConnection"
-								},
-								"Parse_Sector_List_Item_JSON": {
-									"inputs": {
-										"content": "@body('Get_Sector_List_Item')",
-										"schema": {
-											"properties": {
-												"value": {
-													"items": {
-														"properties": {
-															"ID": {
-																"type": "integer"
-															},
-															"SectorID": {
-																"type": "string"
-															},
-															"Title": {
-																"type": "string"
-															}
-														},
-														"type": "object"
-													},
-													"type": "array"
+								}
+							},
+							"else": {
+								"actions": {
+									"Update_Delete_Sector_List_Item": {
+										"inputs": {
+											"body": {
+												"body": "{\n\"SectorID\": \"@{body('Parse_Event_Grid_Data_JSON')?['Id']}\",\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"arTitle\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\"\n}",
+												"headers": {
+													"Accept": "application/json;odata=nometadata",
+													"Content-Type": "application/json",
+													"If-Match": "*",
+													"X-HTTP-Method": "@{if(equals(triggerBody()?['eventType'], 'sector-updated'), 'MERGE', 'DELETE')}"
+												},
+												"method": "POST",
+												"uri": "/_api/web/lists/GetByTitle('@{parameters('SectorsList')}')/items(@{first(body('Parse_Sector_List_Item_JSON')?['value'])?['ID']})"
+											},
+											"host": {
+												"connection": {
+													"name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
 												}
 											},
-											"type": "object"
-										}
-									},
-									"runAfter": {
-										"Get_Sector_List_Item": [
-											"Succeeded"
+											"method": "post",
+											"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('GlobalSiteUrl')))}/httprequest"
+										},
+										"runAfter": {},
+										"type": "ApiConnection"
+									}
+								}
+							},
+							"expression": {
+								"and": [
+									{
+										"equals": [
+											"@length(body('Parse_Sector_List_Item_JSON')?['value'])",
+											0
 										]
-									},
-									"type": "ParseJson"
-								}
+									}
+								]
 							},
-							"foreach": "@body('Get_Configuration_List_Items')?['value']",
 							"runAfter": {
-								"Parse_Configuration_List_Items_JSON": [
+								"Parse_Sector_List_Item_JSON": [
 									"Succeeded"
 								]
 							},
-							"type": "Foreach"
+							"type": "If"
 						},
-						"Parse_Configuration_List_Items_JSON": {
+						"Get_Sector_List_Item": {
 							"inputs": {
-								"content": "@body('Get_Configuration_List_Items')?['value']",
-								"schema": {
-									"items": {
-										"properties": {
-											"SiteURL": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"SiteURL"
-										],
-										"type": "object"
+								"body": {
+									"headers": {
+										"Accept": "application/json;odata=nometadata",
+										"Content-Type": "application/json"
 									},
-									"type": "array"
-								}
+									"method": "GET",
+									"uri": "/_api/web/lists/GetByTitle('@{parameters('SectorsList')}')/items?$filter=SectorID eq '@{body('Parse_Event_Grid_Data_JSON')?['Id']}'"
+								},
+								"host": {
+									"connection": {
+										"name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+									}
+								},
+								"method": "post",
+								"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('GlobalSiteUrl')))}/httprequest"
 							},
-							"runAfter": {
-								"Get_Configuration_List_Items": [
-									"Succeeded"
-								]
-							},
-							"type": "ParseJson"
+							"runAfter": {},
+							"type": "ApiConnection"
 						},
-						"Parse_Sector_Details_AR_JSON": {
+						"Parse_Sector_List_Item_JSON": {
 							"inputs": {
-								"content": "@body('Get_Sector_Details_AR')",
+								"content": "@body('Get_Sector_List_Item')",
 								"schema": {
 									"properties": {
-										"id": {
-											"type": "string"
-										},
-										"name": {
-											"type": [
-												"string",
-												"null"
-											]
+										"value": {
+											"items": {
+												"properties": {
+													"ID": {
+														"type": "integer"
+													},
+													"SectorID": {
+														"type": "string"
+													},
+													"Title": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"type": "array"
 										}
 									},
 									"type": "object"
 								}
 							},
 							"runAfter": {
-								"Get_Sector_Details_AR": [
+								"Get_Sector_List_Item": [
 									"Succeeded"
 								]
 							},
 							"type": "ParseJson"
-						},
-						"Parse_Sector_Details_EN_JSON": {
-							"inputs": {
-								"content": "@body('Get_Sector_Details_EN')",
-								"schema": {
-									"properties": {
-										"id": {
-											"type": "string"
-										},
-										"name": {
-											"type": "string"
-										}
-									},
-									"type": "object"
-								}
-							},
-							"runAfter": {
-								"Get_Sector_Details_EN": [
-									"Succeeded"
-								]
-							},
-							"type": "ParseJson"
-						},
-						"Set_Sector_AR": {
-							"inputs": {
-								"name": "SectorAR",
-								"value": "@body('Parse_Sector_Details_AR_JSON')?['name']"
-							},
-							"runAfter": {
-								"Set_Sector_EN": [
-									"Succeeded"
-								]
-							},
-							"type": "SetVariable"
-						},
-						"Set_Sector_EN": {
-							"inputs": {
-								"name": "SectorEN",
-								"value": "@body('Parse_Sector_Details_EN_JSON')?['name']"
-							},
-							"runAfter": {
-								"Parse_Sector_Details_AR_JSON": [
-									"Succeeded"
-								]
-							},
-							"type": "SetVariable"
 						}
 					},
 					"expression": {
@@ -385,7 +230,7 @@
 							{
 								"equals": [
 									"@triggerBody()?['eventType']",
-									"sector-update"
+									"sector-updated"
 								]
 							},
 							{
@@ -397,7 +242,7 @@
 						]
 					},
 					"runAfter": {
-						"Initialize_Sector_AR": [
+						"Parse_Event_Grid_Data_JSON": [
 							"Succeeded"
 						]
 					},
@@ -411,12 +256,16 @@
 					"defaultValue": {},
 					"type": "Object"
 				},
-				"sectorListName": {
-					"defaultValue": "Sectors",
+				"GlobalConfigList": {
+					"defaultValue": "Configuration",
 					"type": "String"
 				},
-				"tenantUrl": {
-					"defaultValue": "https://tasmusqcp.sharepoint.com/",
+				"GlobalSiteUrl": {
+					"defaultValue": "https://tasmusqcp.sharepoint.com/sites/cms-dev-global",
+					"type": "String"
+				},
+				"SectorsList": {
+					"defaultValue": "Sectors",
 					"type": "String"
 				}
 			}
@@ -430,9 +279,9 @@
 			"value": {
 				"$connections": {
 					"value": {
-						"azureeventgrid": {
-							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-sbx-we-01/providers/Microsoft.Web/connections/azureeventgrid",
-							"connectionName": "azureeventgrid",
+						"apicon-cpd-apps-integ-sbx-we-01": {
+							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-sbx-we-01",
+							"connectionName": "apicon-cpd-apps-integ-sbx-we-01",
 							"id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
 						},
 						"apicon-cpd-apps-intspo-sbx-we-01": {

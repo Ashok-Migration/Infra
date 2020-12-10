@@ -42,10 +42,10 @@
                             "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
-                                "Content-Type": "application/json;odata=nometadata"
+                                "Content-Type": "application/json"
                             },
                             "method": "POST",
-                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/items?$select=Id"
+                            "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/items?$select=Id"
                         },
                         "host": {
                             "connection": {
@@ -62,10 +62,10 @@
                     },
                     "type": "ApiConnection"
                 },
-                "Delay_10_Seconds_After_Approved_Or_Rejected": {
+                "Delay_5_Seconds_After_Approved_Or_Rejected": {
                     "inputs": {
                         "interval": {
-                            "count": 10,
+                            "count": 5,
                             "unit": "Second"
                         }
                     },
@@ -76,14 +76,40 @@
                     },
                     "type": "Wait"
                 },
+                "Get_Translators_Approvers_Group_From_Config": {
+                    "inputs": {
+                        "body": {
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata",
+                                "Content-Type": "application/json"
+                            },
+                            "method": "GET",
+                            "uri": "/_api/web/lists/getByTitle('@{body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList']}')/items?$filter=SiteURL eq '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}'"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-tra-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL']))}/httprequest"
+                    },
+                    "runAfter": {
+                        "Parse_Service_Bus_Message_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
                 "Get_Users_from_SharePoint_Approvers_Group": {
                     "inputs": {
                         "body": {
                             "headers": {
-                                "Accept": "application/json;odata=nometadata"
+                                "Accept": "application/json;odata=nometadata",
+                                "Content-Type": "application/json"
                             },
                             "method": "GET",
-                            "uri": "_api/web/SiteGroups/GetByName('@{parameters('approversGroupName')}')/users?$select=Email,Id"
+                            "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['Approvers']}')/users?$select=Email,Id"
                         },
                         "host": {
                             "connection": {
@@ -94,7 +120,7 @@
                         "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
                     },
                     "runAfter": {
-                        "Initialize_ApprovalRejectionReminder": [
+                        "Parse_Translators_Approvers_Group_From_Config_JSON": [
                             "Succeeded"
                         ]
                     },
@@ -107,7 +133,7 @@
                                 "Update_Internal_Task_Status_Approved_-_Translation_Task": {
                                     "inputs": {
                                         "body": {
-                                            "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
+                                            "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\"\n}",
                                             "headers": {
                                                 "Accept": "application/json;odata=verbose",
                                                 "Content-Type": "application/json",
@@ -115,7 +141,7 @@
                                                 "X-HTTP-Method": "MERGE"
                                             },
                                             "method": "POST",
-                                            "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
+                                            "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
                                         },
                                         "host": {
                                             "connection": {
@@ -200,6 +226,29 @@
                             },
                             "type": "ApiConnection"
                         },
+                        "Send_message_For_2nd_Level_Approval_Queue": {
+                            "inputs": {
+                                "body": {
+                                    "ContentData": "@{base64(concat('{','\n','\"SiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['SiteURL'],'\",','\n','\"ItemTitle\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemTitle'],'\",','\n','\"ItemGUID\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemGUID'],'\",','\n','\"ItemId\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemId'],'\",','\n','\"ListName\": \"',body('Parse_Service_Bus_Message_JSON')?['ListName'],'\",','\n','\"EditorEmail\": \"',body('Parse_Service_Bus_Message_JSON')?['EditorEmail'],'\",','\n','\"Sensitivity\": \"',body('Parse_Service_Bus_Message_JSON')?['Sensitivity'],'\",','\n','\"MarketplaceSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL'],'\",','\n','\"GlobalSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL'],'\",','\n','\"GlobalConfigList\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList'],'\"','\n','}'))}"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intsb-tra-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/@{encodeURIComponent(encodeURIComponent('approvalglobal'))}/messages",
+                                "queries": {
+                                    "systemProperties": "None"
+                                }
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Approved_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
                         "Set_EditorEmailBody_Approved": {
                             "inputs": {
                                 "name": "EditorEmailBody",
@@ -227,7 +276,7 @@
                         "Update_Internal_Task_Status_And_Comments_-_Approval_Task": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
+                                    "body": "{\n\"TASMUTaskStatusInternal\": \"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
@@ -235,7 +284,7 @@
                                         "X-HTTP-Method": "MERGE"
                                     },
                                     "method": "POST",
-                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
+                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
                                 },
                                 "host": {
                                     "connection": {
@@ -255,7 +304,7 @@
                         "Update_Item_Status_And_Comments_-_Approved": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Approved\"\n}",
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Pending 2nd Level Approval\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
@@ -292,7 +341,7 @@
                                                     "X-HTTP-Method": "MERGE"
                                                 },
                                                 "method": "POST",
-                                                "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
+                                                "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['TranslatorId']})"
                                             },
                                             "host": {
                                                 "connection": {
@@ -412,7 +461,7 @@
                                             "X-HTTP-Method": "MERGE"
                                         },
                                         "method": "POST",
-                                        "uri": "/_api/web/lists/GetByTitle('@{parameters('myTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
+                                        "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})"
                                     },
                                     "host": {
                                         "connection": {
@@ -432,7 +481,7 @@
                             "Update_Item_Status_And_Comments_-_Rejected": {
                                 "inputs": {
                                     "body": {
-                                        "body": "{\n\"ApproverComments\":\"Task action Rejected at 1 level.\",\n\"ContentStatus\":\"Rejected\"\n}",
+                                        "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Rejected\",\n\"RequiresTranslation\":\"False\"\n}",
                                         "headers": {
                                             "Accept": "application/json;odata=verbose",
                                             "Content-Type": "application/json",
@@ -466,7 +515,7 @@
                         ]
                     },
                     "runAfter": {
-                        "Delay_10_Seconds_After_Approved_Or_Rejected": [
+                        "Delay_5_Seconds_After_Approved_Or_Rejected": [
                             "Succeeded"
                         ]
                     },
@@ -483,7 +532,7 @@
                         ]
                     },
                     "runAfter": {
-                        "Parse_Service_Bus_Message_JSON": [
+                        "Initialize_EditorEmailBody": [
                             "Succeeded"
                         ]
                     },
@@ -633,10 +682,13 @@
                         "content": "@decodeBase64(triggerBody()?['ContentData'])",
                         "schema": {
                             "properties": {
-                                "ApproversGroupName": {
+                                "EditorEmail": {
                                     "type": "string"
                                 },
-                                "EditorEmail": {
+                                "GlobalConfigList": {
+                                    "type": "string"
+                                },
+                                "GlobalSiteURL": {
                                     "type": "string"
                                 },
                                 "ItemGUID": {
@@ -654,21 +706,75 @@
                                 "ListName": {
                                     "type": "string"
                                 },
+                                "MarketplaceSiteURL": {
+                                    "type": "string"
+                                },
+                                "Sensitivity": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
                                 "SiteURL": {
                                     "type": "string"
                                 },
                                 "TranslatorId": {
-                                    "type": "string"
-                                },
-                                "TranslatorsEmail": {
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 }
                             },
                             "type": "object"
                         }
                     },
                     "runAfter": {
-                        "Initialize_EditorEmailBody": [
+                        "Initialize_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Parse_Translators_Approvers_Group_From_Config_JSON": {
+                    "inputs": {
+                        "content": "@body('Get_Translators_Approvers_Group_From_Config')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "Approvers": {
+                                                "type": "string"
+                                            },
+                                            "CriticalApprovers": {
+                                                "type": "string"
+                                            },
+                                            "Id": {
+                                                "type": "integer"
+                                            },
+                                            "SiteLevel": {
+                                                "type": "string"
+                                            },
+                                            "SiteURL": {
+                                                "type": "string"
+                                            },
+                                            "Title": {
+                                                "type": "string"
+                                            },
+                                            "Translators": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Get_Translators_Approvers_Group_From_Config": [
                             "Succeeded"
                         ]
                     },
@@ -790,7 +896,7 @@
                 "Set_EditorEmailBody_Approval_Request_Notification": {
                     "inputs": {
                         "name": "EditorEmailBody",
-                        "value": "<p>Hello Editor,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                        "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
                         "Set_EmailBody_Approval_Request": [
@@ -802,7 +908,7 @@
                 "Set_EmailBody_Approval_Request": {
                     "inputs": {
                         "name": "EmailBody",
-                        "value": "<p>Hello Approver,<br>\n<br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                        "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
                         "Update_Item_Status_to_Pending_Approval": [
@@ -827,10 +933,11 @@
                             "inputs": {
                                 "body": {
                                     "headers": {
-                                        "Accept": "application/json;odata=nometadata"
+                                        "Accept": "application/json;odata=nometadata",
+                                        "Content-Type": "application/json"
                                     },
                                     "method": "GET",
-                                    "uri": "/_api/web/lists/getbytitle('@{parameters('myTasksList')}')/items(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})?$select=TASMUTaskStatusInternal,TaskComments,TASMUTaskStatus"
+                                    "uri": "/_api/web/lists/getbytitle('@{parameters('MyTasksList')}')/items(@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']})?$select=TASMUTaskStatusInternal,TaskComments,TASMUTaskStatus"
                                 },
                                 "host": {
                                     "connection": {
@@ -908,7 +1015,7 @@
                     },
                     "expression": "@equals(or(equals(variables('ApproverTaskStatus'), 'Approved'), equals(variables('ApproverTaskStatus'), 'Rejected')), true)",
                     "limit": {
-                        "count": 3000,
+                        "count": 2900,
                         "timeout": "P1M"
                     },
                     "runAfter": {
@@ -920,11 +1027,11 @@
                 },
                 "Until_Task_Is_Approved_Or_Rejected_Reminder": {
                     "actions": {
-                        "Delay_10_Seconds_Reminder": {
+                        "Delay_1_Minute_Approval_Rejection_Reminder": {
                             "inputs": {
                                 "interval": {
-                                    "count": 10,
-                                    "unit": "Second"
+                                    "count": 1,
+                                    "unit": "Minute"
                                 }
                             },
                             "runAfter": {},
@@ -969,7 +1076,7 @@
                                 }
                             },
                             "expression": {
-                                "and": [
+                                "or": [
                                     {
                                         "equals": [
                                             "@variables('ApprovalRejectionReminder')",
@@ -979,7 +1086,7 @@
                                 ]
                             },
                             "runAfter": {
-                                "Delay_10_Seconds_Reminder": [
+                                "Delay_1_Minute_Approval_Rejection_Reminder": [
                                     "Succeeded"
                                 ]
                             },
@@ -993,8 +1100,7 @@
                     },
                     "runAfter": {
                         "Send_an_email_(V2)_-_Approval_Request_Notification": [
-                            "Succeeded",
-                            "TimedOut"
+                            "Succeeded"
                         ]
                     },
                     "type": "Until"
@@ -1035,11 +1141,7 @@
                     "defaultValue": {},
                     "type": "Object"
                 },
-                "approversGroupName": {
-                    "defaultValue": "Approvers",
-                    "type": "String"
-                },
-                "myTasksList": {
+                "MyTasksList": {
                     "defaultValue": "My Tasks",
                     "type": "String"
                 }

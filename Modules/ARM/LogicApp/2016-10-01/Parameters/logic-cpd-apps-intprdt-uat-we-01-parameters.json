@@ -30,15 +30,15 @@
 										"product-deleted"
 									]
 								},
-								"topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-temp-sbx-we-02/providers/Microsoft.EventGrid/topics/evg-cpd-temp-sbx-we-01"
+								"topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-uat-we-01"
 							}
 						},
 						"host": {
 							"connection": {
-								"name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+								"name": "@parameters('$connections')['apicon-cpd-apps-integ-uat-we-01']['connectionId']"
 							}
 						},
-						"path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Topics')}/resource/eventSubscriptions",
+						"path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
 						"queries": {
 							"x-ms-api-version": "2017-06-15-preview"
 						}
@@ -50,16 +50,76 @@
 		},
 		"workflowActions": {
 			"value": {
-				"Parse_JSON": {
+				"Parse_Event_Grid_Data_JSON": {
 					"inputs": {
 						"content": "@triggerBody()?['data']",
 						"schema": {
 							"properties": {
-								"ApiUrl": {
-									"type": "string"
-								},
 								"Id": {
 									"type": "string"
+								},
+								"LocalizedValues": {
+									"properties": {
+										"Ar": {
+											"properties": {
+												"id": {
+													"type": "string"
+												},
+												"longDescription": {
+													"type": [
+														"string",
+														"null"
+													]
+												},
+												"name": {
+													"type": "string"
+												},
+												"productUrl": {
+													"type": [
+														"string",
+														"null"
+													]
+												},
+												"shortDescription": {
+													"type": [
+														"string",
+														"null"
+													]
+												}
+											},
+											"type": "object"
+										}
+									},
+									"type": "object"
+								},
+								"Value": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"longDescription": {
+											"type": [
+												"string",
+												"null"
+											]
+										},
+										"name": {
+											"type": "string"
+										},
+										"productUrl": {
+											"type": [
+												"string",
+												"null"
+											]
+										},
+										"shortDescription": {
+											"type": [
+												"string",
+												"null"
+											]
+										}
+									},
+									"type": "object"
 								}
 							},
 							"type": "object"
@@ -70,18 +130,18 @@
 				},
 				"Perform_on_Event_Type": {
 					"actions": {
-						"Condition": {
+						"Check_If_Product_Exists": {
 							"actions": {
-								"Create_Product": {
+								"Add_Product_List_Item": {
 									"inputs": {
 										"body": {
-											"body": "{\n\"Title\": \"@{body('Parse_Product_Details_EN_JSON')?['name']}\",\n\"ProductId\": \"@{body('Parse_Product_Details_EN_JSON')?['id']}\",\n\"ProductName\": \"@{body('Parse_Product_Details_EN_JSON')?['name']}\",\n\"arProductName\": \"@{body('Parse_Product_Details_AR_JSON')?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Product_Details_EN_JSON')?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Product_Details_AR_JSON')?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Product_Details_EN_JSON')?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Product_Details_AR_JSON')?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Product_Details_EN_JSON')?['productUrl']}\", \"Url\": \"@{body('Parse_Product_Details_EN_JSON')?['productUrl']}\" }\n}",
+											"body": "{\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"ProductId\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['id']}\",\n\"arProductName\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\", \"Url\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\" }\n}",
 											"headers": {
 												"Accept": "application/json;odata=nometadata",
 												"Content-Type": "application/json"
 											},
 											"method": "POST",
-											"uri": "_api/web/lists/GetByTitle('@{parameters('productListName')}')/items"
+											"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items"
 										},
 										"host": {
 											"connection": {
@@ -89,7 +149,7 @@
 											}
 										},
 										"method": "post",
-										"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('tenantURL'),'/sites/cms-dev-marketplace'))}/httprequest"
+										"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
 									},
 									"runAfter": {},
 									"type": "ApiConnection"
@@ -97,10 +157,10 @@
 							},
 							"else": {
 								"actions": {
-									"Update_Delete_Product": {
+									"Update_Delete_Product_List_Item": {
 										"inputs": {
 											"body": {
-												"body": "{\n\"Title\": \"@{body('Parse_Product_Details_EN_JSON')?['name']}\",\n\"ProductId\": \"@{body('Parse_Product_Details_EN_JSON')?['id']}\",\n\"ProductName\": \"@{body('Parse_Product_Details_EN_JSON')?['name']}\",\n\"arProductName\": \"@{body('Parse_Product_Details_AR_JSON')?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Product_Details_EN_JSON')?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Product_Details_AR_JSON')?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Product_Details_EN_JSON')?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Product_Details_AR_JSON')?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Product_Details_EN_JSON')?['productUrl']}\", \"Url\": \"@{body('Parse_Product_Details_EN_JSON')?['productUrl']}\" }\n}",
+												"body": "{\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"ProductId\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['id']}\",\n\"arProductName\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\", \"Url\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\" }\n}",
 												"headers": {
 													"Accept": "application/json;odata=nometadata",
 													"Content-Type": "application/json",
@@ -108,7 +168,7 @@
 													"X-HTTP-Method": "@{if(equals(triggerBody()?['eventType'], 'product-updated'), 'MERGE', 'DELETE')}"
 												},
 												"method": "POST",
-												"uri": "_api/web/lists/GetByTitle('@{parameters('productListName')}')/items(@{first(body('Parse_Product_List_Item_JSON')?['value'])?['ID']})"
+												"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items(@{first(body('Parse_Product_List_Item_JSON')?['value'])?['ID']})"
 											},
 											"host": {
 												"connection": {
@@ -116,7 +176,7 @@
 												}
 											},
 											"method": "post",
-											"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('tenantURL'),'/sites/cms-dev-marketplace'))}/httprequest"
+											"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
 										},
 										"runAfter": {},
 										"type": "ApiConnection"
@@ -140,26 +200,6 @@
 							},
 							"type": "If"
 						},
-						"Get_Product_Details_AR": {
-							"inputs": {
-								"method": "GET",
-								"uri": "@{body('Parse_JSON')?['ApiUrl']}?lang=1025"
-							},
-							"runAfter": {
-								"Parse_Product_Details_EN_JSON": [
-									"Succeeded"
-								]
-							},
-							"type": "Http"
-						},
-						"Get_Product_Details_EN": {
-							"inputs": {
-								"method": "GET",
-								"uri": "@{body('Parse_JSON')?['ApiUrl']}?lang=1033"
-							},
-							"runAfter": {},
-							"type": "Http"
-						},
 						"Get_Product_Item": {
 							"inputs": {
 								"body": {
@@ -168,7 +208,7 @@
 										"Content-Type": "application/json"
 									},
 									"method": "GET",
-									"uri": "_api/web/lists/GetByTitle('@{parameters('productListName')}')/items?$filter=ProductId eq '@{body('Parse_JSON')?['Id']}'"
+									"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items?$filter=ProductId eq '@{body('Parse_Event_Grid_Data_JSON')?['Id']}'"
 								},
 								"host": {
 									"connection": {
@@ -176,178 +216,10 @@
 									}
 								},
 								"method": "post",
-								"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('tenantURL'),'/sites/cms-dev-marketplace'))}/httprequest"
+								"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
 							},
-							"runAfter": {
-								"Parse_Product_Details_AR_JSON": [
-									"Succeeded"
-								]
-							},
+							"runAfter": {},
 							"type": "ApiConnection"
-						},
-						"Parse_Product_Details_AR_JSON": {
-							"inputs": {
-								"content": "@body('Get_Product_Details_AR')",
-								"schema": {
-									"properties": {
-										"id": {
-											"type": "string"
-										},
-										"imageUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"legalUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"longDescription": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"modifiedOn": {
-											"type": "string"
-										},
-										"name": {
-											"type": "string"
-										},
-										"popularProduct": {
-											"type": "boolean"
-										},
-										"productCategoryId": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productCategoryName": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productSubCategoryId": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productSubCategoryName": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"shortDescription": {
-											"type": [
-												"string",
-												"null"
-											]
-										}
-									},
-									"type": "object"
-								}
-							},
-							"runAfter": {
-								"Get_Product_Details_AR": [
-									"Succeeded"
-								]
-							},
-							"type": "ParseJson"
-						},
-						"Parse_Product_Details_EN_JSON": {
-							"inputs": {
-								"content": "@body('Get_Product_Details_EN')",
-								"schema": {
-									"properties": {
-										"id": {
-											"type": "string"
-										},
-										"imageUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"legalUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"longDescription": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"modifiedOn": {
-											"type": "string"
-										},
-										"name": {
-											"type": "string"
-										},
-										"popularProduct": {
-											"type": "boolean"
-										},
-										"productCategoryId": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productCategoryName": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productSubCategoryId": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productSubCategoryName": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"productUrl": {
-											"type": [
-												"string",
-												"null"
-											]
-										},
-										"shortDescription": {
-											"type": [
-												"string",
-												"null"
-											]
-										}
-									},
-									"type": "object"
-								}
-							},
-							"runAfter": {
-								"Get_Product_Details_EN": [
-									"Succeeded"
-								]
-							},
-							"type": "ParseJson"
 						},
 						"Parse_Product_List_Item_JSON": {
 							"inputs": {
@@ -406,7 +278,7 @@
 						]
 					},
 					"runAfter": {
-						"Parse_JSON": [
+						"Parse_Event_Grid_Data_JSON": [
 							"Succeeded"
 						]
 					},
@@ -420,12 +292,12 @@
 					"defaultValue": {},
 					"type": "Object"
 				},
-				"productListName": {
-					"defaultValue": "Products",
+				"MarketplaceUrl": {
+					"defaultValue": "https://tasmusqcpuat.sharepoint.com/sites/cms-dev-marketplace",
 					"type": "String"
 				},
-				"tenantURL": {
-					"defaultValue": "https://tasmusqcpuat.sharepoint.com",
+				"ProductsList": {
+					"defaultValue": "Products",
 					"type": "String"
 				}
 			}
@@ -439,9 +311,9 @@
 			"value": {
 				"$connections": {
 					"value": {
-						"azureeventgrid": {
-							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-sbx-we-01/providers/Microsoft.Web/connections/azureeventgrid",
-							"connectionName": "azureeventgrid",
+						"apicon-cpd-apps-integ-uat-we-01": {
+							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-uat-we-01",
+							"connectionName": "apicon-cpd-apps-integ-uat-we-01",
 							"id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
 						},
 						"apicon-cpd-apps-intspo-uat-we-01": {
