@@ -4,6 +4,7 @@
 - [PR Checklist](#pr-checklist)
 - [Solution Structure](#ssolution-structure)
 - [Conventions](#conventions)
+- [Recommended Developer Tools](#recommended-developer-tools)
 - [ARM Modules](#arm-modules)
 - [Adding New Module](#adding-new-module)
 - [Adding New Resource Group](#adding-new-resource-group)
@@ -42,6 +43,19 @@ Code for all infrastructure components.
 - [Resource Naming Conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging)
 - [ARM Template Syntax](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-syntax)
 - [ARM Template Best Practices](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-best-practices)
+
+#Recommended Developer Tools
+1. Visual Studio Code
+>>Recommended Extensions
+>>- Azure Pipelines (Microsoft)
+>>- Power Shell (Microsoft)
+>>- YAML (Red Hat)
+>>- Sort JSON Objects (richie5um2)
+>>- Markdown-formatter (mervin)
+>>- Bracket Pair Colorizer (CoenraadS)
+>>- ARM Tools (Microsoft)
+
+2. Azure CLI [(Latest Stable Version)](https://aka.ms/installazurecliwindows)
 
 # Resources list and conventions specific to TASMU
 [BOM Sheet](https://microsofteur.sharepoint.com/:x:/r/teams/TASMUNationalPlatform-DeliveryStream-MicrosoftOnly/_layouts/15/guestaccess.aspx?e=VvPNKy&share=EZkiApVrr7BOvrmV_DpgOtQBHWe5l9yqv7a4eaiLu2s6Uw)  
