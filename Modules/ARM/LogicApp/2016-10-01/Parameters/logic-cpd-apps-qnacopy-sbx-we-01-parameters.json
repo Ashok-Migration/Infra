@@ -1,0 +1,102 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workflowName": {
+			"value": "logic-cpd-apps-qnacopy-sbx-we-01"
+		},
+		"workflowLocation": {
+			"value": "westeurope"
+		},
+		"workflowSchema": {
+			"value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+		},
+		"workflowTriggers": {
+			"value": {
+				"Recurrence": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1
+					},
+					"type": "Recurrence"
+				}
+			}
+		},
+		"workflowActions": {
+			"value": {
+				"Send_message": {
+					"runAfter": {},
+					"type": "ApiConnection",
+					"inputs": {
+						"body": {
+							"ContentData": "@{base64('copyqnamakerdata')}",
+							"ContentType": "Text/Plain",
+							"SessionId": "qnamakersyncdata"
+						},
+						"host": {
+							"connection": {
+								"name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
+							}
+						},
+						"method": "post",
+						"path": "/@{encodeURIComponent(encodeURIComponent('qnasync'))}/messages",
+						"queries": {
+							"systemProperties": "Run Details"
+						}
+					}
+				},
+				"Send_message_2": {
+					"inputs": {
+						"body": {
+							"ContentData": "@{base64('copyqnamakerdataar')}",
+							"ContentType": "Text/Plain",
+							"SessionId": "qnamakersyncdata2"
+						},
+						"host": {
+							"connection": {
+								"name": "@parameters('$connections')['servicebus']['connectionId']"
+							}
+						},
+						"method": "post",
+						"path": "/@{encodeURIComponent(encodeURIComponent('qnasync'))}/messages",
+						"queries": {
+							"systemProperties": "Run Details"
+						}
+					},
+					"runAfter": {
+						"Send_message": [
+							"Succeeded"
+						]
+					},
+					"type": "ApiConnection"
+				}
+			}
+		},
+		"workflowParameters": {
+			"value": {
+				"$connections": {
+					"defaultValue": {},
+					"type": "Object"
+				}
+			}
+		},
+		"tags": {
+			"value": {
+				"Environment": "Sandbox"
+			}
+		},
+		"connectionParameters": {
+			"value": {
+				"$connections": {
+					"value": {
+						"apicon-cpd-apps-intsb-sbx-we-01": {
+							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-sbx-we-01",
+							"connectionName": "apicon-cpd-apps-intsb-sbx-we-01",
+							"id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+						}
+					}
+				}
+			}
+		}
+	}
+}

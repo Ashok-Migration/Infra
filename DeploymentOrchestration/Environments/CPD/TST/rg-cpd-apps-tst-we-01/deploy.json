@@ -1029,6 +1029,71 @@
           "uri": "[concat(variables('modulesPath'), 'CognitiveServicesQna/2017-04-18/Parameters/cog-cpd-apps-qna-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-app-cpd-apps-arqna-prprty-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01",
+        "DEP-app-cpd-apps-arqna-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePropertiesQnA/2018-11-01/Parameters/app-cpd-apps-arqna-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-app-cpd-apps-arqna-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01",
+        "DEP-cog-cpd-apps-arqna-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServiceManagement/2018-11-01/Parameters/app-cpd-apps-arqna-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-cog-cpd-apps-arqna-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServicesQna/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'CognitiveServicesQna/2017-04-18/Parameters/cog-cpd-apps-arqna-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
   "outputs": {}
