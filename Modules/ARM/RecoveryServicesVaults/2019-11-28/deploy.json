@@ -9,6 +9,17 @@
 				"description": "Required. Name of the Azure Recovery Service Vault"
 			}
 		},
+		"vaultStorageType": {
+			"type": "string",
+			"defaultValue": "LocallyRedundant",
+		    "allowedValues": [
+        		"LocallyRedundant",
+        		"GeoRedundant"
+      		],
+			"metadata": {
+				"description": "Change Vault Storage Type (not allowed if the vault has registered backups)"
+			}
+		},
 		"location": {
 			"type": "string",
 			"defaultValue": "[resourceGroup().location]",
@@ -239,6 +250,17 @@
 				}
 			]
 		},
+		{
+      		"type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
+      		"apiVersion": "2020-02-02",
+      		"name": "[concat(parameters('recoveryVaultName'), '/vaultstorageconfig')]",
+      		"dependsOn": [
+        		"[resourceId('Microsoft.RecoveryServices/vaults/', parameters('recoveryVaultName'))]"
+      		],
+      		"properties": {
+        		"StorageModelType": "[parameters('vaultStorageType')]"
+      		}
+    },
 		{
 			"apiVersion": "2016-12-01",
 			"name": "[if(empty(parameters('backupPolicies')), concat(parameters('recoveryVaultName'), '/', 'dummy'), concat(parameters('recoveryVaultName'), '/', parameters('backupPolicies')[copyIndex('backupPolicies')].name))]",
