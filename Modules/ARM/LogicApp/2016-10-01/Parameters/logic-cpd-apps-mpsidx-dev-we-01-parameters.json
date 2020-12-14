@@ -249,7 +249,7 @@
                   "value": "@body('Select_Product_Details')"
                 },
                 "headers": {
-                  "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                  "api-key": "@variables('SearchApiKey')",
                   "content-type": "application/json"
                 },
                 "method": "POST",
@@ -268,7 +268,7 @@
                   "value": "@body('Select_Product_Details_AR')"
                 },
                 "headers": {
-                  "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                  "api-key": "@variables('SearchApiKey')",
                   "content-type": "application/json"
                 },
                 "method": "POST",
@@ -277,7 +277,7 @@
             }
           },
           "runAfter": {
-            "Initialize_EventData_Object": [
+            "Set_ApiKey": [
               "Succeeded"
             ]
           },
@@ -350,7 +350,7 @@
                         "value": "@body('Select_KB_Details')"
                       },
                       "headers": {
-                        "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                        "api-key": "@variables('SearchApiKey')",
                         "content-type": "application/json"
                       },
                       "method": "POST",
@@ -491,11 +491,11 @@
                           "value": "@body('Select_News_Details')"
                         },
                         "headers": {
-                          "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                          "api-key": "@variables('SearchApiKey')",
                           "content-type": "application/json"
                         },
                         "method": "POST",
-                        "uri": "https://srch-cpd-apps-cog-dev-we-01.search.windows.net/indexes/content-index-lps/docs/index?api-version=2020-06-30"
+                        "uri": "https://srch-cpd-apps-cog-dev-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
                       }
                     },
                     "Send_News_Details_to_Azure_Search_AR": {
@@ -510,7 +510,7 @@
                           "value": "@body('Select_News_Details_AR')"
                         },
                         "headers": {
-                          "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                          "api-key": "@variables('SearchApiKey')",
                           "content-type": "application/json"
                         },
                         "method": "POST",
@@ -524,13 +524,13 @@
                     {
                       "equals": [
                         "@variables('EventType')",
-                        "new-kbarticle"
+                        "kbarticle-created"
                       ]
                     },
                     {
                       "equals": [
                         "@variables('EventType')",
-                        "kbarticle-update"
+                        "kbarticle-updated"
                       ]
                     }
                   ]
@@ -544,18 +544,48 @@
               {
                 "equals": [
                   "@variables('EventType')",
-                  "new-product"
+                  "product-created"
                 ]
               },
               {
                 "equals": [
                   "@variables('EventType')",
-                  "product-update"
+                  "product-updated"
                 ]
               }
             ]
           },
           "type": "If"
+        },
+        "Response": {
+          "runAfter": {
+            "Perform_action_as_per_eventtype": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "Http",
+          "inputs": {
+            "body": "Event has been processed.",
+            "statusCode": 200
+          }
+        },
+        "Set_ApiKey": {
+          "runAfter": {
+            "Initialize_EventData_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "SearchApiKey",
+                "type": "string",
+                "value": "41A057E7D3C77873806056971634A4CD"
+              }
+            ]
+          }
         }
       }
     },

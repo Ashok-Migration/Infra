@@ -21,6 +21,13 @@
         "description": "Name of the Service Bus queue"
       }
     },
+    "sessionEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "A value that indicates whether the queue supports the concept of sessions"
+      }
+    },
     "tags": {
       "defaultValue": {},
       "metadata": {
@@ -40,7 +47,7 @@
         "lockDuration": "PT30S",
         "maxSizeInMegabytes": 1024,
         "requiresDuplicateDetection": false,
-        "requiresSession": false,
+        "requiresSession": "[parameters('sessionEnabled')]",
         "defaultMessageTimeToLive": "P14D",
         "deadLetteringOnMessageExpiration": false,
         "enableBatchedOperations": true,
