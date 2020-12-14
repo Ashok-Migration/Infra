@@ -60,6 +60,18 @@
       },
       "type": "string"
     },
+    "openIdConfigUrl": {
+      "type": "string",
+      "defaultValue": "https://login.microsoftonline.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/.well-known/openid-configuration"
+    },
+    "audienceId": {
+      "type": "string",
+      "defaultValue": "5b22938c-00b4-4706-893a-7e3018826129"
+    },
+    "issuerUrl":{
+      "type": "string",
+      "defaultValue": "https://tasmucpb2csbx.b2clogin.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/"
+    },
     "apiOperations": {
       "type": "array",
       "metadata": {
@@ -68,8 +80,12 @@
     }
   },
   "variables": {
-    "basePolicy": "<policies><inbound><base/><set-backend-service id=\"apim-generated-policy\" backend-id=\"<NAMEOFLOGICAPPBACKEND>\"/><set-method id=\"apim-generated-policy\">POST</set-method><set-variable name=\"requestPath\" value=\"@(context.Request.Url.Path)\"/><rewrite-uri id=\"apim-generated-policy\" template=\"/manual/paths/invoke/?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=<SIGNATUREOFLOGICAPP>\"/><validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized. Access token is missing or invalid.\"><openid-config url=\"https://login.microsoftonline.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/.well-known/openid-configuration\"/><audiences><audience>5b22938c-00b4-4706-893a-7e3018826129</audience></audiences><issuers><issuer>https://tasmucpb2csbx.b2clogin.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/</issuer></issuers></validate-jwt><set-header name=\"Authorization\" exists-action=\"override\"><value/></set-header></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>",
-    "policy": "[replace(variables('basePolicy'),'<NAMEOFLOGICAPPBACKEND>',parameters('apiPolicyLogicAppName'))]"
+    "basePolicy0": "<policies><inbound><base/><set-backend-service id=\"apim-generated-policy\" backend-id=\"<NAMEOFLOGICAPPBACKEND>\"/><set-method id=\"apim-generated-policy\">POST</set-method><set-variable name=\"requestPath\" value=\"@(context.Request.Url.Path)\"/><rewrite-uri id=\"apim-generated-policy\" template=\"/manual/paths/invoke/?api-version=2016-10-01&amp;sp=%2Ftriggers%2Fmanual%2Frun&amp;sv=1.0&amp;sig=<SIGNATUREOFLOGICAPP>\"/><validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized. Access token is missing or invalid.\"><openid-config url=\"<OPENIDCONFIGURL>\"/><audiences><audience><AUDIENCEGUID></audience></audiences><issuers><issuer><ISSUERURL></issuer></issuers></validate-jwt><set-header name=\"Authorization\" exists-action=\"override\"><value/></set-header></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>",
+    "basePolicy1": "[replace(variables('basePolicy0'),'<NAMEOFLOGICAPPBACKEND>',parameters('apiPolicyLogicAppName'))]",
+    "basePolicy2": "[replace(variables('basePolicy1'),'<OPENIDCONFIGURL>',parameters('openIdConfigUrl'))]",
+    "basePolicy3": "[replace(variables('basePolicy2'),'<AUDIENCEGUID>',parameters('audienceId'))]",
+    "basePolicy4": "[replace(variables('basePolicy3'),'<ISSUERURL>',parameters('issuerUrl'))]",
+    "policy": "[variables('basePolicy4')]"
   },
   "resources": [
     {
