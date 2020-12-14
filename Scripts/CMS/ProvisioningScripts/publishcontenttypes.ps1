@@ -104,6 +104,5 @@ foreach($ct in $tasmuCTs){
     $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'publishButton'
     $body['ctl00$PlaceHolderMain$ctl00$RptControls$okButton'] = 'OK'
     $response = Invoke-WebRequest -Uri $url -Method Post -WebSession $session -Body $body
-
     write-host "Done" -ForegroundColor Green
 }

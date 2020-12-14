@@ -116,7 +116,6 @@ function ContentType($scXML) {
         $contentTypeName = Get-AttributeValue $columnItem "ContentTypeName"
         $columnName = Get-AttributeValue $columnItem "ColumnName"
         $required = Get-AttributeValue $columnItem "Required"
-        
         if($contentTypeName -ne '')
         {
             AddColumns-ContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection $required
@@ -166,12 +165,26 @@ function AddColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName,
     try {
         Write-Host "Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName....."
         $client.TrackEvent("Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName.....")
-        if ($required -eq "False") {
-            $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+
+        if($ContentTypeName -eq "TASMU Translation Tasks" -or $ContentTypeName -eq "TASMU Approval Tasks"){
+            if($ColumnName -eq "AssignedTo"){
+                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -Hidden -ErrorAction Stop -Connection $connection
+            }
+            elseif ($required -eq "False") {
+                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+            }
+            else {
+                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
+            } 
         }
-        else {
-            $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
-        }  
+        else{
+            if ($required -eq "False") {
+                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+            }
+            else {
+                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
+            } 
+        }
     }
     catch {
         $ErrorMessage = $_.Exception.Message

@@ -329,6 +329,10 @@ function DeleteSiteColumns($siteColumnfilePathfile)
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
 
+    Write-Host "Delete All items from the Recycle Bin Started..."
+    Clear-PnPRecycleBinItem -All -Force
+    Write-Host "Delete All items from the Recycle Bin Completed..."
+
     Write-Host "Delete Site Columns Started..."
     $client.TrackEvent("Delete Site Columns Started...")
      

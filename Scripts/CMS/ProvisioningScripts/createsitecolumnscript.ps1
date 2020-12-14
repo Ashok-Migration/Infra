@@ -34,7 +34,8 @@ param (
     $sp_user,
     $sp_password,
     $scope,
-    $InstrumentationKey
+    $InstrumentationKey,
+    $contenttypehub
 )
 
 function Create-SiteColumns() 
@@ -49,7 +50,9 @@ function Create-SiteColumns()
 
     $RoleName = $JsonParameters.RoleName.value
 
-    $contenttypehub="https://"+ $tenant+".sharepoint.com/sites/contentTypeHub"
+    if([bool]($contenttypehub) -eq $false){
+        $contenttypehub="https://"+ $tenant+".sharepoint.com/sites/contentTypeHub"
+    }
 
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.ApplicationInsights.dll')
 
@@ -106,6 +109,9 @@ function Get-SiteColumsToImport($xmlTermsPath){
             $groupName = $fieldNode.GroupName
             $columnType = $fieldNode.ColumnType
             $columnFormatting=$fieldNode.ColumnFormatting
+            $description=$fieldNode.Description
+            $message=$fieldNode.Message
+            $validation=$fieldNode.Validation
 
             $columnChoices=''
 
@@ -131,7 +137,7 @@ function Get-SiteColumsToImport($xmlTermsPath){
 
             if($columnName -ne '')
             {
-              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue $enforceUniqueValues $indexed $columnFormatting
+              Create-SiteColumn $tenantAdmin $contenttypehub $columnTitle $columnName $groupName $columnType $ChoiceOptions $required $format $TermSetPath $showInNewEditForm $isSingleSelect $isRichText $defaultValue $enforceUniqueValues $indexed $columnFormatting $message $description $validation
             }        
 
      }
@@ -149,7 +155,7 @@ function Get-SiteColumsToImport($xmlTermsPath){
     Disconnect-PnPOnline
 }
 
-function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue, $enforceUniqueValues, $indexed, $columnFormatting) {
+function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $GroupName, $columnType, $ChoiceOptions, $Required, $Format, $TermSetPath, $showInNewEditForm, $isSingleSelect,$isRichText, $defaultValue, $enforceUniqueValues, $indexed, $columnFormatting, $message, $description, $validation) {
     Try {
 
         Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
@@ -240,7 +246,13 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
             } 
          elseif ($columnType -eq "Number") {
                 $Id=[GUID]::NewGuid() 
-                $fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName'></Field>"
+                #$fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName'></Field>"
+                if($null -ne $validation)
+                {
+                 $validation=$validation.Replace('>','&gt;').Replace('<','&lt;')
+                }
+                $fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName' Description='$description'><Validation Message='$message'>$validation</Validation></Field>"
+
                 $addNewField = Add-PnPFieldFromXml -Connection $connection $fieldXml
             }
             elseif ($columnType -eq "Boolean") {
@@ -258,6 +270,28 @@ function Create-SiteColumn($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnN
                 StaticName='$ColumnName'
                 ShowInEditForm='$showInNewEditForm'
                 ShowInNewForm='$showInNewEditForm'
+                ID='$Id' 
+                Name='$ColumnName'>
+                <Default>$defaultValue</Default>
+		        </Field>"
+            }
+            elseif ($columnType -eq "UserMulti") {
+                $Id=[GUID]::NewGuid()
+                if ($null -eq $showInNewEditForm) {
+                    $showInNewEditForm = "TRUE"
+                }
+                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
+				DisplayName='$ColumnTitle' 
+				Required='$Required' 
+				EnforceUniqueValues='$enforceUniqueValues' 
+				Indexed='$indexed' 
+				Group='$GroupName' 
+				FriendlyDisplayFormat='Disabled' 
+                StaticName='$ColumnName'
+                ShowInEditForm='$showInNewEditForm'
+                ShowInNewForm='$showInNewEditForm'
+                UserSelectionMode='PeopleAndGroups' 
+                Mult='TRUE'
                 ID='$Id' 
                 Name='$ColumnName'>
                 <Default>$defaultValue</Default>

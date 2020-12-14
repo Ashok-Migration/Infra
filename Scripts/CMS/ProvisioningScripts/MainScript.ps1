@@ -67,12 +67,12 @@ if($null -ne $webparams){
     .$psfileensuretermstoreadminscript @webparams
 }
 .$psfilecreatetaxanomyscript @params
- .$psfilecreatesitecolumnscript @params
-  .$psfilecreatecontenttypescript @params
-  if($null -ne $webparams){
-     .$psfilepublishcontenttypescript @webparams
-  }
- .$psfilecreatenewsitescript @paramsnewsite
+.$psfilecreatesitecolumnscript @params
+.$psfilecreatecontenttypescript @params
+if($null -ne $webparams){
+    .$psfilepublishcontenttypescript @webparams
+}
+.$psfilecreatenewsitescript @paramsnewsite
 
 #region To check if all Content type exists in Global site 
 
@@ -86,7 +86,6 @@ function checkContentTypeExists()
     $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
 
-
     $urlprefix = "https://"+$tenant+".sharepoint.com/sites/"
     $globalhubsite=$sitefile.sites.globalhubsite.site.Alias
 
@@ -97,11 +96,13 @@ function checkContentTypeExists()
 
     $isContentTypeAvailable=$true
     foreach ($itemList in $sitefile.sites.globalSPList.ListAndContentTypes) {
+        if([bool]($itemList.ParentCTName) -eq $false){
         $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
-        if($ListBase -eq $null)
-        {
-            $isContentTypeAvailable=$false
-            Write-host $itemList.ContentTypeName "not available in" $globalhubSiteUrl -ForegroundColor Yellow
+            if($ListBase -eq $null)
+            {
+                $isContentTypeAvailable=$false
+                Write-host $itemList.ContentTypeName "not available in" $globalhubSiteUrl -ForegroundColor Yellow
+            }
         }
     }
     if($isContentTypeAvailable -eq $true){
@@ -113,11 +114,13 @@ function checkContentTypeExists()
         $connection = Get-PnPConnection
 
         foreach ($itemList in $sitefile.sites.ConfigurationSPList.ListAndContentTypes) {
-            $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
-            if($ListBase -eq $null)
-            {
-                $isContentTypeAvailable=$false
-                Write-host $itemList.ContentTypeName "not available in" $configSiteUrl -ForegroundColor Yellow
+            if([bool]($itemList.ParentCTName) -eq $false){
+                $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
+                if($ListBase -eq $null)
+                {
+                    $isContentTypeAvailable=$false
+                    Write-host $itemList.ContentTypeName "not available in" $configSiteUrl -ForegroundColor Yellow
+                }
             }
         }
     }
@@ -152,8 +155,9 @@ if($isExists -eq $true)
      $isEnabled = Get-SPOTenantCdnEnabled -CdnType Public
      if([string] ($isEnabled.Value) -eq "False"){
           Set-SPOTenantCdnEnabled -CdnType Public -Confirm:$false
+          Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0
      }
 
-     Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0
+     
      .$psfileprovisionnewsitecollectionscript @paramsnewsite
 }
