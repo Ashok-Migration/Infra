@@ -25,8 +25,6 @@
 		"workflowActions": {
 			"value": {
 				"Send_message": {
-					"runAfter": {},
-					"type": "ApiConnection",
 					"inputs": {
 						"body": {
 							"ContentData": "@{base64('copyqnamakerdata')}",
@@ -43,7 +41,9 @@
 						"queries": {
 							"systemProperties": "Run Details"
 						}
-					}
+					},
+					"runAfter": {},
+					"type": "ApiConnection"
 				},
 				"Send_message_2": {
 					"inputs": {
@@ -54,7 +54,7 @@
 						},
 						"host": {
 							"connection": {
-								"name": "@parameters('$connections')['servicebus']['connectionId']"
+								"name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
 							}
 						},
 						"method": "post",
@@ -88,7 +88,7 @@
 		"connectionParameters": {
 			"value": {
 				"$connections": {
-					"value": {
+					"value":  {
 						"apicon-cpd-apps-intsb-sbx-we-01": {
 							"connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-sbx-we-01",
 							"connectionName": "apicon-cpd-apps-intsb-sbx-we-01",
