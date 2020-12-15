@@ -586,6 +586,27 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpd-apps-intkv-tst-we-01",
+			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-int-tst-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/Parameters/apicon-cpd-apps-intkv-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "logic-cpd-apps-intsec-tst-we-01",
 			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
 			"dependsOn": [
@@ -777,7 +798,8 @@
 			"name": "DEP-logic-cpd-apps-mpsidx-tst-we-01",
 			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
 			"dependsOn": [
-				"DEP-rg-cpd-apps-int-tst-we-01"
+				"DEP-rg-cpd-apps-int-tst-we-01",
+				"DEP-apicon-cpd-apps-intkv-tst-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",

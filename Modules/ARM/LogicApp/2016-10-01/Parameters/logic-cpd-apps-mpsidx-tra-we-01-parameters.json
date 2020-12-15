@@ -52,6 +52,30 @@
     },
     "workflowActions": {
       "value": {
+        "Get_Search_API_Key": {
+          "runAfter": {
+            "Initialize_ProductsArray_Array": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['keyvault']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/secrets/@{encodeURIComponent('Azure-Search-Key')}/value"
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          }
+        },
         "Initialize_EventData_Object": {
           "runAfter": {
             "Initialize_EventType_String": [
@@ -99,6 +123,38 @@
             ]
           }
         },
+        "Initialize_ProductsArray_Array": {
+          "runAfter": {
+            "Initialize_TempBody_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ProductsArray",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Initialize_TempBody_Object": {
+          "runAfter": {
+            "Initialize_EventData_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "TempBody",
+                "type": "object"
+              }
+            ]
+          }
+        },
         "Perform_action_as_per_eventtype": {
           "actions": {
             "Parse_Product_JSON": {
@@ -109,25 +165,43 @@
                 "schema": {
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "imageUrl": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "longDescription": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "modifiedOn": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "productPrice": {
                       "type": "integer"
                     },
                     "providerName": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "rating": {
                       "type": "number"
@@ -148,35 +222,53 @@
               },
               "type": "ParseJson",
               "inputs": {
-                "content": "@variables('EventData')",
+                "content": "@variables('EventData').localizedValues",
                 "schema": {
                   "properties": {
                     "id": {
                       "type": "string"
                     },
                     "imageUrl": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "longDescription": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "modifiedOn": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "productPrice": {
                       "type": "integer"
                     },
                     "providerName": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "rating": {
                       "type": "number"
                     },
                     "shortDescription": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "type": "object"
@@ -212,28 +304,28 @@
             },
             "Select_Product_Details_AR": {
               "runAfter": {
-                "Parse_Product_JSON_AR": [
+                "Set_TempBody_Variable_Product": [
                   "Succeeded"
                 ]
               },
               "type": "Select",
               "inputs": {
-                "from": "@createArray(body('Parse_Product_JSON_AR'))",
+                "from": "@createArray(variables('TempBody'))",
                 "select": {
                   "@@search.action": "mergeOrUpload",
-                  "average_rating": "@concat(body('Parse_Product_JSON_AR')?['rating'],'')",
+                  "average_rating": "@concat(variables('TempBody')?['rating'],'')",
                   "entity_type": "Products&Services",
-                  "id": "@body('Parse_Product_JSON_AR')?['id']",
-                  "merged_content": "@concat(body('Parse_Product_JSON_AR')?['longDescription'],body('Parse_Product_JSON_AR')?['shortDescription'])",
-                  "metadata_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
+                  "id": "@variables('TempBody').value?['id']",
+                  "merged_content": "@concat(variables('TempBody')?['longDescription'],variables('TempBody')?['shortDescription'])",
+                  "metadata_last_modified": "@variables('TempBody')?['modifiedOn']",
                   "metadata_storage_file_extension": "JSON",
-                  "metadata_storage_last_modified": "@body('Parse_Product_JSON_AR')?['modifiedOn']",
-                  "metadata_storage_name": "@body('Parse_Product_JSON_AR')?['name']",
-                  "price": "@concat(body('Parse_Product_JSON_AR')?['productPrice'],'')",
-                  "provider_name": "@body('Parse_Product_JSON_AR')?['providerName']",
-                  "search_id": "@concat('ProductsServicesAr-',body('Parse_Product_JSON_AR')['id'])",
-                  "short_description": "@body('Parse_Product_JSON_AR')?['shortDescription']",
-                  "thumbnail_url": "@body('Parse_Product_JSON_AR')?['imageUrl']"
+                  "metadata_storage_last_modified": "@variables('TempBody')?['modifiedOn']",
+                  "metadata_storage_name": "@variables('TempBody')?['name']",
+                  "price": "@concat(variables('TempBody')?['productPrice'],'')",
+                  "provider_name": "@variables('TempBody')?['providerName']",
+                  "search_id": "@concat('ProductsServicesAr-',variables('TempBody').value['id'])",
+                  "short_description": "@variables('TempBody')?['shortDescription']",
+                  "thumbnail_url": "@variables('TempBody')?['imageUrl']"
                 }
               }
             },
@@ -249,7 +341,7 @@
                   "value": "@body('Select_Product_Details')"
                 },
                 "headers": {
-                  "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                  "api-key": "@body('Get_Search_API_Key')?['value']",
                   "content-type": "application/json"
                 },
                 "method": "POST",
@@ -268,16 +360,31 @@
                   "value": "@body('Select_Product_Details_AR')"
                 },
                 "headers": {
-                  "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                  "api-key": "@body('Get_Search_API_Key')?['value']",
                   "content-type": "application/json"
                 },
                 "method": "POST",
                 "uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
               }
+            },
+            "Set_TempBody_Variable_Product": {
+              "runAfter": {
+                "Parse_Product_JSON_AR": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "TempBody",
+                "value": {
+                  "id": "empty",
+                  "value": "@body('Parse_Product_JSON_AR')['ar']"
+                }
+              }
             }
           },
           "runAfter": {
-            "Initialize_EventData_Object": [
+            "Get_Search_API_Key": [
               "Succeeded"
             ]
           },
@@ -285,6 +392,41 @@
             "actions": {
               "Condition": {
                 "actions": {
+                  "For_each": {
+                    "foreach": "@array(body('Parse_KB_JSON').value?['relatedProducts'])",
+                    "actions": {
+                      "Append_to_array_variable": {
+                        "runAfter": {
+                          "Select": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "AppendToArrayVariable",
+                        "inputs": {
+                          "name": "ProductsArray",
+                          "value": "@json(string(body('Select')[0]))"
+                        }
+                      },
+                      "Select": {
+                        "runAfter": {},
+                        "type": "Select",
+                        "inputs": {
+                          "from": "@array(json(string(items('For_each'))))",
+                          "select": {
+                            "catalogueId": "@json(string(items('For_each'))).catalogueId",
+                            "category": "@json(string(items('For_each'))).productCategoryName",
+                            "sectors": "@json(string(items('For_each'))).sectorNames"
+                          }
+                        }
+                      }
+                    },
+                    "runAfter": {
+                      "Parse_KB_JSON": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Foreach"
+                  },
                   "Parse_KB_JSON": {
                     "runAfter": {},
                     "type": "ParseJson",
@@ -304,6 +446,9 @@
                           "rating": {
                             "type": "string"
                           },
+                          "relatedProducts": {
+                            "type": "array"
+                          },
                           "title": {
                             "type": "string"
                           }
@@ -314,7 +459,7 @@
                   },
                   "Select_KB_Details": {
                     "runAfter": {
-                      "Parse_KB_JSON": [
+                      "For_each": [
                         "Succeeded"
                       ]
                     },
@@ -333,6 +478,7 @@
                         "metadata_storage_file_extension": "JSON",
                         "metadata_storage_last_modified": "@utcNow()",
                         "metadata_storage_name": "@body('Parse_KB_JSON')?['title']",
+                        "products": "@variables('ProductsArray')",
                         "search_id": "@concat('KbArticle-',body('Parse_KB_JSON')['id'])",
                         "short_description": "@body('Parse_KB_JSON')?['description']"
                       }
@@ -350,7 +496,7 @@
                         "value": "@body('Select_KB_Details')"
                       },
                       "headers": {
-                        "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                        "api-key": "@body('Get_Search_API_Key')?['value']",
                         "content-type": "application/json"
                       },
                       "method": "POST",
@@ -402,7 +548,7 @@
                       },
                       "type": "ParseJson",
                       "inputs": {
-                        "content": "@variables('EventData')",
+                        "content": "@variables('EventData').localizedValues",
                         "schema": {
                           "properties": {
                             "id": {
@@ -458,24 +604,24 @@
                     },
                     "Select_News_Details_AR": {
                       "runAfter": {
-                        "Parse_News_JSON_AR": [
+                        "Set__TempBody_Variable_News": [
                           "Succeeded"
                         ]
                       },
                       "type": "Select",
                       "inputs": {
-                        "from": "@createArray(body('Parse_News_JSON_AR'))",
+                        "from": "@createArray(variables('TempBody'))",
                         "select": {
                           "@@search.action": "mergeOrUpload",
                           "entity_type": "News",
-                          "id": "@body('Parse_News_JSON_AR')?['id']",
-                          "merged_content": "@concat(body('Parse_News_JSON_AR')?['longDescription'],body('Parse_News_JSON_AR')?['shortDescription'])",
-                          "metadata_creation_date": "@body('Parse_News_JSON_AR')?['publishedDate']",
-                          "metadata_last_modified": "@body('Parse_News_JSON_AR')?['modified']",
-                          "metadata_storage_name": "@body('Parse_News_JSON_AR')?['title']",
-                          "search_id": "@concat('NewsAR-',body('Parse_News_JSON')?['id'])",
-                          "short_description": "@body('Parse_News_JSON_AR')?['shortDescription']",
-                          "thumbnail_url": "@body('Parse_News_JSON_AR')?['thumbnailImage']"
+                          "id": "@variables('TempBody').value?['id']",
+                          "merged_content": "@concat(variables('TempBody')?['longDescription'],variables('TempBody')?['shortDescription'])",
+                          "metadata_creation_date": "@variables('TempBody')?['publishedDate']",
+                          "metadata_last_modified": "@variables('TempBody')?['modified']",
+                          "metadata_storage_name": "@variables('TempBody')?['title']",
+                          "search_id": "@concat('NewsAR-',variables('TempBody').value?['id'])",
+                          "short_description": "@variables('TempBody')?['shortDescription']",
+                          "thumbnail_url": "@variables('TempBody')?['thumbnailImage']"
                         }
                       }
                     },
@@ -491,11 +637,11 @@
                           "value": "@body('Select_News_Details')"
                         },
                         "headers": {
-                          "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                          "api-key": "@body('Get_Search_API_Key')?['value']",
                           "content-type": "application/json"
                         },
                         "method": "POST",
-                        "uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index-lps/docs/index?api-version=2020-06-30"
+                        "uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
                       }
                     },
                     "Send_News_Details_to_Azure_Search_AR": {
@@ -510,11 +656,26 @@
                           "value": "@body('Select_News_Details_AR')"
                         },
                         "headers": {
-                          "api-key": "5BB816FE81305A3747DA086A0C2F59F9",
+                          "api-key": "@body('Get_Search_API_Key')?['value']",
                           "content-type": "application/json"
                         },
                         "method": "POST",
                         "uri": "https://srch-cpd-apps-cog-tra-we-01.search.windows.net/indexes/content-index/docs/index?api-version=2020-06-30"
+                      }
+                    },
+                    "Set__TempBody_Variable_News": {
+                      "runAfter": {
+                        "Parse_News_JSON_AR": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "TempBody",
+                        "value": {
+                          "id": "empty",
+                          "value": "@body('Parse_News_JSON_AR')['ar']"
+                        }
                       }
                     }
                   }
@@ -524,13 +685,13 @@
                     {
                       "equals": [
                         "@variables('EventType')",
-                        "new-kbarticle"
+                        "kbarticle-created"
                       ]
                     },
                     {
                       "equals": [
                         "@variables('EventType')",
-                        "kbarticle-update"
+                        "kbarticle-updated"
                       ]
                     }
                   ]
@@ -544,18 +705,31 @@
               {
                 "equals": [
                   "@variables('EventType')",
-                  "new-product"
+                  "product-created"
                 ]
               },
               {
                 "equals": [
                   "@variables('EventType')",
-                  "product-update"
+                  "product-updated"
                 ]
               }
             ]
           },
           "type": "If"
+        },
+        "Response": {
+          "runAfter": {
+            "Perform_action_as_per_eventtype": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "Http",
+          "inputs": {
+            "body": "Event has been processed.",
+            "statusCode": 200
+          }
         }
       }
     },
@@ -568,7 +742,17 @@
       }
     },
     "connectionParameters": {
-      "value": {}
+      "value": {
+        "$connections": {
+          "value": {
+            "keyvault": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intkv-tra-we-01",
+              "connectionName": "apicon-cpd-apps-intkv-tra-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
+            }
+          }
+        }
+      }
     },
     "tags": {
       "value": {
