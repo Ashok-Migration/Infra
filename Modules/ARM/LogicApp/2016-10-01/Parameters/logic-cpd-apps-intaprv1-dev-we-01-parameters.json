@@ -39,7 +39,7 @@
                 "Create_Task_in_MyTasks_for_Approval": {
                     "inputs": {
                         "body": {
-                            "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
+                            "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
                                 "Content-Type": "application/json"
@@ -747,7 +747,10 @@
                                                 "type": "string"
                                             },
                                             "CriticalApprovers": {
-                                                "type": "string"
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ]
                                             },
                                             "Id": {
                                                 "type": "integer"
@@ -756,9 +759,6 @@
                                                 "type": "string"
                                             },
                                             "SiteURL": {
-                                                "type": "string"
-                                            },
-                                            "Title": {
                                                 "type": "string"
                                             },
                                             "Translators": {

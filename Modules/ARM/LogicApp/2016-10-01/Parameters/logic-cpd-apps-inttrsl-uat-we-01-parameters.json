@@ -91,7 +91,7 @@
                         "Add_Users_To_Task_For_Translation": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\"\n}",
+                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=nometadata",
                                         "Content-Type": "application/json"
@@ -291,7 +291,7 @@
                                         },
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-dev-we-01']['connectionId']"
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-uat-we-01']['connectionId']"
                                             }
                                         },
                                         "method": "post",
@@ -437,7 +437,7 @@
                                 "Reassign_Task_To_One_Translator": {
                                     "inputs": {
                                         "body": {
-                                            "body": "{\n\"AssignedToId\":[@{variables('TranslationOwnershipEmail')}]\n}",
+                                            "body": "{\n\"cmsAssignedToUserId\":[@{variables('TranslationOwnershipEmail')}]\n}",
                                             "headers": {
                                                 "Accept": "application/json;odata=nometadata",
                                                 "Content-Type": "application/json",
@@ -1003,7 +1003,10 @@
                                                         "type": "string"
                                                     },
                                                     "CriticalApprovers": {
-                                                        "type": "string"
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
                                                     },
                                                     "Id": {
                                                         "type": "integer"
@@ -1012,9 +1015,6 @@
                                                         "type": "string"
                                                     },
                                                     "SiteURL": {
-                                                        "type": "string"
-                                                    },
-                                                    "Title": {
                                                         "type": "string"
                                                     },
                                                     "Translators": {

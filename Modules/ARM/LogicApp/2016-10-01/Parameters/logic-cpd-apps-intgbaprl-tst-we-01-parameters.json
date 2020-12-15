@@ -241,7 +241,7 @@
                 "Create_Task_in_MyTasks_for_Approval": {
                     "inputs": {
                         "body": {
-                            "body": "{\n\"Title\":\"Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"AssignedToId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
+                            "body": "{\n\"Title\":\"Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
                                 "Content-Type": "application/json;odata=nometadata"
@@ -404,7 +404,7 @@
                         "Update_Item_Status_And_Comments_-_Approved": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Approved\",\n\"RequiresTranslation\":\"False\"\n}",
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Approved\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
@@ -527,7 +527,7 @@
                             "Update_Item_Status_And_Comments_-_Rejected": {
                                 "inputs": {
                                     "body": {
-                                        "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Rejected\",\n\"RequiresTranslation\":\"False\"\n}",
+                                        "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Rejected\"\n}",
                                         "headers": {
                                             "Accept": "application/json;odata=verbose",
                                             "Content-Type": "application/json",
@@ -749,9 +749,6 @@
                                                 "type": "string"
                                             },
                                             "SiteURL": {
-                                                "type": "string"
-                                            },
-                                            "Title": {
                                                 "type": "string"
                                             },
                                             "Translators": {
