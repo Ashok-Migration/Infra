@@ -66,8 +66,49 @@
                     "resources": []
                 }
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-kv-cpd-pltf-tst-we-01",
+            "resourceGroup": "rg-cpd-pltf-sec-tst-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-pltf-sec-tst-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-pltf-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-mi-cpd-pltf-tst-we-01",
+            "resourceGroup": "rg-cpd-pltf-sec-tst-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-pltf-sec-tst-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/Parameters/mi-cpd-pltf-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
-
 
     ],
     "outputs": {
