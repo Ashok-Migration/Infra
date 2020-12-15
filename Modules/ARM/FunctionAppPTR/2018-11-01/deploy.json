@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "alwaysOn": {
@@ -21,6 +21,9 @@
         "hostingPlanRG": {
             "type": "string",
             "defaultValue": "[resourceGroup().name]"
+        },
+        "keyVaultName":{
+            "type": "string"
         },
         "location": {
             "defaultValue": "[resourceGroup().location]",
@@ -84,6 +87,10 @@
                         {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(subscription().subscriptionId, parameters('storageAccountRG'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "PaymentPreferenceKeyVaultName",
+                            "value": "[parameters('keyVaultName')]"
                         }
                     ],
                     "alwaysOn": "[parameters('alwaysOn')]"
