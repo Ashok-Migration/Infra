@@ -1,5 +1,13 @@
 steps:
   - task: AzureCLI@2
+    displayName: Delete Key Values from App Config $(appConfigName)
+    inputs:
+      azureSubscription: $(azureSubscription)
+      scriptType: "ps"
+      scriptLocation: "inlineScript"
+      inlineScript: 'az appconfig kv delete -n "$(appConfigName)" --key Menus*'
+
+  - task: AzureCLI@2
     displayName: Update App Config $(appConfigName)
     inputs:
       azureSubscription: $(azureSubscription)
