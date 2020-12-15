@@ -5,7 +5,7 @@ steps:
       azureSubscription: $(azureSubscription)
       scriptType: "ps"
       scriptLocation: "inlineScript"
-      inlineScript: 'az appconfig kv delete -n "$(appConfigName)" --key Menus*'
+      inlineScript: 'az appconfig kv delete -n "$(appConfigName)" --key Menus* --yes'
 
   - task: AzureCLI@2
     displayName: Update App Config $(appConfigName)
