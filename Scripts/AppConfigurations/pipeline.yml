@@ -11,7 +11,7 @@ trigger:
 
 variables:
   - name: PoolName
-    value: "tasmumsagents"
+    value: "testagentpool"
   - name: azureSubscription
     value: sqcp-ado-spn-dev
 pool:
@@ -39,6 +39,10 @@ stages:
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-sbx-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-sbx-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-sbx-we-01"
       - name: env
         value: "sbx"
     jobs:
@@ -50,12 +54,17 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
+                - template: restart-pods.yml
   - stage: Dev
     displayName: Update App Configurations for dev
     dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-dev-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-dev-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-dev-we-01"
       - name: env
         value: "dev"
     jobs:
@@ -67,12 +76,17 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
+                - template: restart-pods.yml
   - stage: Tst
     displayName: Update App Configurations for tst
     dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-tst-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-tst-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-tst-we-01"
       - name: env
         value: "tst"
     jobs:
@@ -84,12 +98,17 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
+                - template: restart-pods.yml
   - stage: Tra
     displayName: Update App Configurations for tra
     dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-tra-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-tra-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-tra-we-01"
       - name: env
         value: "tra"
     jobs:
@@ -101,12 +120,17 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
+                - template: restart-pods.yml
   - stage: uat
     displayName: Update App Configurations for uat
     dependsOn: PublishArtifacts
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-str-uat-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-aks-uat-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-uat-we-01"
       - name: env
         value: "uat"
     jobs:
@@ -118,3 +142,4 @@ stages:
             deploy:
               steps:
                 - template: update-app-config.yml
+                - template: restart-pods.yml
