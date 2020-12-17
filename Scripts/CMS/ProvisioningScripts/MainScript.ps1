@@ -64,7 +64,7 @@ $psfilecreatenewsitescript = Resolve-Path $PSScriptRoot".\createnewsitescript.ps
 $psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsitecollectionscript.ps1"
 
 if($null -ne $webparams){
-    .$psfileensuretermstoreadminscript @webparams
+  .$psfileensuretermstoreadminscript @webparams
 }
 .$psfilecreatetaxanomyscript @params
 .$psfilecreatesitecolumnscript @params

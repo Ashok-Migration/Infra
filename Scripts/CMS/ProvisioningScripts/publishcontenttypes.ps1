@@ -35,10 +35,11 @@ param (
     $sp_password,
     $InstrumentationKey,
     $fedAuth,
-    $rtFA
+    $rtFA,
+    $arrContentTypesToPublish
 )
 
-function Initialize(){
+function Initialize() {
     $contenttypehub = "https://$tenant.sharepoint.com/sites/contenttypehub"
     $secstr = New-Object -TypeName System.Security.SecureString
     $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
@@ -61,12 +62,16 @@ function Initialize(){
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
 }
 
-Initialize
+function PublishContentType($ct,$republish) {
 
-$CTs = Get-PnPContentType 
-$tasmuCTs = $CTs | Where-Object { $_.Group -eq "TASMU" }
-foreach($ct in $tasmuCTs){
-    write-host "Publishing CT $($ct.Name): " -NoNewline
+    if($republish -eq $true)
+    {
+        write-host "Republishing CT $($ct.Name): " -NoNewline
+    }
+    else {
+        write-host "Publishing CT $($ct.Name): " -NoNewline    
+    }
+    
     $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession 
     $cookieCollection = New-Object System.Net.CookieCollection 
     $cookie1 = New-Object System.Net.Cookie 
@@ -100,9 +105,32 @@ foreach($ct in $tasmuCTs){
             $body[$key] = $value
         }
     }
-
-    $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'publishButton'
+    if($republish -eq $false)
+    {
+        $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'publishButton'
+    }
+    else {
+        $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'republishButton'
+    }
+    
     $body['ctl00$PlaceHolderMain$ctl00$RptControls$okButton'] = 'OK'
     $response = Invoke-WebRequest -Uri $url -Method Post -WebSession $session -Body $body
     write-host "Done" -ForegroundColor Green
+ }
+
+Initialize
+
+if ($null -ne $arrContentTypesToPublish -and $arrContentTypesToPublish.Length -gt 0) {
+  foreach ($item in $arrContentTypesToPublish) {
+      $ct=Get-PnPContentType -Identity $item
+      PublishContentType $ct $true
+  }
+}
+else {
+    
+    $CTs = Get-PnPContentType 
+    $tasmuCTs = $CTs | Where-Object { $_.Group -eq "TASMU" }
+    foreach ($ct in $tasmuCTs) {
+      PublishContentType $ct $false
+    }
 }
