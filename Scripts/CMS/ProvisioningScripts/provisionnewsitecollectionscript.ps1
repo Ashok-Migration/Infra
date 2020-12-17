@@ -101,9 +101,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 
 		if ([bool] ($siteExits) -eq $true) {            
 			Write-host "site exists, starting creation of other components." -ForegroundColor Green
-            $paramsSiteColumn = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; contenttypehub = $globalconfigSiteUrl}
-            $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
-            .$psfilecreatesitecolumnscript @paramsSiteColumn
+			$paramsSiteColumn = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; contenttypehub = $globalconfigSiteUrl}
+			$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
+			.$psfilecreatesitecolumnscript @paramsSiteColumn
 			ListandLibrary $globalconfigSiteUrl $sitefile.sites.ConfigurationSPList
 			AssignUniquePermission $sitefile.sites.UniquePermissions.List $globalconfigSiteUrl
 			AddCustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
@@ -121,9 +121,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			
 		if ([bool] ($siteExits) -eq $true) {
 			Write-host "site exists, starting creation of other components." -ForegroundColor Green
-            $paramsSiteColumn = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; contenttypehub = $globalhubSiteUrl}
-            $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
-            .$psfilecreatesitecolumnscript @paramsSiteColumn
+			$paramsSiteColumn = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; contenttypehub = $globalhubSiteUrl}
+			$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
+			.$psfilecreatesitecolumnscript @paramsSiteColumn
 			ListandLibrary $globalhubSiteUrl $sitefile.sites.globalSPList
 			CreateColumnsAndListProductDocuments($globalhubSiteUrl)
 
@@ -132,9 +132,12 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			AssignUniquePermission $sitefile.sites.UniquePermissions.List $globalhubSiteUrl
 
 			AddCustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
-			ApplyTheme $sitefile.sites.globaltheme.Name $globalhubSiteUrl $tenantAdmin $tenantUrl         
+			ApplyTheme $sitefile.sites.globaltheme.Name $globalhubSiteUrl $tenantAdmin $tenantUrl       
 			CreateModernPage $globalhubSiteUrl $sitefile.sites.globalPageWebpart
 			AddWebpartToPage $globalhubSiteUrl $sitefile.sites.globalPageWebpart
+			$webpartkeyHeight = 1
+			UpdateListViewWebPartProperties $sitefile.sites.globalPageWebpart.page.name $webpartkeyHeight
+			UpdateRegionalSettings $globalhubSiteUrl $tenantAdmin
 			#UploadFiles $globalhubSiteUrl $sitefile.sites.globalUploadFiles
 			Update-SiteColumns $globalhubSiteUrl $sitefile.sites.updateSiteColumns.globalChange $tenantAdmin
 			Delete-SiteColumns $globalhubSiteUrl $sitefile.sites.deleteSiteColumns $tenantAdmin
@@ -178,6 +181,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 						   
 			   CreateModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
 			   AddWebpartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
+			   $webpartkeyHeight = 1
+			   UpdateListViewWebPartProperties $sitefile.sites.sectorPageWebpart.page.name $webpartkeyHeight
+			   UpdateRegionalSettings $sectorhubSiteUrl $tenantAdmin
 			   #UploadFiles $sectorhubSiteUrl $sitefile.sites.sectorUploadFiles
 			   Update-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
 			   UpdateViewForTasksList 'My Tasks' $sectorhubSiteUrl
@@ -221,6 +227,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 									
 		#            CreateModernPage $orgSiteUrl $sitefile.sites.orgPageWebpart
 		#            AddWebpartToPage $orgSiteUrl $sitefile.sites.orgPageWebpart
+		#			 $webpartkeyHeight = 1
+		#		     UpdateListViewWebPartProperties $sitefile.sites.orgPageWebpart.page.name $webpartkeyHeight
+		#		     UpdateRegionalSettings $orgSiteUrl $tenantAdmin
 		#            #UploadFiles $orgSiteUrl $sitefile.sites.orgUploadFiles
 		#            Update-SiteColumns $orgSiteUrl $sitefile.sites.updateSiteColumns.orgChange $tenantAdmin
 		#            UpdateViewForTasksList 'My Tasks' $orgSiteUrl
@@ -358,6 +367,12 @@ function CreateColumnsAndListProductDocuments($globalhubSiteUrl){
 		}
 
 		ViewCreation $ListName $globalhubSiteUrl $nodeList.defaultviewfields $nodeList.ListTemplate
+
+		if($nodeList.customView -ne ''){
+				if(Get-PnPList -Identity $nodeList.ListName){
+					CustomViewCreation $nodeList.ListName $globalhubSiteUrl $nodeList.customView $nodeList.customViewfields
+				}
+			}
 	}
 }
 
@@ -1408,7 +1423,7 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
 
 		#foreach ($field in $fields) {
 			if([bool]$LookupFieldColumnName -eq $true -and [bool]$LookupListName -eq $true -and [bool]$LookupField -eq $true){
-				CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields -GroupName -$GroupName $connection
+				CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields -GroupName $GroupName $connection
 			}
 	   # }
 		
@@ -1417,9 +1432,9 @@ function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTe
 			Create-ContentType $globalhubSiteUrl $ContentTypeName $ContentTypeName $ParentContentTypeName $GroupName $connection
 
 			foreach($columnItem in $ColumnItems){
-			    AddColumns-ContentType $globalhubSiteUrl $columnItem.ContentTypeName $columnItem.ColumnName $connection $columnItem.Required
-		    } 
-        }
+				AddColumns-ContentType $globalhubSiteUrl $columnItem.ContentTypeName $columnItem.ColumnName $connection $columnItem.Required
+			} 
+		}
 
 		$ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
 		if ([bool]($ListExist) -eq $false) {
@@ -1819,7 +1834,7 @@ function CheckAndCreateAppCatalog($siteUrl){
 		$ErrorMessage = $_.Exception.Message         
 		Write-Host $ErrorMessage "In Site $siteUrl " -foreground Yellow         
 		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"        
-        $telemtryException.Exception = $_.Exception.Message
+		$telemtryException.Exception = $_.Exception.Message
 		$client.TrackException($telemtryException)     
 	} 
 }
@@ -1930,11 +1945,16 @@ function AddWebpartToPage($url, $nodeLevel)
 							Write-Host $_.Exception.Message -ForegroundColor Yellow
 						}
 
-					 $jsonProperties = '{"selectedListId":"'+ $list.Id+ '","listTitle":"'+$webpartSection.ListTitleDisplay+'","webpartHeightKey":2,"hideCommandBar":"' + $webpartSection.hideCommandBar+ '","selectedViewId":"'+ $ListView.Id + '"}'
-					 $listWebpart = Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties $jsonProperties -ErrorAction Stop
-					 Set-PnPClientSideWebPart -Page $page -Identity $listWebpart.InstanceId -PropertiesJson $jsonProperties
-					 #Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{selectedListId = $list.Id; "listTitle" = $webpartSection.ListTitleDisplay; webpartHeightKey = 1; "selectedViewId"= $ListView.Id} -ErrorAction Stop
-						
+					if($webpartSection.hideCommandBar -eq "True"){
+						$jsonProperties = '{"selectedListId":"'+ $list.Id+ '","listTitle":"'+$webpartSection.ListTitleDisplay+'","webpartHeightKey":1,"hideCommandBar":true,"selectedViewId":"'+ $ListView.Id + '"}'
+					}
+					else{
+						$jsonProperties = '{"selectedListId":"'+ $list.Id+ '","listTitle":"'+$webpartSection.ListTitleDisplay+'","webpartHeightKey":1,"hideCommandBar":false,"selectedViewId":"'+ $ListView.Id + '"}'
+					}
+					
+					$listWebpart = Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties $jsonProperties -ErrorAction Stop
+					Write-Host "Webpart " $listWebpart.InstanceId " added successfully with properties " $listWebpart.PropertiesJson
+					 #Set-PnPClientSideWebPart -Page $page -Identity $listWebpart.InstanceId -PropertiesJson $jsonProperties
 				  }
 				  
 				  if($webpartSection.DefaultWebPartType -eq 'SiteActivity'){
@@ -2010,6 +2030,74 @@ $jsonProps = '
 		$client.TrackException($telemtryException)
 
 		DeletePageOnFailure $pagename
+	}
+}
+
+function UpdateListViewWebPartProperties($page, $webpartkeyHeight){
+	$wpList = Get-PnPClientSideComponent -Page $page
+    foreach($wp in $wpList)
+    {
+        try{
+			if($wp.Title -eq "List"){
+				Write-Host "Webpart " $wp.InstanceId " PropertiesJson is : " $wp.PropertiesJson
+				$prop = $wp.PropertiesJson
+				$property = $prop | ConvertFrom-Json
+				$property.webpartHeightKey = $webpartkeyHeight
+				$prop = $property | ConvertTo-Json
+				Write-Host "Updated PropertiesJson is " $prop
+				Set-PnPClientSideWebPart -Page $page -Identity $wp.InstanceId -PropertiesJson $prop
+			}
+		}
+		catch{
+			$ErrorMessage = $_.Exception.Message
+			Write-Host $ErrorMessage -foreground Yellow  
+
+			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+			$telemtryException.Exception = $_.Exception.Message  
+			$client.TrackException($telemtryException)
+		}
+    }
+}
+
+function UpdateRegionalSettings($url, $tenantAdmin){
+	try{
+		#Load SharePoint CSOM Assemblies
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+  
+		#Config parameters for SharePoint Online Site URL and Timezone description
+		$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext(url)
+		$admin = $tenantAdmin.UserName
+		$password = $tenantAdmin.Password
+		$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+		$Ctx.Credentials = $credentials
+		$Web = $Ctx.Web
+		$regionalSettings = $Web.RegionalSettings
+		$timezones = $Web.RegionalSettings.TimeZones
+		$Ctx.Load($regionalSettings)
+		$Ctx.Load($timezones)
+		$Ctx.ExecuteQuery()
+		$Web.RegionalSettings.LocaleId = 16385 # Arabic(Qatar)
+		$Web.RegionalSettings.WorkDayStartHour = 480 # 8 AM
+		$Web.RegionalSettings.WorkDayEndHour = 1020 # 5 PM
+		$Web.RegionalSettings.FirstDayOfWeek = 0 # Sunday
+		$Web.RegionalSettings.Time24 = $False
+		$Web.RegionalSettings.CalendarType = 10 #Gregorian Arabic Calendar
+		$Web.RegionalSettings.AlternateCalendarType = 0 #None
+		$Web.RegionalSettings.WorkDays = 124
+		$TimezoneName ="(UTC+03:00) Kuwait, Riyadh"
+		$NewTimezone = $Timezones | Where {$_.Description -eq $TimezoneName}
+		$Ctx.Web.RegionalSettings.TimeZone = $NewTimezone
+		$Web.Update()
+		$Ctx.ExecuteQuery()
+	}
+	catch{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
+
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 	}
 }
 
@@ -2407,16 +2495,16 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 		}
 	  }
 
-        Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+		Connect-PnPOnline -Url $url -Credentials $tenantAdmin
 
 		#region Updating the change Title Fields
 		foreach($item in $node.changeTitle){
-            Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
 			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
 			if([bool]($field) -eq $true){
 				$field.Title = $item.NewTitle
 				$field.Update()
-    			$field.Context.ExecuteQuery()
+				$field.Context.ExecuteQuery()
 			}
 
 		}
@@ -2424,7 +2512,7 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 
 		#region Change the required value
 		foreach($item in $node.changeRequiredField){
-            try{
+			try{
 				Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
 				$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
 				if([bool]($field) -eq $true){
@@ -2435,7 +2523,7 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 						$field.Required = $false
 					}
 					$field.Update()
-    				$field.Context.ExecuteQuery()
+					$field.Context.ExecuteQuery()
 				}
 			}
 			catch{
@@ -2452,7 +2540,7 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 				if([bool]($field) -eq $true){
 					$field.Hidden = $true
 					$field.Update()
-    				$field.Context.ExecuteQuery()
+					$field.Context.ExecuteQuery()
 				}
 			}
 			catch{
@@ -2460,7 +2548,7 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 				if([bool]($field) -eq $true){
 					$field.ReadOnlyField = $true
 					$field.Update()
-    				$field.Context.ExecuteQuery()
+					$field.Context.ExecuteQuery()
 				}
 			}
 		}
@@ -2474,7 +2562,7 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 				if([bool]($field) -eq $true){
 					$field.Required = $false
 					$field.Update()
-    				$field.Context.ExecuteQuery()
+					$field.Context.ExecuteQuery()
 				}
 			}
 			catch{
@@ -2485,13 +2573,13 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 
 		#region Remove from edit form
 		foreach($item in $node.removeFromEditForm){
-            Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
 			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
 			if([bool]($field) -eq $true){
 				$field.SetShowInEditForm($false)
 				$field.SetShowInNewForm($false)
 				$field.Update()
-    			$field.Context.ExecuteQuery()
+				$field.Context.ExecuteQuery()
 			}
 		}
 		#endregion
@@ -2510,18 +2598,18 @@ function Delete-SiteColumns($url, $node, $tenantAdmin) {
 	Connect-PnPOnline -Url $url -Credentials $tenantAdmin
 	#region Delete Site Column
 	foreach($item in $node.column){
-        try {
-            Write-Host "Delete-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
-            $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+		try {
+			Write-Host "Delete-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
 			if([bool]($field) -eq $true){
 				Remove-PnPField -List $item.ListName -Identity $item.ColumnInternalName -Force
 				$field.Hidden = $true
 				$field.Update()
-    			$field.Context.ExecuteQuery()
+				$field.Context.ExecuteQuery()
 			}
 			
 		}
-        catch {
+		catch {
 			$ErrorMessage = $_.Exception.Message
 			Write-Host $ErrorMessage -foreground Yellow
 			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
