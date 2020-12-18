@@ -2,7 +2,7 @@
 .DESCRIPTION
     This Script is for Deleting all Site collections, Site content types, Site columns & taxanomy columns as per the input from the XML file
     XML files it will look for inputs are
-    Site.xml, ContentType.xml, SiteColumns.xml, Taxonomy.xml
+    Cleanup.xml, ContentType.xml, SiteColumns.xml, Taxonomy.xml
 .INPUTS
     tenant                  - This is the name of the tenant that you are running the Clean up script
     TemplateParametersFile  - This should be the json file having RoleName for Logging
@@ -38,6 +38,8 @@ param (
 
 function Complete-Cleanup() 
 {
+    Write-Host 'Cleanup started on tenant '$tenant -ForegroundColor Yellow
+    
     $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
  
     $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
@@ -53,7 +55,7 @@ function Complete-Cleanup()
     $client.InstrumentationKey = $InstrumentationKey 
     $client.Context.Cloud.RoleName = $RoleName
 
-    $filePath = $PSScriptRoot + '\resources\Site.xml'
+    $filePath = $PSScriptRoot + '\resources\Cleanup.xml'
     [xml]$sitefile = Get-Content -Path $filePath
 
     $siteContentTypePath = $PSScriptRoot + '\resources\ContentType.xml'
@@ -99,14 +101,14 @@ function CompleteCleanup($sitefile,$scXML,$siteColumnfilePathfile,$termsfile)
     #delete Sites
     DeleteSiteCollections $sitefile
 
-    #delete ContentTypes from Contenttypehub
-    DeleteContentTypes $scXML
+    # delete ContentTypes from Contenttypehub
+     DeleteContentTypes $scXML
 
-    #delete Site Columns from Contenttypehub
-    DeleteSiteColumns $siteColumnfilePathfile
+    # delete Site Columns from Contenttypehub
+     DeleteSiteColumns $siteColumnfilePathfile
 
-    #delete Taxanomy from Term Store
-    DeleteTaxanomyGroup $termsfile
+    # delete Taxanomy from Term Store
+     DeleteTaxanomyGroup $termsfile
 
 }
 
@@ -136,7 +138,6 @@ function DeleteSiteCollections($sitefile)
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-    $connection = Get-PnPConnection
 
     Write-Host "Delete Site Collections Started..."
     $client.TrackEvent("Delete Site Collections Started...")
@@ -148,16 +149,16 @@ function DeleteSiteCollections($sitefile)
         $globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
         $siteExits = Get-PnPTenantSite -Url $globalhubSiteUrl -ErrorAction SilentlyContinue
             
-        if ([bool] ($siteExits) -eq $true) {
+         if ([bool] ($siteExits) -eq $true) {
             
-            Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl"
-            $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl")
+             Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl"
+             $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl")
             
-            Remove-PnPTenantSite -Url $globalhubSiteUrl -Force -SkipRecycleBin
+             Remove-PnPTenantSite -Url $globalhubSiteUrl -Force -SkipRecycleBin
             
-            Write-Host "Remove-PnPTenantSite Completed for $globalhubSiteUrl"
-            $client.TrackEvent("Remove-PnPTenantSite Completed for $globalhubSiteUrl")
-        }
+             Write-Host "Remove-PnPTenantSite Completed for $globalhubSiteUrl"
+             $client.TrackEvent("Remove-PnPTenantSite Completed for $globalhubSiteUrl")
+         }
                 
         foreach($sectorhubsite in $globalhubsite.sectorhubsite.site)
         {
@@ -208,34 +209,34 @@ function DeleteSiteCollections($sitefile)
 
        }
 
-       foreach($globalsite in $sitefile.sites.Configsite.site)
+        foreach($globalsite in $sitefile.sites.Configsite.site)
+      {
+         try
+         {
+         $globalSiteUrl = $urlprefix + $globalsite.Alias
+         $siteExits = Get-PnPTenantSite -Url $globalSiteUrl -ErrorAction SilentlyContinue
+            
+         if ([bool] ($siteExits) -eq $true) {
+            
+             Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl"
+             $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl")
+            
+             Remove-PnPTenantSite -Url $globalSiteUrl -Force -SkipRecycleBin
+            
+             Write-Host "Remove-PnPTenantSite Completed for $globalSiteUrl"
+             $client.TrackEvent("Remove-PnPTenantSite Completed for $globalSiteUrl")
+         }
+     }
+     catch
      {
-        try
-        {
-        $globalSiteUrl = $urlprefix + $globalsite.Alias
-        $siteExits = Get-PnPTenantSite -Url $globalSiteUrl -ErrorAction SilentlyContinue
-            
-        if ([bool] ($siteExits) -eq $true) {
-            
-            Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl"
-            $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalSiteUrl")
-            
-            Remove-PnPTenantSite -Url $globalSiteUrl -Force -SkipRecycleBin
-            
-            Write-Host "Remove-PnPTenantSite Completed for $globalSiteUrl"
-            $client.TrackEvent("Remove-PnPTenantSite Completed for $globalSiteUrl")
-        }
-    }
-    catch
-    {
-       $ErrorMessage = $_.Exception.Message
-       Write-Host $ErrorMessage -foreground Yellow
+        $ErrorMessage = $_.Exception.Message
+        Write-Host $ErrorMessage -foreground Yellow
 
-       $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-       $telemtryException.Exception = $_.Exception.Message  
-       $client.TrackException($telemtryException)
-    }
-}
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
+     }
+ }
 
     Disconnect-PnPOnline
 }

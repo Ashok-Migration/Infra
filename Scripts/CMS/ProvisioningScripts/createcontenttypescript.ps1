@@ -36,6 +36,7 @@ param (
     $InstrumentationKey
 )
 
+Import-Module Microsoft.Online.SharePoint.PowerShell
 function Create-ContentTypeAddColumns() 
 {
     $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))

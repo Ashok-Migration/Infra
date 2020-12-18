@@ -1,0 +1,772 @@
+﻿<sites>
+	<!--Site structure for Global/Sector/Org-->
+	<globalhubsite>
+		<site Title="TASMU CMS" Alias="cms-marketplace" Type="CommunicationSite">
+			<sectorhubsite>
+			   <!--Below section <site> provisions Transportation sector. To similaryly provision other sectors,
+			   repeat below code block and change the references appropriately. In addition, add references
+			    to the new sector in other sections namely:  globalConfigNav, globalNav,TopNav -->
+				 <site Title="Transportation" Alias="cms-sector-transportation" Type="CommunicationSite"> 
+					<!-- <orgassociatedsite>
+						<site Title="Fedex" Alias="cms-transportation-fedexorg" Type="CommunicationSite"/>
+						<site Title="Swift" Alias="cms-transportation-swiftorg" Type="CommunicationSite"/>
+					</orgassociatedsite>-->
+				 </site>
+			</sectorhubsite>
+		</site>
+	</globalhubsite>
+	<Configsite>
+		<site Title="Global" Alias="cms-global" Type="CommunicationSite"></site>
+	</Configsite>
+<!--Theme Config for Sector/Org-->
+	<sectortheme Name="TASMU Sector"></sectortheme>
+	<!-- <orgtheme Name="TASMU Sector"></orgtheme> -->
+
+	<!--Sharepoint Group Config for Sector/Org-->
+		
+		<sectorSPGroup>
+		<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			<ADGroup Name="Marketing Managers"></ADGroup>
+		</group>
+		<group Name="Translators" Description="Use this group to grant people Translators permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.sanketh.bappal@tasmusqcp.onmicrosoft.com"></users>
+		</group>
+		<defaultgroup Name="Members" Description="" isUsers="True" Role="Contribute" isADGroup="False"  SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+		<defaultgroup Name="Visitors" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+		<defaultgroup Name="Owners" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+	</sectorSPGroup>
+  <!-- <orgSPGroup>
+		<group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			<ADGroup Name="Marketing Managers"></ADGroup>
+		</group>
+		<group Name="Translators" Description="Use this group to grant people Translators permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.sanketh.bappal@tasmusqcp.onmicrosoft.com"></users>
+		</group>
+		<defaultgroup Name="Members" Description="" isUsers="True" Role="Contribute" isADGroup="False"  SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+		<defaultgroup Name="Visitors" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+		<defaultgroup Name="Owners" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
+			<users email="ms.madhava.ganesh.a@tasmusqcp.onmicrosoft.com"></users>
+			<users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
+		</defaultgroup>
+	</orgSPGroup> -->
+	
+	<!--SharePoint List Config for Global/Sector/Org-->
+
+	<sectorSPList>
+		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
+			<defaultviewfields name="cmsAssignedToUser"></defaultviewfields>
+			<defaultviewfields name="ParentItemLink"></defaultviewfields>
+			<defaultviewfields name="TaskComments"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="TASMUTaskStatus"></customViewfields>
+			<customViewfields name="TaskComments"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="Created"></customViewfields>
+			<customViewfields name="Modified"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ShortDescription"></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Sensitivity"></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Announcements" ContentTypeName="TASMU Announcements" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ShortDescription" ></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel" ></defaultviewfields>
+			<defaultviewfields name="Sensitivity" ></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Sponsors" ContentTypeName="TASMU Sponsors" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arSponsorName"></defaultviewfields>
+			<defaultviewfields name="ShortDescription"></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Sensitivity"></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="SponsorPicture"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arSponsorName"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Media Assets" ContentTypeName="TASMU Media Assets" ListTemplate="PictureLibrary" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="Created"></customViewfields>
+			<customViewfields name="Modified"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Projects" ContentTypeName="TASMU Projects" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ShortDescription"></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Sensitivity"></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Videos" ContentTypeName="TASMU Videos" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ShortDescription" Required="True"></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Link" Required="True"></defaultviewfields>
+			<defaultviewfields name="Channel" Required="True"></defaultviewfields>
+			<defaultviewfields name="Sensitivity" Required="True"></defaultviewfields>
+			<defaultviewfields name="Personas" Required="True"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Contacts" ContentTypeName="TASMU Contacts" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="LastName"></defaultviewfields>
+			<defaultviewfields name="arLastName"></defaultviewfields>
+			<defaultviewfields name="cmsFirstName"></defaultviewfields>
+			<defaultviewfields name="arFirstName"></defaultviewfields>
+			<defaultviewfields name="cmsFullName"></defaultviewfields>
+			<defaultviewfields name="arFullName"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Sensitivity"></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="cmsFullName"></customViewfields>
+			<customViewfields name="arFullName"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Campaigns" ContentTypeName="TASMU Campaigns" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ShortDescription"></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Sensitivity"></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="News Articles" ContentTypeName="TASMU News Articles" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="PreviewUrl"></defaultviewfields>
+			<defaultviewfields name="arPreviewUrl"></defaultviewfields>
+			<defaultviewfields name="ShortDescription" ></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel" ></defaultviewfields>
+			<defaultviewfields name="Sensitivity" ></defaultviewfields>
+			<defaultviewfields name="ReadingTime" ></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="ThumbnailImage"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="MediaURL"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+	</sectorSPList>
+	<!-- <orgSPList>
+		<ListAndContentTypes ListName="Sectors" ContentTypeName="TASMU Sector" ListTemplate="GenericList" customView="">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorID"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU MyTask" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="AssignedTo"></defaultviewfields>
+			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
+			<defaultviewfields name="TaskComments"></defaultviewfields>
+			<defaultviewfields name="ParentItemLink"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="TASMUTaskStatus"></customViewfields>
+			<customViewfields name="TaskComments"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Documents" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="DocumentTypes"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="DocumentTypes"></customViewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Events" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="EventTypes"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="cmsStartDate"></defaultviewfields>
+			<defaultviewfields name="cmsEndDate"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="EventTypes"></customViewfields>
+
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Announcements" ContentTypeName="TASMU Announcements" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="AnnouncementCategories"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="cmsStartDate"></defaultviewfields>
+			<defaultviewfields name="cmsEndDate"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="AnnouncementCategories"></customViewfields>
+
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Sponsors" ContentTypeName="TASMU Sponsors" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arSponsorName"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arSponsorName"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Media Assets" ContentTypeName="TASMU Media Assets" ListTemplate="PictureLibrary" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Media Assets" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="MediaTypes"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="MediaTypes"></customViewfields>
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Projects" ContentTypeName="TASMU Projects" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Projects" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ProjectTypes"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="cmsStartDate"></defaultviewfields>
+			<defaultviewfields name="cmsEndDate"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="ProjectTypes"></customViewfields>
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Videos" ContentTypeName="TASMU Videos" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Videos" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="MediaTypes"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="MediaTypes"></customViewfields>
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Contact Information" ContentTypeName="TASMU Contact Information" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Contact Information" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="cmsFirstName"></defaultviewfields>
+			<defaultviewfields name="arFirstName"></defaultviewfields>
+			<defaultviewfields name="LastName"></defaultviewfields>
+			<defaultviewfields name="arLastName"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="cmsFirstName"></customViewfields>
+			<customViewfields name="arFirstName"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+
+		</ListAndContentTypes>
+
+		<ListAndContentTypes ListName="Campaigns" ContentTypeName="TASMU Campaigns" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+			
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="CampaignCategories"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="cmsStartDate"></defaultviewfields>
+			<defaultviewfields name="cmsEndDate"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="CampaignCategories"></customViewfields>
+
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="Articles" ContentTypeName="TASMU Articles" ListTemplate="GenericList" customView="Home">
+			<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
+			<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+			<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
+
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Articles" ColumnName="SectorLookupMulti_x003A_SectorID" Required="False"></columnItem>
+
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="ArticleCategories"></defaultviewfields>
+			<defaultviewfields name="ContentTier"></defaultviewfields>
+			<defaultviewfields name="Channel"></defaultviewfields>
+			<defaultviewfields name="Created"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="GeoLocation"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_arTitle"></defaultviewfields>
+			<defaultviewfields name="SectorLookupMulti_x003A_SectorID"></defaultviewfields>
+
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+			<customViewfields name="ArticleCategories"></customViewfields>
+
+		</ListAndContentTypes>
+	</orgSPList> -->
+
+<!-- Lists which need unique permission and with unique group permissions-->
+<UniquePermissions>
+<List ListName="Changelog">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="TranslateConfig">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="Configuration">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+<List ListName="Products">
+<Permissions>
+ <Group Name="Owner" Role ="Full Control"/>
+ <Group Name="*" Role ="Read"/>
+</Permissions>
+</List>
+</UniquePermissions>
+
+	<!--Upload Files Config for Sector/Org, Uncomment & add appropriate data to proceed. -->
+	<!-- SourceFolder="{Source Path of the documents}" DestinationFolder="{Destination Path: Name of the Sharepoint library} -->
+
+	<sectorUploadFiles>
+	</sectorUploadFiles>
+	<!-- <orgUploadFiles>
+	</orgUploadFiles> -->
+
+	<!--Page & webpart Config for Global/Sector/Org-->
+
+	<sectorPageWebpart>
+		<page name="Sector-Home"></page>
+		<webpartSection SectionTemplate="TwoColumnLeft" pagename="Sector-Home">
+			<webpart DefaultWebPartType="List" hideCommandBar="True" layoutId="GridNews" Order="1" Section="1" Column="1" ListTitle="My Tasks" ListTitleDisplay="My Tasks" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Order="2" Section="1" Column="1" ListTitle="News Articles" ListTitleDisplay="News Articles" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Public Documents" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Media Assets" ListTitleDisplay="Media Assets" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
+			<webpart DefaultWebPartType="QuickLinks" layoutId="GridNews" Section="1" Column="2" items0title="">
+				<items>
+					<item Title="News Articles" ListUrl="NewsArticles"></item>
+					<item Title="Media Assets" ListUrl="MediaAssets"></item>
+					<item Title="Public Documents" ListUrl="PublicDocuments"></item>
+				</items>
+			</webpart>
+			<webpart DefaultWebPartType="ContentRollup" Section="1" Column="2" ListTitle="Recent Documents"></webpart>
+		</webpartSection>
+	</sectorPageWebpart>
+	<!-- <orgPageWebpart>
+		<page name="Entity-Home"></page>
+
+		<webpartSection SectionTemplate="TwoColumnLeft" pagename="Entity-Home">
+
+			<webpart DefaultWebPartType="List" hideCommandBar="True" layoutId="GridNews" Order="1" Section="1" Column="1" ListTitle="My Tasks" ListTitleDisplay="My Tasks" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Order="2" Section="1" Column="1" ListTitle="Announcements" ListTitleDisplay="Announcements" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Order="3" Section="1" Column="1" ListTitle="Articles" ListTitleDisplay="Articles" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events List" ListTitleDisplay="Events" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Campaigns" ListTitleDisplay="Campaigns" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Documents" ViewName="Home"></webpart>
+
+			<webpart DefaultWebPartType="QuickLinks" layoutId="GridNews" Section="1" Column="2">
+				<items>
+					<item Title="Articles" ListUrl="Articles"></item>
+					<item Title="Announcements" ListUrl="Announcements"></item>
+					<item Title="Campaigns" ListUrl="Campaigns"></item>
+					<item Title="Contact Information" ListUrl="ContactInformation"></item>
+					<item Title="Videos" ListUrl="Videos"></item>
+					<item Title="Media Assets" ListUrl="MediaAssets"></item>
+					<item Title="Projects" ListUrl="Projects"></item>
+					<item Title="Sponsors" ListUrl="Sponsors"></item>
+					<item Title="Documents" ListUrl="PublicDocuments"></item>
+				</items>
+			</webpart>
+			<webpart DefaultWebPartType="ContentRollup" Section="1" Column="2" ListTitle="Recent Documents"></webpart>
+
+		</webpartSection>
+	</orgPageWebpart> -->
+
+	<!--Custom Navigation config for Global/Sector/Org-->
+	<globalConfigNav>
+		<Level1 nodeName="Sectors" count="1">
+			<Level2 nodeName="Transportation" url="cms-sector-transportation">
+				<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
+			 </Level2>
+		</Level1>
+	</globalConfigNav>
+	<globalNav>
+		<Level1 nodeName="Sectors" count="1">
+			<Level2 nodeName="Transportation" url="cms-sector-transportation">
+				<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+				<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
+			</Level2>
+		</Level1>
+	</globalNav>
+	<sectorNav>
+		<QuickLaunchNav>
+			<!--<Level1 nodeName="Entities" count="1">
+				<Level2 nodeName="Fedex" sector="cms-dev-transportsector" url="cms-dev-transportsector-fedexorg"></Level2>
+				<Level2 nodeName="Swift" sector="cms-dev-transportsector" url="cms-dev-transportsector-swiftorg"></Level2>
+				<Level2 nodeName="Easthide" sector="cms-dev-healthsector" url="cms-dev-healthsector-easthideorg"></Level2>
+				<Level2 nodeName="Treejoy" sector="cms-dev-healthsector" url="cms-dev-healthsector-treejoyorg"></Level2>
+			</Level1>-->
+			<Level1 nodeName="Manage Content" count="2">
+				<Level2 nodeName="News Articles" url="NewsArticles"></Level2>
+				<Level2 nodeName="Media Assets" url="MediaAssets"></Level2>
+				<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
+			</Level1>
+			<Level1 nodeName="My Tasks" url="MyTasks" count="3">
+			</Level1>
+			<Level1 nodeName="More" url="More" count="4">
+				<Level2 nodeName="Tasmu Smart Qatar" url="https://tasmu.gov.qa/"></Level2>
+				<Level2 nodeName="Ministry of Transport and Communications" url="https://www.motc.gov.qa/en/node/14067"></Level2>
+			</Level1>
+		</QuickLaunchNav>
+		<TopNav>
+			<Level1 nodeName="Sectors">
+				<Level2 nodeName="Transportation" url="cms-sector-transportation">
+					<!-- <Level3 nodeName="Fedex" url="cms-dev-transportsector-fedexorg"/>
+					<Level3 nodeName="Swift" url="cms-dev-transportsector-swiftorg"/> -->
+				</Level2>
+			</Level1>
+		</TopNav>
+	</sectorNav>
+	<!-- <orgNav>
+		<QuickLaunchNav>
+			<Level1 nodeName="Manage Content" count="2">
+				<Level2 nodeName="Articles" url="Articles"></Level2>
+				<Level2 nodeName="Announcements" url="Announcements"></Level2>
+				<Level2 nodeName="Campaigns" url="Campaigns"></Level2>
+				<Level2 nodeName="Contact Information" url="ContactInformation"></Level2>
+				<Level2 nodeName="Videos" url="Videos"></Level2>
+				<Level2 nodeName="Media Assets" url="MediaAssets"></Level2>
+				<Level2 nodeName="Projects" url="Projects"></Level2>
+				<Level2 nodeName="Sponsors" url="Sponsors"></Level2>
+				<Level2 nodeName="Public Documents" url="PublicDocuments"></Level2>
+				<Level2 nodeName="Events" url="EventsList"></Level2>
+			</Level1>
+			<Level1 nodeName="My Tasks" url="MyTasks" count="3">
+			</Level1>
+			<Level1 nodeName="More" url="More" count="4">
+				<Level2 nodeName="Tasmu Smart Qatar" url="https://tasmu.gov.qa/"></Level2>
+				<Level2 nodeName="Ministry of Transport and Communications" url="https://www.motc.gov.qa/en/node/14067"></Level2>
+			</Level1>
+		</QuickLaunchNav>
+	</orgNav> -->
+	<updateSiteColumns>
+		<updateFieldToMultiline ColumnInternalName="Picture" ColumnTitle="Image of Sponsor" GroupName="TASMU" ColumnType="URL" ColumnChoices="None" Required="FALSE" Format="Image"></updateFieldToMultiline>
+		<renameFieldDisplayName ColumnInternalName="Picture" ColumnTitle="" ColumnNewTitle="Arabic Title" GroupName="TASMU" ColumnType="URL" ColumnChoices="None" Required="FALSE" Format="Image"></renameFieldDisplayName>
+		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Announcements"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Campaigns"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Events"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Projects"></changeDateOnly>
+
+		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Announcements"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Campaigns"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Events"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Projects"></changeDateOnly>
+
+		<sectorChange>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Announcements" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Sponsors" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Projects" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Videos" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Contacts" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Events List" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Campaigns" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="News Articles" Format="None" ></changeContentTierChoice>
+
+			<changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Sponsors" ContentTypeName="TASMU Sponsors" NewTitle="Sponsor Name"></changeTitle>
+			<changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Products" ContentTypeName="TASMU Products" NewTitle="Product Name"></changeTitle>
+
+			<!--<removeFromEditForm ColumnInternalName="AssignedTo" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Approval Tasks" ShowInEditForm="False"></removeFromEditForm>
+			<removeFromEditForm ColumnInternalName="AssignedTo" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Translation Tasks" ShowInEditForm="False"></removeFromEditForm>-->
+		</sectorChange>
+		<!--<orgChange>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Announcements" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Public Documents" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Sponsors" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Media Assets" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Projects" Format="None"></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Videos" Format="None"></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Contacts" Format="None"></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Events List" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Campaigns" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Articles" Format="None" ></changeContentTierChoice>
+		</orgChange>-->
+	</updateSiteColumns>
+
+<sectorAddItemConfigurationList>
+		<item configListName="Configuration" SiteLevel="Sector" ListNames="News Articles;Announcements;Campaigns;Contacts;Events List;Media Assets;Projects;Public Documents;Videos" Approvers="Sector Approvers" Translators="Sector Translators"></item>
+	</sectorAddItemConfigurationList>
+
+	<!-- <orgAddItemConfigurationList>
+		<item configListName="Configuration" SiteLevel="Entity" ListNames="Sectors;My Tasks;Public Document;Events List;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
+	</orgAddItemConfigurationList> -->
+</sites>
