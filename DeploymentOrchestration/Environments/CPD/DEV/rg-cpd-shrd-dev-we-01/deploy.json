@@ -88,6 +88,50 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
+            "name": "DEP-apimlab-cpd-shrd-dev-we-01",
+            "resourceGroup": "rg-cpd-shrd-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-shrd-dev-we-01",
+                "DEP-apim-cpd-shrd-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/Parameters/apimlab-cpd-shrd-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-apimapi-cpd-shrd-dev-we-01",
+            "resourceGroup": "rg-cpd-shrd-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-shrd-dev-we-01",
+                "DEP-apim-cpd-shrd-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApiManagementAPI/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApiManagementAPI/2019-01-01/Parameters/apimapi-cpd-shrd-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
             "name": "DEP-stcpdshrddevwe01",
             "resourceGroup": "rg-cpd-shrd-dev-we-01",
             "dependsOn": [
