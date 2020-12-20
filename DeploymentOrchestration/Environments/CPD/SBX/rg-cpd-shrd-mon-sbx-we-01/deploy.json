@@ -113,7 +113,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-stcpdshrddiagdevwe01",
+            "name": "DEP-stcpdshrddiagsbxwe01",
             "resourceGroup": "rg-cpd-shrd-mon-sbx-we-01",
             "dependsOn": [
                 "DEP-rg-cpd-shrd-mon-sbx-we-01"
@@ -127,7 +127,7 @@
                     "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdshrddiagdevwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdshrddiagsbxwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -151,7 +151,30 @@
                     "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpd-shrd-mon-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-evhns-cpd-shrd-mon-sbx-we-01",
+      "resourceGroup": "rg-cpd-shrd-mon-sbx-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-shrd-mon-sbx-we-01",
+        "DEP-stcpdshrddiagsbxwe01",
+        "DEP-log-cpd-shrd-mon-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/Parameters/evhns-cpd-shrd-mon-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
+      }
+    }
     ],
     "outputs": {
     }
