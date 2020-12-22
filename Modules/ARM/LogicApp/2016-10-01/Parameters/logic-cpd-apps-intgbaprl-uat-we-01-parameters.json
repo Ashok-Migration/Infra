@@ -123,6 +123,18 @@
                                 ]
                             },
                             "type": "ParseJson"
+                        },
+                        "Set_ApproverTitle_Critical": {
+                            "inputs": {
+                                "name": "ApproverTitle",
+                                "value": "Global Critical"
+                            },
+                            "runAfter": {
+                                "Loop_Critical_Approvers_Group": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
                         }
                     },
                     "else": {
@@ -212,6 +224,18 @@
                                     ]
                                 },
                                 "type": "ParseJson"
+                            },
+                            "Set_ApproverTitle": {
+                                "inputs": {
+                                    "name": "ApproverTitle",
+                                    "value": "Global"
+                                },
+                                "runAfter": {
+                                    "Loop_Approvers_Group": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
                             }
                         }
                     },
@@ -238,10 +262,62 @@
                     },
                     "type": "If"
                 },
+                "Check_If_Document_Or_Picture_Library": {
+                    "actions": {
+                        "Set_ListName_Append_Forms": {
+                            "inputs": {
+                                "name": "ListName",
+                                "value": "@{concat(replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ',''),'/Forms')}"
+                            },
+                            "runAfter": {},
+                            "type": "SetVariable"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Set_ListName_Remove_Spaces": {
+                                "inputs": {
+                                    "name": "ListName",
+                                    "value": "@{replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ','')}"
+                                },
+                                "runAfter": {},
+                                "type": "SetVariable"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "or": [
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Hero Web"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Hero Mobile"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Product Assets"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Check_For_Sensitivity_Type": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
                 "Create_Task_in_MyTasks_for_Approval": {
                     "inputs": {
                         "body": {
-                            "body": "{\n\"Title\":\"Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
+                            "body": "{\n\"Title\":\"@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\",\n\"ParentItemLink\": {'Description': '', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'}\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
                                 "Content-Type": "application/json;odata=nometadata"
@@ -258,7 +334,7 @@
                         "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
                     },
                     "runAfter": {
-                        "Check_For_Sensitivity_Type": [
+                        "Check_If_Document_Or_Picture_Library": [
                             "Succeeded"
                         ]
                     },
@@ -309,7 +385,7 @@
                             "inputs": {
                                 "body": {
                                     "Body": "<p>@{variables('EmailBody')}</p>",
-                                    "Subject": "Global - Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "Subject": "@{variables('ApproverTitle')} Content Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                                     "To": "@variables('ApproverEmail')"
                                 },
                                 "host": {
@@ -331,7 +407,7 @@
                             "inputs": {
                                 "body": {
                                     "Body": "<p>@{variables('EditorEmailBody')}</p>",
-                                    "Subject": "Global - Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "Subject": "@{variables('ApproverTitle')} Content Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                                     "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
                                 },
                                 "host": {
@@ -364,7 +440,7 @@
                         "Set_EmailBody_Approved": {
                             "inputs": {
                                 "name": "EmailBody",
-                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                             },
                             "runAfter": {
                                 "Update_Internal_Task_Status_And_Comments_-_Approval_Task": [
@@ -404,7 +480,7 @@
                         "Update_Item_Status_And_Comments_-_Approved": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Approved\"\n}",
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
@@ -432,7 +508,7 @@
                                 "inputs": {
                                     "body": {
                                         "Body": "<p>@{variables('EmailBody')}</p>",
-                                        "Subject": "Global - Approval Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "Subject": "@{variables('ApproverTitle')} Content Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                                         "To": "@variables('ApproverEmail')"
                                     },
                                     "host": {
@@ -454,7 +530,7 @@
                                 "inputs": {
                                     "body": {
                                         "Body": "<p>@{variables('EditorEmailBody')}</p>",
-                                        "Subject": "Global - Approval Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "Subject": "@{variables('ApproverTitle')} Content Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                                         "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
                                     },
                                     "host": {
@@ -487,7 +563,7 @@
                             "Set_EmailBody_Rejected": {
                                 "inputs": {
                                     "name": "EmailBody",
-                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                                 },
                                 "runAfter": {
                                     "Update_Internal_Task_Status_Rejected_-_Approval_Task": [
@@ -628,6 +704,22 @@
                     },
                     "type": "InitializeVariable"
                 },
+                "Initialize_ApproverTitle": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTitle",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ListName": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
                 "Initialize_ApproverUserId": {
                     "inputs": {
                         "variables": [
@@ -671,6 +763,22 @@
                     },
                     "runAfter": {
                         "Initialize_ApproverTaskComments": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ListName": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ListName",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApprovalRejectionReminder": [
                             "Succeeded"
                         ]
                     },
@@ -722,7 +830,7 @@
                         }
                     },
                     "runAfter": {
-                        "Initialize_ApprovalRejectionReminder": [
+                        "Initialize_ApproverTitle": [
                             "Succeeded"
                         ]
                     },
@@ -797,7 +905,7 @@
                         "body": {
                             "Body": "<p>@{variables('EmailBody')}</p>",
                             "Importance": "High",
-                            "Subject": "Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                            "Subject": "@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                             "To": "@variables('ApproverEmail')"
                         },
                         "host": {
@@ -819,7 +927,7 @@
                     "inputs": {
                         "body": {
                             "Body": "<p>@{variables('EditorEmailBody')}</p>",
-                            "Subject": "Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                            "Subject": "@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
                             "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
                         },
                         "host": {
@@ -864,7 +972,7 @@
                 "Set_EmailBody_Approval_Request": {
                     "inputs": {
                         "name": "EmailBody",
-                        "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                        "value": "<p>Hello @{variables('ApproverTitle')} Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
                         "Update_Item_Status_to_Pending_Approval": [
@@ -987,20 +1095,6 @@
                                 "interval": {
                                     "count": 1,
                                     "unit": "Day"
-                                }
-                            },
-                            "runAfter": {
-                                "Delay_1_Minute_Approval_Rejection_Reminder": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Wait"
-                        },
-                        "Delay_1_Minute_Approval_Rejection_Reminder": {
-                            "inputs": {
-                                "interval": {
-                                    "count": 1,
-                                    "unit": "Minute"
                                 }
                             },
                             "runAfter": {},

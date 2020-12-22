@@ -36,10 +36,62 @@
         },
         "workflowActions": {
             "value": {
+                "Check_For_Document_Or_Picture_Library": {
+                    "actions": {
+                        "Set_ListName_Append_Forms": {
+                            "inputs": {
+                                "name": "ListName",
+                                "value": "@{concat(replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ',''),'/Forms')}"
+                            },
+                            "runAfter": {},
+                            "type": "SetVariable"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Set_ListName_Remove_Spaces": {
+                                "inputs": {
+                                    "name": "ListName",
+                                    "value": "@{replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ','')}"
+                                },
+                                "runAfter": {},
+                                "type": "SetVariable"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "or": [
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Hero Web"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Hero Mobile"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Product Assets"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Loop_Approvers_Group": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
                 "Create_Task_in_MyTasks_for_Approval": {
                     "inputs": {
                         "body": {
-                            "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\"\n}",
+                            "body": "{\n\"Title\":\"Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\",\n\"ParentItemLink\": {'Description': '', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'}\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
                                 "Content-Type": "application/json"
@@ -56,7 +108,7 @@
                         "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
                     },
                     "runAfter": {
-                        "Loop_Approvers_Group": [
+                        "Check_For_Document_Or_Picture_Library": [
                             "Succeeded"
                         ]
                     },
@@ -264,7 +316,7 @@
                         "Set_EmailBody_Approved": {
                             "inputs": {
                                 "name": "EmailBody",
-                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                             },
                             "runAfter": {
                                 "Update_Internal_Task_Status_And_Comments_-_Approval_Task": [
@@ -441,7 +493,7 @@
                             "Set_EmailBody_Rejected": {
                                 "inputs": {
                                     "name": "EmailBody",
-                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                                 },
                                 "runAfter": {
                                     "Update_Internal_Task_Status_Rejected_-_Approval_Task": [
@@ -634,6 +686,22 @@
                     },
                     "type": "InitializeVariable"
                 },
+                "Initialize_ListName": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ListName",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
                 "Initialize_TranslatorsEmail": {
                     "inputs": {
                         "variables": [
@@ -729,7 +797,7 @@
                         }
                     },
                     "runAfter": {
-                        "Initialize_ApprovalRejectionReminder": [
+                        "Initialize_ListName": [
                             "Succeeded"
                         ]
                     },
@@ -908,7 +976,7 @@
                 "Set_EmailBody_Approval_Request": {
                     "inputs": {
                         "name": "EmailBody",
-                        "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{body('Parse_Service_Bus_Message_JSON')?['ListName']}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                        "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
                         "Update_Item_Status_to_Pending_Approval": [
@@ -1027,66 +1095,49 @@
                 },
                 "Until_Task_Is_Approved_Or_Rejected_Reminder": {
                     "actions": {
-                        "Delay_1_Minute_Approval_Rejection_Reminder": {
+                        "Delay_1_Day_Reminder": {
                             "inputs": {
                                 "interval": {
                                     "count": 1,
-                                    "unit": "Minute"
+                                    "unit": "Day"
                                 }
                             },
                             "runAfter": {},
                             "type": "Wait"
                         },
                         "If_Task_Status_Is_Approved_Or_Rejected_Reminder": {
-                            "actions": {},
-                            "else": {
-                                "actions": {
-                                    "Delay_1_Day_Reminder": {
-                                        "inputs": {
-                                            "interval": {
-                                                "count": 1,
-                                                "unit": "Day"
+                            "actions": {
+                                "Send_an_email_(V2)_Approval_Rejection_Reminder": {
+                                    "inputs": {
+                                        "body": {
+                                            "Body": "<p>@{variables('EmailBody')}</p>",
+                                            "Subject": "Gentle Reminder- Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                            "To": "@variables('ApproverEmail')"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-dev-we-01']['connectionId']"
                                             }
                                         },
-                                        "runAfter": {},
-                                        "type": "Wait"
+                                        "method": "post",
+                                        "path": "/v2/Mail"
                                     },
-                                    "Send_an_email_(V2)_Approval_Rejection_Reminder": {
-                                        "inputs": {
-                                            "body": {
-                                                "Body": "<p>@{variables('EmailBody')}</p>",
-                                                "Subject": "Gentle Reminder- Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
-                                                "To": "@variables('ApproverEmail')"
-                                            },
-                                            "host": {
-                                                "connection": {
-                                                    "name": "@parameters('$connections')['apicon-cpd-apps-into365-dev-we-01']['connectionId']"
-                                                }
-                                            },
-                                            "method": "post",
-                                            "path": "/v2/Mail"
-                                        },
-                                        "runAfter": {
-                                            "Delay_1_Day_Reminder": [
-                                                "Succeeded"
-                                            ]
-                                        },
-                                        "type": "ApiConnection"
-                                    }
+                                    "runAfter": {},
+                                    "type": "ApiConnection"
                                 }
                             },
                             "expression": {
-                                "or": [
+                                "and": [
                                     {
                                         "equals": [
                                             "@variables('ApprovalRejectionReminder')",
-                                            "@false"
+                                            "@true"
                                         ]
                                     }
                                 ]
                             },
                             "runAfter": {
-                                "Delay_1_Minute_Approval_Rejection_Reminder": [
+                                "Delay_1_Day_Reminder": [
                                     "Succeeded"
                                 ]
                             },
