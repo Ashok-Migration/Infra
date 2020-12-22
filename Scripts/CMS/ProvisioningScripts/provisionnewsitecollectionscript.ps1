@@ -147,7 +147,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			CheckAndCreateAppCatalog $globalhubSiteUrl             
 			#Check and add the spfx webpart   
 			# appName will be the title of the application customizer from tenant app catalog
-			$appName = "tasmu-spfx-global-client-side-solution"     
+			$appName = "global-custom-style-client-side-solution"     
 			AddSPFxWebPart $globalhubSiteUrl $tenantAdmin $appName
 			#Uncomment and run below line on new site creation only, else keep commented
 			#AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
@@ -192,7 +192,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			   CheckAndCreateAppCatalog $sectorhubSiteUrl             
 			   #Check and add the spfx webpart    
 			   # appName will be the title of the application customizer from tenant app catalog
-			   $appName = "tasmu-spfx-sector-client-side-solution" 
+			   $appName = "sector-custom-style-client-side-solution" 
 			   AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
 			   
 			   #Uncomment and run below line on new site creation only, else keep commented
@@ -1762,7 +1762,7 @@ function UpdateViewForTasksList($listNameForView, $siteUrlNew)
 		
 		if ([bool]($allItemViewMyTasks) -eq $true) {
 			 $PnPContext = Get-PnPContext
-			 $allItemViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='AssignedTo'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
+			 $allItemViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='cmsAssignedToUser'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
 			 $allItemViewMyTasks.Update()
 			 $PnPContext.ExecuteQuery()
 			 Write-Host "All Items - View updated for $listNameForView list."

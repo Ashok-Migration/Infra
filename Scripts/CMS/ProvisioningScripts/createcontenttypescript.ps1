@@ -86,33 +86,37 @@ function Get-SiteColumsToImport($xmlTermsPath){
  }
 }
 function ContentType($scXML) {
-
-    #Connect to SPO Service and add the site collection admin 
-    $tenantUrl = "https://"+$tenant+"-admin.sharepoint.com/"
-    Connect-SPOService -url $tenantUrl -credential $tenantAdmin
  
-    #Add Site collection Admin
-    Set-SPOUser -site $contenttypehub -LoginName $sp_user -IsSiteCollectionAdmin $True
-
+    # #Connect to SPO Service and add the site collection admin 
+    # $tenantUrl = "https://"+$tenant+"-admin.sharepoint.com/"
+    # Connect-SPOService -url $tenantUrl -credential $tenantAdmin
+ 
+    # #Add Site collection Admin
+    # Set-SPOUser -site $contenttypehub -LoginName $sp_user -IsSiteCollectionAdmin $True
+ 
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
-
+    
+    #Add Site collection Admin
+    Add-PnPSiteCollectionAdmin -Owners $sp_user
+    
+ 
     #create all the content Types
-    foreach ($contentItem in $scXML.Descendants("contentItem")) 
+    foreach ($contentItem in $scXML.Descendants("contentItem")) 
     {
         $contentTypeName = Get-AttributeValue $contentItem "ContentTypeName"
         $parentCTName = Get-AttributeValue $contentItem "ParentCTName"
         $groupName = Get-AttributeValue $contentItem "GroupName"
-
+ 
         if($contentTypeName -ne '')
         {
             Create-ContentType $tenantAdmin $contenttypehub $contentTypeName $contentTypeName $parentCTName $groupName $connection
         }
     }
-
+ 
     #add columns to the content Types
-    foreach ($columnItem in $scXML.Descendants("columnItem"))
+    foreach ($columnItem in $scXML.Descendants("columnItem"))
     {
         $contentTypeName = Get-AttributeValue $columnItem "ContentTypeName"
         $columnName = Get-AttributeValue $columnItem "ColumnName"
@@ -123,7 +127,7 @@ function ContentType($scXML) {
         }
     }
     #remove columns from content types
-    foreach ($columnRemovable in $scXML.Descendants("columnRemovable"))
+    foreach ($columnRemovable in $scXML.Descendants("columnRemovable"))
     {
         
         $contentTypeName = Get-AttributeValue $columnRemovable "ContentTypeName"
@@ -134,7 +138,7 @@ function ContentType($scXML) {
             RemoveColumns-ContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection
         }
     }
-
+ 
     Disconnect-PnPOnline
 }
 
