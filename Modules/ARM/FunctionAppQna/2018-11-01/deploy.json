@@ -176,7 +176,7 @@
                     "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/service')]",
                     "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
                     "dependsOn": [
-                        "[concat('Microsoft.Logic/workflows/', parameters('functionAppName'))]"
+                        "[concat('Microsoft.Web/sites/', parameters('functionAppName'))]"
                     ],
                     "properties": {
                         "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
