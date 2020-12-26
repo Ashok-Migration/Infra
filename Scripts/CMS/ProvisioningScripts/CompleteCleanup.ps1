@@ -102,13 +102,13 @@ function CompleteCleanup($sitefile,$scXML,$siteColumnfilePathfile,$termsfile)
     DeleteSiteCollections $sitefile
 
     # delete ContentTypes from Contenttypehub
-     DeleteContentTypes $scXML
+    DeleteContentTypes $scXML
 
     # delete Site Columns from Contenttypehub
-     DeleteSiteColumns $siteColumnfilePathfile
+    DeleteSiteColumns $siteColumnfilePathfile
 
     # delete Taxanomy from Term Store
-     DeleteTaxanomyGroup $termsfile
+    DeleteTaxanomyGroup $termsfile
 
 }
 
@@ -139,6 +139,8 @@ function DeleteSiteCollections($sitefile)
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
 
+    $SiteColumnGroup = "TASMU"
+
     Write-Host "Delete Site Collections Started..."
     $client.TrackEvent("Delete Site Collections Started...")
 
@@ -150,6 +152,9 @@ function DeleteSiteCollections($sitefile)
         $siteExits = Get-PnPTenantSite -Url $globalhubSiteUrl -ErrorAction SilentlyContinue
             
          if ([bool] ($siteExits) -eq $true) {
+
+             #Remove-SiteContentTypeGroup $globalhubSiteUrl, $SiteColumnGroup, $tenantAdmin
+             #Remove-SiteColumnGroup $globalhubSiteUrl $SiteColumnGroup $tenantAdmin
             
              Write-Host "Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl"
              $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $globalhubSiteUrl")
@@ -167,6 +172,9 @@ function DeleteSiteCollections($sitefile)
            $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
            
            if ([bool] ($siteExits) -eq $true) {
+
+               #Remove-SiteContentTypeGroup $sectorhubSiteUrl, $SiteColumnGroup, $tenantAdmin
+               #Remove-SiteColumnGroup $sectorhubSiteUrl $SiteColumnGroup $tenantAdmin
                
                Write-Host "Site Exists so, Remove-PnPTenantSite Started for $sectorhubSiteUrl"
                $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $sectorhubSiteUrl")
@@ -366,6 +374,10 @@ function DeleteSiteColumns($siteColumnfilePathfile)
          }
         }
     Disconnect-PnPOnline
+
+    $SiteColumnGroup="TASMU"
+    Remove-SiteColumnGroup $contenttypehub $SiteColumnGroup $tenantAdmin
+
 }
 
 <#
@@ -428,6 +440,116 @@ function DeleteTaxanomyGroup($termsfile)
          }
         }
     Disconnect-PnPOnline
+}
+
+<#
+.SYNOPSIS
+    This function is used to Delete all Site Column belonging to the TASMU group
+
+.DESCRIPTION
+    This function will use the CSOM commands to delete all site columns belonging to the TASMU group
+
+.EXAMPLE
+    Remove-SiteColumnGroup $SiteURL $SiteColumnGroup $tenantAdmin
+
+.INPUTS
+
+.OUTPUTS
+    
+#>
+
+function Remove-SiteColumnGroup($SiteURL, $SiteColumnGroup, $tenantAdmin)
+{
+    Try{
+        #Setup the context
+        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+	    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+
+	    $admin = $tenantAdmin.UserName
+	    $password = $tenantAdmin.Password
+        $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+        $Ctx.Credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+     
+        $Ctx.Load($Ctx.Web)
+        $Ctx.Load($Ctx.Web.Fields)
+        $Ctx.ExecuteQuery()
+ 
+        #Get the site column Group
+        $SiteColumns = $Ctx.Web.Fields | where {$_.Group -eq $SiteColumnGroup}
+        if($SiteColumns -ne $NULL)
+        {
+            #Loop Through Each Field
+            ForEach($Column in $SiteColumns)
+            {
+                Write-host "Removing Site Column:" $($Column.InternalName)
+                $Column.DeleteObject()
+                $Ctx.ExecuteQuery()
+            }
+            Write-host -f Green "Site Columns Deleted Successfully!"
+        }
+        Else
+        {
+            Write-host -f Yellow "Site Column Group '$($SiteColumnGroup)' Does not Exist!"
+        }   
+    }
+    Catch {
+    write-host -f Red "Error Removing Site Columns!" $_.Exception.Message
+    }
+}
+
+<#
+.SYNOPSIS
+    This function is used to Delete all Site Content Types belonging to the TASMU group
+
+.DESCRIPTION
+    This function will use the CSOM commands to delete all site cotent types belonging to the TASMU group
+
+.EXAMPLE
+    Remove-SiteContentTypeGroup $SiteURL $SiteColumnGroup $tenantAdmin
+
+.INPUTS
+
+.OUTPUTS
+    
+#>
+
+Function Remove-SiteContentTypeGroup($SiteURL, $SiteColumnGroup, $tenantAdmin)
+{
+    Try{
+         #Setup the context
+        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+	    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+
+	    $admin = $tenantAdmin.UserName
+	    $password = $tenantAdmin.Password
+        $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+        $Ctx.Credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+     
+        $Ctx.Load($Ctx.Web)
+        $Ctx.Load($Ctx.Web.ContentTypes)
+        $Ctx.ExecuteQuery()
+ 
+        #Get the site column Group
+        $SiteCTs = $Ctx.Web.ContentTypes | where {$_.Group -eq $SiteColumnGroup}
+        if($SiteCTs -ne $NULL)
+        {
+            #Loop Through Each Field
+            ForEach($CT in $SiteCTs)
+            {
+                Write-host "Removing Site Content Type:" $($CT.InternalName)
+                $CT.DeleteObject()
+                $Ctx.ExecuteQuery()
+            }
+            Write-host -f Green "Site Content Type Deleted Successfully!"
+        }
+        Else
+        {
+            Write-host -f Yellow "Site CT Group '$($SiteColumnGroup)' Does not Exist!"
+        }   
+    }
+    Catch {
+    write-host -f Red "Error Removing Site Content Type!" $_.Exception.Message
+    }
 }
 
 

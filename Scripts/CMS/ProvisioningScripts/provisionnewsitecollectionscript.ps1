@@ -150,7 +150,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			$appName = "global-custom-style-client-side-solution"     
 			AddSPFxWebPart $globalhubSiteUrl $tenantAdmin $appName
 			#Uncomment and run below line on new site creation only, else keep commented
-			#AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
+			AddEntryInConfigurationListForGlobalSite $globalconfigSiteUrl $globalhubSiteUrl $sitefile.sites.globalAddItemConfigurationList.item
 					
 		}
 				
@@ -196,7 +196,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			   AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
 			   
 			   #Uncomment and run below line on new site creation only, else keep commented
-			   #AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
+			   AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
 		   } 
 	   
 		# Entity provisioning   
@@ -2066,7 +2066,7 @@ function UpdateRegionalSettings($url, $tenantAdmin){
 		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
   
 		#Config parameters for SharePoint Online Site URL and Timezone description
-		$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext(url)
+		$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($url)
 		$admin = $tenantAdmin.UserName
 		$password = $tenantAdmin.Password
 		$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
