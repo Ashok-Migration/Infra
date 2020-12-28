@@ -105,6 +105,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
 			$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
 			.$psfilecreatesitecolumnscript @paramsSiteColumn
 			ListandLibrary $globalconfigSiteUrl $sitefile.sites.ConfigurationSPList
+			Update-SiteColumns $globalconfigSiteUrl $sitefile.sites.updateSiteColumns.configChange $tenantAdmin
 			AssignUniquePermission $sitefile.sites.UniquePermissions.List $globalconfigSiteUrl
 			AddCustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
 		}
@@ -2454,6 +2455,36 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 		$context.Load($web.ContentTypes)
 		$context.ExecuteQuery()
 
+		foreach($objfield in $node.changeDateOnly){
+
+			try
+			{
+				Write-Host "Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName -foreground Green
+				$client.TrackEvent("Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName)           
+				#Get the List
+			$List = $context.Web.Lists.GetByTitle($objfield.ListName)
+			$context.Load($List)
+			$context.ExecuteQuery()
+ 
+			#Get the field
+			$Field = $List.Fields.GetByInternalNameOrTitle($objfield.ColumnInternalName)
+			$context.Load($Field)
+			$context.ExecuteQuery()
+
+			$field.DisplayFormat = $objfield.DisplayFormat
+			$field.Update()
+			$field.Context.ExecuteQuery()
+			
+			}
+			catch{
+				$ErrorMessage = $_.Exception.Message
+				Write-Host $ErrorMessage -foreground Yellow
+	
+				$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+				$telemtryException.Exception = $_.Exception.Message  
+				$client.TrackException($telemtryException)
+			}
+		}
 
 		foreach($objfield in $node.changeContentTierChoice){
 

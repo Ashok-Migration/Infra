@@ -34,7 +34,7 @@ param (
     $sp_user,
     $sp_password,
     $scope,
-    $InstrumentationKey="82633d60-eb02-40f5-a711-b68aa1981167"
+    $InstrumentationKey
 )
 
 Write-host "Started provisioning sectors on " $tenant -ForegroundColor Yellow

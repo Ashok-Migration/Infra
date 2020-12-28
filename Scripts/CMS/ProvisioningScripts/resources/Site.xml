@@ -102,14 +102,14 @@
 		<ConfigurationSPList>
 			<ListAndContentTypes ListName="Configuration" ContentTypeName="TASMU Configuration" ListTemplate="GenericList" ParentCTName="Item" GroupName="TASMU" customView="">
 
-				<columnItem ContentTypeName="TASMU Configuration" ColumnName="SiteURL" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration" ColumnName="SiteLevel" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration" ColumnName="Sector" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration" ColumnName="Entity" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration" ColumnName="ListNames" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration"  ColumnName="Approvers" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration"  ColumnName="CriticalApprovers" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Configuration"  ColumnName="Translators" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration" ColumnName="SiteURL" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration" ColumnName="SiteLevel" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration" ColumnName="Sectors" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration" ColumnName="Entity" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration" ColumnName="ListNames" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration"  ColumnName="Approvers" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration"  ColumnName="CriticalApprovers" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Configuration"  ColumnName="Translators" Required="False"></columnItem>
 
 				<defaultviewfields name="SiteURL"></defaultviewfields>
 				<defaultviewfields name="SiteLevel"></defaultviewfields>
@@ -148,9 +148,9 @@
 					<Item ListName="Contacts" EngColumnName="cmsJobTitle" ArColumnName="arJobTitle" TextType="plain"/>
 					<Item ListName="Contacts" EngColumnName="cmsFirstName" ArColumnName="arFirstName" TextType="plain"/>
 					<Item ListName="Contacts" EngColumnName="LastName" ArColumnName="arLastName" TextType="plain"/>
-					<Item ListName="Events" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
-					<Item ListName="Events" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
-					<Item ListName="Events" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
+					<Item ListName="Events List" EngColumnName="Title" ArColumnName="arTitle" TextType="plain"/>
+					<Item ListName="Events List" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
+					<Item ListName="Events List" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
 					<Item ListName="News Articles" EngColumnName="Caption" ArColumnName="ArabicMediaCaption" TextType="plain"/>
 					<Item ListName="News Articles" EngColumnName="LongDescription" ArColumnName="arLongDescription" TextType="html"/>
 					<Item ListName="News Articles" EngColumnName="ShortDescription" ArColumnName="arShortDescription" TextType="plain"/>
@@ -209,6 +209,7 @@
 				<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ApprovedDate" Required="False"></columnItem>
 				<columnItem ContentTypeName="TASMU Product Assets" ColumnName="ApproverComments" Required="False"></columnItem>
 				<columnItem ContentTypeName="TASMU Product Assets" ColumnName="RequiresApproval" Required="False"></columnItem>
+				<columnItem ContentTypeName="TASMU Product Assets" ColumnName="cmsversion" Required="False"></columnItem>
 
 				<defaultviewfields name="ProductName"></defaultviewfields>
 				<defaultviewfields name="Product_x003a_arProductName"></defaultviewfields>
@@ -239,11 +240,14 @@
 			</ListAndContentTypes>
 			<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
 				<defaultviewfields name="Title"></defaultviewfields>
+				<defaultviewfields name="PreviewUrl"></defaultviewfields>
+				<defaultviewfields name="arPreviewUrl"></defaultviewfields>
 				<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
 				<defaultviewfields name="cmsAssignedToUser"></defaultviewfields>
 				<defaultviewfields name="ParentItemLink"></defaultviewfields>
 				<defaultviewfields name="Translation"></defaultviewfields>
 				<defaultviewfields name="TaskComments"></defaultviewfields>
+				<defaultviewfields name="ListName"></defaultviewfields>
 
 				<customViewfields name="Title"></customViewfields>
 				<customViewfields name="TASMUTaskStatus"></customViewfields>
@@ -259,7 +263,7 @@
 				<customViewfields name="Created"></customViewfields>
 				<customViewfields name="Modified"></customViewfields>
 			</ListAndContentTypes>
-			<ListAndContentTypes ListName="Events" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
+			<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
 				<defaultviewfields name="Title"></defaultviewfields>
 				<defaultviewfields name="arTitle"></defaultviewfields>
 				<defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -379,13 +383,14 @@
 			</ListAndContentTypes>
 			<ListAndContentTypes ListName="Products" ContentTypeName="TASMU Products" ListTemplate="GenericList" ParentCTName="Item" GroupName="TASMU" customView="Home">
 
-				<columnItem ContentTypeName="TASMU Products" ColumnName="arProductName" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="ProductShortDescription" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="arProductShortDescription" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="ProductLongDescription" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="arProductLongDescription" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="ProductReferenceURL" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Products" ColumnName="ProductId" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="arProductName" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="ProductShortDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="arProductShortDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="ProductLongDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="arProductLongDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="ProductReferenceURL" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="ProductId" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Products" ColumnName="cmsversion" Required="False"></columnItem>
 
 				<defaultviewfields name="Title"></defaultviewfields>
 				<defaultviewfields name="arProductName"></defaultviewfields>
@@ -401,19 +406,20 @@
 			<ListAndContentTypes ListName="Generic Page" ContentTypeName="TASMU Generic Page" ListTemplate="GenericList" ParentCTName="Item" GroupName="TASMU" customView="Home">
 				<Field ColumnName="cmsgenericpagename" ColumnTitle="Page Name" Type="Lookup" LookupListName="Generic Master" LookupField="Title" ShowField="Title" GroupName="TASMU" ColumnType="Text" Required="TRUE" Format="None" choicevalue=""></Field>
 
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arTitle" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="LongDescription" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arLongDescription" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="Sensitivity" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="Personas" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="cmsgenericpagename" Required="True"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ContentTier" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ContentStatus" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ApprovedDate" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ApproverComments" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="RequiresTranslation" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="PreviewUrl" Required="False"></columnItem>
-				<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arPreviewUrl" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arTitle" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="LongDescription" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arLongDescription" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="Sensitivity" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="Personas" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="cmsgenericpagename" Required="True"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ContentTier" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ContentStatus" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ApprovedDate" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="ApproverComments" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="RequiresTranslation" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="PreviewUrl" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="arPreviewUrl" Required="False"></columnItem>
+			<columnItem ContentTypeName="TASMU Generic Page" ColumnName="cmsversion" Required="False"></columnItem>
 
 				<defaultviewfields name="Title"></defaultviewfields>
 				<defaultviewfields name="arTitle"></defaultviewfields>
@@ -470,24 +476,24 @@
 			</ListAndContentTypes>
 			<ListAndContentTypes ListName="News Articles" ContentTypeName="TASMU News Articles" ListTemplate="GenericList" customView="Home">
 
-				<defaultviewfields name="Title"></defaultviewfields>
-				<defaultviewfields name="arTitle"></defaultviewfields>
-				<defaultviewfields name="PreviewUrl"></defaultviewfields>
-				<defaultviewfields name="arPreviewUrl"></defaultviewfields>
-				<defaultviewfields name="ShortDescription" ></defaultviewfields>
-				<defaultviewfields name="arShortDescription"></defaultviewfields>
-				<defaultviewfields name="Channel" ></defaultviewfields>
-				<defaultviewfields name="Sensitivity" ></defaultviewfields>
-				<defaultviewfields name="ReadingTime" ></defaultviewfields>
-				<defaultviewfields name="Personas"></defaultviewfields>
-				<defaultviewfields name="ThumbnailImage"></defaultviewfields>
-				<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-				<defaultviewfields name="cmsPublished"></defaultviewfields>
-				<defaultviewfields name="ContentStatus"></defaultviewfields>
-				<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-				<defaultviewfields name="MediaURL"></defaultviewfields>
-				<defaultviewfields name="Sectors"></defaultviewfields>
-				<defaultviewfields name="Modified"></defaultviewfields>
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="PreviewUrl"></defaultviewfields>
+			<defaultviewfields name="arPreviewUrl"></defaultviewfields>
+			<defaultviewfields name="ShortDescription" ></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel" ></defaultviewfields>
+			<defaultviewfields name="Sensitivity" ></defaultviewfields>
+			<defaultviewfields name="ReadingTime" ></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="ThumbnailImage"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="MediaURL"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+			<defaultviewfields name="cmsAuthor"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
 
 				<customViewfields name="Title"></customViewfields>
 				<customViewfields name="arTitle"></customViewfields>
@@ -524,20 +530,22 @@
 				<defaultviewfields name="Link" ></defaultviewfields>
 				<defaultviewfields name="Modified"></defaultviewfields>
 
-				<customViewfields name="Title"></customViewfields>
-				<customViewfields name="arTitle"></customViewfields>
-				<customViewfields name="ContentStatus"></customViewfields>
-			</ListAndContentTypes>
-		</globalSPList>
-	
-		<sectorSPList>
-			<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
-				<defaultviewfields name="Title"></defaultviewfields>
-				<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
-				<defaultviewfields name="cmsAssignedToUser"></defaultviewfields>
-				<defaultviewfields name="ParentItemLink"></defaultviewfields>
-				<defaultviewfields name="Translation"></defaultviewfields>
-				<defaultviewfields name="TaskComments"></defaultviewfields>
+			<customViewfields name="Title"></customViewfields>
+			<customViewfields name="arTitle"></customViewfields>
+			<customViewfields name="ContentStatus"></customViewfields>
+		</ListAndContentTypes>
+	</globalSPList>
+	<sectorSPList>
+		<ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="PreviewUrl"></defaultviewfields>
+				<defaultviewfields name="arPreviewUrl"></defaultviewfields>
+			<defaultviewfields name="TASMUTaskStatus"></defaultviewfields>
+			<defaultviewfields name="cmsAssignedToUser"></defaultviewfields>
+			<defaultviewfields name="ParentItemLink"></defaultviewfields>
+			<defaultviewfields name="Translation"></defaultviewfields>
+			<defaultviewfields name="TaskComments"></defaultviewfields>
+			<defaultviewfields name="ListName"></defaultviewfields>
 
 				<customViewfields name="Title"></customViewfields>
 				<customViewfields name="TASMUTaskStatus"></customViewfields>
@@ -553,7 +561,7 @@
 				<customViewfields name="Created"></customViewfields>
 				<customViewfields name="Modified"></customViewfields>
 			</ListAndContentTypes>
-			<ListAndContentTypes ListName="Events" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
+			<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
 				<defaultviewfields name="Title"></defaultviewfields>
 				<defaultviewfields name="arTitle"></defaultviewfields>
 				<defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -687,26 +695,26 @@
 				<customViewfields name="arTitle"></customViewfields>
 				<customViewfields name="ContentStatus"></customViewfields>
 
-			</ListAndContentTypes>
-			<ListAndContentTypes ListName="News Articles" ContentTypeName="TASMU News Articles" ListTemplate="GenericList" customView="Home">
-				<defaultviewfields name="Title"></defaultviewfields>
-				<defaultviewfields name="arTitle"></defaultviewfields>
-				<defaultviewfields name="PreviewUrl"></defaultviewfields>
-				<defaultviewfields name="arPreviewUrl"></defaultviewfields>
-				<defaultviewfields name="ShortDescription" ></defaultviewfields>
-				<defaultviewfields name="arShortDescription"></defaultviewfields>
-				<defaultviewfields name="Channel" ></defaultviewfields>
-				<defaultviewfields name="Sensitivity" ></defaultviewfields>
-				<defaultviewfields name="ReadingTime" ></defaultviewfields>
-				<defaultviewfields name="Personas"></defaultviewfields>
-				<defaultviewfields name="ThumbnailImage"></defaultviewfields>
-				<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-				<defaultviewfields name="cmsPublished"></defaultviewfields>
-				<defaultviewfields name="ContentStatus"></defaultviewfields>
-				<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
-				<defaultviewfields name="MediaURL"></defaultviewfields>
-				<defaultviewfields name="Sectors"></defaultviewfields>
-				<defaultviewfields name="Modified"></defaultviewfields>
+		</ListAndContentTypes>
+		<ListAndContentTypes ListName="News Articles" ContentTypeName="TASMU News Articles" ListTemplate="GenericList" customView="Home">
+			<defaultviewfields name="Title"></defaultviewfields>
+			<defaultviewfields name="arTitle"></defaultviewfields>
+			<defaultviewfields name="PreviewUrl"></defaultviewfields>
+			<defaultviewfields name="arPreviewUrl"></defaultviewfields>
+			<defaultviewfields name="ShortDescription" ></defaultviewfields>
+			<defaultviewfields name="arShortDescription"></defaultviewfields>
+			<defaultviewfields name="Channel" ></defaultviewfields>
+			<defaultviewfields name="Sensitivity" ></defaultviewfields>
+			<defaultviewfields name="ReadingTime" ></defaultviewfields>
+			<defaultviewfields name="Personas"></defaultviewfields>
+			<defaultviewfields name="ThumbnailImage"></defaultviewfields>
+			<defaultviewfields name="EnterpriseKeywords"></defaultviewfields>
+			<defaultviewfields name="cmsPublished"></defaultviewfields>
+			<defaultviewfields name="ContentStatus"></defaultviewfields>
+			<defaultviewfields name="MediaURL"></defaultviewfields>
+			<defaultviewfields name="Sectors"></defaultviewfields>
+			<defaultviewfields name="cmsAuthor"></defaultviewfields>
+			<defaultviewfields name="Modified"></defaultviewfields>
 
 				<customViewfields name="Title"></customViewfields>
 				<customViewfields name="arTitle"></customViewfields>
@@ -762,7 +770,7 @@
 					<customViewfields name="ContentStatus"></customViewfields>
 					<customViewfields name="DocumentTypes"></customViewfields>
 				</ListAndContentTypes>
-				<ListAndContentTypes ListName="Events" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
+				<ListAndContentTypes ListName="Events List" ContentTypeName="TASMU Events" ListTemplate="GenericList" customView="Home">
 					<Field ColumnName="SectorLookupMulti" ColumnTitle="Sectors" LookupListName="Sectors" Type="LookupMulti" LookupField="Title" ShowField="Title" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></Field>
 					<projectedField ColumnName="SectorLookupMulti_x003A_arTitle" ColumnTitle="Sector:Arabic Title" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="arTitle" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
 					<projectedField ColumnName="SectorLookupMulti_x003A_SectorID" ColumnTitle="Sector:SectorID" Type="LookupMulti" LookupListName="Sectors" LookupField="SectorLookupMulti" ShowField="SectorID" ColumnType="Text" Required="FALSE" Format="None" choicevalue=""></projectedField>
@@ -1142,7 +1150,7 @@
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Order="2" Section="1" Column="1" ListTitle="Announcements" ListTitleDisplay="Announcements" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Order="3" Section="1" Column="1" ListTitle="Articles" ListTitleDisplay="Articles" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="SiteActivity" layoutId="GridNews" Section="1" Column="1"></webpart>
-			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events" ListTitleDisplay="Events" ViewName="Home"></webpart>
+			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Events List" ListTitleDisplay="Events List" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Campaigns" ListTitleDisplay="Campaigns" ViewName="Home"></webpart>
 			<webpart DefaultWebPartType="List" hideCommandBar="False" layoutId="GridNews" Section="1" Column="1" ListTitle="Public Documents" ListTitleDisplay="Documents" ViewName="Home"></webpart>
 
@@ -1278,7 +1286,7 @@
 	<updateSiteColumns>
 		<updateFieldToMultiline ColumnInternalName="Picture" ColumnTitle="Image of Sponsor" GroupName="TASMU" ColumnType="URL" ColumnChoices="None" Required="FALSE" Format="Image"></updateFieldToMultiline>
 		<renameFieldDisplayName ColumnInternalName="Picture" ColumnTitle="" ColumnNewTitle="Arabic Title" GroupName="TASMU" ColumnType="URL" ColumnChoices="None" Required="FALSE" Format="Image"></renameFieldDisplayName>
-		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Announcements"></changeDateOnly>
+		<!-- <changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Announcements"></changeDateOnly>
 		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Campaigns"></changeDateOnly>
 		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Events"></changeDateOnly>
 		<changeDateOnly ColumnInternalName="StartDate" ColumnTitle="Start Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="[today]" ContentTypeName="TASMU Projects"></changeDateOnly>
@@ -1286,16 +1294,25 @@
 		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Announcements"></changeDateOnly>
 		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Campaigns"></changeDateOnly>
 		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Events"></changeDateOnly>
-		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Projects"></changeDateOnly>
+		<changeDateOnly ColumnInternalName="EndDate" ColumnTitle="End Date" GroupName="TASMU" DisplayFormat="DateOnly" DefaultValue="" ContentTypeName="TASMU Projects"></changeDateOnly> -->
 
+		<configChange>
+		<changeRequiredField ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="TranslateConfig" ContentTypeName="TASMU Translate Config" Required="False"></changeRequiredField>
+		</configChange>
 		<globalChange>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="Generic Page" ContentTypeName="TASMU Generic Page"></changeDateOnly>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="News Articles" ContentTypeName="TASMU News Articles"></changeDateOnly>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="Hero Mobile" ContentTypeName="TASMU Hero Mobile"></changeDateOnly>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="Hero Web" ContentTypeName="TASMU Hero Web"></changeDateOnly>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="Product Assets" ContentTypeName="TASMU Product Assets"></changeDateOnly>
+
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Entities" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Announcements" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Sponsors" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Projects" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Videos" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Contacts" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Events" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Events List" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Campaigns" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="News Articles" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Global" DefaultValue="Global" ListName="Hero Web" Format="None" ></changeContentTierChoice>
@@ -1326,20 +1343,22 @@
 		</globalChange>
 		
 		<sectorChange>
+			<changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="News Articles" ContentTypeName="TASMU News Articles"></changeDateOnly>
+
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Announcements" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Sponsors" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Projects" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Videos" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Contacts" Format="None" ></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Events" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Events List" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Campaigns" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="News Articles" Format="None" ></changeContentTierChoice>
 
 			<changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Sponsors" ContentTypeName="TASMU Sponsors" NewTitle="Sponsor Name"></changeTitle>
 			<changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Products" ContentTypeName="TASMU Products" NewTitle="Product Name"></changeTitle>
 
-			<!--<removeFromEditForm ColumnInternalName="AssignedTo" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Approval Tasks" ShowInEditForm="False"></removeFromEditForm>
-			<removeFromEditForm ColumnInternalName="AssignedTo" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Translation Tasks" ShowInEditForm="False"></removeFromEditForm>-->
+			<!--<removeFromEditForm ColumnInternalName="cmsAssignedToUser" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Approval Tasks" ShowInEditForm="False"></removeFromEditForm>
+			<removeFromEditForm ColumnInternalName="cmsAssignedToUser" ColumnTitle="Assigned To" ListName="My Tasks" GroupName="TASMU" ContentTypeName="TASMU Translation Tasks" ShowInEditForm="False"></removeFromEditForm>-->
 		</sectorChange>
 		
 		<!--<orgChange>
@@ -1350,7 +1369,7 @@
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Projects" Format="None"></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Videos" Format="None"></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Contacts" Format="None"></changeContentTierChoice>
-			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Events" Format="None" ></changeContentTierChoice>
+			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Events List" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Campaigns" Format="None" ></changeContentTierChoice>
 			<changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Articles" Format="None" ></changeContentTierChoice>
 		</orgChange>-->
@@ -1370,13 +1389,13 @@
 	</deleteSiteColumns>
 
 	<globalAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Global" ListNames="News Articles;Announcements;Campaigns;Contacts;Events;Entities;Media Assets;Projects;Public Documents;Videos;Product Assets;Generic Pages;Hero Web;Hero Mobile" Approvers="Global Approvers" CriticalApprovers="Global Critical Content Approvers" Translators="Global Translators"></item>
+		<item configListName="Configuration" SiteLevel="Global" ListNames="News Articles;Announcements;Campaigns;Contacts;Events List;Entities;Media Assets;Projects;Public Documents;Videos;Product Assets;Generic Pages;Hero Web;Hero Mobile" Approvers="Global Approvers" CriticalApprovers="Global Critical Content Approvers" Translators="Global Translators"></item>
 	</globalAddItemConfigurationList>
 	
 	<sectorAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Sector" ListNames="News Articles;Announcements;Campaigns;Contacts;Events;Media Assets;Projects;Public Documents;Videos" Approvers="Sector Approvers" Translators="Sector Translators"></item>
+		<item configListName="Configuration" SiteLevel="Sector" ListNames="News Articles;Announcements;Campaigns;Contacts;Events List;Media Assets;Projects;Public Documents;Videos" Approvers="Sector Approvers" Translators="Sector Translators"></item>
 	</sectorAddItemConfigurationList>
 	<!--<orgAddItemConfigurationList>
-		<item configListName="Configuration" SiteLevel="Entity" ListNames="Sectors;My Tasks;Public Document;Events;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
+		<item configListName="Configuration" SiteLevel="Entity" ListNames="Sectors;My Tasks;Public Document;Events List;Announcements;Sponsors;Media Assets;Projects;Videos;Contact Information;Campaigns;Articles"></item>
 	</orgAddItemConfigurationList>-->
 </sites>

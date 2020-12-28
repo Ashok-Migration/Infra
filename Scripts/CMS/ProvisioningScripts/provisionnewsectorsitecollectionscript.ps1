@@ -92,7 +92,8 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-
+    $connection = Get-PnPConnection
+    
     foreach($globalconfigsite in $sitefile.sites.Configsite.site)
     {
         $globalconfigSiteUrl = $urlprefix + $globalconfigsite.Alias
@@ -119,13 +120,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
            $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
            
            if ([bool] ($siteExits) -eq $true) {
-               
-               #Register the created Site as Hub Site
-               $hubSite=Get-PnPHubSite -Identity $sectorhubSiteUrl
-               if($null -eq $hubSite)
-                {
-                    Register-PnPHubSite -Site $sectorhubSiteUrl
-                }
+                    #Register the created Site as Hub Site
+                       Register-PnPHubSite -Site $sectorhubSiteUrl 
+       
                
                EnableMegaMenu $sectorhubSiteUrl
                 ListandLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
@@ -133,21 +130,27 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
                 AddUsersToDefaultSPGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
                 AssignUniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
                
-               AddCustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
-               AddCustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
-               ApplyTheme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
-               CreateModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
-               AddWebpartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
-               #UploadFiles $sectorhubSiteUrl $sitefile.sites.sectorUploadFiles
-               Update-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChangeContentTierChoice
+                AddCustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
+                AddCustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
+                UpdateTopNavForExistingSectors $sectorhubsite.Alias $sitefile.sites.sectorNav.TopNav.Level1.Level2 $sitefile.sites.sectorNav.TopNav.Level1.nodeName $sectorhubsite.Title
+
+                ApplyTheme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
+                CreateModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
+                AddWebpartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
+                $webpartkeyHeight = 1
+			    UpdateListViewWebPartProperties $sitefile.sites.sectorPageWebpart.page.name $webpartkeyHeight
+			   UpdateRegionalSettings $sectorhubSiteUrl $tenantAdmin
+			  
+            #    #UploadFiles $sectorhubSiteUrl $sitefile.sites.sectorUploadFiles
+               Update-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
                UpdateViewForTasksList 'My Tasks' $sectorhubSiteUrl
 
-               #Check and add the app catalog             
+            #    #Check and add the app catalog             
                CheckAndCreateAppCatalog $sectorhubSiteUrl             
                #Check and add the spfx webpart    
-               # appName will be the title of the application customizer from tenant app catalog
-               $appName = "tasmu-spfx-sector-client-side-solution" 
-               AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
+                # appName will be the title of the application customizer from tenant app catalog
+                 $appName = "tasmu-spfx-sector-client-side-solution" 
+                 AddSPFxWebPart $sectorhubSiteUrl $tenantAdmin $appName
                
                #Uncomment and run below line on new site creation only, else keep commented
                AddEntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
@@ -156,8 +159,37 @@ function ProvisionSiteCollections($sitefile, $tenantUrl)
           }
        }
     #set at Search Configuration tenant level, Uncomment to execute it
-    SearchConfiguration $scope $serchConfigPath
+    #SearchConfiguration $scope $serchConfigPath
     
+}
+
+function UpdateTopNavForExistingSectors($sectorhubsiteAlias,$sectorNav,$TopNavName,$sectorhubsite)
+{
+    Write-Host 'Adding '$sectorhubsiteAlias' to other sectors' -foreground Green
+    foreach ($level2 in $sectorNav) {
+        if($level2.url -eq $sectorhubsiteAlias)
+        {
+         continue
+        }
+       #foreach ($site in $sitefile.sites.globalhubsite.site.sectorhubsite.site) {
+       $sectorUrl='https://'+$tenant + '.sharepoint.com/sites/'+$level2.url
+       Write-Host 'Adding '$sectorhubsiteAlias' to '$sectorUrl
+       Connect-PnPOnline -Url $sectorUrl -Credentials $tenantAdmin
+   
+        $allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
+        foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
+               if($NavigationNodeTopNavigationBar.Title -eq $TopNavName)
+               {
+                   $TopNav = Get-PnPNavigationNode -id  $NavigationNodeTopNavigationBar.Id
+                   $level2currentURL=$urlprefix+$sectorhubsiteAlias
+                   $navNode= Add-PnPNavigationNode -Title $sectorhubsite -Url $level2currentURL -Location "TopNavigationBar" -Parent $TopNav.Id
+                   break
+               }
+           }
+   
+   
+       Disconnect-PnPOnline 
+       }
 }
 
 <#
@@ -274,51 +306,52 @@ Function CreateLookupColumn()
 
 Function CreateLookupColumnForList()
 {
-    param
-    (
-        [Parameter(Mandatory=$true)] [string] $SiteURL,
-        [Parameter(Mandatory=$true)] [string] $ListName,
-        [Parameter(Mandatory=$true)] [string] $Name,
-        [Parameter(Mandatory=$true)] [string] $DisplayName,
-        [Parameter(Mandatory=$false)] [string] $IsRequired = "FALSE",
-        [Parameter(Mandatory=$false)] [string] $EnforceUniqueValues = "FALSE",
-        [Parameter(Mandatory=$true)] [string] $LookupListName,
-        [Parameter(Mandatory=$true)] [string] $LookupField,
-        [Parameter(Mandatory=$true)] [string] $LookupType,
-        [Parameter(Mandatory=$false)] [object] $ProjectedFields,
-        $connection
-    )
-    
-    $fieldExists = Get-PNPField -identity $Name -ErrorAction SilentlyContinue
-    $LookupListExist = Get-PnPList -Identity $LookupListName -Connection $connection -ErrorAction Stop
-    if ([bool] ($fieldExists) -eq $false) {
-        
-        $LookupListID= $LookupListExist.id
-        
-        $web = Get-PnPWeb
-        $LookupWebID=$web.Id
+	param
+	(
+		[Parameter(Mandatory=$true)] [string] $SiteURL,
+		[Parameter(Mandatory=$true)] [string] $ListName,
+		[Parameter(Mandatory=$true)] [string] $Name,
+		[Parameter(Mandatory=$true)] [string] $DisplayName,
+		[Parameter(Mandatory=$false)] [string] $IsRequired = "FALSE",
+		[Parameter(Mandatory=$false)] [string] $EnforceUniqueValues = "FALSE",
+		[Parameter(Mandatory=$true)] [string] $LookupListName,
+		[Parameter(Mandatory=$true)] [string] $LookupField,
+		[Parameter(Mandatory=$true)] [string] $LookupType,
+		[Parameter(Mandatory=$false)] [object] $ProjectedFields,
+		[Parameter(Mandatory=$true)] [string] $GroupName,
+		$connection
+	)
+	
+	$fieldExists = Get-PNPField -identity $Name -ErrorAction SilentlyContinue
+	$LookupListExist = Get-PnPList -Identity $LookupListName -Connection $connection -ErrorAction Stop
+	if ([bool] ($fieldExists) -eq $false) {
+		
+		$LookupListID= $LookupListExist.id
+		
+		$web = Get-PnPWeb
+		$LookupWebID=$web.Id
 
-        $lookupColumnId = [GUID]::NewGuid() 
-        $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$LookupType'
-        ID='{$lookupColumnId}' Mult='TRUE' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
-        Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
-        WebId='$LookupWebID' ShowField='$LookupField' />"
+		$lookupColumnId = [GUID]::NewGuid() 
+		$addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$LookupType'
+		ID='{$lookupColumnId}' Mult='TRUE' Group='$GroupName' Sortable='FALSE' DisplayName='$DisplayName' Name='$Name' Description='$Description'
+		Required='$IsRequired' EnforceUniqueValues='$EnforceUniqueValues' List='$LookupListID' 
+		WebId='$LookupWebID' ShowField='$LookupField' />"
 
-        foreach($columnItem in $ProjectedFields){
-            $columnExists = Get-PNPField -identity $columnItem.ColumnName -ErrorAction SilentlyContinue
-            if ([bool] ($columnExists) -eq $false) {
-                # create the projected field
-                $newID=[GUID]::NewGuid() 
-                $ColumnTitle=$columnItem.ColumnTitle
-                $ColumnName=$columnItem.ColumnName
-                $showField = $columnItem.ShowField
-                $projectedType = $columnItem.Type
-                $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$projectedType' DisplayName='$ColumnTitle' Name='$ColumnName' 
-                ShowField='$showField' EnforceUniqueValues='FALSE' Mult='TRUE' Sortable='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
-                ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
-            }
-        }
-    }
+		foreach($columnItem in $ProjectedFields){
+			$columnExists = Get-PNPField -identity $columnItem.ColumnName -ErrorAction SilentlyContinue
+			if ([bool] ($columnExists) -eq $false) {
+				# create the projected field
+				$newID=[GUID]::NewGuid() 
+				$ColumnTitle=$columnItem.ColumnTitle
+				$ColumnName=$columnItem.ColumnName
+				$showField = $columnItem.ShowField
+				$projectedType = $columnItem.Type
+				$addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$projectedType' DisplayName='$ColumnTitle' Name='$ColumnName' 
+				ShowField='$showField' EnforceUniqueValues='FALSE' Group='$GroupName' Mult='TRUE' Sortable='FALSE' Required='FALSE' Hidden='FALSE' ReadOnly='TRUE' CanToggleHidden='FALSE' 
+				ID='$newID' UnlimitedLengthInDocumentLibrary='FALSE' FieldRef='$lookupColumnId' List='$LookupListID' />"
+			}
+		}
+	}
 }
 
 function Create-ContentType($contenttypehub, $ContentTypeName, $ContentTypeDesc, $ParentCTName, $GroupName, $connection) {
@@ -347,24 +380,25 @@ function Create-ContentType($contenttypehub, $ContentTypeName, $ContentTypeDesc,
 }
 
 function AddColumns-ContentType($contenttypehub, $ContentTypeName, $ColumnName, $connection, $required) {
-    try {
-        Write-Host "Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName....."
-        $client.TrackEvent("Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName.....")
-        if ($required -eq "False") {
-            $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
-        }
-        else {
-            $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
-        }  
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    } 
+	try {
+		Write-Host "Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName....."
+		$client.TrackEvent("Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName.....")
+		if ($required -eq "False") {
+			$columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+		}
+		else {
+			$columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
+		}  
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	} 
 }
+
 
 
 # function AddEntryInConfigurationListForGlobalSite($globalconfigSiteUrl,$SiteUrl,$node)
@@ -391,23 +425,26 @@ function AddColumns-ContentType($contenttypehub, $ContentTypeName, $ColumnName, 
 
 function AddEntryInConfigurationListForSectorSite($globalconfigSiteUrl,$SiteUrl,$node,$value )
 {
-    try
-    {
-        Write-Host "Add Entry In Configuration List started for $SiteUrl....."
-        $client.TrackEvent("Add Entry In Configuration List started for $SiteUrl...")
+	try
+	{
+		Write-Host "Add Entry In Configuration List started for $SiteUrl....."
+		$client.TrackEvent("Add Entry In Configuration List started for $SiteUrl...")
 
-        $connection = Connect-PnPOnline -Url $globalconfigSiteUrl -Credentials $tenantAdmin
-       $result= Add-PnPListItem -List $node.configListName -Values @{"SiteURL" = $SiteUrl;"SiteLevel" = $node.SiteLevel; "ListNames"=$node.ListNames; "Sector"=$value}
-    }
-    catch
-    {
-       $ErrorMessage = $_.Exception.Message
-       Write-Host $ErrorMessage -foreground Yellow
+		$connection = Connect-PnPOnline -Url $globalconfigSiteUrl -Credentials $tenantAdmin
+		$sectorApprovers=$node.Approvers.Replace('Sector',$value)
+		$sectorTranslators=$node.Translators.Replace('Sector',$value)
+		$reference=Add-PnPListItem -List $node.configListName -Values @{"SiteURL" = $SiteUrl;"SiteLevel" = $node.SiteLevel; "ListNames"=$node.ListNames; "Sector"=$value;"Approvers"=$sectorApprovers;"Translators"=$sectorTranslators}
+		#Add-PnPListItem -List $node.configListName -Values @{"SiteURL" = $SiteUrl;"SiteLevel" = $node.SiteLevel; "ListNames"=$node.ListNames; "Sector"=$value}
+	}
+	catch
+	{
+	   $ErrorMessage = $_.Exception.Message
+	   Write-Host $ErrorMessage -foreground Yellow
 
-       $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-       $telemtryException.Exception = $_.Exception.Message  
-       $client.TrackException($telemtryException)
-    }
+	   $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+	   $telemtryException.Exception = $_.Exception.Message  
+	   $client.TrackException($telemtryException)
+	}
 }
 
 # function AddEntryInConfigurationListForOrgSite($globalconfigSiteUrl,$SiteUrl,$node,$value )
@@ -433,115 +470,115 @@ function AddEntryInConfigurationListForSectorSite($globalconfigSiteUrl,$SiteUrl,
 
 function SearchConfiguration($scope, $serchConfigPath)
 {
-    try
-    {
-        if(Test-Path $serchConfigPath)
-        {
-            $client.TrackEvent("Search Configuration Started at Tenent Level.")
-            Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-            Set-PnPSearchConfiguration -Path $serchConfigPath -Scope $scope
-            $client.TrackEvent("Completed.")
-        }
-        else
-        {
-            $client.TrackEvent("Search Configuration Completed at Tenent Level.")
-        }
-    }
-    catch 
-     {
-       $ErrorMessage = $_.Exception.Message
-       Write-Host $ErrorMessage -foreground Yellow
+	try
+	{
+		if(Test-Path $serchConfigPath)
+		{
+			$client.TrackEvent("Search Configuration Started at Tenent Level.")
+			Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+			Set-PnPSearchConfiguration -Path $serchConfigPath -Scope $scope
+			$client.TrackEvent("Completed.")
+		}
+		else
+		{
+			$client.TrackEvent("Search Configuration Completed at Tenent Level.")
+		}
+	}
+	catch 
+	 {
+	   $ErrorMessage = $_.Exception.Message
+	   Write-Host $ErrorMessage -foreground Yellow
 
-       $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-       $telemtryException.Exception = $_.Exception.Message  
-       $client.TrackException($telemtryException)
-     }
+	   $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+	   $telemtryException.Exception = $_.Exception.Message  
+	   $client.TrackException($telemtryException)
+	 }
   
-    Disconnect-PnPOnline
+	Disconnect-PnPOnline
 }
 
 
-function Create-SiteCollection($Type, $Title, $Alias, $isGlobalHubSite, $globalhubSiteUrl, $isSectorHubSite,$sectorhubSiteUrl,$isOrgSite,$orgSiteUrl) {
- try {
+# function Create-SiteCollection($Type, $Title, $Alias, $isGlobalHubSite, $globalhubSiteUrl, $isSectorHubSite,$sectorhubSiteUrl,$isOrgSite,$orgSiteUrl) {
+#  try {
        
-        if($isGlobalHubSite -eq $true){
-            $siteExits = Get-PnPTenantSite -Url $globalhubSiteUrl -ErrorAction SilentlyContinue
-        }
-        if($isSectorHubSite -eq $true){
-            $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
-        }
-        # if($isOrgSite -eq $true){
-        #     $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
-        # }
+#         if($isGlobalHubSite -eq $true){
+#             $siteExits = Get-PnPTenantSite -Url $globalhubSiteUrl -ErrorAction SilentlyContinue
+#         }
+#         if($isSectorHubSite -eq $true){
+#             $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
+#         }
+#         # if($isOrgSite -eq $true){
+#         #     $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
+#         # }
         
-        #Check for existence of SPE Admin Site 
-        if ([bool] ($siteExits) -eq $false) {
-            Write-Host "Site collection not found ,so creating a new $globalhubSiteUrl....."
-            $client.TrackEvent("Site collection not found ,so creating a new $globalhubSiteUrl.....")
-            #Create new site if site collection does not exist      
+#         #Check for existence of SPE Admin Site 
+#         if ([bool] ($siteExits) -eq $false) {
+#             Write-Host "Site collection not found ,so creating a new $globalhubSiteUrl....."
+#             $client.TrackEvent("Site collection not found ,so creating a new $globalhubSiteUrl.....")
+#             #Create new site if site collection does not exist      
             
-                if($isGlobalHubSite){
-                  try{
-                     New-PnPSite -Type $Type -Title $Title -Url $globalhubSiteUrl -SiteDesign Blank
-                     $client.TrackEvent("Site collection created.. $globalhubSiteUrl") 
-                  }
-                  catch{
-                     $ErrorMessage = $_.Exception.Message
-                     Write-Host $ErrorMessage -foreground Yellow
+#                 if($isGlobalHubSite){
+#                   try{
+#                      New-PnPSite -Type $Type -Title $Title -Url $globalhubSiteUrl -SiteDesign Blank
+#                      $client.TrackEvent("Site collection created.. $globalhubSiteUrl") 
+#                   }
+#                   catch{
+#                      $ErrorMessage = $_.Exception.Message
+#                      Write-Host $ErrorMessage -foreground Yellow
 
-                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                     $telemtryException.Exception = $_.Exception.Message  
-                     $client.TrackException($telemtryException)
+#                      $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+#                      $telemtryException.Exception = $_.Exception.Message  
+#                      $client.TrackException($telemtryException)
 
-                  }
-                }
+#                   }
+#                 }
                 
-                if($isSectorHubSite){
-                    try {
-                        New-PnPSite -Type $Type -Title $Title -Url $sectorhubSiteUrl -SiteDesign Blank
-                        $client.TrackEvent("Site collection created.. $sectorhubSiteUrl") 
-                    }
-                    catch {
-                        $ErrorMessage = $_.Exception.Message
-                        Write-Host $ErrorMessage -foreground Yellow
+#                 if($isSectorHubSite){
+#                     try {
+#                         New-PnPSite -Type $Type -Title $Title -Url $sectorhubSiteUrl -SiteDesign Blank
+#                         $client.TrackEvent("Site collection created.. $sectorhubSiteUrl") 
+#                     }
+#                     catch {
+#                         $ErrorMessage = $_.Exception.Message
+#                         Write-Host $ErrorMessage -foreground Yellow
 
-                         $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                         $telemtryException.Exception = $_.Exception.Message  
-                         $client.TrackException($telemtryException)
-                    }
-                }
+#                          $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+#                          $telemtryException.Exception = $_.Exception.Message  
+#                          $client.TrackException($telemtryException)
+#                     }
+#                 }
 
-                # if($isOrgSite){
-                #     try {
-                #         New-PnPSite -Type $Type -Title $Title -Url $orgSiteUrl -SiteDesign Blank
-                #         $client.TrackEvent("Site collection created.. $orgSiteUrl")
-                #     }
-                #     catch 
-                #     {
-                #         $ErrorMessage = $_.Exception.Message
-                #         Write-Host $ErrorMessage -foreground Yellow
+#                 # if($isOrgSite){
+#                 #     try {
+#                 #         New-PnPSite -Type $Type -Title $Title -Url $orgSiteUrl -SiteDesign Blank
+#                 #         $client.TrackEvent("Site collection created.. $orgSiteUrl")
+#                 #     }
+#                 #     catch 
+#                 #     {
+#                 #         $ErrorMessage = $_.Exception.Message
+#                 #         Write-Host $ErrorMessage -foreground Yellow
 
-                #          $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                #          $telemtryException.Exception = $_.Exception.Message  
-                #          $client.TrackException($telemtryException)
-                #     }
-                # }
+#                 #          $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+#                 #          $telemtryException.Exception = $_.Exception.Message  
+#                 #          $client.TrackException($telemtryException)
+#                 #     }
+#                 # }
                         
-        }
-        else {
-            Write-Host "Site Collection- $siteTitle already exists"
-            $client.TrackEvent("Site Collection- $siteTitle already exists")
-        }
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+#         }
+#         else {
+#             Write-Host "Site Collection- $siteTitle already exists"
+#             $client.TrackEvent("Site Collection- $siteTitle already exists")
+#         }
+#     }
+#     catch {
+#         $ErrorMessage = $_.Exception.Message
+#         Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    } 
-}
+#         $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+#         $telemtryException.Exception = $_.Exception.Message  
+#         $client.TrackException($telemtryException)
+#     } 
+# }
 
 
 #region Enable Mega Menu/ Custom Navigation block, to add QuickLaunchNavigation or TopNavigation
@@ -574,9 +611,7 @@ function AddCustomQuickLaunchNavigationGlobal($url, $nodeLevel)
      $client.TrackEvent("Configure Custom Navigation, Started.")
 
      $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-     Remove-PnPNavigationNode -Title Documents -Location QuickLaunch -Force
-     Remove-PnPNavigationNode -Title Pages -Location QuickLaunch -Force
-     Remove-PnPNavigationNode -Title "Site contents" -Location QuickLaunch -Force
+
      foreach($level1 in $nodeLevel.Level1){
      
      $isPresent=$false
@@ -808,19 +843,19 @@ function AddCustomTopNavigationSector($url, $nodeLevel)
   try
    {
      $client.TrackEvent("Configure Custom Navigation, Started.")
-
+    Write-Host 'Adding top navigation...' -foreground Green
      $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
      
      foreach($level1 in $nodeLevel.Level1){
 
      $isPresent=$false
-     $allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
-     foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
-            if($NavigationNodeTopNavigationBar.Title -eq $level1.nodeName)
-            {
-                $isPresent=$true
-            }
-        }
+     #$allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
+     #foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
+     #       if($NavigationNodeTopNavigationBar.Title -eq $level1.nodeName)
+     #       {
+     #           $isPresent=$true
+     #       }
+     #   }
 
     if($isPresent -eq $false)
      {
@@ -915,19 +950,19 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
         Write-Host -ForegroundColor Green 'Applying theme...'
         $client.TrackEvent("Apply Theme started.")
          if($themeName -eq "TASMU Sector") {
-            try{
-                $theme = Get-SPOTheme -Name $themeName
-                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-                Set-PnPWebTheme -Theme $themeName -WebUrl $url
-                Write-Host "Theme updated for the site " $url
-            } catch{
-                Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
-                Add-SPOTheme -Identity $themeName -Palette $themeGlobal -IsInverted $false -Overwrite
-                Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-                Set-PnPWebTheme -Theme $themeName -WebUrl $url
-                Write-Host "Theme updated for the site " $url
-            }
-        } 
+			try{
+				$theme = Get-SPOTheme -Name $themeName
+				Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+				Set-PnPWebTheme -Theme $themeName -WebUrl $url
+				Write-Host "Theme updated for the site " $url
+			} catch{
+				Connect-SPOService -Url $tenantUrl -Credential $tenantAdmin
+				Add-SPOTheme -Identity $themeName -Palette $themeSector -IsInverted $false -Overwrite
+				Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+				Set-PnPWebTheme -Theme $themeName -WebUrl $url
+				Write-Host "Theme updated for the site " $url
+			}
+		} 
         #else {
             #Set-PnPWebTheme -Theme $themeName �WebUrl $url
         #}
@@ -950,199 +985,206 @@ function ApplyTheme($themeName, $url, $tenantAdmin, $tenantUrl)
 
 function CreateNewGroupAddUsers($url, $nodeLevel, $siteAlias) {
 
-   $siteUrl = $url
-   $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
-   
-   
-   try {
-
-      foreach($SPGroup in $nodeLevel.group){
-        $SPGroupName= $siteAlias+' '+$SPGroup.Name
-        $groupExists = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
-        
-        if ([bool]($groupExists) -eq $false) {
-            Write-Host "Group not found. Creating new $($SPGroup.Name) group in $siteUrl"
-            $client.TrackEvent("Group not found. Creating new $($SPGroup.Name) group in $siteUrl")
-            
-            $newGroup = New-PnPGroup -Title $SPGroupName -Description $SPGroup.Description
-            Set-PnPGroupPermissions -Identity $SPGroupName -AddRole $SPGroup.Role
-        }
-        else {
-              Write-Host "$($SPGroup.Name) already exists in $siteUrl"
-              $client.TrackEvent("$($SPGroup.Name) already exists in $siteUrl")
+    $siteUrl = $url
+    $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    
+    
+    try {
+ 
+       foreach($SPGroup in $nodeLevel.group){
+         if($siteAlias -eq "TASMU CMS"){
+             $SPGroupName= 'Global '+$SPGroup.Name
          }
-
-         #add users in group
-         $GroupPresent= Get-PnPGroup -Identity $SPGroupName
-
-         if ([bool]($GroupPresent) -eq $true) {
-
-           if($SPGroup.isUsers -eq $true)
-            {
-                $web=Get-PnPWeb  
-                $ctx= $web.Context  
-                $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
-                $ctx.Load($newGroupName)  
-                $ctx.ExecuteQuery()
-
-            foreach($user in $SPGroup.users){
-
-                try {                  
-                    $userName=$user.email  
-                    $userInfo = $web.EnsureUser($userName)  
-                    $ctx.Load($userInfo)  
-                    $addUser = $GroupPresent.Users.AddUser($userInfo)  
-                    $ctx.Load($addUser)  
-                    $ctx.ExecuteQuery()
-                }
-                catch {                    
-                    $ErrorMessage = $_.Exception.Message
-                    Write-Host $ErrorMessage -foreground Yellow
-
-                    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                    $telemtryException.Exception = $_.Exception.Message  
-                    $client.TrackException($telemtryException)
-                }
-            }
-          }
-
-          if($SPGroup.isADGroup -eq $true)
-            {
-                $web=Get-PnPWeb  
-                $ctx= $web.Context  
-                $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
-                $ctx.Load($newGroupName)  
-                $ctx.ExecuteQuery()
-
-            foreach($ADGroupUser in $SPGroup.ADGroup){
-
-                try {
-                                   
-                    $ADGroup = $web.EnsureUser($ADGroupUser)                    
-                    #sharepoint online powershell add AD group to sharepoint group
-                    $Result = $GroupPresent.Users.AddUser($ADGroup)
-                    $ctx.Load($Result)
-                    $ctx.ExecuteQuery()
-                }
-                catch {                    
-                    $ErrorMessage = $_.Exception.Message
-                    Write-Host $ErrorMessage -foreground Yellow
-
-                    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                    $telemtryException.Exception = $_.Exception.Message  
-                    $client.TrackException($telemtryException)
-                }
-            }
-          }
-        
-
-          if($SPGroup.SecurityGroup -ne '')
-            {
-                # Add Security group as member to Sharepoint group
-                Add-PnPUserToGroup -Identity $SPGroupName -LoginName $SPGroup.SecurityGroup
-            }
-        }       
-      }      
-    }   
-    catch {            
-          Write-Host $_.Exception.Message -ForegroundColor Red
-      }
-        Disconnect-PnPOnline
-}
-
-function AddUsersToDefaultSPGroup($url, $nodeLevel, $siteAlias) {
-
-   $siteUrl = $url
-   $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
-      
-   try {
-
-      foreach($SPGroup in $nodeLevel.defaultgroup){
-        $SPGroupName= $siteAlias+' '+$SPGroup.Name
-        $GroupPresent = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
-        
-   if ([bool]($GroupPresent) -eq $true) {
-         Write-Host "Group found. Adding users in $SPGroupName group in $siteUrl"
-         $client.TrackEvent("Group found. Adding users inw $SPGroupName group in $siteUrl")
-            
-         #add users in group
-
-         if($SPGroup.isUsers -eq $true)
-            {
-                $web=Get-PnPWeb  
-                $ctx= $web.Context  
-                $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
-                $ctx.Load($newGroupName)  
-                $ctx.ExecuteQuery()
-
-            foreach($user in $SPGroup.users){
-
-                try {                  
-                    $userName=$user.email  
-                    $userInfo = $web.EnsureUser($userName)  
-                    $ctx.Load($userInfo)  
-                    $addUser = $GroupPresent.Users.AddUser($userInfo)  
-                    $ctx.Load($addUser)  
-                    $ctx.ExecuteQuery()
-                }
-                catch {                    
-                    $ErrorMessage = $_.Exception.Message
-                    Write-Host $ErrorMessage -foreground Yellow
-
-                    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                    $telemtryException.Exception = $_.Exception.Message  
-                    $client.TrackException($telemtryException)
-                }
-            }
-          }
-
-         if($SPGroup.isADGroup -eq $true)
-            {
-                $web=Get-PnPWeb  
-                $ctx= $web.Context  
-                $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
-                $ctx.Load($newGroupName)  
-                $ctx.ExecuteQuery()
-
-            foreach($ADGroupUser in $SPGroup.ADGroup){
-
-                try {
-                                   
-                    $ADGroup = $web.EnsureUser($ADGroupUser)                    
-                    #sharepoint online powershell add AD group to sharepoint group
-                    $Result = $GroupPresent.Users.AddUser($ADGroup)
-                    $ctx.Load($Result)
-                    $ctx.ExecuteQuery()
-                }
-                catch {                    
-                    $ErrorMessage = $_.Exception.Message
-                    Write-Host $ErrorMessage -foreground Yellow
-
-                    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                    $telemtryException.Exception = $_.Exception.Message  
-                    $client.TrackException($telemtryException)
-                }
-            }
-          }
-
-         if($SPGroup.SecurityGroup -ne '')
-            {
-                # Add Security group as member to Sharepoint group
-                Add-PnPUserToGroup -Identity $SPGroup.Name -LoginName $SPGroup.SecurityGroup
-            }
-        }
-        
-    else {
-              Write-Host "$SPGroupName not found in $siteUrl"
-              $client.TrackEvent("$SPGroupName not found in $siteUrl")
+         else{
+             $SPGroupName= $siteAlias+' '+$SPGroup.Name
          }
+         $groupExists = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
+         
+         if ([bool]($groupExists) -eq $false) {
+             Write-Host "Group not found. Creating new $($SPGroup.Name) group in $siteUrl"
+             $client.TrackEvent("Group not found. Creating new $($SPGroup.Name) group in $siteUrl")
+             
+             $newGroup = New-PnPGroup -Title $SPGroupName -Description $SPGroup.Description
+             Set-PnPGroupPermissions -Identity $SPGroupName -AddRole $SPGroup.Role
+         }
+         else {
+               Write-Host "$($SPGroup.Name) already exists in $siteUrl"
+               $client.TrackEvent("$($SPGroup.Name) already exists in $siteUrl")
+          }
+ 
+          #add users in group
+          $GroupPresent= Get-PnPGroup -Identity $SPGroupName
+ 
+          if ([bool]($GroupPresent) -eq $true) {
+ 
+            if($SPGroup.isUsers -eq $true)
+             {
+                 $web=Get-PnPWeb  
+                 $ctx= $web.Context  
+                 $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
+                 $ctx.Load($newGroupName)  
+                 $ctx.ExecuteQuery()
+ 
+             foreach($user in $SPGroup.users){
+ 
+                 try {                  
+                     $userName=$user.email  
+                     $userInfo = $web.EnsureUser($userName)  
+                     $ctx.Load($userInfo)  
+                     $addUser = $GroupPresent.Users.AddUser($userInfo)  
+                     $ctx.Load($addUser)  
+                     $ctx.ExecuteQuery()
+                 }
+                 catch {                    
+                     $ErrorMessage = $_.Exception.Message
+                     Write-Host $ErrorMessage -foreground Yellow
+ 
+                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+                     $telemtryException.Exception = $_.Exception.Message  
+                     $client.TrackException($telemtryException)
+                 }
+             }
+           }
+ 
+           if($SPGroup.isADGroup -eq $true)
+             {
+                 $web=Get-PnPWeb  
+                 $ctx= $web.Context  
+                 $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
+                 $ctx.Load($newGroupName)  
+                 $ctx.ExecuteQuery()
+ 
+             foreach($ADGroupUser in $SPGroup.ADGroup){
+ 
+                 try {
+                                    
+                     $ADGroup = $web.EnsureUser($ADGroupUser)                    
+                     #sharepoint online powershell add AD group to sharepoint group
+                     $Result = $GroupPresent.Users.AddUser($ADGroup)
+                     $ctx.Load($Result)
+                     $ctx.ExecuteQuery()
+                 }
+                 catch {                    
+                     $ErrorMessage = $_.Exception.Message
+                     Write-Host $ErrorMessage -foreground Yellow
+ 
+                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+                     $telemtryException.Exception = $_.Exception.Message  
+                     $client.TrackException($telemtryException)
+                 }
+             }
+           }
+         
+ 
+           if($SPGroup.SecurityGroup -ne '')
+             {
+                 # Add Security group as member to Sharepoint group
+                 Add-PnPUserToGroup -Identity $SPGroupName -LoginName $SPGroup.SecurityGroup
+             }
+         }       
+       }      
+     }   
+     catch {            
+           Write-Host $_.Exception.Message -ForegroundColor Red
        }
-      }
-      catch {            
-          Write-Host $_.Exception.Message -ForegroundColor Red
-      }
-        Disconnect-PnPOnline
-}
+         Disconnect-PnPOnline
+ }
+
+
+ function AddUsersToDefaultSPGroup($url, $nodeLevel, $siteAlias) {
+
+    $siteUrl = $url
+    $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    
+    
+    try {
+ 
+       foreach($SPGroup in $nodeLevel.defaultgroup){
+         $SPGroupName= $siteAlias+' '+$SPGroup.Name
+         $GroupPresent = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
+         
+    if ([bool]($GroupPresent) -eq $true) {
+          Write-Host "Group found. Adding users in $SPGroupName group in $siteUrl"
+          $client.TrackEvent("Group found. Adding users inw $SPGroupName group in $siteUrl")
+             
+          #add users in group
+ 
+          if($SPGroup.isUsers -eq $true)
+             {
+                 $web=Get-PnPWeb  
+                 $ctx= $web.Context  
+                 $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
+                 $ctx.Load($newGroupName)  
+                 $ctx.ExecuteQuery()
+ 
+             foreach($user in $SPGroup.users){
+ 
+                 try {                  
+                     $userName=$user.email  
+                     $userInfo = $web.EnsureUser($userName)  
+                     $ctx.Load($userInfo)  
+                     $addUser = $GroupPresent.Users.AddUser($userInfo)  
+                     $ctx.Load($addUser)  
+                     $ctx.ExecuteQuery()
+                 }
+                 catch {                    
+                     $ErrorMessage = $_.Exception.Message
+                     Write-Host $ErrorMessage -foreground Yellow
+ 
+                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+                     $telemtryException.Exception = $_.Exception.Message  
+                     $client.TrackException($telemtryException)
+                 }
+             }
+           }
+ 
+          if($SPGroup.isADGroup -eq $true)
+             {
+                 $web=Get-PnPWeb  
+                 $ctx= $web.Context  
+                 $newGroupName=$web.SiteGroups.GetByName($SPGroupName)  
+                 $ctx.Load($newGroupName)  
+                 $ctx.ExecuteQuery()
+ 
+             foreach($ADGroupUser in $SPGroup.ADGroup){
+ 
+                 try {
+                                    
+                     $ADGroup = $web.EnsureUser($ADGroupUser)                    
+                     #sharepoint online powershell add AD group to sharepoint group
+                     $Result = $GroupPresent.Users.AddUser($ADGroup)
+                     $ctx.Load($Result)
+                     $ctx.ExecuteQuery()
+                 }
+                 catch {                    
+                     $ErrorMessage = $_.Exception.Message
+                     Write-Host $ErrorMessage -foreground Yellow
+ 
+                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+                     $telemtryException.Exception = $_.Exception.Message  
+                     $client.TrackException($telemtryException)
+                 }
+             }
+           }
+ 
+          if($SPGroup.SecurityGroup -ne '')
+             {
+                 # Add Security group as member to Sharepoint group
+                 Add-PnPUserToGroup -Identity $SPGroup.Name -LoginName $SPGroup.SecurityGroup
+             }
+         }
+         
+     else {
+               Write-Host "$SPGroupName not found in $siteUrl"
+               $client.TrackEvent("$SPGroupName not found in $siteUrl")
+          }
+        }
+       }
+       catch {            
+           Write-Host $_.Exception.Message -ForegroundColor Red
+       }
+         Disconnect-PnPOnline
+ }
 
 #endregion
 
@@ -1150,579 +1192,581 @@ function AddUsersToDefaultSPGroup($url, $nodeLevel, $siteAlias) {
 
 function ListandLibrary($url, $nodeLevel) {
 
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+	Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+	Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
-    $admin = $tenantAdmin.UserName
-    $password = $tenantAdmin.Password
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+	$admin = $tenantAdmin.UserName
+	$password = $tenantAdmin.Password
+	$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
 
 
-        #create all list
-        $siteUrlNew = $url
+		#create all list
+		$siteUrlNew = $url
 
-        EnableSitePagesFeatureAtSiteLevel $siteUrlNew
+		EnableSitePagesFeatureAtSiteLevel $siteUrlNew
 
-        #create all List & Libraries
-        $client.TrackEvent("List and Library creation started.")
-        
-        foreach ($itemList in $nodeLevel.ListAndContentTypes) {
-            if ($itemList.ListName -eq "Documents" -or $itemList.ListName -eq "Site Pages" -or $itemList.ListName -eq "Image Gallery") {
-                $ListURL = $itemList.ListName
-            }
-            else {
-                $ListURL = "Lists/" + $itemList.ListName
-            }
-            
-            $ListURL = $ListURL -replace '\s', ''
-            
-            Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem $itemList.Data.Item
-            
-            if($itemList.ListName -eq "Generic Page"){
-                Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field2.LookupListName $itemList.Field2.LookupField $null $itemList.Field2.ColumnName $itemList.Field2.ColumnTitle $itemList.Field2.Type $itemList.columnItem2 $null
-            }
+		#create all List & Libraries
+		$client.TrackEvent("List and Library creation started.")
+		
+		foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+			if ($itemList.ListName -eq "Documents" -or $itemList.ListName -eq "Site Pages" -or $itemList.ListName -eq "Image Gallery") {
+				$ListURL = $itemList.ListName
+			}
+			else {
+				$ListURL = "Lists/" + $itemList.ListName
+			}
+			
+			$ListURL = $ListURL -replace '\s', ''
+			
+			Create-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem $itemList.Data.Item $itemList.ParentCTName $itemList.GroupName
 
-            if(Get-PnPList -Identity $itemList.ListName){     
-                ViewCreation $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
-            }
+			if(Get-PnPList -Identity $itemList.ListName){     
+				ViewCreation $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
+			}
 
-            if($itemList.customView -ne ''){
-                if(Get-PnPList -Identity $itemList.ListName){
-                    CustomViewCreation $itemList.ListName $siteUrlNew $itemList.customView $itemList.customViewfields
-                }
-            }
-            if(Get-PnPList -Identity $itemList.ListName)
-            {
-                # Enable document set content type only for Services List
-                if($itemList.ListName -eq 'Services')
-                {
-                    EnabledocsetFeatureOnTargetSite $siteUrlNew $itemList.ListName
-                }
-            } 
-            
-            
-        }
+			if($itemList.customView -ne ''){
+				if(Get-PnPList -Identity $itemList.ListName){
+					CustomViewCreation $itemList.ListName $siteUrlNew $itemList.customView $itemList.customViewfields
+				}
+			}
+			if(Get-PnPList -Identity $itemList.ListName)
+			{
+				# Enable document set content type only for Services List
+				if($itemList.ListName -eq 'Services')
+				{
+					EnabledocsetFeatureOnTargetSite $siteUrlNew $itemList.ListName
+				}
+			} 
+		}
 }
 
 function GrantPermissionOnListToGroup($url, $nodeLevel)
 {
-    #GrantPermissionOnListToGroup List & Libraries
-    $client.TrackEvent("List and Library creation started.")
-        
-     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
-        #Grant permission on list to Group
-        Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
-        Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
-        Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
-     }
+	#GrantPermissionOnListToGroup List & Libraries
+	$client.TrackEvent("List and Library creation started.")
+		
+	 foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+		#Grant permission on list to Group
+		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
+		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
+		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
+	 }
 }
 
 function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
 
-    Write-Host "Updating $FieldName to RichText for $ListName in $SiteUrl..."
+	Write-Host "Updating $FieldName to RichText for $ListName in $SiteUrl..."
 
-    $admin = $sp_user
-    $password = $sp_password
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
-    $context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
-    $context.Credentials = $credentials
-    try {
-        $web = $context.Web
-        $list = $web.Lists.GetByTitle($ListName)
-        $context.Load($web)
-        $context.Load($web.Lists)
-        $context.Load($list.Fields)
-        $context.ExecuteQuery()
-        $field = $list.Fields | Where-Object {$_.InternalName -eq $FieldName}
-        if ($field -ne $null) {
-            $field.RichText = $True
-            $field.Update()
-            $context.ExecuteQuery()
-        }
-    }
-    catch {
-        Write-Host $_.Exception.Message -ForegroundColor Yellow
-    }
+	$admin = $sp_user
+	$password = $sp_password
+	$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+	$context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
+	$context.Credentials = $credentials
+	try {
+		$web = $context.Web
+		$list = $web.Lists.GetByTitle($ListName)
+		$context.Load($web)
+		$context.Load($web.Lists)
+		$context.Load($list.Fields)
+		$context.ExecuteQuery()
+		$field = $list.Fields | Where-Object {$_.InternalName -eq $FieldName}
+		if ($field -ne $null) {
+			$field.RichText = $True
+			$field.Update()
+			$context.ExecuteQuery()
+		}
+	}
+	catch {
+		Write-Host $_.Exception.Message -ForegroundColor Yellow
+	}
 }
 
-function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems, $Items) {
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+function Create-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems, $Items, $ParentContentTypeName, $GroupName) {
+	Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+	Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
-    $admin = $tenantAdmin.UserName
-    $password = $tenantAdmin.Password
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+	$admin = $tenantAdmin.UserName
+	$password = $tenantAdmin.Password
+	$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
 
-    try {
-        # Connect with the tenant admin credentials to the tenant
-        $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
+	try {
+		# Connect with the tenant admin credentials to the tenant
+		$connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
 
-        #foreach�($field�in�$fields) {
-            if([bool]$LookupFieldColumnName -eq $true -and [bool]$LookupListName -eq $true -and [bool]$LookupField -eq $true){
-                CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields $connection
-            }
-       # }
-        
-        $ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
-        if ([bool]($ListExist) -eq $false) {
-            Write-Host "List not found in $siteUrlNew creating new List - $ListName .."
-            $client.TrackEvent("List not found in $siteUrlNew creating new List - $ListName ..")
+		#foreach ($field in $fields) {
+			if([bool]$LookupFieldColumnName -eq $true -and [bool]$LookupListName -eq $true -and [bool]$LookupField -eq $true){
+				CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields -GroupName $GroupName $connection
+			}
+	   # }
+		
+		if([bool]($ParentContentTypeName) -eq $true){
+			#Call the function to Create ContentType
+			Create-ContentType $globalhubSiteUrl $ContentTypeName $ContentTypeName $ParentContentTypeName $GroupName $connection
 
-            if ($ListName -eq "Documents") {                
-                New-PnPList -Title $ListName -Template $ListTemplate -ErrorAction Stop
-            }
-            else {
-                if ($ListName -ne "Site Pages") {
-                    $newList = New-PnPList -Title $ListName -Template $ListTemplate -Url $ListURL -ErrorAction Stop
-                    $client.TrackEvent("List/Library created, $ListName")
-                }
-            }
+			foreach($columnItem in $ColumnItems){
+				AddColumns-ContentType $globalhubSiteUrl $columnItem.ContentTypeName $columnItem.ColumnName $connection $columnItem.Required
+			} 
+		}
 
-            $List = Get-PnPList -Identity $ListURL -ErrorAction Stop
-            if($ContentTypeName -ne '')
-            {
+		$ListExist = Get-PnPList -Identity $ListURL -ErrorAction Stop
+		if ([bool]($ListExist) -eq $false) {
+			Write-Host "List not found in $siteUrlNew creating new List - $ListName .."
+			$client.TrackEvent("List not found in $siteUrlNew creating new List - $ListName ..")
 
-            $ListBase = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
-            Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
-            
-            if($ContentTypeName -ne 'Item'){
-                # make the content type read-only false
-                Try {
-                    #Setup the context
-                    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrlNew)
-                    $Ctx.Credentials = $credentials
-         
-                    #Get the content type from the web
-                    $ContentTypeColl = $Ctx.Web.ContentTypes
-                    $Ctx.Load($ContentTypeColl)
-                    $Ctx.ExecuteQuery()
+			if ($ListName -eq "Documents") {                
+				New-PnPList -Title $ListName -Template $ListTemplate -ErrorAction Stop
+			}
+			else {
+				if ($ListName -ne "Site Pages") {
+					$newList = New-PnPList -Title $ListName -Template $ListTemplate -Url $ListURL -ErrorAction Stop
+					$client.TrackEvent("List/Library created, $ListName")
+				}
+			}
+
+			$List = Get-PnPList -Identity $ListURL -ErrorAction Stop
+			if($ContentTypeName -ne '')
+			{
+
+			$ListBase = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
+			Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
+			
+			<#if($ContentTypeName -ne 'Item'){
+				# make the content type read-only false
+				Try {
+					#Setup the context
+					$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrlNew)
+					$Ctx.Credentials = $credentials
+		 
+					#Get the content type from the web
+					$ContentTypeColl = $Ctx.Web.ContentTypes
+					$Ctx.Load($ContentTypeColl)
+					$Ctx.ExecuteQuery()
   
-                    #Get the content type to Add
-                    $CType = $ContentTypeColl | Where {$_.Name -eq $ContentTypeName}
-                    If($CType -ne $Null)
-                    {
-                        $CType.ReadOnly=$false
-                        $CType.Update($True)
-                        $Ctx.ExecuteQuery()
+					#Get the content type to Add
+					$CType = $ContentTypeColl | Where {$_.Name -eq $ContentTypeName}
+					If($CType -ne $Null)
+					{
+						$CType.ReadOnly=$false
+						$CType.Update($True)
+						$Ctx.ExecuteQuery()
  
-                        Write-host "Content Type $ContentTypeName is Set to Read Only False!" -ForegroundColor Green
-                    }
-                    else
-                    {
-                        Write-host "Content Type $ContentTypeName Doesn't Exist!" -ForegroundColor Yellow
-                    }
-                }
-                Catch {
-                    write-host -f Red "Error Setting Content Type $ContentTypeName to Read Only false!" $_.Exception.Message
-                }
-            }
+						Write-host "Content Type $ContentTypeName is Set to Read Only False!" -ForegroundColor Green
+					}
+					else
+					{
+						Write-host "Content Type $ContentTypeName Doesn't Exist!" -ForegroundColor Yellow
+					}
+				}
+				Catch {
+					write-host -f Red "Error Setting Content Type $ContentTypeName to Read Only false!" $_.Exception.Message
+				}
+			}#>
 
-            # Add the lookup columns to the list
-            foreach($columnItem in $ColumnItems){
-                Add-PnPFieldToContentType -Field $columnItem.ColumnName -ContentType $ContentTypeName
-                $siteColumn = $columnItem.ColumnName
-                Write-host "Site Column '$siteColumn' Added to List '$ListName' Successfully!" -f Green
-            } 
+			# Add the lookup columns to the list
+			<#foreach($columnItem in $ColumnItems){
+				Add-PnPFieldToContentType -Field $columnItem.ColumnName -ContentType $ContentTypeName
+				$siteColumn = $columnItem.ColumnName
+				Write-host "Site Column '$siteColumn' Added to List '$ListName' Successfully!" -f Green
+			} #>
 
-            $contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
-            $client.TrackEvent("Content Type, $ContentTypeName added to List, $ListName")
+			$contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
+			$client.TrackEvent("Content Type, $ContentTypeName added to List, $ListName")
 
-            if($ListName -eq "My Tasks")
-            {
-                $secondContentTypeName="TASMU MyTask Translator"
-                $secondListBase = Get-PnPContentType -Identity $secondContentTypeName -ErrorAction Stop -Connection $connection
-                $contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $secondListBase -ErrorAction Stop
-                $client.TrackEvent("Content Type, $secondContentTypeName added to List, $ListName")                
-            }
+			if($ListName -eq "My Tasks")
+			{
+				#$secondContentTypeName="TASMU MyTask Translator"
+				$secondContentTypeName="TASMU Translation Tasks"
+				$secondListBase = Get-PnPContentType -Identity $secondContentTypeName -ErrorAction Stop -Connection $connection
+				$contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $secondListBase -ErrorAction Stop
+				$client.TrackEvent("Content Type, $secondContentTypeName added to List, $ListName")                
+			}
 
-            #remove content type which gets created by default
+			#remove content type which gets created by default
 
-            if($ListTemplate -eq 'GenericList')
-            {
-                #Get the content type
-                $BaseItemContentType = Get-PnPContentType -Identity "Item" -Connection $connection -ErrorAction Stop
+			if($ListTemplate -eq 'GenericList')
+			{
+				#Get the content type
+				$BaseItemContentType = Get-PnPContentType -Identity "Item" -Connection $connection -ErrorAction Stop
  
-                If($BaseItemContentType)
-                {
-                    Remove-PnPContentTypeFromList -List $List -ContentType $BaseItemContentType -ErrorAction Stop
-                    $client.TrackEvent("Default Content Type, $BaseItemContentType deleted from List, $ListName")
-                }
-            }
-            if($ListTemplate -eq 'DocumentLibrary')
-            {
-                #Get the content type
-                $BaseDocContentType = Get-PnPContentType -Identity "Document" -Connection $connection -ErrorAction Stop
+				If($BaseItemContentType)
+				{
+					Remove-PnPContentTypeFromList -List $List -ContentType $BaseItemContentType -ErrorAction Stop
+					$client.TrackEvent("Default Content Type, $BaseItemContentType deleted from List, $ListName")
+				}
+			}
+			if($ListTemplate -eq 'DocumentLibrary')
+			{
+				#Get the content type
+				$BaseDocContentType = Get-PnPContentType -Identity "Document" -Connection $connection -ErrorAction Stop
  
-                If($BaseDocContentType)
-                {
-                    Remove-PnPContentTypeFromList -List $List -ContentType $BaseDocContentType -ErrorAction Stop
-                    $client.TrackEvent("Default Content Type, $BaseDocContentType deleted from Library, $ListName")
-                }
-            }
-            if($ListTemplate -eq 'PictureLibrary')
-            {
-                #Get the content type
-                $BasePicContentType = Get-PnPContentType -Identity "Picture" -Connection $connection -ErrorAction Stop
+				If($BaseDocContentType)
+				{
+					Remove-PnPContentTypeFromList -List $List -ContentType $BaseDocContentType -ErrorAction Stop
+					$client.TrackEvent("Default Content Type, $BaseDocContentType deleted from Library, $ListName")
+				}
+			}
+			if($ListTemplate -eq 'PictureLibrary')
+			{
+				#Get the content type
+				$BasePicContentType = Get-PnPContentType -Identity "Picture" -Connection $connection -ErrorAction Stop
  
-                If($BasePicContentType)
-                {
-                    Remove-PnPContentTypeFromList -List $List -ContentType $BasePicContentType -ErrorAction Stop
-                    $client.TrackEvent("Default Content Type, $BasePicContentType deleted from picture Library, $ListName")
-                }
-            }
-            }
+				If($BasePicContentType)
+				{
+					Remove-PnPContentTypeFromList -List $List -ContentType $BasePicContentType -ErrorAction Stop
+					$client.TrackEvent("Default Content Type, $BasePicContentType deleted from picture Library, $ListName")
+				}
+			}
+			}
 
-            #Adding data to the created list
-            foreach ($item in $Items) {
-                $hash = $null
-                $hash = @{}
-                foreach($attr in $item.Attributes)
-                {
-                $hash.add($attr.Name,$attr.Value)
-                }
-                Write-Host "Adding item to " $ListName
-                $client.TrackEvent("Adding item to $ListName")
-                Add-PnPListItem -List  'TranslateConfig' -Values $hash
-            }
-        }
-        else {
-            Write-Host "$ListName already exists in $siteUrlNew"
-            $client.TrackEvent("$ListName already exists in $siteUrlNew")
-        } 
+			#Adding data to the created list
+			foreach ($item in $Items) {
+				$hash = $null
+				$hash = @{}
+				foreach($attr in $item.Attributes)
+				{
+				$hash.add($attr.Name,$attr.Value)
+				}
+				Write-Host "Adding item to " $ListName
+				$client.TrackEvent("Adding item to $ListName")
+				Add-PnPListItem -List  'TranslateConfig' -Values $hash
+			}
+		}
+		else {
+			Write-Host "$ListName already exists in $siteUrlNew"
+			$client.TrackEvent("$ListName already exists in $siteUrlNew")
+		} 
+		#Disconnect-PnPOnline
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-
-        DeleteListOnFailure $siteUrlNew $ListName
-    }
+		#DeleteListOnFailure $siteUrlNew $ListName
+	}
 }
 
 function Remove-ContentTypeFromListLibrary($SiteUrl, $ListName, $ContentType) {
-    
-    Write-Host "Removing $ContentType content type from $ListName in $SiteUrl"
-    $client.TrackEvent("Removing $ContentType content type from $ListName in $SiteUrl")
-    try {
-        Connect-PnPOnline -Url $SiteUrl -Credentials $tenantAdmin
-        $list = Get-PnPList -Identity $ListName -ErrorAction SilentlyContinue
-        if ($null -ne $list) {
-            Remove-PnPContentTypeFromList -List $ListName -ContentType $ContentType
-        }
-        Disconnect-PnPOnline
-    }
-    catch {
-        Write-Host $_.Exception.Message
-    }
+	
+	Write-Host "Removing $ContentType content type from $ListName in $SiteUrl"
+	$client.TrackEvent("Removing $ContentType content type from $ListName in $SiteUrl")
+	try {
+		Connect-PnPOnline -Url $SiteUrl -Credentials $tenantAdmin
+		$list = Get-PnPList -Identity $ListName -ErrorAction SilentlyContinue
+		if ($null -ne $list) {
+			Remove-PnPContentTypeFromList -List $ListName -ContentType $ContentType
+		}
+		Disconnect-PnPOnline
+	}
+	catch {
+		Write-Host $_.Exception.Message
+	}
 }
 
 function EnableSitePagesFeatureAtSiteLevel($siteUrlNew) 
 {
-    $client.TrackEvent("Enable SitePages Feature At SiteLevel Started.")
-    Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
-    $connection = Get-PnPConnection
+	$client.TrackEvent("Enable SitePages Feature At SiteLevel Started.")
+	Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
+	$connection = Get-PnPConnection
 
-    #activate feature for site pages
-    Write-Host "Enabling feature for site pages - b6917cb1-93a0-4b97-a84d-7cf49975d4ec"
-    $client.TrackEvent("Enabling feature for site pages - b6917cb1-93a0-4b97-a84d-7cf49975d4ec")
-    
-    Enable-PnPFeature -Identity b6917cb1-93a0-4b97-a84d-7cf49975d4ec -Connection $connection -Scope Web -Force
-    #enable Team Collaboration Lists feature
-    Write-Host "Enabling feature for Team Collaboration Lists - 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5"
-    $client.TrackEvent("Enabling feature for Team Collaboration Lists - 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5")
-    
-    Enable-PnPFeature -Identity 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5 -Connection $connection -Scope Web -Force
+	#activate feature for site pages
+	Write-Host "Enabling feature for site pages - b6917cb1-93a0-4b97-a84d-7cf49975d4ec"
+	$client.TrackEvent("Enabling feature for site pages - b6917cb1-93a0-4b97-a84d-7cf49975d4ec")
+	
+	Enable-PnPFeature -Identity b6917cb1-93a0-4b97-a84d-7cf49975d4ec -Connection $connection -Scope Web -Force
+	#enable Team Collaboration Lists feature
+	Write-Host "Enabling feature for Team Collaboration Lists - 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5"
+	$client.TrackEvent("Enabling feature for Team Collaboration Lists - 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5")
+	
+	Enable-PnPFeature -Identity 00bfea71-4ea5-48d4-a4ad-7ea5c011abe5 -Connection $connection -Scope Web -Force
 
-        
-    Disconnect-PnPOnline
+		
+	Disconnect-PnPOnline
 }
 
 function EnabledocsetFeatureOnTargetSite($siteUrlNew, $ListName) 
 {
-    $client.TrackEvent("Enabling docset feature on target site Started.")
-    Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
-    $connection = Get-PnPConnection
+	$client.TrackEvent("Enabling docset feature on target site Started.")
+	Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
+	$connection = Get-PnPConnection
 
-    #activate feature for site pages
-    Write-Host "Enabling docset feature on target site - 3bae86a2-776d-499d-9db8-fa4cdc7884f8"
-    $client.TrackEvent("Enabling feature for site pages - 3bae86a2-776d-499d-9db8-fa4cdc7884f8")
-    
-    Enable-PnPFeature -Identity 3bae86a2-776d-499d-9db8-fa4cdc7884f8 -Connection $connection -Scope Site -Force
+	#activate feature for site pages
+	Write-Host "Enabling docset feature on target site - 3bae86a2-776d-499d-9db8-fa4cdc7884f8"
+	$client.TrackEvent("Enabling feature for site pages - 3bae86a2-776d-499d-9db8-fa4cdc7884f8")
+	
+	Enable-PnPFeature -Identity 3bae86a2-776d-499d-9db8-fa4cdc7884f8 -Connection $connection -Scope Site -Force
 
-    Set-PnPList -Identity $ListName -EnableContentTypes $true
-    Add-PnPContentTypeToList -List $ListName -ContentType "Document Set"
-        
-    Disconnect-PnPOnline
+	Set-PnPList -Identity $ListName -EnableContentTypes $true
+	Add-PnPContentTypeToList -List $ListName -ContentType "Document Set"
+		
+	Disconnect-PnPOnline
 }
 
 function RenameColumn($siteColUrl, $ListName, $ColumnName, $DisplayName, $spoCtx) {
-    Try {
+	Try {
 
-        [Microsoft.SharePoint.Client.Web]$web = $spoCtx.Web
-        $spoCtx.ExecuteQuery();
+		[Microsoft.SharePoint.Client.Web]$web = $spoCtx.Web
+		$spoCtx.ExecuteQuery();
 
-        #Get the List
-        [Microsoft.SharePoint.Client.List]$List = $spoCtx.Web.Lists.GetByTitle($ListName)
-        $spoCtx.Load($List)
-        $spoCtx.ExecuteQuery()
+		#Get the List
+		[Microsoft.SharePoint.Client.List]$List = $spoCtx.Web.Lists.GetByTitle($ListName)
+		$spoCtx.Load($List)
+		$spoCtx.ExecuteQuery()
  
-        #Get the column to rename
-        $Field = $List.Fields.GetByInternalNameOrTitle($ColumnName)
-        $Field.Title = $DisplayName
-        $Field.Update()
-        $spoCtx.ExecuteQuery()
-        $spoCtx.Dispose()
-        Write-Host "Column Name Changed successfully! in site - $siteColUrl" -ForegroundColor Green 
-        $client.TrackEvent("Column Name Changed successfully! in site - $siteColUrl")
-    }
-    Catch {
-        write-host -f Red "Error Renaming Column! -$siteColUrl" $_.Exception.Message
-    }
+		#Get the column to rename
+		$Field = $List.Fields.GetByInternalNameOrTitle($ColumnName)
+		$Field.Title = $DisplayName
+		$Field.Update()
+		$spoCtx.ExecuteQuery()
+		$spoCtx.Dispose()
+		Write-Host "Column Name Changed successfully! in site - $siteColUrl" -ForegroundColor Green 
+		$client.TrackEvent("Column Name Changed successfully! in site - $siteColUrl")
+	}
+	Catch {
+		write-host -f Red "Error Renaming Column! -$siteColUrl" $_.Exception.Message
+	}
 }
 #endregion
 
 #region --CreateView--
 function ViewCreation($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
-    
-    $client.TrackEvent("View creation started for list, $listNameForView.")
+	
+	$client.TrackEvent("View creation started for list, $listNameForView.")
+	#Connect with the tenant admin credentials to the tenant
+	#Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
 
-    try {
-             
-         if($ListTemplate -eq 'DocumentLibrary')
-         {
-            $viewExists = Get-PnPView -List $listNameForView -Identity "All Documents" -ErrorAction SilentlyContinue
-            $defaultviewName='All Documents'
-         }
-         else
-         {
-            $viewExists = Get-PnPView -List $listNameForView -Identity "All Items" -ErrorAction SilentlyContinue
-            $defaultviewName='All Items'
-         }
-         
-         
-         foreach($field in $fields)
-         {
-           $defaultviewfields+= @($field.name)
-         }
+	try {
+			 
+		 if($ListTemplate -eq 'DocumentLibrary')
+		 {
+			$viewExists = Get-PnPView -List $listNameForView -Identity "All Documents" -ErrorAction SilentlyContinue
+			$defaultviewName='All Documents'
+		 }
+		 else
+		 {
+			$viewExists = Get-PnPView -List $listNameForView -Identity "All Items" -ErrorAction SilentlyContinue
+			$defaultviewName='All Items'
+		 }
+		 
+		 
+		 foreach($field in $fields)
+		 {
+		   $defaultviewfields+= @($field.name)
+		 }
 
-        $client.TrackEvent("Fields ready for default view creation.")
+		$client.TrackEvent("Fields ready for default view creation.")
 
-        if ([bool]($viewExists) -eq $false) {
-            Write-Host "View not found ,so creating a new View in $listNameForView"
-            $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
-            $newView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
-        }
-        else {
-            Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
-            $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-            Add-ColumnToDefaultView -SiteUrl $siteUrlNew -Fields $defaultviewfields -ListName $listNameForView
-            
-            #delete the LinkTitle from default view
-            Update-ColumnToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
-        }
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
+		if ([bool]($viewExists) -eq $false) {
+			Write-Host "View not found ,so creating a new View in $listNameForView"
+			$client.TrackEvent("View not found ,so creating a new View in $listNameForView")
+			$newView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
+		}
+		else {
+			Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
+			$client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+			Add-ColumnToDefaultView -SiteUrl $siteUrlNew -Fields $defaultviewfields -ListName $listNameForView
+			
+			#delete the LinkTitle from default view
+			Update-ColumnToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        DeleteListOnFailure $siteUrlNew $listNameForView
-    }
-    #Disconnect-PnPOnline
+		DeleteListOnFailure $siteUrlNew $listNameForView
+	}
+	#Disconnect-PnPOnline
 }
 
 function CustomViewCreation($listNameForView, $siteUrlNew, $customViewName, $fields)
 {
-    
-    try {
-        $viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
+	#Connect with the tenant admin credentials to the tenant
+	#Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
 
-        if ([bool]($viewExists) -eq $false) {
-            Write-Host "View not found ,so creating a new View in $listNameForView"
-            $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
+	try {
+		$viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
 
-            foreach($field in $fields)
-            {
-               $customViewfields+= @($field.name)
-            }
-            
-            $newView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
-            Write-Host "$customViewName - View created in $listNameForView"
-            $client.TrackEvent("$customViewName - View created in $listNameForView")
-        }
-        else {
-            Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
-            $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-        }
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
+		if ([bool]($viewExists) -eq $false) {
+			Write-Host "View not found ,so creating a new View in $listNameForView"
+			$client.TrackEvent("View not found ,so creating a new View in $listNameForView")
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+			foreach($field in $fields)
+			{
+			   $customViewfields+= @($field.name)
+			}
+			
+			$newView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
+			Write-Host "$customViewName - View created in $listNameForView"
+			$client.TrackEvent("$customViewName - View created in $listNameForView")
+		}
+		else {
+			Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
+			$client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
 
-        DeleteListOnFailure $siteUrlNew $listNameForView
-    }
-    #Disconnect-PnPOnline
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+
+		DeleteListOnFailure $siteUrlNew $listNameForView
+	}
+	#Disconnect-PnPOnline
 }
 
 function UpdateViewForTasksList($listNameForView, $siteUrlNew)
 {   
    try {
-        $connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
+		$connection = Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin -ErrorAction Stop
 
-        $allItemViewMyTasks = Get-PnPView -List $listNameForView -Identity 'All Items' -ErrorAction SilentlyContinue
-        
-        if ([bool]($allItemViewMyTasks) -eq $true) {
-             $PnPContext = Get-PnPContext
-             $allItemViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='AssignedTo'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
-             $allItemViewMyTasks.Update()
-             $PnPContext.ExecuteQuery()
-             Write-Host "All Items - View updated for $listNameForView list."
-             $client.TrackEvent("All Items - View updated for $listNameForView list.")
-        }
-        else {
-            Write-Host "View not found in List $listNameForViews site- $siteUrlNew "
-            $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-        }
+		$allItemViewMyTasks = Get-PnPView -List $listNameForView -Identity 'All Items' -ErrorAction SilentlyContinue
+		
+		if ([bool]($allItemViewMyTasks) -eq $true) {
+			 $PnPContext = Get-PnPContext
+			 $allItemViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='cmsAssignedToUser'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
+			 $allItemViewMyTasks.Update()
+			 $PnPContext.ExecuteQuery()
+			 Write-Host "All Items - View updated for $listNameForView list."
+			 $client.TrackEvent("All Items - View updated for $listNameForView list.")
+		}
+		else {
+			Write-Host "View not found in List $listNameForViews site- $siteUrlNew "
+			$client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+		}
 
-       $HomeViewMyTasks = Get-PnPView -List $listNameForView -Identity 'Home' -ErrorAction SilentlyContinue
+	   $HomeViewMyTasks = Get-PnPView -List $listNameForView -Identity 'Home' -ErrorAction SilentlyContinue
 
-        if ([bool]($HomeViewMyTasks) -eq $true) {
+		if ([bool]($HomeViewMyTasks) -eq $true) {
 
-             $PnPContext = Get-PnPContext
-             $HomeViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='AssignedTo'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
-             $HomeViewMyTasks.Update()
-             $PnPContext.ExecuteQuery()
-             Write-Host "Home - View updated for $listNameForView list."
-             $client.TrackEvent("Home - View updated for $listNameForView list.")
-        }
-        else {
-            Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
-            $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-        }
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
+			 $PnPContext = Get-PnPContext
+			 $HomeViewMyTasks.ViewQuery = "<Where><Eq><FieldRef Name='cmsAssignedToUser'/><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>"
+			 $HomeViewMyTasks.Update()
+			 $PnPContext.ExecuteQuery()
+			 Write-Host "Home - View updated for $listNameForView list."
+			 $client.TrackEvent("Home - View updated for $listNameForView list.")
+		}
+		else {
+			Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
+			$client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        DeleteListOnFailure $siteUrlNew $listNameForView
-    }
+		DeleteListOnFailure $siteUrlNew $listNameForView
+	}
+	#Disconnect-PnPOnline
 }
 
 function AddSPFxWebPart($siteUrl, $tenantAdmin, $appTitle){
-    try{
-        Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
-        $tenantApps = Get-PnPApp -Scope Tenant
-        if($tenantApps -ne $null){
-            foreach($app in $tenantApps){
-                if($app.Title -eq $appTitle){
-                    Install-PnPApp -Identity $app.Id
-                    Write-Host "App $appTitle deployed for the site $SiteUrl " 
-                }
-            }
-        }
-    }
-    catch{
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage "Unable to install the app to the site $siteUrl. Check package path $path " -foreground Yellow
-
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+	try{
+		Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+		$tenantApps = Get-PnPApp -Scope Tenant
+		if($tenantApps -ne $null){
+			foreach($app in $tenantApps){
+				if($app.Title -eq $appTitle){
+					Install-PnPApp -Identity $app.Id
+					Write-Host "App $appTitle deployed for the site $SiteUrl " 
+				}
+			}
+		}
+	}
+	catch{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage "Unable to install the app to the site $siteUrl. Check package path $path " -foreground Yellow
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 function CheckAndCreateAppCatalog($siteUrl){     
-    try{ 
-        $isAppCatalogPresent=Get-SPOSiteCollectionAppCatalogs -Site $siteUrl
-        if($null -eq $isAppCatalogPresent)
-        {
-            Write-Host "Creating app catalog for the site url  $SiteUrl "             
-            Add-SPOSiteCollectionAppCatalog -Site $siteUrl             
-            Write-Host "App catalog for the site url  $SiteUrl is created " 
-        }
-        else {
-            Write-Host "App catalog for the site url  $SiteUrl already exists"  
-        }
-    }     
-    catch{         
-        $ErrorMessage = $_.Exception.Message         
-        Write-Host $ErrorMessage "In Site $siteUrl " -foreground Yellow         
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"        $telemtryException.Exception = $_.Exception.Message
-        $client.TrackException($telemtryException)     
-    } 
+	try{         
+		Write-Host "Creating app catalog for the site url  $SiteUrl "             
+		Add-SPOSiteCollectionAppCatalog -Site $siteUrl             
+		Write-Host "App catalog for the site url  $SiteUrl is created "         
+	}     
+	catch{         
+		$ErrorMessage = $_.Exception.Message         
+		Write-Host $ErrorMessage "In Site $siteUrl " -foreground Yellow         
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"        
+		$telemtryException.Exception = $_.Exception.Message
+		$client.TrackException($telemtryException)     
+	} 
 }
 
 function Add-ColumnToDefaultView($SiteUrl, $Fields, $ListName) {
-    Write-Host "Updating view for $ListName..."
-    $client.TrackEvent("Updating view for $ListName...")
-    $admin = $tenantAdmin.UserName
-    $password = $tenantAdmin.Password
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
-    $context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
-    $context.Credentials = $credentials
-    $web = $context.Web
-    $list = $web.Lists.GetByTitle($ListName)
-    $defaultFields = $list.DefaultView.ViewFields
-    
-    $context.Load($web)
-    $context.Load($web.Lists)
-    $context.Load($list.Fields)
-    $context.Load($defaultFields)
-    $context.ExecuteQuery()
+	Write-Host "Updating view for $ListName..."
+	$client.TrackEvent("Updating view for $ListName...")
+	$admin = $tenantAdmin.UserName
+	$password = $tenantAdmin.Password
+	$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+	$context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
+	$context.Credentials = $credentials
+	$web = $context.Web
+	$list = $web.Lists.GetByTitle($ListName)
+	$defaultFields = $list.DefaultView.ViewFields
+	
+	$context.Load($web)
+	$context.Load($web.Lists)
+	$context.Load($list.Fields)
+	$context.Load($defaultFields)
+	$context.ExecuteQuery()
 
-    try {
-        [int]$fieldOrder = 0
-        foreach ($f in $Fields) {
-            $field = $list.Fields | Where-Object { $_.InternalName -eq $f } | Select-Object -First 1
-            if ($null -ne $field) {
-                $isField = $defaultFields | Where-Object { $_ -eq $field.Title -or $_ -eq $field.InternalName }
-                if ($null -eq $isField) {
-                    $defaultFields.Add($field.InternalName)
-                }
-                $defaultFields.MoveFieldTo($field.InternalName, $fieldOrder)
-            }      
-            $list.DefaultView.Update()
-            $fieldOrder++
-        }
+	try {
+		[int]$fieldOrder = 0
+		foreach ($f in $Fields) {
+			$field = $list.Fields | Where-Object { $_.InternalName -eq $f } | Select-Object -First 1
+			if ($null -ne $field) {
+				$isField = $defaultFields | Where-Object { $_ -eq $field.Title -or $_ -eq $field.InternalName }
+				if ($null -eq $isField) {
+					$defaultFields.Add($field.InternalName)
+				}
+				$defaultFields.MoveFieldTo($field.InternalName, $fieldOrder)
+			}      
+			$list.DefaultView.Update()
+			$fieldOrder++
+		}
 
-        # If view contains Pinned column, then sort with Pinned then Modified Date
-        $isContainsPinned = $list.Fields | Where-Object { $_.InternalName -eq 'Pinned' }
-        if ($null -ne $isContainsPinned) {
-            $viewQuery = '<OrderBy><FieldRef Name="Pinned" Ascending="FALSE" /><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
-            $list.DefaultView.ViewQuery = $viewQuery
-            $list.DefaultView.Update()
-        }
-        else {
-            $viewQuery = '<OrderBy><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
-            $list.DefaultView.ViewQuery = $viewQuery
-            $list.DefaultView.Update()
-        }
-        $context.ExecuteQuery()
-    }
-    catch {
-        Write-Host $_.Exception.Message -ForegroundColor Red
+		# If view contains Pinned column, then sort with Pinned then Modified Date
+		$isContainsPinned = $list.Fields | Where-Object { $_.InternalName -eq 'Pinned' }
+		if ($null -ne $isContainsPinned) {
+			$viewQuery = '<OrderBy><FieldRef Name="Pinned" Ascending="FALSE" /><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
+			$list.DefaultView.ViewQuery = $viewQuery
+			$list.DefaultView.Update()
+		}
+		else {
+			$viewQuery = '<OrderBy><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
+			$list.DefaultView.ViewQuery = $viewQuery
+			$list.DefaultView.Update()
+		}
+		$context.ExecuteQuery()
+	}
+	catch {
+		Write-Host $_.Exception.Message -ForegroundColor Red
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        DeleteListOnFailure $SiteUrl $ListName
-    }
+		DeleteListOnFailure $SiteUrl $ListName
+	}
 }
 #endregion
 
@@ -1730,167 +1774,242 @@ function Add-ColumnToDefaultView($SiteUrl, $Fields, $ListName) {
 
 function AddWebpartToPage($url, $nodeLevel)
 {
-    try {
+	try {
         Write-Host -ForegroundColor Green 'Adding webparts...'
         #Load SharePoint CSOM Assemblies
-        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
-        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
-        $client.TrackEvent("Page creation & Webpart addition to page started.") 
-         
-        Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+		$client.TrackEvent("Page creation & Webpart addition to page started.") 
+		 
+		Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
 
-        $pagename=$nodeLevel.webpartSection.pagename
-        $page = Get-PnPClientSidePage -Identity $pagename -ErrorAction Stop           
-        
-        if($page -ne $null)
-        {
-        Add-PnPClientSidePageSection -Page $page -SectionTemplate $nodeLevel.webpartSection.SectionTemplate -ErrorAction Stop
+		$pagename=$nodeLevel.webpartSection.pagename
+		$page = Get-PnPClientSidePage -Identity $pagename -ErrorAction Stop           
+		
+		if($page -ne $null)
+		{
+		Add-PnPClientSidePageSection -Page $page -SectionTemplate $nodeLevel.webpartSection.SectionTemplate -ErrorAction Stop
 
-        #Write-host "Disabling Commnets on page:$Page"
-        #Set-PnPClientSidePage -Identity $page -CommentsEnabled:$False
+		#Write-host "Disabling Commnets on page:$Page"
+		#Set-PnPClientSidePage -Identity $page -CommentsEnabled:$False
 
-        
-        foreach($webpartSection in $nodeLevel.webpartSection){
-        
-              foreach($webpartSection in $webpartSection.webpart){
-             
-                if($webpartSection.DefaultWebPartType -eq 'List'){
+		
+		foreach($webpartSection in $nodeLevel.webpartSection){
+		
+			  foreach($webpartSection in $webpartSection.webpart){
+			 
+				if($webpartSection.DefaultWebPartType -eq 'List'){
+					Write-host "Updating the web part " $webpartSection.ListTitleDisplay
+					$admin = $tenantAdmin.UserName
+					$password = $tenantAdmin.Password
+					$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+					$context = New-Object Microsoft.SharePoint.Client.ClientContext($url)
+					$context.Credentials = $credentials
 
-                    $admin = $tenantAdmin.UserName
-                    $password = $tenantAdmin.Password
-                    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
-                    $context = New-Object Microsoft.SharePoint.Client.ClientContext($url)
-                    $context.Credentials = $credentials
+						try {
+						$web = $context.Web
+						$list = $web.Lists.GetByTitle($webpartSection.ListTitle)
+						$ListView = $list.views.GetByTitle($webpartSection.ViewName)                        
+						$context.Load($list)
+						$context.Load($ListView)
+						$context.ExecuteQuery()
+						}
+						catch {
+							Write-Host $_.Exception.Message -ForegroundColor Yellow
+						}
 
-                        try {
-                        $web = $context.Web
-                        $list = $web.Lists.GetByTitle($webpartSection.ListTitle)
-                        $ListView = $list.views.GetByTitle($webpartSection.ViewName)                        
-                        $context.Load($list)
-                        $context.Load($ListView)
-                        $context.ExecuteQuery()
-                        }
-                        catch {
-                            Write-Host $_.Exception.Message -ForegroundColor Yellow
-                        }
+					if($webpartSection.hideCommandBar -eq "True"){
+						$jsonProperties = '{"selectedListId":"'+ $list.Id+ '","listTitle":"'+$webpartSection.ListTitleDisplay+'","webpartHeightKey":1,"hideCommandBar":true,"selectedViewId":"'+ $ListView.Id + '"}'
+					}
+					else{
+						$jsonProperties = '{"selectedListId":"'+ $list.Id+ '","listTitle":"'+$webpartSection.ListTitleDisplay+'","webpartHeightKey":1,"hideCommandBar":false,"selectedViewId":"'+ $ListView.Id + '"}'
+					}
+					
+					$listWebpart = Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties $jsonProperties -ErrorAction Stop
+					Write-Host "Webpart " $listWebpart.InstanceId " added successfully with properties " $listWebpart.PropertiesJson
+					 #Set-PnPClientSideWebPart -Page $page -Identity $listWebpart.InstanceId -PropertiesJson $jsonProperties
+				  }
+				  
+				  if($webpartSection.DefaultWebPartType -eq 'SiteActivity'){
+					 Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title"="Recent Activity"; maxItems="9"} -ErrorAction Stop
+				  }
 
-                     Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{selectedListId = $list.Id; "listTitle" = $webpartSection.ListTitleDisplay; webpartHeightKey = 1; "selectedViewId"= $ListView.Id} -ErrorAction Stop
-                        
-                  }
-                  
-                  if($webpartSection.DefaultWebPartType -eq 'SiteActivity'){
-                     Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title"="Recent Activity"; maxItems="9"} -ErrorAction Stop
+				  if($webpartSection.DefaultWebPartType -eq 'QuickLinks'){
 
-                  }
+						$item0Title=$webpartSection.items.item[0].Title
+						$item0Url=$url+"/Lists/"+$webpartSection.items.item[0].ListUrl
+						
+						$item1Title=$webpartSection.items.item[1].Title
+						$item1Url=$url+"/Lists/"+$webpartSection.items.item[1].ListUrl
 
-                  if($webpartSection.DefaultWebPartType -eq 'QuickLinks'){
+						$item2Title=$webpartSection.items.item[2].Title
+						$item2Url=$url+"/Lists/"+$webpartSection.items.item[2].ListUrl
 
-                        $item0Title=$webpartSection.items.item[0].Title
-                        $item0Url=$url+"/Lists/"+$webpartSection.items.item[0].ListUrl
-                        
-                        $item1Title=$webpartSection.items.item[1].Title
-                        $item1Url=$url+"/Lists/"+$webpartSection.items.item[1].ListUrl
+						$item3Title=$webpartSection.items.item[3].Title
+						$item3Url=$url+"/Lists/"+$webpartSection.items.item[3].ListUrl
 
-                        $item2Title=$webpartSection.items.item[2].Title
-                        $item2Url=$url+"/Lists/"+$webpartSection.items.item[2].ListUrl
+						$item4Title=$webpartSection.items.item[4].Title
+						$item4Url=$url+"/Lists/"+$webpartSection.items.item[4].ListUrl
 
-                        $item3Title=$webpartSection.items.item[3].Title
-                        $item3Url=$url+"/Lists/"+$webpartSection.items.item[3].ListUrl
+						$item5Title=$webpartSection.items.item[5].Title
+						$item5Url=$url+"/Lists/"+$webpartSection.items.item[5].ListUrl
 
-                        $item4Title=$webpartSection.items.item[4].Title
-                        $item4Url=$url+"/Lists/"+$webpartSection.items.item[4].ListUrl
+						$item6Title=$webpartSection.items.item[6].Title
+						$item6Url=$url+"/Lists/"+$webpartSection.items.item[6].ListUrl
 
-                        $item5Title=$webpartSection.items.item[5].Title
-                        $item5Url=$url+"/Lists/"+$webpartSection.items.item[5].ListUrl
+						$item7Title=$webpartSection.items.item[7].Title
+						$item7Url=$url+"/Lists/"+$webpartSection.items.item[7].ListUrl
 
-                        $item6Title=$webpartSection.items.item[6].Title
-                        $item6Url=$url+"/Lists/"+$webpartSection.items.item[6].ListUrl
+						$item8Title=$webpartSection.items.item[8].Title
+						$item8Url=$url+"/Lists/"+$webpartSection.items.item[8].ListUrl
 
-                        $item7Title=$webpartSection.items.item[7].Title
-                        $item7Url=$url+"/Lists/"+$webpartSection.items.item[7].ListUrl
+						$item9Title=$webpartSection.items.item[9].Title
+						$item9Url=$url+"/Lists/"+$webpartSection.items.item[9].ListUrl
 
-                        $item8Title=$webpartSection.items.item[8].Title
-                        $item8Url=$url+"/Lists/"+$webpartSection.items.item[8].ListUrl
-
-                        $item9Title=$webpartSection.items.item[9].Title
-                        $item9Url=$url+"/Lists/"+$webpartSection.items.item[9].ListUrl
-
-                        $item10Title=$webpartSection.items.item[10].Title
-                        $item10Url=$url+"/Lists/"+$webpartSection.items.item[10].ListUrl
+						$item10Title=$webpartSection.items.item[10].Title
+						$item10Url=$url+"/Lists/"+$webpartSection.items.item[10].ListUrl
 
 $jsonProps = '
 {"controlType":3,"id":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"layoutIndex":1},"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","webPartData":{"id":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","instanceId":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","title":"Quick links","description":"Add links to important documents and pages.","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick Links","items[0].title":"'+$item0Title+'","items[1].title":"'+$item1Title+'","items[2].title":"'+$item2Title+'","items[3].title":"'+$item3Title+'","items[4].title":"'+$item4Title+'","items[5].title":"'+$item5Title+'","items[6].title":"'+$item6Title+'","items[7].title":"'+$item7Title+'","items[8].title":"'+$item8Title+'","items[9].title":"'+$item9Title+'","items[10].title":"'+$item10Title+'"},"imageSources":{},"links":{"baseUrl":"'+$url+'","items[0].sourceItem.url":"'+$item0Url+'","items[1].sourceItem.url":"'+$item1Url+'","items[2].sourceItem.url":"'+$item2Url+'","items[3].sourceItem.url":"'+$item3Url+'","items[4].sourceItem.url":"'+$item4Url+'","items[5].sourceItem.url":"'+$item5Url+'","items[6].sourceItem.url":"'+$item6Url+'","items[7].sourceItem.url":"'+$item7Url+'","items[8].sourceItem.url":"'+$item8Url+'","items[9].sourceItem.url":"'+$item9Url+'","items[10].sourceItem.url":"'+$item10Url+'"},"componentDependencies":{"layoutComponentId":"706e33c8-af37-4e7b-9d22-6e5694d92a6f"}},"dataVersion":"2.2","properties":{"items":[{"sourceItem":{"itemType":5,"fileExtension":"","progId":""},"thumbnailType":3,"id":11,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":10,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":9,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":8,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":7,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":6,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":5,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":4,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":3,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":2,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":1,"description":"","altText":""}],"isMigrated":true,"layoutId":"List","shouldShowThumbnail":true,"imageWidth":100,"buttonLayoutOptions":{"showDescription":false,"buttonTreatment":2,"iconPositionType":2,"textAlignmentVertical":2,"textAlignmentHorizontal":2,"linesOfText":2},"listLayoutOptions":{"showDescription":false,"showIcon":false},"waffleLayoutOptions":{"iconSize":1,"onlyShowThumbnail":false},"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","webId":"93012ab1-1675-4c10-a48d-9318b877ab5e","siteId":"8051fa3b-1aeb-4793-8354-d5c2eb571b6d"}},"emphasis":{},"reservedHeight":270,"reservedWidth":744,"addedFromPersistedData":true}
 '
 
-                     #Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title"="Quick Links";"isMigrated"=1;"layoutId"="CompactCard";"shouldShowThumbnail"=1;"buttonLayoutOptions"=@{"showDescription"=0;"buttonTreatment"=2;"iconPositionType"=2;"textAlignmentVertical"=2;"textAlignmentHorizontal"=2;"linesOfText"=2};"listLayoutOptions"=@{"showDescription"=0;"showIcon"=1};"waffleLayoutOptions"=@{"iconSize"=1;"onlyShowThumbnail"=0};"hideWebPartWhenEmpty"=1;"dataProviderId"="QuickLinks"} -ErrorAction Stop
-                     Add-PnPClientSideWebPart -Page $page -DefaultWebPartType QuickLinks -WebPartProperties $jsonProps -Section $webpartSection.Section -Column $webpartSection.Column -Order 3
-                  }
+					 #Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title"="Quick Links";"isMigrated"=1;"layoutId"="CompactCard";"shouldShowThumbnail"=1;"buttonLayoutOptions"=@{"showDescription"=0;"buttonTreatment"=2;"iconPositionType"=2;"textAlignmentVertical"=2;"textAlignmentHorizontal"=2;"linesOfText"=2};"listLayoutOptions"=@{"showDescription"=0;"showIcon"=1};"waffleLayoutOptions"=@{"iconSize"=1;"onlyShowThumbnail"=0};"hideWebPartWhenEmpty"=1;"dataProviderId"="QuickLinks"} -ErrorAction Stop
+					 Add-PnPClientSideWebPart -Page $page -DefaultWebPartType QuickLinks -WebPartProperties $jsonProps -Section $webpartSection.Section -Column $webpartSection.Column -Order 3
+				  }
 
-                  if($webpartSection.DefaultWebPartType -eq 'ContentRollup'){
-                     Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -Order 2 -WebPartProperties @{"title"="Recent documents"; "count"=5} -ErrorAction Stop
+				  if($webpartSection.DefaultWebPartType -eq 'ContentRollup'){
+					 Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -Order 2 -WebPartProperties @{"title"="Recent documents"; "count"=5} -ErrorAction Stop
 
-                  }
-                               
-                }
+				  }
+							   
+				}
 
-        }
-        }
-        else
-             {
-                 Write-Host "Page does not exist or is not modern $webpart.pagename"
-                 $client.TrackEvent("Page does not exist or is not modern $webpart.pagename")
-             }
+		}
+		}
+		else
+			 {
+				 Write-Host "Page does not exist or is not modern $webpart.pagename"
+				 $client.TrackEvent("Page does not exist or is not modern $webpart.pagename")
+			 }
+	}
+
+	 
+	catch {  
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow  
+
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+
+		DeletePageOnFailure $pagename
+	}
+}
+
+function UpdateListViewWebPartProperties($page, $webpartkeyHeight){
+	$wpList = Get-PnPClientSideComponent -Page $page
+    foreach($wp in $wpList)
+    {
+        try{
+			if($wp.Title -eq "List"){
+				Write-Host "Webpart " $wp.InstanceId " PropertiesJson is : " $wp.PropertiesJson
+				$prop = $wp.PropertiesJson
+				$property = $prop | ConvertFrom-Json
+				$property.webpartHeightKey = $webpartkeyHeight
+				$prop = $property | ConvertTo-Json
+				Write-Host "Updated PropertiesJson is " $prop
+				Set-PnPClientSideWebPart -Page $page -Identity $wp.InstanceId -PropertiesJson $prop
+			}
+		}
+		catch{
+			$ErrorMessage = $_.Exception.Message
+			Write-Host $ErrorMessage -foreground Yellow  
+
+			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+			$telemtryException.Exception = $_.Exception.Message  
+			$client.TrackException($telemtryException)
+		}
     }
+}
 
-     
-    catch {  
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow  
+function UpdateRegionalSettings($url, $tenantAdmin){
+	try{
+		#Load SharePoint CSOM Assemblies
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+  
+		#Config parameters for SharePoint Online Site URL and Timezone description
+		$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($url)
+		$admin = $tenantAdmin.UserName
+		$password = $tenantAdmin.Password
+		$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+		$Ctx.Credentials = $credentials
+		$Web = $Ctx.Web
+		$regionalSettings = $Web.RegionalSettings
+		$timezones = $Web.RegionalSettings.TimeZones
+		$Ctx.Load($regionalSettings)
+		$Ctx.Load($timezones)
+		$Ctx.ExecuteQuery()
+		$Web.RegionalSettings.LocaleId = 16385 # Arabic(Qatar)
+		$Web.RegionalSettings.WorkDayStartHour = 480 # 8 AM
+		$Web.RegionalSettings.WorkDayEndHour = 1020 # 5 PM
+		$Web.RegionalSettings.FirstDayOfWeek = 0 # Sunday
+		$Web.RegionalSettings.Time24 = $False
+		$Web.RegionalSettings.CalendarType = 10 #Gregorian Arabic Calendar
+		$Web.RegionalSettings.AlternateCalendarType = 0 #None
+		$Web.RegionalSettings.WorkDays = 124
+		$TimezoneName ="(UTC+03:00) Kuwait, Riyadh"
+		$NewTimezone = $Timezones | Where {$_.Description -eq $TimezoneName}
+		$Ctx.Web.RegionalSettings.TimeZone = $NewTimezone
+		$Web.Update()
+		$Ctx.ExecuteQuery()
+	}
+	catch{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-
-        DeletePageOnFailure $pagename
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 function CreateModernPage($url, $nodeLevel)
 {
-    try
-    {
+	try
+	{
         Write-Host -ForegroundColor Green 'Creating homepage...' 
         Connect-PnPOnline -Url $url -Credential $tenantAdmin
-        foreach($modernPage in $nodeLevel.page){
-        
-        $modernPagename=$modernPage.name
-        $page = Get-PnPClientSidePage -Identity $modernPage.name -ErrorAction SilentlyContinue           
-        
-        if($page -eq $null)
-        {            
-            Add-PnPClientSidePage -Name $modernPagename -LayoutType Home -ErrorAction Stop
-            $client.TrackEvent("Page created, $modernPage.name")
-            Set-PnPHomePage -RootFolderRelativeUrl SitePages/$modernPagename.aspx
-            Set-PnPClientSidePage -Identity $modernPagename -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
-        }
-        else
-        {
-            Write-Host "Page Already exists $page"
-            $client.TrackEvent("Page Already exists $page")
-        }
-      }
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		foreach($modernPage in $nodeLevel.page){
+		
+		$modernPagename=$modernPage.name
+		$page = Get-PnPClientSidePage -Identity $modernPage.name -ErrorAction SilentlyContinue           
+		
+		if($page -eq $null)
+		{            
+			Add-PnPClientSidePage -Name $modernPagename -LayoutType Home -ErrorAction Stop
+			$client.TrackEvent("Page created, $modernPage.name")
+			Set-PnPHomePage -RootFolderRelativeUrl SitePages/$modernPagename.aspx
+			Set-PnPClientSidePage -Identity $modernPagename -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
+		}
+		else
+		{
+			Write-Host "Page Already exists $page"
+			$client.TrackEvent("Page Already exists $page")
+		}
+	  }
+	}
+	catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        DeletePageOnFailure $modernPagename
-    }
+		DeletePageOnFailure $modernPagename
+	}
 }
 
 #endregion
@@ -1899,246 +2018,248 @@ function CreateModernPage($url, $nodeLevel)
 
 function DeletelistOnFailure($siteUrlNew, $listName)
 {
-    try
-    {
-        Write-Host "Clean up: Delete List on failure started for: $listName"
-        $client.TrackEvent("Clean up: Delete List on failure started for: $listName") 
+	try
+	{
+		Write-Host "Clean up: Delete List on failure started for: $listName"
+		$client.TrackEvent("Clean up: Delete List on failure started for: $listName") 
 
-        #Connect to PNP Online
-        Connect-PnPOnline -Url $siteUrlNew -Credential $tenantAdmin -ErrorAction Stop
-         
-        #Check if List exists
+		#Connect to PNP Online
+		Connect-PnPOnline -Url $siteUrlNew -Credential $tenantAdmin -ErrorAction Stop
+		 
+		#Check if List exists
+		#$List = Get-PnPList -Identity $ListName -ErrorAction SilentlyContinue
+		#if($List -ne $Null)
+		if(Get-PnPList -Identity $listName)
+		{
+			#sharepoint online powershell remove list
+			Remove-PnPList -Identity $listName -Force -ErrorAction Stop
+			Write-host "List '$listName' Deleted Successfully!"
+			$client.TrackEvent("List '$listName' Deleted Successfully!, Site URL, $url")
+		}
+		else
+		{
+			Write-host -f Yellow "Could not find List '$listName'"
+			$client.TrackEvent("Could not find List '$listName', Site URL, $url")
+		}
 
-        if(Get-PnPList -Identity $listName)
-        {
-            #sharepoint online powershell remove list
-            Remove-PnPList -Identity $listName -Force -ErrorAction Stop
-            Write-host "List '$listName' Deleted Successfully!"
-            $client.TrackEvent("List '$listName' Deleted Successfully!, Site URL, $url")
-        }
-        else
-        {
-            Write-host -f Yellow "Could not find List '$listName'"
-            $client.TrackEvent("Could not find List '$listName', Site URL, $url")
-        }
+		Write-Host "Clean up: Delete List on failure completed for: $listName"
+		$client.TrackEvent("Clean up: Delete List on failure completed for: $listName")
+	 }
+	 catch
+	 {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        Write-Host "Clean up: Delete List on failure completed for: $listName"
-        $client.TrackEvent("Clean up: Delete List on failure completed for: $listName")
-     }
-     catch
-     {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
-
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-     }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	 }
 }
 
 function DeletePageOnFailure($pagename)
 {
-    try
-    {
-        Write-Host "Clean up: Delete Page on failure started for: $pagename"
-        $client.TrackEvent("Clean up: Delete Page on failure started for: $pagename") 
+	try
+	{
+		Write-Host "Clean up: Delete Page on failure started for: $pagename"
+		$client.TrackEvent("Clean up: Delete Page on failure started for: $pagename") 
 
-        Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
+		Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
 
-        $pagename=$nodeLevel.webpartSection.pagename
-        $page = Get-PnPClientSidePage -Identity $pagename -ErrorAction SilentlyContinue           
-        
-        if($page -ne $null)
-        {
-           Remove-PnPClientSidePage $pagename -ErrorAction Stop
-        }
+		$pagename=$nodeLevel.webpartSection.pagename
+		$page = Get-PnPClientSidePage -Identity $pagename -ErrorAction SilentlyContinue           
+		
+		if($page -ne $null)
+		{
+		   Remove-PnPClientSidePage $pagename -ErrorAction Stop
+		}
 
-        Write-Host "Clean up: Delete Page on failure completed for: $pagename"
-        $client.TrackEvent("Clean up: Delete Page on failure completed for: $pagename")
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		Write-Host "Clean up: Delete Page on failure completed for: $pagename"
+		$client.TrackEvent("Clean up: Delete Page on failure completed for: $pagename")
+	}
+	catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 function RemoveCustomNavigationQuickLaunchOnfailure($url, $nodeLevel)
 {
    try
    {
-    Write-Host "Clean up: Remove Custom Navigation QuickLaunch on failure started for site: $url"
-    $client.TrackEvent("Clean up: Remove Custom Navigation QuickLaunch on failure started for site: $url")
+	Write-Host "Clean up: Remove Custom Navigation QuickLaunch on failure started for site: $url"
+	$client.TrackEvent("Clean up: Remove Custom Navigation QuickLaunch on failure started for site: $url")
 
-    $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-    $navigationNodeCollection = Get-PnPNavigationNode -Location QuickLaunch
+	$connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+	$navigationNodeCollection = Get-PnPNavigationNode -Location QuickLaunch
 
-    foreach($level1 in $nodeLevel.Level1){
+	foreach($level1 in $nodeLevel.Level1){
 
-        foreach($navigationNode in $navigationNodeCollection){
+		foreach($navigationNode in $navigationNodeCollection){
 
-            if($navigationNode.Title -eq $level1.nodeName)
-            {
-                Remove-PnPNavigationNode -Title $navigationNode.Title -Location QuickLaunch -Force
-            }
-        }    
-      }
-      
-      Write-Host "Clean up: Remove Custom Navigation QuickLaunch on failure completed for site: $urll"
-      $client.TrackEvent("Clean up: Remove Custom Navigation QuickLaunch on failure completed for site: $url")
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+			if($navigationNode.Title -eq $level1.nodeName)
+			{
+				Remove-PnPNavigationNode -Title $navigationNode.Title -Location QuickLaunch -Force
+			}
+		}    
+	  }
+	  
+	  Write-Host "Clean up: Remove Custom Navigation QuickLaunch on failure completed for site: $urll"
+	  $client.TrackEvent("Clean up: Remove Custom Navigation QuickLaunch on failure completed for site: $url")
+	}
+	catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 function RemoveCustomNavigationTopNavOnfailure($url, $nodeLevel)
 {
    try
    {
-    Write-Host "Clean up: Remove Custom Navigation TopNav on failure started for site: $url"
-    $client.TrackEvent("Clean up: Remove Custom Navigation TopNav on failure started for site: $url")
+	Write-Host "Clean up: Remove Custom Navigation TopNav on failure started for site: $url"
+	$client.TrackEvent("Clean up: Remove Custom Navigation TopNav on failure started for site: $url")
 
-    $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-    $topNavigationNodeCollection = Get-PnPNavigationNode -Location TopNavigationBar
+	$connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+	$topNavigationNodeCollection = Get-PnPNavigationNode -Location TopNavigationBar
 
-    foreach($level1 in $nodeLevel.Level1){
+	foreach($level1 in $nodeLevel.Level1){
 
-        foreach($topNavigationNode in $topNavigationNodeCollection){
+		foreach($topNavigationNode in $topNavigationNodeCollection){
 
-            if($topNavigationNode.Title -eq $level1.nodeName)
-            {
-                Remove-PnPNavigationNode -Title $topNavigationNode.Title -Location TopNavigationBar -Force
-            }
-        }    
-      }
+			if($topNavigationNode.Title -eq $level1.nodeName)
+			{
+				Remove-PnPNavigationNode -Title $topNavigationNode.Title -Location TopNavigationBar -Force
+			}
+		}    
+	  }
 
-      Write-Host "Clean up: Remove Custom Navigation TopNav on failure completed for site: $url"
-      $client.TrackEvent("Clean up: Remove Custom Navigation TopNav on failure completed for site: $url")
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+	  Write-Host "Clean up: Remove Custom Navigation TopNav on failure completed for site: $url"
+	  $client.TrackEvent("Clean up: Remove Custom Navigation TopNav on failure completed for site: $url")
+	}
+	catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
+	#Disconnect-PnPOnline
 }
 
 function RemoveColumnsAndContentType($url)
 {   
-    
-    #remove all the fields from each content type from given site
-    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
-    {
-        RemoveFieldFromContentType $url $objcolumnItem.ColumnName $objcolumnItem.ContentTypeName
-    }
-    
-    #remove all the content types from given site
-    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
-    {
-        RemovePnPContentType $url $objcolumnItem.ContentTypeName
-    }
-    
-    #remove all all the fields from given site
-    foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
-    {
-        RemovePnPField $url $objcolumnItem.ColumnName
-    }
+	
+	#remove all the fields from each content type from given site
+	foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+	{
+		RemoveFieldFromContentType $url $objcolumnItem.ColumnName $objcolumnItem.ContentTypeName
+	}
+	
+	#remove all the content types from given site
+	foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+	{
+		RemovePnPContentType $url $objcolumnItem.ContentTypeName
+	}
+	
+	#remove all all the fields from given site
+	foreach($objcolumnItem in $deletefile.Main.siteColumnsToContentTypes.columnItem)
+	{
+		RemovePnPField $url $objcolumnItem.ColumnName
+	}
 }
 
 function RemoveFieldFromContentType($url, $sitecolumn, $contenttype)
 {
-    try
-    {
-        #Connect to PNP Online
-        Connect-PnPOnline -Url $url -Credential $tenantAdmin -ErrorAction Stop
-        
-        $fieldExists = Get-PNPField -identity $sitecolumn -ErrorAction SilentlyContinue
-        $ContentTypeExist = Get-PnPContentType -Identity $contenttype -ErrorAction SilentlyContinue
-        
-        if (([bool] ($fieldExists) -eq $true) -and ([bool] ($ContentTypeExist) -eq $true)) {
-            Remove-PnPFieldFromContentType -Field $sitecolumn -ContentType $contenttype
-            $client.TrackEvent("Field '$sitecolumn' removed From ContentType '$contenttype', Site URL, $url")
-        }        
-         
-     }
-     catch
-     {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+	try
+	{
+		#Connect to PNP Online
+		Connect-PnPOnline -Url $url -Credential $tenantAdmin -ErrorAction Stop
+		
+		$fieldExists = Get-PNPField -identity $sitecolumn -ErrorAction SilentlyContinue
+		$ContentTypeExist = Get-PnPContentType -Identity $contenttype -ErrorAction SilentlyContinue
+		
+		if (([bool] ($fieldExists) -eq $true) -and ([bool] ($ContentTypeExist) -eq $true)) {
+			Remove-PnPFieldFromContentType -Field $sitecolumn -ContentType $contenttype
+			$client.TrackEvent("Field '$sitecolumn' removed From ContentType '$contenttype', Site URL, $url")
+		}        
+		 
+	 }
+	 catch
+	 {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-     }
-    Disconnect-PnPOnline
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	 }
+	Disconnect-PnPOnline
 }
 
 function RemovePnPContentType($url, $contenttype)
 {
-    try
-    {
-        #Connect to PNP Online
-        Connect-PnPOnline -Url $url -Credential $tenantAdmin
+	try
+	{
+		#Connect to PNP Online
+		Connect-PnPOnline -Url $url -Credential $tenantAdmin
 
-        $ContentTypeExist = Get-PnPContentType -Identity $contenttype -ErrorAction SilentlyContinue
-        
-        if ([bool] ($ContentTypeExist) -eq $true) {
-            Remove-PnPContentType -Identity $contenttype -Force
-            $client.TrackEvent("ContentType '$contenttype' removed From site, Site URL, $url")
-        }
-         
-     }
-     catch
-     {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		$ContentTypeExist = Get-PnPContentType -Identity $contenttype -ErrorAction SilentlyContinue
+		
+		if ([bool] ($ContentTypeExist) -eq $true) {
+			Remove-PnPContentType -Identity $contenttype -Force
+			$client.TrackEvent("ContentType '$contenttype' removed From site, Site URL, $url")
+		}
+		 
+	 }
+	 catch
+	 {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-     }
-    Disconnect-PnPOnline
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	 }
+	Disconnect-PnPOnline
 }
 
 function RemovePnPField($url, $sitecolumn)
 {
-    try
-    {
-        #Connect to PNP Online
-        Connect-PnPOnline -Url $url -Credential $tenantAdmin
+	try
+	{
+		#Connect to PNP Online
+		Connect-PnPOnline -Url $url -Credential $tenantAdmin
 
-        $fieldExists = Get-PNPField -identity $sitecolumn -ErrorAction SilentlyContinue
-        
-        if ([bool] ($fieldExists) -eq $true) {
-            Remove-PnPField -Identity $sitecolumn
-            $client.TrackEvent("Field '$sitecolumn' removed From site, Site URL, $url")
-        }
-         
-     }
-     catch
-     {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		$fieldExists = Get-PNPField -identity $sitecolumn -ErrorAction SilentlyContinue
+		
+		if ([bool] ($fieldExists) -eq $true) {
+			Remove-PnPField -Identity $sitecolumn
+			$client.TrackEvent("Field '$sitecolumn' removed From site, Site URL, $url")
+		}
+		 
+	 }
+	 catch
+	 {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-     }
-    Disconnect-PnPOnline
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	 }
+	Disconnect-PnPOnline
 }
 
 #endregion
@@ -2147,196 +2268,341 @@ function RemovePnPField($url, $sitecolumn)
 
 function UploadFiles($url, $nodeLevel)  
 {
-    foreach($uploadFile in $nodeLevel.UploadFile)  
-    {
-        #upload $url $uploadFile.DestinationFolder $uploadFile.SourceFolder $uploadFile.CreateFolder $uploadFile.FolderName
-        uploadfiletoSharepoint $url $uploadFile.SourceFolder $uploadFile.DestinationFolder
-    }
+	foreach($uploadFile in $nodeLevel.UploadFile)  
+	{
+		#upload $url $uploadFile.DestinationFolder $uploadFile.SourceFolder $uploadFile.CreateFolder $uploadFile.FolderName
+		uploadfiletoSharepoint $url $uploadFile.SourceFolder $uploadFile.DestinationFolder
+	}
 }
 
 function uploadfiletoSharepoint($url, $sourcefolder, $destinationfolder)
 {
-    try
-    {
-      Write-Host "Upload file to Sharepoint started." -foreground Green
-      $client.TrackEvent("Upload file to Sharepoint started.")
-      $Files = Get-ChildItem $sourcefolder
-      $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-        
-      foreach($File in $Files)
-      {
-        try
-        {      
-            Add-PnPFile -Folder $destinationfolder -Path $File.FullName -Connection $connection -ErrorAction Stop
-        }
-        catch
-        {
-            $ErrorMessage = $_.Exception.Message
-            Write-Host $ErrorMessage -foreground Yellow
+	try
+	{
+	  Write-Host "Upload file to Sharepoint started." -foreground Green
+	  $client.TrackEvent("Upload file to Sharepoint started.")
+	  $Files = Get-ChildItem $sourcefolder
+	  $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+		
+	  foreach($File in $Files)
+	  {
+		try
+		{      
+			Add-PnPFile -Folder $destinationfolder -Path $File.FullName -Connection $connection -ErrorAction Stop
+		}
+		catch
+		{
+			$ErrorMessage = $_.Exception.Message
+			Write-Host $ErrorMessage -foreground Yellow
 
-            $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-            $telemtryException.Exception = $_.Exception.Message  
-            $client.TrackException($telemtryException)
-        }
-      }
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+			$telemtryException.Exception = $_.Exception.Message  
+			$client.TrackException($telemtryException)
+		}
+	  }
+	}
+	catch
+	{
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 #endregion
 
-function Update-SiteColumns($url, $node) {
+function Update-SiteColumns($url, $node, $tenantAdmin) {
 
-    try {
-        $context = New-Object Microsoft.SharePoint.Client.ClientContext($url)
-        $admin = $tenantAdmin.UserName
-        $password = $tenantAdmin.Password
-        $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
-        $context.Credentials = $credentials
-        $web = $context.Web
-        $context.Load($web)
-        $context.Load($web.Fields) 
-        $context.Load($web.ContentTypes)
-        $context.ExecuteQuery()
+	try {
+		$context = New-Object Microsoft.SharePoint.Client.ClientContext($url)
+		$admin = $tenantAdmin.UserName
+		$password = $tenantAdmin.Password
+		$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+		$context.Credentials = $credentials
+		$web = $context.Web
+		$context.Load($web)
+		$context.Load($web.Fields) 
+		$context.Load($web.ContentTypes)
+		$context.ExecuteQuery()
 
+		foreach($objfield in $node.changeDateOnly){
 
-        foreach($objfield in $node.changeContentTierChoice){
-
-        try
-        {
-            Write-Host "Update-SiteColumns, Choice value for Content Type started for- " $objfield.ListName -foreground Green
-            $client.TrackEvent("Update-SiteColumns, Choice value for Content Type started for- "+ $objfield.ListName)           
-            #Get the List
-            $List = $context.Web.Lists.GetByTitle($objfield.ListName)
-            $context.Load($List)
-            $context.ExecuteQuery()
+			try
+			{
+				Write-Host "Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName -foreground Green
+				$client.TrackEvent("Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName)           
+				#Get the List
+			$List = $context.Web.Lists.GetByTitle($objfield.ListName)
+			$context.Load($List)
+			$context.ExecuteQuery()
  
-            #Get the field
-            $Field = $List.Fields.GetByInternalNameOrTitle($objfield.ColumnInternalName)
-            $context.Load($Field)
-            $context.ExecuteQuery()
+			#Get the field
+			$Field = $List.Fields.GetByInternalNameOrTitle($objfield.ColumnInternalName)
+			$context.Load($Field)
+			$context.ExecuteQuery()
+
+			$field.DisplayFormat = $objfield.DisplayFormat
+			$field.Update()
+			$field.Context.ExecuteQuery()
+			
+			}
+			catch{
+				$ErrorMessage = $_.Exception.Message
+				Write-Host $ErrorMessage -foreground Yellow
+	
+				$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+				$telemtryException.Exception = $_.Exception.Message  
+				$client.TrackException($telemtryException)
+			}
+		}
+
+		foreach($objfield in $node.changeContentTierChoice){
+
+		try
+		{
+			Write-Host "Update-SiteColumns, Choice value for Content Type started for- "+ $objfield.ListName -foreground Green
+			$client.TrackEvent("Update-SiteColumns, Choice value for Content Type started for- "+ $objfield.ListName)           
+			#Get the List
+			$List = $context.Web.Lists.GetByTitle($objfield.ListName)
+			$context.Load($List)
+			$context.ExecuteQuery()
  
-            #Cast the field to Choice Field
-            $ChoiceField = New-Object Microsoft.SharePoint.Client.FieldMultiChoice($context, $Field.Path)
-            $context.Load($ChoiceField)
-            $context.ExecuteQuery()
-
-            $Choices = $objfield.choicevalue.Split(",")
+			#Get the field
+			$Field = $List.Fields.GetByInternalNameOrTitle($objfield.ColumnInternalName)
+			$context.Load($Field)
+			$context.ExecuteQuery()
  
-            $ChoiceField.Choices = $Choices
-            $ChoiceField.DefaultValue = $objfield.DefaultValue           
-            $ChoiceField.UpdateAndPushChanges($True)
-            $context.ExecuteQuery()
-                           
-        }
-        catch{
-            $ErrorMessage = $_.Exception.Message
-            Write-Host $ErrorMessage -foreground Yellow
+			#Cast the field to Choice Field
+			$ChoiceField = New-Object Microsoft.SharePoint.Client.FieldMultiChoice($context, $Field.Path)
+			$context.Load($ChoiceField)
+			$context.ExecuteQuery()
 
-            $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-            $telemtryException.Exception = $_.Exception.Message  
-            $client.TrackException($telemtryException)
-        }
-      }
+			$Choices = $objfield.choicevalue.Split(",")
+ 
+			#$choiceField.Choices.Clear()
+			$ChoiceField.Choices = $Choices
+			$ChoiceField.DefaultValue = $objfield.DefaultValue           
+			$ChoiceField.UpdateAndPushChanges($True)
+			$context.ExecuteQuery()
+						   
+		}
+		catch{
+			$ErrorMessage = $_.Exception.Message
+			Write-Host $ErrorMessage -foreground Yellow
 
-        
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+			$telemtryException.Exception = $_.Exception.Message  
+			$client.TrackException($telemtryException)
+		}
+	  }
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+
+		#region Updating the change Title Fields
+		foreach($item in $node.changeTitle){
+			Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+			if([bool]($field) -eq $true){
+				$field.Title = $item.NewTitle
+				$field.Update()
+				$field.Context.ExecuteQuery()
+			}
+
+		}
+		#endregion
+
+		#region Change the required value
+		foreach($item in $node.changeRequiredField){
+			try{
+				Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+				$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+				if([bool]($field) -eq $true){
+					if($item.Required -eq "True"){
+						$field.Required = $true
+					}
+					else{
+						$field.Required = $false
+					}
+					$field.Update()
+					$field.Context.ExecuteQuery()
+				}
+			}
+			catch{
+				
+			}
+		}
+		#endregion
+
+		#region Hide columns
+		foreach($item in $node.hideColumn){
+			try{
+				Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+				$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+				if([bool]($field) -eq $true){
+					$field.Hidden = $true
+					$field.Update()
+					$field.Context.ExecuteQuery()
+				}
+			}
+			catch{
+				$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+				if([bool]($field) -eq $true){
+					$field.ReadOnlyField = $true
+					$field.Update()
+					$field.Context.ExecuteQuery()
+				}
+			}
+		}
+		#endregion
+
+		#region Update multi select column
+		<#foreach($item in $node.updateUserSelectionMode){
+			try{
+				Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+				$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+				if([bool]($field) -eq $true){
+					$field.Required = $false
+					$field.Update()
+					$field.Context.ExecuteQuery()
+				}
+			}
+			catch{
+				
+			}
+		}#>
+		#endregion
+
+		#region Remove from edit form
+		foreach($item in $node.removeFromEditForm){
+			Write-Host "Update-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+			if([bool]($field) -eq $true){
+				$field.SetShowInEditForm($false)
+				$field.SetShowInNewForm($false)
+				$field.Update()
+				$field.Context.ExecuteQuery()
+			}
+		}
+		#endregion
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
+
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
+}
+
+function Delete-SiteColumns($url, $node, $tenantAdmin) {
+	Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+	#region Delete Site Column
+	foreach($item in $node.column){
+		try {
+			Write-Host "Delete-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+			$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+			if([bool]($field) -eq $true){
+				Remove-PnPField -List $item.ListName -Identity $item.ColumnInternalName -Force
+				$field.Hidden = $true
+				$field.Update()
+				$field.Context.ExecuteQuery()
+			}
+			
+		}
+		catch {
+			$ErrorMessage = $_.Exception.Message
+			Write-Host $ErrorMessage -foreground Yellow
+			$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+			$telemtryException.Exception = $_.Exception.Message  
+			$client.TrackException($telemtryException)
+		}
+	#endregion
+	}
+	
 }
 
 function Update-ColumnToDefaultView($ListName,$ViewName,$url)
 {
-    Try {
-        #Connect to PNP Online
-        Connect-PnPOnline -Url $url -Credential $tenantAdmin
+	Try {
+		#Connect to PNP Online
+		Connect-PnPOnline -Url $url -Credential $tenantAdmin
  
-        #Get the Context
-        $Context = Get-PnPContext
+		#Get the Context
+		$Context = Get-PnPContext
  
-        #Get the List View from the list
-        $ListView  =  Get-PnPView -List $ListName -Identity $ViewName -ErrorAction Stop
+		#Get the List View from the list
+		$ListView  =  Get-PnPView -List $ListName -Identity $ViewName -ErrorAction Stop
 
-        $ColumnName="LinkTitle"
+		$ColumnName="LinkTitle"
  
-        #Check if view doesn't have the column already
-        If($ListView.ViewFields -contains $ColumnName)
-        {
-            #Remove Column from View
-            $ListView.ViewFields.Remove($ColumnName)
-            $ListView.Update()
-            $Context.ExecuteQuery()
-            Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
-        }
-        else
-        {
-            Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
-        }
+		#Check if view doesn't have the column already
+		If($ListView.ViewFields -contains $ColumnName)
+		{
+			#Remove Column from View
+			$ListView.ViewFields.Remove($ColumnName)
+			$ListView.Update()
+			$Context.ExecuteQuery()
+			Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
+		}
+		else
+		{
+			Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
+		}
 
-        $ColumnName="LinkFilename"
+		$ColumnName="LinkFilename"
 
-        #Check if view doesn't have the column already
-        If($ListView.ViewFields -contains $ColumnName)
-        {
-            #Remove Column from View
-            $ListView.ViewFields.Remove($ColumnName)
-            $ListView.Update()
-            $Context.ExecuteQuery()
-            Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
-        }
-        else
-        {
-            Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
-        }
+		#Check if view doesn't have the column already
+		If($ListView.ViewFields -contains $ColumnName)
+		{
+			#Remove Column from View
+			$ListView.ViewFields.Remove($ColumnName)
+			$ListView.Update()
+			$Context.ExecuteQuery()
+			Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
+		}
+		else
+		{
+			Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
+		}
 
-        $ColumnName="DocIcon"
-        #Check if view doesn't have the column already
-        If($ListView.ViewFields -contains $ColumnName)
-        {
-            #Remove Column from View
-            $ListView.ViewFields.Remove($ColumnName)
-            $ListView.Update()
-            $Context.ExecuteQuery()
-            Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
-        }
-        else
-        {
-            Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
-        }
+		$ColumnName="DocIcon"
+		#Check if view doesn't have the column already
+		If($ListView.ViewFields -contains $ColumnName)
+		{
+			#Remove Column from View
+			$ListView.ViewFields.Remove($ColumnName)
+			$ListView.Update()
+			$Context.ExecuteQuery()
+			Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
+		}
+		else
+		{
+			Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
+		}
 
-        $ColumnName="Editor"
+		$ColumnName="Editor"
 
-        #Check if view doesn't have the column already
-        If($ListView.ViewFields -contains $ColumnName)
-        {
-            #Remove Column from View
-            $ListView.ViewFields.Remove($ColumnName)
-            $ListView.Update()
-            $Context.ExecuteQuery()
-            Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
-        }
-        else
-        {
-            Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
-        }
-    }
-    catch {
-        write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
-    }
+		#Check if view doesn't have the column already
+		If($ListView.ViewFields -contains $ColumnName)
+		{
+			#Remove Column from View
+			$ListView.ViewFields.Remove($ColumnName)
+			$ListView.Update()
+			$Context.ExecuteQuery()
+			Write-host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
+		}
+		else
+		{
+			Write-host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
+		}
+	}
+	catch {
+		write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+	}
 }
 
 Provision-ComponentsForSites

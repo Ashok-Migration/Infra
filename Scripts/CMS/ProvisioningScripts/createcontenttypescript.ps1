@@ -172,7 +172,7 @@ function AddColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName,
         $client.TrackEvent("Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName.....")
 
         if($ContentTypeName -eq "TASMU Translation Tasks" -or $ContentTypeName -eq "TASMU Approval Tasks"){
-            if($ColumnName -eq "AssignedTo"){
+            if($ColumnName -eq "cmsAssignedToUser"){
                 $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -Hidden -ErrorAction Stop -Connection $connection
             }
             elseif ($required -eq "False") {
