@@ -178,7 +178,10 @@
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('cleanStorageAccountName'))]"
-            ]
+            ],
+            "properties": {
+                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]"
+            }
         }
     ],
     "outputs": {
