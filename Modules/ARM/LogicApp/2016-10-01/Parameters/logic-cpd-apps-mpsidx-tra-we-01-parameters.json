@@ -286,19 +286,19 @@
                 "from": "@createArray(body('Parse_Product_JSON'))",
                 "select": {
                   "@@search.action": "mergeOrUpload",
-                  "average_rating": "@concat(body('Parse_Product_JSON')?['rating'],'')",
-                  "entity_type": "Products&Services",
+                  "average_rating": "@concat(body('Parse_Product_JSON')?.value['rating'],'')",
+                  "entity_type": "Products & Services",
                   "id": "@body('Parse_Product_JSON')?['id']",
-                  "merged_content": "@concat(body('Parse_Product_JSON')?['longDescription'],body('Parse_Product_JSON')?['shortDescription'])",
-                  "metadata_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
+                  "merged_content": "@concat(body('Parse_Product_JSON')?.value['longDescription'],body('Parse_Product_JSON')?.value['shortDescription'])",
+                  "metadata_last_modified": "@body('Parse_Product_JSON')?.value['modifiedOn']",
                   "metadata_storage_file_extension": "JSON",
-                  "metadata_storage_last_modified": "@body('Parse_Product_JSON')?['modifiedOn']",
-                  "metadata_storage_name": "@body('Parse_Product_JSON')?['name']",
-                  "price": "@concat(body('Parse_Product_JSON')?['productPrice'],'')",
-                  "provider_name": "@body('Parse_Product_JSON')?['providerName']",
+                  "metadata_storage_last_modified": "@body('Parse_Product_JSON')?.value['modifiedOn']",
+                  "metadata_storage_name": "@body('Parse_Product_JSON')?.value['name']",
+                  "price": "@concat(body('Parse_Product_JSON')?.value['productPrice'],'')",
+                  "provider_name": "@body('Parse_Product_JSON')?.value['providerName']",
                   "search_id": "@concat('ProductsServices-',body('Parse_Product_JSON')['id'])",
-                  "short_description": "@body('Parse_Product_JSON')?['shortDescription']",
-                  "thumbnail_url": "@body('Parse_Product_JSON')?['imageUrl']"
+                  "short_description": "@body('Parse_Product_JSON')?.value['shortDescription']",
+                  "thumbnail_url": "@body('Parse_Product_JSON')?.value['imageUrl']"
                 }
               }
             },
@@ -314,7 +314,7 @@
                 "select": {
                   "@@search.action": "mergeOrUpload",
                   "average_rating": "@concat(variables('TempBody')?['rating'],'')",
-                  "entity_type": "Products&Services",
+                  "entity_type": "Products & Services",
                   "id": "@variables('TempBody').value?['id']",
                   "merged_content": "@concat(variables('TempBody')?['longDescription'],variables('TempBody')?['shortDescription'])",
                   "metadata_last_modified": "@variables('TempBody')?['modifiedOn']",
@@ -755,19 +755,19 @@
       }
     },
     "diagnosticLogsRetentionInDays": {
-        "value": 365
+      "value": 365
     },
     "diagnosticStorageAccountId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
     },
     "workspaceId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
     },
     "eventHubAuthorizationRuleId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
     },
     "eventHubName": {
-        "value": "evh-cpd-apps-mon-tra-we-01"
+      "value": "evh-cpd-apps-mon-tra-we-01"
     },
     "tags": {
       "value": {
