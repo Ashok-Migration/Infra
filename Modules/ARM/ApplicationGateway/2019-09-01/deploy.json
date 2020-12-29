@@ -59,9 +59,109 @@
       "type": "string",
       "defaultValue": "httpListener"
     },
+    "httpListeners": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "httpListener",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), concat('/frontendIPConfigurations/', parameters('applicationGatewayName'), '-privateip'))]"
+            },
+            "frontendPort": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_80')]"
+            },
+            "sslCertificate": null,
+            "protocol": "Http",
+            "hostName": null,
+            "hostNames": [],
+            "requireServerNameIndication": false
+          }
+        }
+      ]
+    },
+    "frontendPorts": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "port_80",
+          "properties": {
+            "Port": 80
+          }
+        }
+      ]
+    },
+    "backendAddressPools": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "backendPool",
+          "properties": {
+            "backendAddresses": []
+          }
+        }
+      ]
+    },
     "backendHttpSettingName": {
       "type": "string",
       "defaultValue": "backendHttpSetting"
+    },
+    "backendHttpSettingsCollection": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "[parameters('backendHttpSettingName')]",
+          "properties": {
+            "Port": 80,
+            "Protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "requestTimeout": 20
+          }
+        }
+      ]
+    },
+    "requestRoutingRules": {
+      "type": "array",
+      "defaultValue": [
+          {
+            "Name": "routingRule",
+            "properties": {
+              "RuleType": "Basic",
+              "httpListener": {
+                "id": null
+              },
+              "backendAddressPool": {
+                "id": null
+              },
+              "backendHttpSettings": {
+                "id": null
+              }
+            }
+          }
+        ]
+    },
+    "probes": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "firewallMode": {
+      "type": "string",
+      "defaultValue": "Prevention",
+      "allowedValues": [
+        "Detection",
+        "Prevention"
+      ],
+      "metadata": {
+        "description": "Optionals. Specifies web application firewall mode (Detection/Prevention)."
+      }
+    },
+    "sslCertificates": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "managedIdentityId": {
+      "type": "string",
+      "defaultValue": ""
     },
     "tags": {
       "defaultValue": {},
@@ -72,6 +172,10 @@
     },
     "privateIPAddress": {
       "type": "string"
+    },
+    "requestBodyCheck": {
+      "type": "bool",
+      "defaultValue": true
     },
     "diagnosticLogsRetentionInDays": {
       "type": "int",
@@ -164,6 +268,12 @@
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
       ],
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[parameters('managedIdentityId')]": {}
+        }
+      },
       "tags": "[parameters('tags')]",
       "properties": {
         "sku": {
@@ -200,77 +310,26 @@
             }
           }
         ],
-        "frontendPorts": [
-          {
-            "name": "port_80",
-            "properties": {
-              "Port": 80
-            }
-          }
-        ],
-        "backendAddressPools": [
-          {
-            "name": "[parameters('backendAddressPoolName')]",
-            "properties": {
-              "backendAddresses": []
-            }
-          }
-        ],
-        "backendHttpSettingsCollection": [
-          {
-            "name": "[parameters('backendHttpSettingName')]",
-            "properties": {
-              "Port": 80,
-              "Protocol": "Http",
-              "cookieBasedAffinity": "Disabled",
-              "requestTimeout": 20
-            }
-          }
-        ],
-        "httpListeners": [
-          {
-            "name": "[parameters('httpListenerName')]",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[concat(variables('applicationGatewayId'), '/frontendIPConfigurations/',parameters('applicationGatewayName'), '-privateip')]"
-              },
-              "frontendPort": {
-                "id": "[concat(variables('applicationGatewayId'), '/frontendPorts/port_80')]"
-              },
-              "protocol": "Http",
-              "sslCertificate": null
-            }
-          }
-        ],
-        "requestRoutingRules": [
-          {
-            "Name": "routingRule",
-            "properties": {
-              "RuleType": "Basic",
-              "httpListener": {
-                "id": "[concat(variables('applicationGatewayId'), '/httpListeners/', parameters('httpListenerName'))]"
-              },
-              "backendAddressPool": {
-                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/', parameters('backendAddressPoolName'))]"
-              },
-              "backendHttpSettings": {
-                "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/', parameters('backendHttpSettingName'))]"
-              }
-            }
-          }
-        ],
+        "frontendPorts": "[parameters('frontendPorts')]",
+        "backendAddressPools": "[parameters('backendAddressPools')]",
+        "backendHttpSettingsCollection": "[parameters('backendHttpSettingsCollection')]",
+        "httpListeners": "[parameters('httpListeners')]",
+        "requestRoutingRules": "[parameters('requestRoutingRules')]",
         "enableHttp2": false,
-        "sslCertificates": [],
-        "probes": [],
+        "sslCertificates": "[parameters('sslCertificates')]",
+        "probes": "[parameters('probes')]",
         "autoscaleConfiguration": {
           "minCapacity": "[parameters('capacity')]",
           "maxCapacity": "[parameters('autoScaleMaxCapacity')]"
         },
         "webApplicationFirewallConfiguration": {
           "enabled": true,
-          "firewallMode": "Detection",
+          "firewallMode": "[parameters('firewallMode')]",
           "ruleSetType": "OWASP",
-          "ruleSetVersion": "3.0"
+          "ruleSetVersion": "3.0",
+          "disabledRuleGroups": [],
+          "exclusions": [],
+          "requestBodyCheck": "[parameters('requestBodyCheck')]"
         }
       },
       "resources": [
