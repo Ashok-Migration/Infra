@@ -27,64 +27,129 @@
         "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
         "location": "[deployment().location]"
     },
-    "resources": [
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "name": "DEP-rg-cpd-apps-str-tst-we-01",
-            "location": "[variables('location')]",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-apps-str-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-rg-cpd-apps-str-tst-we-01",
+      "location": "[variables('location')]",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
         },
-        {
-            "apiVersion": "2019-10-01",
-            "name": "[variables('CUA')]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-cpd-apps-str-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-apps-str-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": []
-                }
-            }
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "name": "DEP-ntfns-cpd-apps-str-tst-we-01",
-            "resourceGroup": "rg-cpd-apps-str-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-apps-str-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/Parameters/ntfns-cpd-apps-str-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-apps-str-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
-    ],
+      }
+    },
+    {
+      "apiVersion": "2019-10-01",
+      "name": "[variables('CUA')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "rg-cpd-apps-str-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-str-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-ntfns-cpd-apps-str-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-str-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-str-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/Parameters/ntfns-cpd-apps-str-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apicon-cpd-apps-strcds-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-str-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-str-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/Parameters/apicon-cpd-apps-strcds-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apicon-cpd-apps-ascalrt-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-str-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-str-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionSecurityAlert/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionSecurityAlert/2019-04-01/Parameters/apicon-cpd-apps-ascalrt-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-logic-cpd-apps-dfndr-tst-we-01",
+      "resourceGroup": "rg-cpd-apps-str-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-str-tst-we-01",
+        "DEP-apicon-cpd-apps-ascalrt-tst-we-01",
+        "DEP-apicon-cpd-apps-strcds-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-dfndr-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    }
+  ],
     "outputs": {}
 }

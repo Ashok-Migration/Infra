@@ -1,0 +1,209 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-intfile-uat-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_resource_event_occurs": {
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "file-virus-scan-pass",
+                    "file-upload-ready"
+                  ]
+                },
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-uat-we-01/topics/coreapi"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-uat-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpd-apps-intfile-uat-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
+          }
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Compose": {
+          "inputs": "@body('Get_blob_content')",
+          "runAfter": {
+            "Get_blob_content": [
+              "Succeeded"
+            ]
+          },
+          "type": "Compose"
+        },
+        "File_Variable": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FilelName",
+                "type": "string",
+                "value": "@body('Parse_Data')?['filename']"
+              }
+            ]
+          },
+          "runAfter": {
+            "Parse_Data": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "For_each": {
+          "actions": {
+            "Update_a_record": {
+              "inputs": {
+                "body": {
+                  "_objectid_type": "",
+                  "_ownerid_type": "",
+                  "documentbody": "@{base64(outputs('Compose'))}"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-intcds-uat-we-01']['connectionId']"
+                  }
+                },
+                "method": "patch",
+                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('f6b361ba6d45486cbd290a2236efa4.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('annotations'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['annotationid']))}"
+              },
+              "runAfter": {},
+              "type": "ApiConnection"
+            }
+          },
+          "foreach": "@body('List_records_2')?['value']",
+          "runAfter": {
+            "Compose": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "Get_blob_content": {
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-intst-uat-we-01']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('/case-files/',variables('FilelName')))}/content",
+            "queries": {
+              "inferContentType": true
+            }
+          },
+          "runAfter": {
+            "List_records_2": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection"
+        },
+        "List_records_2": {
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-intcds-uat-we-01']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('f6b361ba6d45486cbd290a2236efa4.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('annotations'))}/items",
+            "queries": {
+              "$filter": "filename eq '@{variables('FilelName')}'",
+              "$top": 1
+            }
+          },
+          "runAfter": {
+            "File_Variable": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection"
+        },
+        "Parse_Data": {
+          "inputs": {
+            "content": "@triggerBody()?['data']",
+            "schema": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "isscansucceeded": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "UAT"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpd-apps-integ-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-uat-we-01",
+              "connectionName": "apicon-cpd-apps-integ-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            },
+            "apicon-cpd-apps-intst-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intst-uat-we-01",
+              "connectionName": "apicon-cpd-apps-intst-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+            },
+            "apicon-cpd-apps-intcds-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intcds-uat-we-01",
+              "connectionName": "apicon-cpd-apps-intcds-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "connectionName": {
+      "type": "String"
+    },
+    "displayName": {
+      "type": "String"
+    },
+    "apiId": {
+      "type": "String"
+    },
+    "clientId": {
+      "type": "securestring"
+    },
+    "clientSecret": {
+      "type": "securestring"
+    },
+    "tenantID": {
+      "defaultValue": "92603419-35d1-4eb0-8427-cac731071355",
+      "type": "string"
+    },
+    "location": {
+      "defaultValue": "westeurope",
+      "type": "String"
+    },
+    "tags": {
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('connectionName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "displayName": "[parameters('displayName')]",
+        "parameterValues": {
+          "token:clientId": "[parameters('clientId')]",
+          "token:clientSecret": "[parameters('clientSecret')]",
+          "token:TenantId": "[parameters('tenantID')]",
+          "token:grantType": "client_credentials"
+        },
+        "customParameterValues": {},
+        "api": {
+          "id": "[parameters('apiId')]"
+        }
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

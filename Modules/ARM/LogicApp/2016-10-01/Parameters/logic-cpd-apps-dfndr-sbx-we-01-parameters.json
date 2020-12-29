@@ -1,0 +1,239 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-dfndr-sbx-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_an_Azure_Security_Center_Alert_is_created_or_triggered": {
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": {
+              "callback_url": "@{listCallbackUrl()}"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-ascalrt-sbx-we-01']['connectionId']"
+              }
+            },
+            "path": "/Microsoft.Security/Alert/subscribe"
+          }
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Condition": {
+          "actions": {
+            "For_each": {
+              "actions": {
+                "Update_Attachment_Extension": {
+                  "inputs": {
+                    "body": {
+                      "_ownerid_type": "",
+                      "cpm_isunsafe": false
+                    },
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['apicon-cpd-apps-strcds-sbx-we-01']['connectionId']"
+                      }
+                    },
+                    "method": "patch",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_annotationextensions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_annotationextensionid']))}"
+                  },
+                  "runAfter": {},
+                  "type": "ApiConnection"
+                }
+              },
+              "foreach": "@body('List_records')?['value']",
+              "runAfter": {
+                "List_records": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            },
+            "List_records": {
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-strcds-sbx-we-01']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_annotationextensions'))}/items",
+                "queries": {
+                  "$filter": "cpm_annotationid eq @{variables('FileId')}",
+                  "$top": 1
+                }
+              },
+              "runAfter": {},
+              "type": "ApiConnection"
+            }
+          },
+          "expression": {
+            "or": [
+              {
+                "equals": [
+                  "@body('Parse_JSON')?['container']",
+                  "casefiles"
+                ]
+              },
+              {
+                "equals": [
+                  "@body('Parse_JSON')?['container']",
+                  "case-files"
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_File_Id": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "Initialize_File_Id": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileId",
+                "type": "string",
+                "value": "@{replace(variables('FileIdSubstring'),concat('.',last(split(variables('FileIdSubstring'),'.'))),'')}"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_File_Name": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Initialize_File_Name": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileIdSubstring",
+                "type": "string",
+                "value": "@{split(body('Parse_JSON')?['blob'],'_')[0]}"
+              }
+            ]
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Parse_JSON": {
+          "inputs": {
+            "content": "@triggerBody()?['ExtendedProperties']",
+            "schema": {
+              "properties": {
+                "alert Id": {
+                  "type": "string"
+                },
+                "api type": {
+                  "type": "string"
+                },
+                "authentication type": {
+                  "type": "string"
+                },
+                "azure AD user": {
+                  "type": "string"
+                },
+                "blob": {
+                  "type": "string"
+                },
+                "client location": {
+                  "type": "string"
+                },
+                "container": {
+                  "type": "string"
+                },
+                "detection source": {
+                  "type": "string"
+                },
+                "investigation steps": {
+                  "type": "string"
+                },
+                "killChainIntent": {
+                  "type": "string"
+                },
+                "malware description": {
+                  "type": "string"
+                },
+                "operations types": {
+                  "type": "string"
+                },
+                "potential causes": {
+                  "type": "string"
+                },
+                "resourceType": {
+                  "type": "string"
+                },
+                "service type": {
+                  "type": "string"
+                },
+                "threat report": {
+                  "type": "string"
+                },
+                "threat report summary": {
+                  "type": "string"
+                },
+                "user agent": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Sandbox"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpd-apps-ascalrt-sbx-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-str-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-ascalrt-sbx-we-01",
+              "connectionName": "apicon-cpd-apps-ascalrt-sbx-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/ascalert"
+            },
+            "apicon-cpd-apps-strcds-sbx-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-str-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-strcds-sbx-we-01",
+              "connectionName": "apicon-cpd-apps-strcds-sbx-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+            }
+          }
+        }
+      }
+    }
+  }
+}
