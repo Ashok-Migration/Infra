@@ -36,19 +36,59 @@
             "value": "snet-cpd-pltf-agw-dev-we-01"
         },
         "frontendPorts": {
-            "value": []
+            "value": [
+                {
+                  "name": "port_80",
+                  "properties": {
+                    "Port": 80
+                  }
+                }
+              ]
         },
         "backendAddressPools": {
-            "value": []
+            "value": [
+                {
+                  "name": "backendPool",
+                  "properties": {
+                    "backendAddresses": []
+                  }
+                }
+              ]
         },
         "backendHttpSettingsCollection": {
-            "value": []
+            "value": [
+                {
+                  "name": "[parameters('backendHttpSettingName')]",
+                  "properties": {
+                    "Port": 80,
+                    "Protocol": "Http",
+                    "cookieBasedAffinity": "Disabled",
+                    "requestTimeout": 20
+                  }
+                }
+              ]
         },
         "httpListeners": {
             "value": []
         },
         "requestRoutingRules": {
-            "value": []
+            "value": [
+                {
+                  "Name": "routingRule",
+                  "properties": {
+                    "RuleType": "Basic",
+                    "httpListener": {
+                      "id": null
+                    },
+                    "backendAddressPool": {
+                      "id": null
+                    },
+                    "backendHttpSettings": {
+                      "id": null
+                    }
+                  }
+                }
+              ]
         },
         "probes": {
             "value": []

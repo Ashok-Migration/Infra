@@ -51,14 +51,6 @@
       "type": "string",
       "defaultValue": "rg-cpd-pltf-net-dev-we-01"
     },
-    "backendAddressPoolName": {
-      "type": "string",
-      "defaultValue": "backendPool"
-    },
-    "httpListenerName": {
-      "type": "string",
-      "defaultValue": "httpListener"
-    },
     "httpListeners": {
       "type": "array",
       "defaultValue": [
@@ -123,22 +115,22 @@
     "requestRoutingRules": {
       "type": "array",
       "defaultValue": [
-          {
-            "Name": "routingRule",
-            "properties": {
-              "RuleType": "Basic",
-              "httpListener": {
-                "id": null
-              },
-              "backendAddressPool": {
-                "id": null
-              },
-              "backendHttpSettings": {
-                "id": null
-              }
+        {
+          "Name": "routingRule",
+          "properties": {
+            "RuleType": "Basic",
+            "httpListener": {
+              "id": null
+            },
+            "backendAddressPool": {
+              "id": null
+            },
+            "backendHttpSettings": {
+              "id": null
             }
           }
-        ]
+        }
+      ]
     },
     "probes": {
       "type": "array",
@@ -219,7 +211,6 @@
     "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
-    "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]",
     "diagnosticsMetrics": [
       {
         "category": "AllMetrics",
@@ -256,7 +247,13 @@
           "days": "[parameters('diagnosticLogsRetentionInDays')]"
         }
       }
-    ]
+    ],
+    "identity": {
+      "type": "UserAssigned",
+      "userAssignedIdentities": {
+        "[parameters('managedIdentityId')]": {}
+      }
+    }
   },
   "resources": [
     {
@@ -268,12 +265,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
       ],
-      "identity": {
-        "type": "UserAssigned",
-        "userAssignedIdentities": {
-          "[parameters('managedIdentityId')]": {}
-        }
-      },
+      "identity": "[if(empty(parameters('managedIdentityId')), json('null'), variables('identity'))]",
       "tags": "[parameters('tags')]",
       "properties": {
         "sku": {
