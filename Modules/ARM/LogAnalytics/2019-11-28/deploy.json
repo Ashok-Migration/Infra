@@ -205,6 +205,9 @@
         {
             "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
             "name": "[concat(parameters('logAnalyticsWorkspaceName'), '/' , 'Automation')]",
+            "dependsOn": [
+                "[parameters('logAnalyticsWorkspaceName')]"
+            ],
             "apiVersion": "2015-11-01-preview",
             "condition": "[not(empty(parameters('automationAccountId')))]",
             "location": "[parameters('location')]",
