@@ -38,6 +38,24 @@
       "metadata": {
         "description": "The throughput for the container"
       }
+    },
+    "includedPaths": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "path": "/*"
+        }       
+      ]
+    },
+    "uniqueKeys": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "paths": [
+            "/phoneNumber"
+          ]
+        }
+      ]
     }
   },
   "variables": {
@@ -59,37 +77,12 @@
           },
           "indexingPolicy": {
             "indexingMode": "consistent",
-            "includedPaths": [
-              {
-                "path": "/*"
-              }
-            ],
-            "excludedPaths": [
-              {
-                "path": "/myPathToNotIndex/*"
-              }
-            ],
-            "spatialIndexes": [
-              {
-                "path": "/path/to/geojson/property/?",
-                "types": [
-                  "Point",
-                  "Polygon",
-                  "MultiPolygon",
-                  "LineString"
-                ]
-              }
-            ]
+            "includedPaths": "[parameters('includedPaths')]",
+            "excludedPaths": []
           },
           "defaultTtl": 86400,
           "uniqueKeyPolicy": {
-            "uniqueKeys": [
-              {
-                "paths": [
-                  "/phoneNumber"
-                ]
-              }
-            ]
+            "uniqueKeys": "[parameters('uniqueKeys')]"
           }
         },
         "options": {

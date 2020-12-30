@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "accountName": {
+            "value": "cosmos-cpd-apps-str-tra-we-01"
+        },
+        "databaseName": {
+            "value": "paymenttransaction"
+        },
+        "containerName": {
+            "value": "transactionhistory"
+        },
+        "partitionKey": {
+            "value": "/profileid"
+        },
+        "throughput": {
+            "value": 400
+        },
+        "includedPaths": {
+            "value": [
+                {
+                    "path": "/*"
+                },
+                {
+                    "path": "/trackid/?"
+                },
+                {
+                    "path": "/originalrequesturl/?"
+                },
+                {
+                    "path": "/originalqueryparams/?"
+                },
+                {
+                    "path": "/paymentgatewayresponsequeryparams/?"
+                },
+                {
+                    "path": "/responsecode/?"
+                },
+                {
+                    "path": "/state/?"
+                }
+            ]
+        },
+        "uniqueKeys":{
+            "value": []
+        }
+    }
+}
