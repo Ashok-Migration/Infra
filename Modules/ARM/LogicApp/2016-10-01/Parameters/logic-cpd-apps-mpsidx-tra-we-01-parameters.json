@@ -54,7 +54,7 @@
       "value": {
         "Get_Search_API_Key": {
           "runAfter": {
-            "Initialize_ProductsArray_Array": [
+            "Initialize_Personas_Array_variable": [
               "Succeeded"
             ]
           },
@@ -122,6 +122,22 @@
               }
             ]
           }
+        },
+        "Initialize_Personas_Array_variable": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "personasArray",
+                "type": "array"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_ProductsArray_Array": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
         },
         "Initialize_ProductsArray_Array": {
           "runAfter": {
@@ -195,7 +211,10 @@
                       ]
                     },
                     "productPrice": {
-                      "type": "integer"
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
                     },
                     "providerName": {
                       "type": [
@@ -204,10 +223,121 @@
                       ]
                     },
                     "rating": {
-                      "type": "number"
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "reviewsCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "sectorNames": {
+                      "items": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
                     },
                     "shortDescription": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "featuredProduct": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "popularProduct": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "popularityRating": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "priceOverview": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productCategoryName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productSubCategoryName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "typeOfServiceId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "providerId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productStructureId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "catalogueTypeId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "customerSegmentIds": {
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
+                    },
+                    "content": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "metadata_title": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "profileTypeIds": {
+                      "items": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
                     }
                   },
                   "type": "object"
@@ -226,7 +356,10 @@
                 "schema": {
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "imageUrl": {
                       "type": [
@@ -253,7 +386,10 @@
                       ]
                     },
                     "productPrice": {
-                      "type": "integer"
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
                     },
                     "providerName": {
                       "type": [
@@ -262,13 +398,121 @@
                       ]
                     },
                     "rating": {
-                      "type": "number"
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "reviewsCount": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "sectorNames": {
+                      "items": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
                     },
                     "shortDescription": {
                       "type": [
                         "string",
                         "null"
                       ]
+                    },
+                    "featuredProduct": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "popularProduct": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "popularityRating": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "priceOverview": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productCategoryName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productSubCategoryName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "typeOfServiceId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "providerId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "productStructureId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "catalogueTypeId": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "customerSegmentIds": {
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
+                    },
+                    "content": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "metadata_title": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "profileTypeIds": {
+                      "items": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "type": "array"
                     }
                   },
                   "type": "object"
@@ -287,18 +531,36 @@
                 "select": {
                   "@@search.action": "mergeOrUpload",
                   "average_rating": "@concat(body('Parse_Product_JSON')?.value['rating'],'')",
+                  "catalogueTypeId": "@body('Parse_Product_JSON')?.value['catalogueTypeId']",
+                  "content": "@body('Parse_Product_JSON')?.value['longDescription']",
+                  "customerSegmentIds": "@coalesce(body('Parse_Product_JSON')?.value['customerSegmentIds'], json('[]'))",
                   "entity_type": "Products & Services",
+                  "featuredProduct": "@body('Parse_Product_JSON')?.value['featuredProduct']",
                   "id": "@body('Parse_Product_JSON')?['id']",
+                  "language": "en",
                   "merged_content": "@concat(body('Parse_Product_JSON')?.value['longDescription'],body('Parse_Product_JSON')?.value['shortDescription'])",
+                  "metadata_creation_date": "@utcNow()",
                   "metadata_last_modified": "@body('Parse_Product_JSON')?.value['modifiedOn']",
                   "metadata_storage_file_extension": "JSON",
                   "metadata_storage_last_modified": "@body('Parse_Product_JSON')?.value['modifiedOn']",
                   "metadata_storage_name": "@body('Parse_Product_JSON')?.value['name']",
+                  "metadata_title": "@body('Parse_Product_JSON')?.value['name']",
+                  "number_of_rating": "@concat(body('Parse_Product_JSON')?.value['reviewsCount'],'')",
+                  "personas": "@coalesce(variables('personasArray'),json('[]'))",
+                  "popularProduct": "@body('Parse_Product_JSON')?.value['popularProduct']",
+                  "popularityRating": "@body('Parse_Product_JSON')?.value['popularityRating']",
                   "price": "@concat(body('Parse_Product_JSON')?.value['productPrice'],'')",
+                  "priceOverview": "@body('Parse_Product_JSON')?.value['priceOverview']",
+                  "productCategoryName": "@body('Parse_Product_JSON')?.value['productCategoryName']",
+                  "productStructureId": "@body('Parse_Product_JSON')?.value['productStructureId']",
+                  "productSubCategoryName": "@body('Parse_Product_JSON')?.value['productSubCategoryName']",
+                  "providerId": "@body('Parse_Product_JSON')?.value['providerId']",
                   "provider_name": "@body('Parse_Product_JSON')?.value['providerName']",
                   "search_id": "@concat('ProductsServices-',body('Parse_Product_JSON')['id'])",
+                  "sector": "@coalesce(body('Parse_Product_JSON')?.value['sectorNames'],json('[]'))",
                   "short_description": "@body('Parse_Product_JSON')?.value['shortDescription']",
-                  "thumbnail_url": "@body('Parse_Product_JSON')?.value['imageUrl']"
+                  "thumbnail_url": "@body('Parse_Product_JSON')?.value['imageUrl']",
+                  "typeOfServiceId": "@body('Parse_Product_JSON')?.value['typeOfServiceId']"
                 }
               }
             },
@@ -313,19 +575,37 @@
                 "from": "@createArray(variables('TempBody'))",
                 "select": {
                   "@@search.action": "mergeOrUpload",
-                  "average_rating": "@concat(variables('TempBody')?['rating'],'')",
+                  "average_rating": "@concat(variables('TempBody')?.value['rating'],'')",
+                  "catalogueTypeId": "@variables('TempBody')?.value['catalogueTypeId']",
+                  "content": "@variables('TempBody')?.value['longDescription']",
+                  "customerSegmentIds": "@coalesce(variables('TempBody')?.value['customerSegmentIds'], json('[]'))",
                   "entity_type": "Products & Services",
+                  "featuredProduct": "@variables('TempBody')?.value['featuredProduct']",
                   "id": "@variables('TempBody').value?['id']",
-                  "merged_content": "@concat(variables('TempBody')?['longDescription'],variables('TempBody')?['shortDescription'])",
-                  "metadata_last_modified": "@variables('TempBody')?['modifiedOn']",
+                  "language": "ar",
+                  "merged_content": "@concat(variables('TempBody')?.value['longDescription'],variables('TempBody')?.value['shortDescription'])",
+                  "metadata_creation_date": "@utcNow()",
+                  "metadata_last_modified": "@variables('TempBody')?.value['modifiedOn']",
                   "metadata_storage_file_extension": "JSON",
-                  "metadata_storage_last_modified": "@variables('TempBody')?['modifiedOn']",
-                  "metadata_storage_name": "@variables('TempBody')?['name']",
-                  "price": "@concat(variables('TempBody')?['productPrice'],'')",
-                  "provider_name": "@variables('TempBody')?['providerName']",
+                  "metadata_storage_last_modified": "@variables('TempBody')?.value['modifiedOn']",
+                  "metadata_storage_name": "@variables('TempBody')?.value['name']",
+                  "metadata_title": "@variables('TempBody')?.value['name']",
+                  "number_of_rating": "@concat(variables('TempBody')?.value['reviewsCount'],'')",
+                  "personas": "@coalesce(variables('personasArray'),json('[]'))",
+                  "popularProduct": "@variables('TempBody')?.value['popularProduct']",
+                  "popularityRating": "@variables('TempBody')?.value['popularityRating']",
+                  "price": "@concat(variables('TempBody')?.value['productPrice'],'')",
+                  "priceOverview": "@variables('TempBody')?.value['priceOverview']",
+                  "productCategoryName": "@variables('TempBody')?.value['productCategoryName']",
+                  "productStructureId": "@variables('TempBody')?.value['productStructureId']",
+                  "productSubCategoryName": "@variables('TempBody')?.value['productSubCategoryName']",
+                  "providerId": "@variables('TempBody')?.value['providerId']",
+                  "provider_name": "@variables('TempBody')?.value['providerName']",
                   "search_id": "@concat('ProductsServicesAr-',variables('TempBody').value['id'])",
-                  "short_description": "@variables('TempBody')?['shortDescription']",
-                  "thumbnail_url": "@variables('TempBody')?['imageUrl']"
+                  "sector": "@coalesce(variables('TempBody')?.value['sectorNames'],json('[]'))",
+                  "short_description": "@variables('TempBody')?.value['shortDescription']",
+                  "thumbnail_url": "@variables('TempBody')?.value['imageUrl']",
+                  "typeOfServiceId": "@variables('TempBody')?.value['typeOfServiceId']"
                 }
               }
             },
@@ -381,6 +661,25 @@
                   "value": "@body('Parse_Product_JSON_AR')['ar']"
                 }
               }
+            },
+            "personasForeach": {
+              "actions": {
+                "Append_to_personas_Array": {
+                  "inputs": {
+                    "name": "personasArray",
+                    "value": "@string(items('personasForeach'))"
+                  },
+                  "runAfter": {},
+                  "type": "AppendToArrayVariable"
+                }
+              },
+              "foreach": "@array(body('Parse_Product_JSON').value?['profileTypeIds'])",
+              "runAfter": {
+                "Parse_Product_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
             }
           },
           "runAfter": {
