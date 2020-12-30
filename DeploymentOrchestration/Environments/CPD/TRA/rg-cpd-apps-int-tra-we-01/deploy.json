@@ -626,6 +626,27 @@
           }
         },
         {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-10-01",
+          "name": "DEP-apicon-cpd-apps-ascalrt-tra-we-01",
+          "resourceGroup": "rg-cpd-apps-int-tra-we-01",
+          "dependsOn": [
+            "DEP-rg-cpd-apps-int-tra-we-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'ApiConnectionSecurityAlert/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'ApiConnectionSecurityAlert/2019-04-01/Parameters/apicon-cpd-apps-ascalrt-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "logic-cpd-apps-intsec-tra-we-01",
@@ -902,6 +923,29 @@
             },
             "parametersLink": {
               "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-intfile-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-10-01",
+          "name": "DEP-logic-cpd-apps-dfndr-tra-we-01",
+          "resourceGroup": "rg-cpd-apps-int-tra-we-01",
+          "dependsOn": [
+            "DEP-rg-cpd-apps-int-tra-we-01",
+            "DEP-apicon-cpd-apps-ascalrt-tra-we-01",
+            "DEP-apicon-cpd-apps-intcds-tra-we-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-dfndr-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
             }
           }
         },
