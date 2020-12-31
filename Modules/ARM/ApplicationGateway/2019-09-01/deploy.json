@@ -169,6 +169,10 @@
       "type": "bool",
       "defaultValue": true
     },
+    "firewallExclusions": {
+      "type": "array",
+      "defaultValue": []
+    },
     "diagnosticLogsRetentionInDays": {
       "type": "int",
       "defaultValue": 365,
@@ -320,7 +324,7 @@
           "ruleSetType": "OWASP",
           "ruleSetVersion": "3.0",
           "disabledRuleGroups": [],
-          "exclusions": [],
+          "exclusions": "[parameters('firewallExclusions')]",
           "requestBodyCheck": "[parameters('requestBodyCheck')]"
         }
       },
