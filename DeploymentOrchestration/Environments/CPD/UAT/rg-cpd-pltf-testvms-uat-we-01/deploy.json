@@ -31,7 +31,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cpd-pltf-testvms-dev-we-01",
+            "name": "DEP-rg-cpd-pltf-testvms-uat-we-01",
             "location": "[variables('location')]",
             "dependsOn": [],
             "properties": {
@@ -43,7 +43,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-pltf-testvms-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-pltf-testvms-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -51,9 +51,9 @@
             "apiVersion": "2019-08-01",
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-cpd-pltf-testvms-dev-we-01",
+            "resourceGroup": "rg-cpd-pltf-testvms-uat-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-pltf-testvms-dev-we-01"
+                "DEP-rg-cpd-pltf-testvms-uat-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -67,10 +67,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-vmsmsgwdevwe01",
-            "resourceGroup": "rg-cpd-pltf-testvms-dev-we-01",
+            "name": "DEP-jmpappsuatwe01",
+            "resourceGroup": "rg-cpd-pltf-testvms-uat-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-pltf-testvms-dev-we-01"
+                "DEP-rg-cpd-pltf-testvms-uat-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -81,28 +81,7 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmsmsgwdevwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-jmpappsdevwe01",
-            "resourceGroup": "rg-cpd-pltf-testvms-dev-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-pltf-testvms-dev-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpappsdevwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpappsuatwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
