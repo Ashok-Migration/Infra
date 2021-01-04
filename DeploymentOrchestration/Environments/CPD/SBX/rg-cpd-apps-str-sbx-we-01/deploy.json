@@ -1,32 +1,32 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "utcYear": {
-            "type": "string",
-            "defaultValue": "[utcNow('yyyy')]",
-            "metadata": {
-                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "utcYear": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy')]",
+      "metadata": {
+        "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+      }
+    }
+  },
+  "variables": {
+    "lockForDeletion": false,
+    "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+    "accountSasProperties": {
+      "signedServices": "bt",
+      "signedPermission": "racuw",
+      "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+      "signedResourceTypes": "co",
+      "signedProtocol": "https"
     },
-    "variables": {
-        "lockForDeletion": false,
-        "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
-        "accountSasProperties": {
-            "signedServices": "bt",
-            "signedPermission": "racuw",
-            "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
-            "signedResourceTypes": "co",
-            "signedProtocol": "https"
-        },
-        "componentStorageAccountId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-iacstg-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgnpdwe01",
-        "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
-        "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
-        "containerName": "components",
-        "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
-        "location": "[deployment().location]"
-    },
+    "componentStorageAccountId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-iacstg-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgnpdwe01",
+    "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+    "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+    "containerName": "components",
+    "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+    "location": "[deployment().location]"
+  },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
@@ -86,5 +86,5 @@
       }
     }
   ],
-    "outputs": {}
+  "outputs": {}
 }
