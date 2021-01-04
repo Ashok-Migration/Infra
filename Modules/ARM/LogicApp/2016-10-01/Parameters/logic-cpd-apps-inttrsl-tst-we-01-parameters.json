@@ -137,7 +137,7 @@
                         "Create_Task_In_MyTasks_For_Translation": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\",\n\"ParentItemLink\": {'Description': '', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'}\n}",
+                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\",\n\"ParentItemLink\": {'Description': '', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'},\n\"PreviewUrl\": {'Description':'', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['PreviewURL']}'},\n\"arPreviewUrl\": {'Description':'', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL']}'},\n\"ListName\": \"@{body('Parse_Service_Bus_Message_JSON')?['ListName']}\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=nometadata",
                                         "Content-Type": "application/json"
@@ -333,7 +333,7 @@
                                 "Send_message_For_1st_Level_Approval_Queue": {
                                     "inputs": {
                                         "body": {
-                                            "ContentData": "@{base64(concat('{','\n','\"SiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['SiteURL'],'\",','\n','\"ItemTitle\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemTitle'],'\",','\n','\"ItemGUID\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemGUID'],'\",','\n','\"ItemId\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemId'],'\",','\n','\"ListName\": \"',body('Parse_Service_Bus_Message_JSON')?['ListName'],'\",','\n','\"EditorEmail\": \"',body('Parse_Service_Bus_Message_JSON')?['EditorEmail'],'\",','\n','\"TranslatorId\": \"',body('Parse_Users_Task_For_Translation_JSON')?['ID'],'\",','\n','\"Sensitivity\": \"',body('Parse_Service_Bus_Message_JSON')?['Sensitivity'],'\",','\n','\"MarketplaceSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL'],'\",','\n','\"GlobalSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL'],'\",','\n','\"GlobalConfigList\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList'],'\"','\n','}'))}"
+                                            "ContentData": "@{base64(concat('{','\n','\"SiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['SiteURL'],'\",','\n','\"ItemTitle\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemTitle'],'\",','\n','\"ItemGUID\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemGUID'],'\",','\n','\"ItemId\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemId'],'\",','\n','\"ListName\": \"',body('Parse_Service_Bus_Message_JSON')?['ListName'],'\",','\n','\"EditorEmail\": \"',body('Parse_Service_Bus_Message_JSON')?['EditorEmail'],'\",','\n','\"TranslatorId\": \"',body('Parse_Users_Task_For_Translation_JSON')?['ID'],'\",','\n','\"Sensitivity\": \"',body('Parse_Service_Bus_Message_JSON')?['Sensitivity'],'\",','\n','\"MarketplaceSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL'],'\",','\n','\"GlobalSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL'],'\",','\n','\"GlobalConfigList\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList'],'\",','\n','\"PreviewURL\": \"',body('Parse_Service_Bus_Message_JSON')?['PreviewURL'],'\",','\n','\"ArabicPreviewURL\": \"',body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL'],'\"','\n','}'))}"
                                         },
                                         "host": {
                                             "connection": {
@@ -2049,6 +2049,12 @@
                         "content": "@decodeBase64(triggerBody()?['ContentData'])",
                         "schema": {
                             "properties": {
+                                "ArabicPreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
                                 "ChangeType": {
                                     "type": [
                                         "string",
@@ -2087,6 +2093,12 @@
                                 },
                                 "MarketplaceSiteURL": {
                                     "type": "string"
+                                },
+                                "PreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "Sensitivity": {
                                     "type": [

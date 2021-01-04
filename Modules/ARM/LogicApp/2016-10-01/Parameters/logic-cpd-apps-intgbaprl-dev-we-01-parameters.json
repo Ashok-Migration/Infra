@@ -317,7 +317,7 @@
                 "Create_Task_in_MyTasks_for_Approval": {
                     "inputs": {
                         "body": {
-                            "body": "{\n\"Title\":\"@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\",\n\"ParentItemLink\": {'Description': '', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'}\n}",
+                            "body": "{\n\"Title\":\"@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\",\n\"ParentItemLink\": {'Description': '', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'},\n\"PreviewUrl\": {'Description':'', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['PreviewURL']}'},\n\"arPreviewUrl\": {'Description':'', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL']}'},\n\"ListName\": \"@{body('Parse_Service_Bus_Message_JSON')?['ListName']}\"\n}",
                             "headers": {
                                 "Accept": "application/json;odata=nometadata",
                                 "Content-Type": "application/json;odata=nometadata"
@@ -789,6 +789,12 @@
                         "content": "@decodeBase64(triggerBody()?['ContentData'])",
                         "schema": {
                             "properties": {
+                                "ArabicPreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
                                 "EditorEmail": {
                                     "type": "string"
                                 },
@@ -815,6 +821,12 @@
                                 },
                                 "MarketplaceSiteURL": {
                                     "type": "string"
+                                },
+                                "PreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "Sensitivity": {
                                     "type": [
