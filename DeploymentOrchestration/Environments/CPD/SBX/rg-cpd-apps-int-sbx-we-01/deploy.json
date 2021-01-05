@@ -153,6 +153,28 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
+      "name": "DEP-sbq-cpd-apps-intsec-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-int-sbx-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-int-sbx-we-01",
+        "DEP-sb-cpd-apps-int-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpd-apps-intsec-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
       "name": "DEP-sbq-cpd-apps-int6dbill-sbx-we-01",
       "resourceGroup": "rg-cpd-apps-int-sbx-we-01",
       "dependsOn": [
@@ -807,6 +829,29 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-intgbaprl-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-logic-cpd-apps-secsync-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-int-sbx-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-int-sbx-we-01",
+        "DEP-apicon-cpd-apps-intspo-sbx-we-01",
+        "DEP-apicon-cpd-apps-intsb-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-secsync-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
