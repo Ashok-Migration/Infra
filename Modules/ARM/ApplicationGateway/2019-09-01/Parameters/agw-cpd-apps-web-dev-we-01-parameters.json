@@ -62,6 +62,16 @@
                             }
                         ]
                     }
+                },
+                {
+                    "name": "opendata-portal",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "52.136.235.138"
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -122,6 +132,19 @@
                         "requestTimeout": 60,
                         "probe": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/probes/agw-ingress-probe"
+                        }
+                    }
+                },
+                {
+                    "name": "opendata-dev-sqcp-http",
+                    "properties": {
+                        "port": 5000,
+                        "protocol": "Http",
+                        "cookieBasedAffinity": "Disabled",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/probes/opendata-portal-probe"
                         }
                     }
                 }
@@ -200,6 +223,24 @@
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
+                },
+                {
+                    "name": "dev-opendata-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/frontendIPConfigurations/agw-cpd-apps-web-dev-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                        },
+                        "hostName": "opendata.dev.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
                 }
             ]
         },
@@ -264,6 +305,21 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendHttpSettingsCollection/account-dev-sqcp-http"
                         }
                     }
+                },
+                {
+                    "name": "dev-opendata-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/httpListeners/dev-opendata-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendAddressPools/opendata-portal"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendHttpSettingsCollection/opendata-dev-sqcp-http"
+                        }
+                    }
                 }
             ]
         },
@@ -277,6 +333,25 @@
                         "path": "/config/api/feature",
                         "interval": 30,
                         "timeout": 60,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "opendata-portal-probe",
+                    "properties": {
+                        "protocol": "Http",
+                        "host": "52.136.235.138",
+                        "port": 5000,
+                        "path": "/",
+                        "interval": 30,
+                        "timeout": 30,
                         "unhealthyThreshold": 3,
                         "pickHostNameFromBackendHttpSettings": false,
                         "minServers": 0,
