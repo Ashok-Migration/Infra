@@ -68,13 +68,14 @@
         "backendHttpSettingsCollection": {
             "value": [
                 {
-                    "name": "apim-dev-sqcp-http",
+                    "name": "apim-dev-sqcp-https",
                     "properties": {
-                        "port": 80,
-                        "protocol": "Http",
+                        "port": 443,
+                        "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
                         "hostName": "apim-cpd-shrd-dev-we-01.azure-api.net",
                         "pickHostNameFromBackendAddress": false,
+                        "affinityCookieName": "ApplicationGatewayAffinity",
                         "requestTimeout": 60,
                         "probe": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-dev-we-01/probes/apimprobe"
@@ -118,7 +119,7 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-dev-we-01/backendAddressPools/apim"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-dev-we-01/backendHttpSettingsCollection/apim-dev-sqcp-http"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-dev-we-01/backendHttpSettingsCollection/apim-dev-sqcp-https"
                         }
                     }
                 }
@@ -129,7 +130,7 @@
                 {
                     "name": "apimprobe",
                     "properties": {
-                        "protocol": "Http",
+                        "protocol": "Https",
                         "host": "apim-cpd-shrd-dev-we-01.azure-api.net",
                         "path": "/status-0123456789abcdef",
                         "interval": 30,

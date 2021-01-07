@@ -72,6 +72,16 @@
                             }
                         ]
                     }
+                },
+                {
+                    "name": "apim",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "172.20.42.77"
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -147,6 +157,20 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/probes/opendata-portal-probe"
                         }
                     }
+                },
+                {
+                    "name": "developer-dev-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "apim-cpd-shrd-dev-we-01.developer.azure-api.net",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 20,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/probes/developer-portal-probe"
+                        }
+                    }
                 }
             ]
         },
@@ -163,7 +187,7 @@
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
                         },
                         "hostName": "mytasmu.dev.sqcp.qa",
                         "hostNames": [],
@@ -181,7 +205,7 @@
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
                         },
                         "hostName": "marketplace.dev.sqcp.qa",
                         "hostNames": [],
@@ -199,7 +223,7 @@
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
                         },
                         "hostName": "account.dev.sqcp.qa",
                         "hostNames": [],
@@ -217,7 +241,7 @@
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
                         },
                         "hostName": "cpadmin.dev.sqcp.qa",
                         "hostNames": [],
@@ -235,9 +259,27 @@
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-cpadmin-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
                         },
                         "hostName": "opendata.dev.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
+                    "name": "dev-developer-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/frontendIPConfigurations/agw-cpd-apps-web-dev-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/sslCertificates/dev-sqcp-qa-httpsvaultcert"
+                        },
+                        "hostName": "developer.dev.sqcp.qa",
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
@@ -320,6 +362,21 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendHttpSettingsCollection/opendata-dev-sqcp-http"
                         }
                     }
+                },
+                {
+                    "name": "dev-developer-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/httpListeners/dev-developer-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendAddressPools/apim"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-dev-we-01/backendHttpSettingsCollection/developer-dev-sqcp-https"
+                        }
+                    }
                 }
             ]
         },
@@ -361,6 +418,21 @@
                             ]
                         }
                     }
+                },
+                {
+                    "name": "developer-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "apim-cpd-shrd-dev-we-01.developer.azure-api.net",
+                        "port": 443,
+                        "path": "/internal-status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 30,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {}
+                    }
                 }
             ]
         },
@@ -370,7 +442,7 @@
         "sslCertificates": {
             "value": [
                 {
-                    "name": "dev-cpadmin-sqcp-httpsvaultCert",
+                    "name": "dev-sqcp-qa-httpsvaultcert",
                     "properties": {
                         "keyVaultSecretId": "https://kv-cpd-glob-npd-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
                     }
