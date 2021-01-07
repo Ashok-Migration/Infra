@@ -36,6 +36,50 @@
         },
         "workflowActions": {
             "value": {
+                "Check_For_Approval_List": {
+                    "actions": {
+                        "Update_RequiresApproval_False": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"RequiresApproval\":\"false\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        }
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "Product Assets"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Update_Item_Status_to_Pending_Approval": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
                 "Check_For_Document_Or_Picture_Library": {
                     "actions": {
                         "Set_ListName_Append_Forms": {
@@ -991,7 +1035,7 @@
                         "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
-                        "Update_Item_Status_to_Pending_Approval": [
+                        "Check_For_Approval_List": [
                             "Succeeded"
                         ]
                     },
