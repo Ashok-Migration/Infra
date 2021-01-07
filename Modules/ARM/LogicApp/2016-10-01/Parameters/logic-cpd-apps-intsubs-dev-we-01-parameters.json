@@ -49,114 +49,211 @@
     },
     "workflowActions": {
       "value": {
-        "Checking_Event_Type": {
+        "Mandatory_Fields_Check": {
           "actions": {
-            "Create_Marketplace_Product_Subscription": {
-              "inputs": {
-                "body": {
-                  "_cpm_contact_value": "@body('Parse_JSON')?['value']?['customerId']",
-                  "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
-                  "cpm_description": "@body('Parse_JSON')?['value']?['description']",
-                  "cpm_externalreferencenumber": "@body('Parse_JSON')?['value']?['id']",
-                  "cpm_name": "@body('Parse_JSON')?['value']?['name']",
-                  "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
-                  "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
-                },
-                "host": {
-                  "connection": {
-                    "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+            "Checking_Event_Type": {
+              "actions": {
+                "Create_Marketplace_Product_Subscription": {
+                  "inputs": {
+                    "body": {
+                      "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                      "_cpm_organisation_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'2'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                      "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                      "cpm_description": "@body('Parse_JSON')?['value']?['description']",
+                      "cpm_externalreferencenumber": "@{body('Parse_JSON')?['value']?['id']}",
+                      "cpm_name": "@{body('Parse_JSON')?['value']?['name']}",
+                      "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                      "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                    },
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                      }
+                    },
+                    "method": "post",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items"
+                  },
+                  "runAfter": {},
+                  "type": "ApiConnection"
+                }
+              },
+              "else": {
+                "actions": {
+                  "Checking_if_subscription_record_doesnt_contain_data_or_not": {
+                    "actions": {
+                      "For_each": {
+                        "actions": {
+                          "_Update_Marketplace_Product_Subscription": {
+                            "inputs": {
+                              "body": {
+                                "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_contact_value'])}",
+                                "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'2'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
+                                "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                                "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
+                                "cpm_name": "@{if(empty(body('Parse_JSON')?['value']?['name']),items('For_each')?['cpm_name'], body('Parse_JSON')?['value']?['name'])}",
+                                "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                                "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                              },
+                              "host": {
+                                "connection": {
+                                  "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                                }
+                              },
+                              "method": "patch",
+                              "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_servicesubscriptionid']))}"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                          }
+                        },
+                        "foreach": "@body('Get_Marketplace_Product_Subscriptions_Records')?['value']",
+                        "runAfter": {},
+                        "type": "Foreach"
+                      }
+                    },
+                    "else": {
+                      "actions": {
+                        "Terminate": {
+                          "inputs": {
+                            "runError": {
+                              "code": "404 ",
+                              "message": "No records found"
+                            },
+                            "runStatus": "Failed"
+                          },
+                          "runAfter": {},
+                          "type": "Terminate"
+                        }
+                      }
+                    },
+                    "expression": {
+                      "and": [
+                        {
+                          "greater": [
+                            "@length(body('Get_Marketplace_Product_Subscriptions_Records')?['value'])",
+                            0
+                          ]
+                        },
+                        {
+                          "equals": [
+                            "@triggerBody()?['eventType']",
+                            "subscription-updated"
+                          ]
+                        }
+                      ]
+                    },
+                    "runAfter": {
+                      "Get_Marketplace_Product_Subscriptions_Records": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "If"
+                  },
+                  "Get_Marketplace_Product_Subscriptions_Records": {
+                    "inputs": {
+                      "host": {
+                        "connection": {
+                          "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                        }
+                      },
+                      "method": "get",
+                      "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items",
+                      "queries": {
+                        "$filter": "cpm_externalreferencenumber eq '@{body('Parse_JSON')?['value']?['id']}' ",
+                        "$top": 1
+                      }
+                    },
+                    "runAfter": {},
+                    "type": "ApiConnection"
                   }
-                },
-                "method": "post",
-                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items"
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@triggerBody()?['eventType']",
+                      "subscription-created"
+                    ]
+                  }
+                ]
               },
               "runAfter": {},
-              "type": "ApiConnection"
+              "type": "If"
             }
           },
           "else": {
             "actions": {
-              "Checking_if_subscription_record_doesn’t_contain_data_or_not": {
-                "actions": {
-                  "For_each": {
-                    "actions": {
-                      "_Update_Marketplace_Product_Subscription": {
-                        "inputs": {
-                          "body": {
-                            "_cpm_contact_value": "@{if(empty(body('Parse_JSON')?['value']?['customerId']),items('For_each')?['_cpm_contact_value'], body('Parse_JSON')?['value']?['customerId'])}",
-                            "_cpm_service_value": "@{if(empty(body('Parse_JSON')?['value']?['productId']),items('For_each')?['_cpm_contact_value'], body('Parse_JSON')?['value']?['productId'])}",
-                            "cpm_description": "@{if(empty(body('Parse_JSON')?['value']?['description']),items('For_each')?['cpm_description'], body('Parse_JSON')?['value']?['description'])}",
-                            "cpm_externalreferencenumber": "@{if(empty(body('Parse_JSON')?['value']?['id']),items('For_each')?['cpm_externalreferencenumber'], body('Parse_JSON')?['value']?['id'])}",
-                            "cpm_name": "@{if(empty(body('Parse_JSON')?['value']?['name']),items('For_each')?['cpm_name'], body('Parse_JSON')?['value']?['name'])}",
-                            "cpm_status": "@if(empty(body('Parse_JSON')?['value']?['statusId']),items('For_each')?['cpm_status'], body('Parse_JSON')?['value']?['statusId'])",
-                            "cpm_statusreason": "@if(empty(body('Parse_JSON')?['value']?['statusReasonId']),items('For_each')?['cpm_statusreason'], body('Parse_JSON')?['value']?['statusReasonId'])"
-                          },
-                          "host": {
-                            "connection": {
-                              "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
-                            }
-                          },
-                          "method": "patch",
-                          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_servicesubscriptionid']))}"
-                        },
-                        "runAfter": {},
-                        "type": "ApiConnection"
-                      }
-                    },
-                    "foreach": "@body('Get_Marketplace_Product_Subscriptions_Records')?['value']",
-                    "runAfter": {},
-                    "type": "Foreach"
-                  }
-                },
-                "expression": {
-                  "and": [
-                    {
-                      "greater": [
-                        "@length(body('Get_Marketplace_Product_Subscriptions_Records')?['value'])",
-                        0
-                      ]
-                    },
-                    {
-                      "equals": [
-                        "@triggerBody()?['eventType']",
-                        "subscription-updated"
-                      ]
-                    }
-                  ]
-                },
-                "runAfter": {
-                  "Get_Marketplace_Product_Subscriptions_Records": [
-                    "Succeeded"
-                  ]
-                },
-                "type": "If"
-              },
-              "Get_Marketplace_Product_Subscriptions_Records": {
+              "Terminate_": {
                 "inputs": {
-                  "host": {
-                    "connection": {
-                      "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
-                    }
+                  "runError": {
+                    "code": "400",
+                    "message": "Required fields missing."
                   },
-                  "method": "get",
-                  "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items",
-                  "queries": {
-                    "$filter": "cpm_externalreferencenumber eq '@{body('Parse_JSON')?['value']?['id']}' ",
-                    "$top": 1
-                  }
+                  "runStatus": "Failed"
                 },
                 "runAfter": {},
-                "type": "ApiConnection"
+                "type": "Terminate"
               }
             }
           },
           "expression": {
             "and": [
               {
-                "equals": [
-                  "@triggerBody()?['eventType']",
-                  "subscription-created"
+                "or": [
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['customerTypeId']",
+                      "@string(1)"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['customerTypeId']",
+                      "@string(2)"
+                    ]
+                  }
                 ]
+              },
+              {
+                "not": {
+                  "equals": [
+                    "@empty(body('Parse_JSON')?['value']?['customerId'])",
+                    "@true"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "equals": [
+                    "@empty(body('Parse_JSON')?['value']?['id'])",
+                    "@true"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "equals": [
+                    "@empty(body('Parse_JSON')?['value']?['productId'])",
+                    "@true"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "equals": [
+                    "@empty(body('Parse_JSON')?['value']?['statusId'])",
+                    "@true"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "equals": [
+                    "@empty(body('Parse_JSON')?['value']?['statusReasonId'])",
+                    "@true"
+                  ]
+                }
               }
             ]
           },
@@ -180,14 +277,23 @@
                     "customerId": {
                       "type": "string"
                     },
-                    "description": {
+                    "customerTypeId": {
                       "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "id": {
                       "type": "string"
                     },
                     "name": {
-                      "type": "string"
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "productId": {
                       "type": "string"
