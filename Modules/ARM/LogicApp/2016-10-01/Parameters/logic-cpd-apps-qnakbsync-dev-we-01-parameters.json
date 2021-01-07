@@ -52,7 +52,32 @@
         "value": {
             "Condition": {
                 "actions": {
-                    "Send_message_2": {
+                    "Send_message_Arabic_Delete": {
+                        "inputs": {
+                            "body": {
+                                "ContentData": "@{base64(body('UpdateArabicDeleteJson'))}",
+                                "ContentType": "application/json",
+                                "SessionId": "logicappmessageaddorupdate"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['apicon-cpd-apps-intsb-dev-we-01']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/@{encodeURIComponent(encodeURIComponent('qnaadd'))}/messages",
+                            "queries": {
+                                "systemProperties": "Run Details"
+                            }
+                        },
+                        "runAfter": {
+                            "Send_message_English": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection"
+                    },
+                    "Send_message_English": {
                         "inputs": {
                             "body": {
                                 "ContentData": "@{base64(body('UpdateDeleteJson'))}",
@@ -71,24 +96,41 @@
                             }
                         },
                         "runAfter": {
-                            "UpdateDeleteJson": [
+                            "UpdateArabicDeleteJson": [
                                 "Succeeded"
                             ]
                         },
                         "type": "ApiConnection"
+                    },
+                    "UpdateArabicDeleteJson": {
+                        "inputs": {
+                            "from": "@createArray(variables('DeleteJson'))",
+                            "select": {
+                                "id": "@body('ParseJSON')?['data']?['id']",
+                                "isDeleteKb": "true",
+                                "languageId": "ar"
+                            }
+                        },
+                        "runAfter": {
+                            "UpdateDeleteJson": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Select"
                     },
                     "UpdateDeleteJson": {
                         "inputs": {
                             "from": "@createArray(variables('DeleteJson'))",
                             "select": {
                                 "id": "@body('ParseJSON')?['data']?['id']",
-                                "isDeleteKb": "true"
+                                "isDeleteKb": "true",
+                                "languageId": "en"
                             }
                         },
                         "runAfter": {},
                         "type": "Select"
                     }
-                },
+                },               
                 "expression": {
                     "or": [
                         {
