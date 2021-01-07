@@ -90,7 +90,7 @@
                                 "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'2'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
                                 "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
                                 "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
-                                "cpm_name": "@{if(empty(body('Parse_JSON')?['value']?['name']),items('For_each')?['cpm_name'], body('Parse_JSON')?['value']?['name'])}",
+                                "cpm_name": "@{if(empty(body('Parse_JSON')?['value']?['name']),items('For_each')?['cpm_name'],body('Parse_JSON')?['value']?['name'])}",
                                 "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
                                 "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
                               },
