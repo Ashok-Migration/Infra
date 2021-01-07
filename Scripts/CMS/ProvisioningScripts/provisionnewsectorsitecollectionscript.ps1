@@ -1572,6 +1572,9 @@ function ViewCreation($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
 			#delete the LinkTitle from default view
 			Update-ColumnToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
 		}
+		#region update the sorting order for the view 
+		UpdateView $siteUrlNew $tenantAdmin $defaultviewName $listNameForView
+		#endregion
 	}
 	catch {
 		$ErrorMessage = $_.Exception.Message
@@ -1611,6 +1614,9 @@ function CustomViewCreation($listNameForView, $siteUrlNew, $customViewName, $fie
 			Write-Host "View already exists in List $listNameForView site- $siteUrlNew "
 			$client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
 		}
+			#region update the sorting order for the view 
+			UpdateView $siteUrlNew $tenantAdmin $customViewName $listNameForView
+			#endregion
 	}
 	catch {
 		$ErrorMessage = $_.Exception.Message
@@ -1623,6 +1629,39 @@ function CustomViewCreation($listNameForView, $siteUrlNew, $customViewName, $fie
 		DeleteListOnFailure $siteUrlNew $listNameForView
 	}
 	#Disconnect-PnPOnline
+}
+
+function UpdateView($url, $tenantAdmin, $viewName, $ListName) {
+	try {
+		#Setup the context
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+		Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+        
+		$admin = $tenantAdmin.UserName
+		$password = $tenantAdmin.Password
+		$credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+		$Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($url)
+		$Ctx.Credentials = $credentials
+		$List = $Ctx.Web.Lists.GetByTitle($ListName)
+		$View = $List.Views.GetByTitle($viewName)
+		$Ctx.ExecuteQuery()
+		if ($null -ne $View) {
+			#Define the CAML Query
+			$Query = "<OrderBy><FieldRef Name='Modified' Ascending='FALSE'/></OrderBy>"
+			#Update the View
+			$View.ViewQuery = $Query
+			$View.Update()
+			$Ctx.ExecuteQuery()
+ 
+			Write-host "View Updated Successfully!" -f Green
+		}
+		else {
+			Write-host "View '$ViewName' Doesn't exist in the List!"  -f Yellow
+		}
+	}
+	catch {
+		write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+	}
 }
 
 function UpdateViewForTasksList($listNameForView, $siteUrlNew)
@@ -2334,19 +2373,11 @@ function Update-SiteColumns($url, $node, $tenantAdmin) {
 			{
 				Write-Host "Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName -foreground Green
 				$client.TrackEvent("Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName)           
-				#Get the List
-			$List = $context.Web.Lists.GetByTitle($objfield.ListName)
-			$context.Load($List)
-			$context.ExecuteQuery()
- 
-			#Get the field
-			$Field = $List.Fields.GetByInternalNameOrTitle($objfield.ColumnInternalName)
-			$context.Load($Field)
-			$context.ExecuteQuery()
-
-			$field.DisplayFormat = $objfield.DisplayFormat
-			$field.Update()
-			$field.Context.ExecuteQuery()
+				Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+            	$field = Get-PNPField -identity $objfield.ColumnInternalName -List $objfield.ListName
+            	[xml]$schemaXml = $field.SchemaXml
+            	$schemaXml.Field.Format=$objfield.DisplayFormat
+            	$updateField = Set-PnPField -List $objfield.ListName  -Identity $objfield.ColumnInternalName -Values @{ SchemaXml = $schemaXml.OuterXml }
 			
 			}
 			catch{
