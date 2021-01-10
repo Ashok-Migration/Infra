@@ -52,7 +52,7 @@
                             "Set_ListName_Remove_Spaces": {
                                 "inputs": {
                                     "name": "ListName",
-                                    "value": "@{replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ','')}"
+                                    "value": "@{concat('Lists/', replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ',''))}"
                                 },
                                 "runAfter": {},
                                 "type": "SetVariable"
@@ -64,13 +64,19 @@
                             {
                                 "equals": [
                                     "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
-                                    "Hero Web"
+                                    "@parameters('HeroWeb')"
                                 ]
                             },
                             {
                                 "equals": [
                                     "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
-                                    "Hero Mobile"
+                                    "@parameters('HeroMobile')"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "@parameters('ProductMediaAssets')"
                                 ]
                             }
                         ]
@@ -137,7 +143,7 @@
                         "Create_Task_In_MyTasks_For_Translation": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\",\n\"ParentItemLink\": {'Description': '', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'},\n\"PreviewUrl\": {'Description':'', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['PreviewURL']}'},\n\"arPreviewUrl\": {'Description':'', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL']}'},\n\"ListName\": \"@{body('Parse_Service_Bus_Message_JSON')?['ListName']}\"\n}",
+                                    "body": "{\n\"Title\":\"Translation Task - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\": @{variables('TranslatorsUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"ContentTypeId\":\"@{variables('TranslationContentTypeId')}\",\n\"ParentItemLink\": {'Description': '', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'},\n\"PreviewUrl\": {'Description':'', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['PreviewURL']}'},\n\"arPreviewUrl\": {'Description':'', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL']}'},\n\"ListName\": \"@{body('Parse_Service_Bus_Message_JSON')?['ListName']}\"\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=nometadata",
                                         "Content-Type": "application/json"
@@ -368,7 +374,7 @@
                                 "Set_EmailBody_Translation_Completed": {
                                     "inputs": {
                                         "name": "EmailBody",
-                                        "value": "<p>Hello Translator,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been translated.\n<br><br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view the translated content. \n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                        "value": "<p>Hello Translator,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been translated.\n<br><br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view the translated content. \n<br><br>\nRegards,<br>\nAdmin Team</p>"
                                     },
                                     "runAfter": {
                                         "Update_Task_Status_And_Comments": [
@@ -459,7 +465,7 @@
                                 }
                             },
                             "expression": {
-                                "or": [
+                                "and": [
                                     {
                                         "equals": [
                                             "@variables('TranslatorTaskStatus')",
@@ -1198,7 +1204,7 @@
                         "Set_EmailBody_Translation_Request": {
                             "inputs": {
                                 "name": "EmailBody",
-                                "value": "<p>Hello Translator,\n<br /><br />\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review or update translation.\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_Task_For_Translation_JSON')?['ID']}\">here</a> to view the task.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                "value": "<p>Hello Translator,\n<br /><br />\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review or update translation.\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_Task_For_Translation_JSON')?['ID']}\">here</a> to view the task.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                             },
                             "runAfter": {
                                 "If_there_are_any_columns_for_auto_translation": [
@@ -1301,7 +1307,7 @@
                                         }
                                     },
                                     "expression": {
-                                        "or": [
+                                        "and": [
                                             {
                                                 "equals": [
                                                     "@variables('FinishTranslationReminder')",
@@ -1582,7 +1588,7 @@
                                         }
                                     },
                                     "expression": {
-                                        "or": [
+                                        "and": [
                                             {
                                                 "equals": [
                                                     "@variables('StartTranslationReminder')",
@@ -2128,8 +2134,20 @@
                     "defaultValue": {},
                     "type": "Object"
                 },
+                "HeroMobile": {
+                    "defaultValue": "Hero Mobile",
+                    "type": "String"
+                },
+                "HeroWeb": {
+                    "defaultValue": "Hero Web",
+                    "type": "String"
+                },
                 "MyTasksList": {
                     "defaultValue": "My Tasks",
+                    "type": "String"
+                },
+                "ProductMediaAssets": {
+                    "defaultValue": "Product Media Assets",
                     "type": "String"
                 },
                 "TranslateConfigListName": {
