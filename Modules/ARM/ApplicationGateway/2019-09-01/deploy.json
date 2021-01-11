@@ -114,23 +114,7 @@
     },
     "requestRoutingRules": {
       "type": "array",
-      "defaultValue": [
-        {
-          "Name": "routingRule",
-          "properties": {
-            "RuleType": "Basic",
-            "httpListener": {
-              "id": null
-            },
-            "backendAddressPool": {
-              "id": null
-            },
-            "backendHttpSettings": {
-              "id": null
-            }
-          }
-        }
-      ]
+      "defaultValue": []
     },
     "probes": {
       "type": "array",
@@ -215,6 +199,23 @@
     "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "defaultRequestRoutingRules": [
+      {
+        "Name": "routingRule",
+        "properties": {
+          "RuleType": "Basic",
+          "httpListener": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/httpListeners/httpListener')]"
+          },
+          "backendAddressPool": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendAddressPools/backendPool')]"
+          },
+          "backendHttpSettings": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendHttpSettingsCollection/backendHttpSetting')]"
+          }
+        }
+      }
+    ],
     "diagnosticsMetrics": [
       {
         "category": "AllMetrics",
@@ -310,7 +311,7 @@
         "backendAddressPools": "[parameters('backendAddressPools')]",
         "backendHttpSettingsCollection": "[parameters('backendHttpSettingsCollection')]",
         "httpListeners": "[parameters('httpListeners')]",
-        "requestRoutingRules": "[parameters('requestRoutingRules')]",
+        "requestRoutingRules": "[if(empty(parameters('requestRoutingRules')), variables('defaultRequestRoutingRules'), parameters('requestRoutingRules'))]",
         "enableHttp2": false,
         "sslCertificates": "[parameters('sslCertificates')]",
         "probes": "[parameters('probes')]",
