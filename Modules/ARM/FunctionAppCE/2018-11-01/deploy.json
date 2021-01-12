@@ -22,14 +22,23 @@
             "type": "string",
             "defaultValue": "[resourceGroup().name]"
         },
-        "blobAccountConnectionString":{
+        "blobAccountConnectionString": {
             "type": "securestring"
         },
-        "eventPostUrl":{
+        "eventPostUrl": {
             "type": "string"
         },
-        "eventPostKey":{
+        "eventPostKey": {
             "type": "securestring"
+        },
+        
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": "stcpdglobacmwe01"
+        },
+        "storageAccountRG": {
+            "type": "string",
+            "defaultValue": "rg-cpd-glob-acm-we-01"
         },
         "location": {
             "defaultValue": "[resourceGroup().location]",
@@ -85,14 +94,16 @@
         }
     },
     "variables": {
+        "blobAccountConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('blobAccountConnectionString'),')')]",
+        "eventPostKey": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('eventPostKey'),')')]",
         "appInsightsResourceId": "[resourceId(subscription().subscriptionId, parameters('appInsightsRG'), 'microsoft.insights/components',parameters('appInsightsName'))]",
         "diagnosticsMetrics": [
             {
                 "category": "AllMetrics",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             }
         ],
@@ -101,8 +112,8 @@
                 "category": "FunctionAppLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             }
         ]
@@ -125,14 +136,6 @@
                 "siteConfig": {
                     "appSettings": [
                         {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "dotnet"
-                        },
-                        {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
                         },
@@ -141,28 +144,16 @@
                             "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').ConnectionString]"
                         },
                         {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[parameters('blobAccountConnectionString')]"
-                        },
-                        {
                             "name": "AzureWebJobsDashboard",
-                            "value": "[parameters('blobAccountConnectionString')]"
+                            "value": "[variables('blobAccountConnectionString')]"
                         },
                         {
-                            "name": "StorageConnectionAppSetting",
-                            "value": "[parameters('blobAccountConnectionString')]"
+                            "name": "AzureWebJobsStorage",
+                            "value": "[variables('blobAccountConnectionString')]"
                         },
                         {
                             "name": "ConnectionStrings__AzureWebJobsStorage",
-                            "value": "[parameters('blobAccountConnectionString')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[parameters('blobAccountConnectionString')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[parameters('functionAppName')]"
+                            "value": "[variables('blobAccountConnectionString')]"
                         },
                         {
                             "name": "EventPostUrl",
@@ -170,7 +161,27 @@
                         },
                         {
                             "name": "EventPostKey",
-                            "value": "[parameters('eventPostKey')]"
+                            "value": "[variables('eventPostKey')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "StorageConnectionAppSetting",
+                            "value": "[variables('blobAccountConnectionString')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageAccountRG'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[parameters('functionAppName')]"
                         }
                     ],
                     "alwaysOn": "[parameters('alwaysOn')]"
