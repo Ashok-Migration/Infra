@@ -833,6 +833,9 @@
                             },
                             "title": {
                               "type": "string"
+                            },
+                            "readingTime": {
+                              "type": "number"
                             }
                           },
                           "type": "object"
@@ -870,6 +873,9 @@
                             },
                             "title": {
                               "type": "string"
+                            },
+                            "readingTime": {
+                              "type": "number"
                             }
                           },
                           "type": "object"
@@ -889,15 +895,20 @@
                           "@@search.action": "mergeOrUpload",
                           "entity_type": "News",
                           "id": "@body('Parse_News_JSON')?['id']",
-                          "merged_content": "@concat(body('Parse_News_JSON')?['longDescription'],body('Parse_News_JSON')?['shortDescription'])",
-                          "metadata_creation_date": "@body('Parse_News_JSON')?['publishedDate']",
-                          "metadata_last_modified": "@body('Parse_News_JSON')?['modified']",
+                          "keywords": "@body('Parse_News_JSON')?.value['keywords']",
+                          "language": "en",
+                          "merged_content": "@concat(body('Parse_News_JSON')?.value['longDescription'],body('Parse_News_JSON')?.value['shortDescription'])",
+                          "metadata_creation_date": "@body('Parse_News_JSON')?.value['publishedDate']",
+                          "metadata_last_modified": "@body('Parse_News_JSON')?.value['modified']",
                           "metadata_storage_file_extension": "JSON",
-                          "metadata_storage_last_modified": "@body('Parse_News_JSON')?['modified']",
-                          "metadata_storage_name": "@body('Parse_News_JSON')?['title']",
-                          "search_id": "@concat('News-',body('Parse_News_JSON')?['id'])",
-                          "short_description": "@body('Parse_News_JSON')?['shortDescription']",
-                          "thumbnail_url": "@body('Parse_News_JSON')?['thumbnailImage']"
+                          "metadata_storage_last_modified": "@body('Parse_News_JSON')?.value['modified']",
+                          "metadata_storage_name": "@body('Parse_News_JSON')?.value['title']",
+                          "personas": "@body('Parse_News_JSON')?.value['personas']",
+                          "search_id": "@concat('News-',body('Parse_News_JSON')?.value['id'])",
+                          "sector": "@body('Parse_News_JSON')?.value['sectors']",
+                          "short_description": "@body('Parse_News_JSON')?.value['shortDescription']",
+                          "thumbnail_url": "@body('Parse_News_JSON')?.value['thumbnailImage']",
+                          "readingTime": "@body('Parse_News_JSON')?.value['readingTime']"
                         }
                       }
                     },
@@ -913,14 +924,21 @@
                         "select": {
                           "@@search.action": "mergeOrUpload",
                           "entity_type": "News",
-                          "id": "@variables('TempBody').value?['id']",
-                          "merged_content": "@concat(variables('TempBody')?['longDescription'],variables('TempBody')?['shortDescription'])",
-                          "metadata_creation_date": "@variables('TempBody')?['publishedDate']",
-                          "metadata_last_modified": "@variables('TempBody')?['modified']",
-                          "metadata_storage_name": "@variables('TempBody')?['title']",
-                          "search_id": "@concat('NewsAR-',variables('TempBody').value?['id'])",
-                          "short_description": "@variables('TempBody')?['shortDescription']",
-                          "thumbnail_url": "@variables('TempBody')?['thumbnailImage']"
+                          "id": "@variables('TempBody')?.value['id']",
+                          "keywords": "@variables('TempBody')?.value['keywords']",
+                          "language": "en",
+                          "merged_content": "@concat(variables('TempBody')?.value['longDescription'],variables('TempBody')?.value['shortDescription'])",
+                          "metadata_creation_date": "@variables('TempBody')?.value['publishedDate']",
+                          "metadata_last_modified": "@variables('TempBody')?.value['modified']",
+                          "metadata_storage_file_extension": "JSON",
+                          "metadata_storage_last_modified": "@variables('TempBody')?.value['modified']",
+                          "metadata_storage_name": "@variables('TempBody')?.value['title']",
+                          "personas": "@variables('TempBody')?.value['personas']",
+                          "search_id": "@concat('News-',variables('TempBody')?.value['id'])",
+                          "sector": "@variables('TempBody')?.value['sectors']",
+                          "short_description": "@variables('TempBody')?.value['shortDescription']",
+                          "thumbnail_url": "@variables('TempBody')?.value['thumbnailImage']",
+                          "readingTime": "@variables('TempBody')?.value['readingTime']"
                         }
                       }
                     },
