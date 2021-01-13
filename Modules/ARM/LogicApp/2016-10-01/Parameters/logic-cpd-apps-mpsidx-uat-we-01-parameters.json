@@ -767,19 +767,20 @@
                       "from": "@createArray(body('Parse_KB_JSON'))",
                       "select": {
                         "@@search.action": "mergeOrUpload",
-                        "average_rating": "@body('Parse_KB_JSON')?['rating']",
-                        "content": "@body('Parse_KB_JSON')?['content']",
+                        "average_rating": "@body('Parse_KB_JSON')?.value['rating']",
+                        "content": "@body('Parse_KB_JSON')?.value['content']",
                         "entity_type": "KbArticle",
-                        "id": "@body('Parse_KB_JSON')?['id']",
-                        "merged_content": "@concat(body('Parse_KB_JSON')?['content'],body('Parse_KB_JSON')?['description'])",
+                        "id": "@body('Parse_KB_JSON')?.value['id']",
+                        "language": "@body('Parse_KB_JSON')?.value['languageShortCode']",
+                        "merged_content": "@concat(body('Parse_KB_JSON')?.value['content'],body('Parse_KB_JSON')?.value['description'])",
                         "metadata_creation_date": "@utcNow()",
                         "metadata_last_modified": "@utcNow()",
                         "metadata_storage_file_extension": "JSON",
                         "metadata_storage_last_modified": "@utcNow()",
-                        "metadata_storage_name": "@body('Parse_KB_JSON')?['title']",
+                        "metadata_storage_name": "@body('Parse_KB_JSON')?.value['title']",
                         "products": "@variables('ProductsArray')",
-                        "search_id": "@concat('KbArticle-',body('Parse_KB_JSON')['id'])",
-                        "short_description": "@body('Parse_KB_JSON')?['description']"
+                        "search_id": "@concat('KbArticle-',body('Parse_KB_JSON')?.value['id'])",
+                        "short_description": "@body('Parse_KB_JSON')?.value['description']"
                       }
                     }
                   },
