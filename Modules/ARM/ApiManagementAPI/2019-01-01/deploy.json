@@ -62,15 +62,15 @@
     },
     "openIdConfigUrl": {
       "type": "string",
-      "defaultValue": "https://login.microsoftonline.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/.well-known/openid-configuration"
+      "defaultValue": "https://login.microsoftonline.com/24f9d756-bf0c-43e9-ad5e-2073ae2d6698/v2.0/.well-known/openid-configuration"
     },
     "audienceId": {
       "type": "string",
-      "defaultValue": "5b22938c-00b4-4706-893a-7e3018826129"
+      "defaultValue": "bc67474e-612b-4d7f-b75a-ac54d45f143a"
     },
     "issuerUrl":{
       "type": "string",
-      "defaultValue": "https://tasmucpb2csbx.b2clogin.com/fa525e36-bf96-43bf-8932-79524b82ce2a/v2.0/"
+      "defaultValue": "https://tasmucpb2cnonprod.b2clogin.com/24f9d756-bf0c-43e9-ad5e-2073ae2d6698/v2.0/"
     },
     "apiOperations": {
       "type": "array",
@@ -85,7 +85,8 @@
     "basePolicy2": "[replace(variables('basePolicy1'),'<OPENIDCONFIGURL>',parameters('openIdConfigUrl'))]",
     "basePolicy3": "[replace(variables('basePolicy2'),'<AUDIENCEGUID>',parameters('audienceId'))]",
     "basePolicy4": "[replace(variables('basePolicy3'),'<ISSUERURL>',parameters('issuerUrl'))]",
-    "policy": "[variables('basePolicy4')]"
+    "policy": "[variables('basePolicy4')]",
+    "logicAppResourceID": "[resourceId(subscription().subscriptionId,parameters('apiPolicyLogicAppRG'),'Microsoft.Logic/workflows/triggers',parameters('apiPolicyLogicAppName'), 'manual')]"
   },
   "resources": [
     {
@@ -114,7 +115,7 @@
           ],
           "condition": "[and(not(empty(parameters('apiPolicyLogicAppName'))),not(empty(parameters('apiPolicyLogicAppRG'))))]",
           "properties": {
-            "value": "[replace(variables('policy'),'<SIGNATUREOFLOGICAPP>', listCallbackUrl(resourceId(subscription().subscriptionId,parameters('apiPolicyLogicAppRG'),'/Microsoft.Logic/workflows/',parameters('apiPolicyLogicAppName'), 'manual'),'2016-06-01').queries.sig)]",
+            "value": "[replace(variables('policy'),'<SIGNATUREOFLOGICAPP>', listCallbackUrl(variables('logicAppResourceID'),'2016-06-01').queries.sig)]",
             "format": "xml"
           }
         }
