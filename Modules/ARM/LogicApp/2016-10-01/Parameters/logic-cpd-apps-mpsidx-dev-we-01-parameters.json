@@ -692,33 +692,53 @@
               "Condition": {
                 "actions": {
                   "For_each": {
-                    "foreach": "@array(body('Parse_KB_JSON').value?['relatedProducts'])",
                     "actions": {
                       "Append_to_array_variable": {
+                        "inputs": {
+                          "name": "ProductsArray",
+                          "value": "@json(string(body('Select')[0]))"
+                        },
                         "runAfter": {
                           "Select": [
                             "Succeeded"
                           ]
                         },
-                        "type": "AppendToArrayVariable",
-                        "inputs": {
-                          "name": "ProductsArray",
-                          "value": "@json(string(body('Select')[0]))"
-                        }
+                        "type": "AppendToArrayVariable"
                       },
                       "Select": {
-                        "runAfter": {},
-                        "type": "Select",
                         "inputs": {
                           "from": "@array(json(string(items('For_each'))))",
                           "select": {
                             "catalogueId": "@json(string(items('For_each'))).catalogueId",
                             "category": "@json(string(items('For_each'))).productCategoryName",
+                            "personas": "@coalesce(variables('personasArray'),json('[]'))",
                             "sectors": "@json(string(items('For_each'))).sectorNames"
                           }
-                        }
+                        },
+                        "runAfter": {
+                          "kbpersonasforeach": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "Select"
+                      },
+                      "kbpersonasforeach": {
+                        "actions": {
+                          "Append_to_array_variable_2": {
+                            "inputs": {
+                              "name": "personasArray",
+                              "value": "@string(items('kbpersonasforeach'))"
+                            },
+                            "runAfter": {},
+                            "type": "AppendToArrayVariable"
+                          }
+                        },
+                        "foreach": "@coalesce(items('For_each').profileTypeIds,json('[]'))",
+                        "runAfter": {},
+                        "type": "Foreach"
                       }
                     },
+                    "foreach": "@array(body('Parse_KB_JSON').value?['relatedProducts'])",
                     "runAfter": {
                       "Parse_KB_JSON": [
                         "Succeeded"
