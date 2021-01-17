@@ -81,6 +81,20 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/probes/apimprobe"
                         }
                     }
+                },
+                {
+                    "name": "developer-tra-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "apim-cpd-shrd-tra-we-01.developer.azure-api.net",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 20,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/probes/developer-portal-probe"
+                        }
+                    }
                 }
             ]
         },
@@ -103,6 +117,24 @@
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
+                },
+                {
+                    "name": "tra-developer-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/frontendIPConfigurations/agw-cpd-apps-api-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/sslCertificates/tra-api-sqcp-httpsvaultcert"
+                        },
+                        "hostName": "developer.trn.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
                 }
             ]
         },
@@ -120,6 +152,21 @@
                         },
                         "backendHttpSettings": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/backendHttpSettingsCollection/apim-tra-sqcp-https"
+                        }
+                    }
+                },
+                {
+                    "name": "tra-developer-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/httpListeners/tra-developer-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/backendAddressPools/apim"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-api-tra-we-01/backendHttpSettingsCollection/developer-tra-sqcp-https"
                         }
                     }
                 }
@@ -143,6 +190,21 @@
                                 "200-399"
                             ]
                         }
+                    }
+                },
+                {
+                    "name": "developer-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "apim-cpd-shrd-tra-we-01.developer.azure-api.net",
+                        "port": 443,
+                        "path": "/internal-status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 30,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {}
                     }
                 }
             ]

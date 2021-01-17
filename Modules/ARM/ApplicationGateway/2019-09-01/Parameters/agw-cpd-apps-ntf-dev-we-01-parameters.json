@@ -68,12 +68,12 @@
         "backendHttpSettingsCollection": {
             "value": [
                 {
-                    "name": "apim-dev-sqcp-http",
+                    "name": "apim-dev-sqcp-https",
                     "properties": {
-                        "port": 80,
-                        "protocol": "Http",
+                        "port": 443,
+                        "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
-                        "hostName": "apim-cpd-shrd-dev-we-01.azure-api.net",
+                        "hostName": "api.dev.sqcp.qa",
                         "path": "/notification/",
                         "pickHostNameFromBackendAddress": false,
                         "requestTimeout": 60,
@@ -119,7 +119,7 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/backendAddressPools/apim"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/backendHttpSettingsCollection/apim-dev-sqcp-http"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/backendHttpSettingsCollection/apim-dev-sqcp-https"
                         }
                     }
                 }
@@ -130,8 +130,8 @@
                 {
                     "name": "apimprobe",
                     "properties": {
-                        "protocol": "Http",
-                        "host": "apim-cpd-shrd-dev-we-01.azure-api.net",
+                        "protocol": "Https",
+                        "host": "api.dev.sqcp.qa",
                         "path": "/status-0123456789abcdef",
                         "interval": 30,
                         "timeout": 60,
@@ -206,6 +206,9 @@
         },
         "eventHubName": {
             "value": "evh-cpd-apps-mon-dev-we-01"
+        },
+        "fileUploadLimitInMb": {
+            "value": 30
         }
     }
 }

@@ -62,16 +62,6 @@
                             }
                         ]
                     }
-                },
-                {
-                    "name": "apim",
-                    "properties": {
-                        "backendAddresses": [
-                            {
-                                "ipAddress": "172.20.74.72"
-                            }
-                        ]
-                    }
                 }
             ]
         },
@@ -132,20 +122,6 @@
                         "requestTimeout": 60,
                         "probe": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/agw-ingress-probe"
-                        }
-                    }
-                },
-                {
-                    "name": "developer-uat-sqcp-https",
-                    "properties": {
-                        "port": 443,
-                        "protocol": "Https",
-                        "cookieBasedAffinity": "Disabled",
-                        "hostName": "apim-cpd-shrd-uat-we-01.developer.azure-api.net",
-                        "pickHostNameFromBackendAddress": false,
-                        "requestTimeout": 20,
-                        "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/developer-portal-probe"
                         }
                     }
                 }
@@ -224,24 +200,6 @@
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
-                },
-                {
-                    "name": "uat-developer-sqcp-https",
-                    "properties": {
-                        "frontendIPConfiguration": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendIPConfigurations/agw-cpd-apps-web-uat-we-01-privateip"
-                        },
-                        "frontendPort": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendPorts/port_443"
-                        },
-                        "protocol": "Https",
-                        "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/sslCertificates/uat-sqcp-qa-httpsvaultcert"
-                        },
-                        "hostName": "developer.uat.sqcp.qa",
-                        "hostNames": [],
-                        "requireServerNameIndication": true
-                    }
                 }
             ]
         },
@@ -306,21 +264,6 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendHttpSettingsCollection/account-uat-sqcp-http"
                         }
                     }
-                },
-                {
-                    "name": "uat-developer-sqcp-443",
-                    "properties": {
-                        "ruleType": "Basic",
-                        "httpListener": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/httpListeners/uat-developer-sqcp-https"
-                        },
-                        "backendAddressPool": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendAddressPools/apim"
-                        },
-                        "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendHttpSettingsCollection/developer-uat-sqcp-https"
-                        }
-                    }
                 }
             ]
         },
@@ -342,21 +285,6 @@
                                 "200-399"
                             ]
                         }
-                    }
-                },
-                {
-                    "name": "developer-portal-probe",
-                    "properties": {
-                        "protocol": "Https",
-                        "host": "apim-cpd-shrd-uat-we-01.developer.azure-api.net",
-                        "port": 443,
-                        "path": "/internal-status-0123456789abcdef",
-                        "interval": 30,
-                        "timeout": 30,
-                        "unhealthyThreshold": 3,
-                        "pickHostNameFromBackendHttpSettings": false,
-                        "minServers": 0,
-                        "match": {}
                     }
                 }
             ]
