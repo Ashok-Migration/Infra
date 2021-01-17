@@ -22,7 +22,7 @@
             "defaultValue": "[newGuid()]"
         },
         "agentCount": {
-            "defaultValue": 3,
+            "defaultValue": 4,
             "minValue": 1,
             "maxValue": 50,
             "type": "int",
@@ -253,15 +253,133 @@
             }
         },
         "zones": {
-            "type": "array"
+            "type": "array",
+            "defaultValue": []
+        },
+        "enableAutoScaling": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "agentPoolMaxCount": {
+            "type": "int",
+            "defaultValue": 6
+        },
+        "agentPoolMinCount": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "diagnosticLogsRetentionInDays": {
+            "type": "int",
+            "defaultValue": 365,
+            "minValue": 0,
+            "maxValue": 365,
+            "metadata": {
+                "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+            }
+        },
+        "diagnosticStorageAccountId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of Log Analytics."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+            }
         }
     },
     "variables": {
-        "vnetSubnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
+        "vnetSubnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]",
+        "diagnosticsLogs": [
+            {
+                "category": "kube-apiserver",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "kube-audit",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "kube-audit-admin",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "kube-controller-manager",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "kube-scheduler",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "cluster-autoscaler",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            },
+            {
+                "category": "guard",
+                "enabled": true,
+                "retentionPolicy": {
+                "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                "enabled": true
+                }
+            }
+        ],
+    "diagnosticsMetrics": [
+      {
+        "category": "API Server (PREVIEW)",
+        "enabled": true,
+        "retentionPolicy": {
+          "days": "[parameters('diagnosticLogsRetentionInDays')]",
+          "enabled": true
+        }
+      }
+    ]
     },
     "resources": [
         {
-            "apiVersion": "2020-03-01",
+            "apiVersion": "2020-09-01",
             "dependsOn": [],
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
@@ -280,10 +398,13 @@
                         "osType": "[parameters('osType')]",
                         "storageProfile": "ManagedDisks",
                         "type": "VirtualMachineScaleSets",
+                        "maxCount": "[parameters('agentPoolMaxCount')]",
+                        "minCount": "[parameters('agentPoolMinCount')]",
                         "mode": "System",
                         "maxPods": "[parameters('maxPods')]",
+                        "enableAutoScaling": "[parameters('enableAutoScaling')]",
                         "vnetSubnetID": "[variables('vnetSubnetID')]",
-                        "availabilityZones": "[parameters('zones')]"
+                        "availabilityZones": "[if(empty(parameters('zones')), json('null'), parameters('zones'))]"
                     }
                 ],
                 "networkProfile": {
@@ -309,6 +430,25 @@
                     }
                 }
             },
+            "resources": [
+                {
+                    "type": "Microsoft.ContainerService/managedClusters/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('clusterName'), '/Microsoft.Insights/service')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('clusterName'))]"
+                    ],
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+                    }
+                }
+            ],
             "tags": "[parameters('tags')]",
             "identity": {
                 "type": "SystemAssigned"
