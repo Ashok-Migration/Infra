@@ -36,113 +36,94 @@ param (
     $InstrumentationKey
 )
 
-Import-Module Microsoft.Online.SharePoint.PowerShell
-function Create-ContentTypeAddColumns() 
-{
+#Import-Module Microsoft.Online.SharePoint.PowerShell
+function Add-ContentTypesAndFields() {
     $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
  
     # Parse the parameter file and update the values of artifacts location and artifacts location SAS token if they are present
     $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
-    if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
+    if ($null -ne ($JsonParameters | Get-Member -Type NoteProperty 'parameters')) {
         $JsonParameters = $JsonParameters.parameters
     }
 
     $RoleName = $JsonParameters.RoleName.value
 
-    $contenttypehub="https://"+ $tenant+".sharepoint.com/sites/contentTypeHub"
-
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.ApplicationInsights.dll')
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+    if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
         $client.Context.Cloud.RoleName = $RoleName
     }
 
     $siteContentTypePath = $PSScriptRoot + '\resources\ContentType.xml'
-    $scXML = Get-SiteColumsToImport $siteContentTypePath
+    $scXML = Get-FieldsToImport $siteContentTypePath
 
-    $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
-    $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
+    Read-FileAndCreateContentTypes $scXML
 
-    ContentType $scXML
+    Write-host "Content Types creation and field addition completed successfully" -ForegroundColor Green
 
-    Write-host "Completed" -ForegroundColor Green
-
-   }
-
-function Get-SiteColumsToImport($xmlTermsPath){
- [Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq") | Out-Null
-
- try
- {
-     $xDoc = [System.Xml.Linq.XDocument]::Load($xmlTermsPath, [System.Xml.Linq.LoadOptions]::None)
-     return $xDoc
- }
- catch
- {
-      Write-Host "Unable to read ContentTypeCTH xml. Exception:$_.Exception.Message" -ForegroundColor Red
- }
 }
-function ContentType($scXML) {
- 
-    # #Connect to SPO Service and add the site collection admin 
-    # $tenantUrl = "https://"+$tenant+"-admin.sharepoint.com/"
-    # Connect-SPOService -url $tenantUrl -credential $tenantAdmin
- 
-    # #Add Site collection Admin
-    # Set-SPOUser -site $contenttypehub -LoginName $sp_user -IsSiteCollectionAdmin $True
- 
+
+function Get-FieldsToImport($xmlTermsPath) {
+    [Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq") | Out-Null
+
+    try {
+        $xDoc = [System.Xml.Linq.XDocument]::Load($xmlTermsPath, [System.Xml.Linq.LoadOptions]::None)
+        return $xDoc
+    }
+    catch {
+        Write-Host "Unable to read ContentTypeCTH xml. Exception:$_.Exception.Message" -ForegroundColor Red
+    }
+}
+function Read-FileAndCreateContentTypes($scXML) {
+    $contenttypehub = "https://" + $tenant + ".sharepoint.com/sites/contentTypeHub"
+    $secstr = New-Object -TypeName System.Security.SecureString
+    $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
+    $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
+    
     # Connect with the tenant admin credentials to the tenant
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
     $connection = Get-PnPConnection
     
     #Add Site collection Admin
     Add-PnPSiteCollectionAdmin -Owners $sp_user
-    
  
     #create all the content Types
-    foreach ($contentItem in $scXML.Descendants("contentItem")) 
-    {
+    foreach ($contentItem in $scXML.Descendants("contentItem")) {
         $contentTypeName = Get-AttributeValue $contentItem "ContentTypeName"
         $parentCTName = Get-AttributeValue $contentItem "ParentCTName"
         $groupName = Get-AttributeValue $contentItem "GroupName"
  
-        if($contentTypeName -ne '')
-        {
-            Create-ContentType $tenantAdmin $contenttypehub $contentTypeName $contentTypeName $parentCTName $groupName $connection
+        if ($contentTypeName -ne '') {
+            Add-ContentType $tenantAdmin $contenttypehub $contentTypeName $contentTypeName $parentCTName $groupName $connection
         }
     }
  
     #add columns to the content Types
-    foreach ($columnItem in $scXML.Descendants("columnItem"))
-    {
+    foreach ($columnItem in $scXML.Descendants("columnItem")) {
         $contentTypeName = Get-AttributeValue $columnItem "ContentTypeName"
         $columnName = Get-AttributeValue $columnItem "ColumnName"
         $required = Get-AttributeValue $columnItem "Required"
-        if($contentTypeName -ne '')
-        {
-            AddColumns-ContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection $required
+        if ($contentTypeName -ne '') {
+            Add-FieldToContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection $required
         }
     }
     #remove columns from content types
-    foreach ($columnRemovable in $scXML.Descendants("columnRemovable"))
-    {
+    foreach ($columnRemovable in $scXML.Descendants("columnRemovable")) {
         
         $contentTypeName = Get-AttributeValue $columnRemovable "ContentTypeName"
         $columnName = Get-AttributeValue $columnRemovable "ColumnName"
         
-        if($contentTypeName -ne '')
-        {
-            RemoveColumns-ContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection
+        if ($contentTypeName -ne '') {
+            Remove-FieldFromContentType $tenantAdmin $contenttypehub $contentTypeName $columnName $connection
         }
     }
  
     Disconnect-PnPOnline
 }
 
-function Create-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ContentTypeDesc, $ParentCTName, $GroupName, $connection) {
+function Add-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ContentTypeDesc, $ParentCTName, $GroupName, $connection) {
     try {
         $ContentTypeExist = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
         #Check for existence of  site content type
@@ -150,7 +131,7 @@ function Create-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $Co
             Write-Host "Content Type not found ,so creating a new contenttype- $ContentTypeName....."
             $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
             $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
-            $contentTypeNew = Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
+            Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
         }
         else {
             Write-Host "$ContentTypeName already exists"
@@ -166,28 +147,28 @@ function Create-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $Co
     } 
 }
 
-function AddColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ColumnName, $connection, $required) {
+function Add-FieldToContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ColumnName, $connection, $required) {
     try {
         Write-Host "Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName....."
         $client.TrackEvent("Column not added, so adding column - $ColumnName to contenttype - $ContentTypeName.....")
 
-        if($ContentTypeName -eq "TASMU Translation Tasks" -or $ContentTypeName -eq "TASMU Approval Tasks"){
-            if($ColumnName -eq "cmsAssignedToUser"){
-                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -Hidden -ErrorAction Stop -Connection $connection
+        if ($ContentTypeName -eq "TASMU Translation Tasks" -or $ContentTypeName -eq "TASMU Approval Tasks") {
+            if ($ColumnName -eq "cmsAssignedToUser") {
+                Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -Hidden -ErrorAction Stop -Connection $connection
             }
             elseif ($required -eq "False") {
-                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+                Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
             }
             else {
-                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
+                Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
             } 
         }
-        else{
+        else {
             if ($required -eq "False") {
-                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
+                Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection
             }
             else {
-                $columnToContentType = Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
+                Add-PnPFieldToContentType -Field $ColumnName -ContentType $ContentTypeName -ErrorAction Stop -Connection $connection -Required
             } 
         }
     }
@@ -200,13 +181,12 @@ function AddColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName,
     } 
 }
 
-function RemoveColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ColumnName, $connection, $required) {
+function Remove-FieldFromContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $ColumnName, $connection, $required) {
     try {
         Write-Host "Removing additional column - $ColumnName from content type - $ContentTypeName "
         $client.TrackEvent("Removing additional column - $ColumnName from content type - $ContentTypeName ")
 
-        $RemovecolumnToContentType = Remove-PnPFieldFromContentType -Field $ColumnName -ContentType $ContentTypeName -Connection $connection
-        
+        Remove-PnPFieldFromContentType -Field $ColumnName -ContentType $ContentTypeName -Connection $connection
     }
     catch {
         $ErrorMessage = $_.Exception.Message
@@ -217,26 +197,22 @@ function RemoveColumns-ContentType($tenantAdmin, $contenttypehub, $ContentTypeNa
     } 
 }
 
-
-
-function Get-AttributeValue($node, $attributeName){
+function Get-AttributeValue($node, $attributeName) {
 
     $attributeValue = ''
-    if($node.Attribute($attributeName) -ne $null)
-    {
-        $attributeValue= $node.Attributes($attributeName).Value
+    if ($null -ne $node.Attribute($attributeName)) {
+        $attributeValue = $node.Attributes($attributeName).Value
     }
 
     return $attributeValue
 
 }
 
-function Get-BooleanAttributeValue($node, $attributeName){
+function Get-BooleanAttributeValue($node, $attributeName) {
 
     $booleanAttributeValue = $false
     $attributeValue = Get-AttributeValue $node $attributeName
-    if($attributeValue -ne '')
-    {
+    if ($attributeValue -ne '') {
         $booleanAttributeValue = [bool]::Parse($attributeValue)
     }
 
@@ -244,4 +220,4 @@ function Get-BooleanAttributeValue($node, $attributeName){
 
 }
 
-Create-ContentTypeAddColumns
+Add-ContentTypesAndFields

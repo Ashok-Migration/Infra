@@ -56,47 +56,45 @@ Write-host $sp_user -ForegroundColor Yellow
 Write-host $sp_password -ForegroundColor Yellow
 
 $secstr = New-Object -TypeName System.Security.SecureString
-$sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+$sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
 
-$contenttypehub="https://"+ $tenant+".sharepoint.com/sites/contentTypeHub"
+$contenttypehub = "https://" + $tenant + ".sharepoint.com/sites/contentTypeHub"
 Write-host $contenttypehub -ForegroundColor Yellow
 
 #region --Taxonomy Creation ---
 function Create-Taxanomy() {
 
-try
-{
-    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Taxonomy.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
+    try {
+        Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.dll')
+        Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+        Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.SharePoint.Client.Taxonomy.dll')
+        Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
 
-    $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
+        $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     
-    $client.InstrumentationKey = $InstrumentationKey
-    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
-        $client.Context.Cloud.RoleName = $RoleName
+        $client.InstrumentationKey = $InstrumentationKey
+        if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
+            $client.Context.Cloud.RoleName = $RoleName
+        }
+
+        $client.TrackEvent("Main function started...")
+
+        $spContext = New-Object Microsoft.SharePoint.Client.ClientContext($contenttypehub)
+        $admin = $sp_user
+        $password = $secstr
+        $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+        $spContext.Credentials = $credentials
+        $web = $spContext.Web
+        $spContext.Load($web)
+        $spContext.ExecuteQuery()
+
     }
-
-    $client.TrackEvent("Main function started...")
-
-    $spContext = New-Object Microsoft.SharePoint.Client.ClientContext($contenttypehub)
-    $admin = $sp_user
-    $password = $secstr
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
-    $spContext.Credentials = $credentials
-    $web = $spContext.Web
-    $spContext.Load($web)
-    $spContext.ExecuteQuery()
-
-   }
-   catch
-   {
-    Write-host "Error in Authentication..." $_.Exception.Message -ForegroundColor Red 
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = "Error in Authentication..."+ $_.Exception.Message  
-    $client.TrackException($telemtryException) 
-   }
+    catch {
+        Write-host "Error in Authentication..." $_.Exception.Message -ForegroundColor Red 
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = "Error in Authentication..." + $_.Exception.Message  
+        $client.TrackException($telemtryException) 
+    }
 
     $client.TrackEvent("Authentication success...")
 
@@ -113,79 +111,71 @@ try
 
     Write-host "Completed" -ForegroundColor Green
     $client.TrackEvent("Completed...")
- }
+}
    
-function Get-TermStoreInfo($spContext){
- $spTaxSession = [Microsoft.SharePoint.Client.Taxonomy.TaxonomySession]::GetTaxonomySession($spContext)
- $spTaxSession.UpdateCache();
- $spContext.Load($spTaxSession)
+function Get-TermStoreInfo($spContext) {
+    $spTaxSession = [Microsoft.SharePoint.Client.Taxonomy.TaxonomySession]::GetTaxonomySession($spContext)
+    $spTaxSession.UpdateCache();
+    $spContext.Load($spTaxSession)
 
- try
- {
-    $spContext.ExecuteQuery()
-    $client.TrackEvent("Reading Term Store Info & Terms completed")
- }
- catch
- {
-    Write-host "Error while loading the Taxonomy Session " $_.Exception.Message -ForegroundColor Red 
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException) 
- }
+    try {
+        $spContext.ExecuteQuery()
+        $client.TrackEvent("Reading Term Store Info & Terms completed")
+    }
+    catch {
+        Write-host "Error while loading the Taxonomy Session " $_.Exception.Message -ForegroundColor Red 
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException) 
+    }
 
- if($spTaxSession.TermStores.Count -eq 0){
-  write-host "The Taxonomy Service is offline or missing" -ForegroundColor Red
-  $client.TrackEvent("The Taxonomy Service is offline or missing.")
- }
+    if ($spTaxSession.TermStores.Count -eq 0) {
+        write-host "The Taxonomy Service is offline or missing" -ForegroundColor Red
+        $client.TrackEvent("The Taxonomy Service is offline or missing.")
+    }
 
- $termStores = $spTaxSession.TermStores
- $spContext.Load($termStores)
+    $termStores = $spTaxSession.TermStores
+    $spContext.Load($termStores)
 
- try
- {
-  $spContext.ExecuteQuery()
-  $termStore = $termStores[0]
-  Write-Host "Connected to TermStore: $($termStore.Name) ID: $($termStore.Id)"
-  $client.TrackEvent("Connected to TermStore: $($termStore.Name) ID: $($termStore.Id)")
- }
- catch
- {
-    Write-host "Error details while getting term store ID" $_.Exception.Message -ForegroundColor Red
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
- }
+    try {
+        $spContext.ExecuteQuery()
+        $termStore = $termStores[0]
+        Write-Host "Connected to TermStore: $($termStore.Name) ID: $($termStore.Id)"
+        $client.TrackEvent("Connected to TermStore: $($termStore.Name) ID: $($termStore.Id)")
+    }
+    catch {
+        Write-host "Error details while getting term store ID" $_.Exception.Message -ForegroundColor Red
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
+    }
 
- return $termStore
+    return $termStore
 
 }
 
-function Get-TermsToImport($xmlTermsPath){
- [Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq") | Out-Null
+function Get-TermsToImport($xmlTermsPath) {
+    [Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq") | Out-Null
 
- try
- {
-     $xDoc = [System.Xml.Linq.XDocument]::Load($xmlTermsPath, [System.Xml.Linq.LoadOptions]::None)
-     return $xDoc
- }
- catch
- {
-    Write-Host "Unable to read taxonomy xml. Exception:" $_.Exception.Message -ForegroundColor Red
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
- }
+    try {
+        $xDoc = [System.Xml.Linq.XDocument]::Load($xmlTermsPath, [System.Xml.Linq.LoadOptions]::None)
+        return $xDoc
+    }
+    catch {
+        Write-Host "Unable to read taxonomy xml. Exception:" $_.Exception.Message -ForegroundColor Red
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
+    }
 }
 
-function Create-Groups($spContext, $termStore, $termsXML){
+function Create-Groups($spContext, $termStore, $termsXML) {
      
-     foreach($groupNode in $termsXML.Descendants("Group"))
-     {
+    foreach ($groupNode in $termsXML.Descendants("Group")) {
         $client.TrackEvent("Group creation for Taxanomy started...")
-        $group=$null;
+        $group = $null;
         $name = Get-AttributeValue $groupNode "Name"
-        if($name -ne '')
-        {
+        if ($name -ne '') {
             $description = Get-AttributeValue $groupNode "Description"
         
             Write-Host "Processing Group: $name " -NoNewline
@@ -194,55 +184,50 @@ function Create-Groups($spContext, $termStore, $termsXML){
             $spContext.Load($termStore.Groups);
             $spContext.ExecuteQuery();
 
-            $group = $termStore.Groups | Where-Object {$_.Name -eq $name}
+            $group = $termStore.Groups | Where-Object { $_.Name -eq $name }
 	
-	        if ($group.Name -eq $null) {
+            if ($group.Name -eq $null) {
                 $groupGuid = [GUID]::NewGuid();
                 $group = $termStore.CreateGroup($name, $groupGuid);
            
                 $spContext.Load($group);
 
-                try
-                {
+                try {
                     $spContext.ExecuteQuery();
-		            write-host "Inserted" -ForegroundColor Green
-                    $client.TrackEvent("Group Inserted, Name: "+ $group.Name)
+                    write-host "Inserted" -ForegroundColor Green
+                    $client.TrackEvent("Group Inserted, Name: " + $group.Name)
                 }
-                catch
-                {
+                catch {
                     Write-host "Error creating new Group " $name " " $_.Exception.Message -ForegroundColor Red 
                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-                    $telemtryException.Exception = "Error creating new Group "+ $name + $_.Exception.Message  
+                    $telemtryException.Exception = "Error creating new Group " + $name + $_.Exception.Message  
                     $client.TrackException($telemtryException)
                 }
             }
-	        else {
-		        write-host "Already exists" -ForegroundColor Yellow
-                $client.TrackEvent("Group Already exists, "+ $group.Name)
-	        }
+            else {
+                write-host "Already exists" -ForegroundColor Yellow
+                $client.TrackEvent("Group Already exists, " + $group.Name)
+            }
 	
-	        Create-TermSets $termsXML $group $termStore $spContext
-      }
-      else
-      {
-        Write-Host "Name missing for the group in Taxonomy xml"
-        $client.TrackEvent("Name missing for the group in Taxonomy xml")
-      }
+            Create-TermSets $termsXML $group $termStore $spContext
+        }
+        else {
+            Write-Host "Name missing for the group in Taxonomy xml"
+            $client.TrackEvent("Name missing for the group in Taxonomy xml")
+        }
 
-     }
+    }
 
-     try
-     {
-         $termStore.CommitAll();
-         $spContext.ExecuteQuery();
-     }
-     catch
-     {
-       Write-Host "Error commiting changes to server. Exception:$_.Exception.Message" -foregroundcolor red
-       $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"
-       $telemtryException.Exception = "Error commiting changes to server," + $_.Exception.Message
-       $client.TrackException($telemtryException)
-     }
+    try {
+        $termStore.CommitAll();
+        $spContext.ExecuteQuery();
+    }
+    catch {
+        Write-Host "Error commiting changes to server. Exception:$_.Exception.Message" -foregroundcolor red
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"
+        $telemtryException.Exception = "Error commiting changes to server," + $_.Exception.Message
+        $client.TrackException($telemtryException)
+    }
 }
 
 function Create-TermSets($termsXML, $group, $termStore, $spContext) {
@@ -255,100 +240,87 @@ function Create-TermSets($termsXML, $group, $termStore, $spContext) {
     $spContext.Load($termSetsInTermStore)
     $spContext.ExecuteQuery()
 
-	foreach ($termSetNode in $termSets)
-    {
+    foreach ($termSetNode in $termSets) {
         $errorOccurred = $false
 
 
-		$name = Get-AttributeValue $termSetNode "Name"
-        if($name -ne '')
-        {
+        $name = Get-AttributeValue $termSetNode "Name"
+        if ($name -ne '') {
             $id = [GUID]::NewGuid();
             $description = Get-AttributeValue $termSetNode "Description"
             $customSortOrder = Get-AttributeValue $termSetNode "CustomSortOrder"
             Write-host "Processing TermSet $name ... " -NoNewLine
             $client.TrackEvent("Processing TermSet $name ...")
 		
-            $termSet = $termSetsInTermStore | Where-Object {$_.Name -eq $name}
+            $termSet = $termSetsInTermStore | Where-Object { $_.Name -eq $name }
                 
 		
-		    if ($termSet -eq $null -or $termSet -eq '') 
-            {
-			    $termSet = $group.CreateTermSet($name, $id, $termStore.DefaultLanguage);
+            if ($termSet -eq $null -or $termSet -eq '') {
+                $termSet = $group.CreateTermSet($name, $id, $termStore.DefaultLanguage);
                 $termSet.Description = $description;
             
-                if($customSortOrder -ne $null)
-                {
+                if ($customSortOrder -ne $null) {
                     $termSet.CustomSortOrder = $customSortOrder
                 }
             
                 $termSet.IsAvailableForTagging = Get-BooleanAttributeValue $termSetNode "IsAvailableForTagging" 
                 $termSet.IsOpenForTermCreation = Get-BooleanAttributeValue $termSetNode "IsOpenForTermCreation"
 
-                try
-                {
+                try {
                     #load terms
                     $termSet = $termStore.GetTermSet($id);
                     $spContext.Load($termSet)
                     $spContext.ExecuteQuery()
                 }
-                catch
-                {
+                catch {
                     Write-host "Error occured while create Term Set" $name $_.Exception.Message -ForegroundColor Red
                     $errorOccurred = $true
                     
                     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"
-                    $telemtryException.Exception = "Error occured while create Term Set "+ $name,+ $_.Exception.Message
+                    $telemtryException.Exception = "Error occured while create Term Set " + $name, + $_.Exception.Message
                     $client.TrackException($telemtryException)
                 }
 
                 write-host "created" -ForegroundColor Green
-                $client.TrackEvent("Term Set created, "+$name)
-		    }
-		    else {
-			    write-host "Already exists" -ForegroundColor Yellow
-                $client.TrackEvent("Term Set Already exists, "+$name)
-		    }
+                $client.TrackEvent("Term Set created, " + $name)
+            }
+            else {
+                write-host "Already exists" -ForegroundColor Yellow
+                $client.TrackEvent("Term Set Already exists, " + $name)
+            }
 			
-                $termSetTerms = $termSet.GetAllTerms()
-                $spContext.Load($termSetTerms)
-                $spContext.ExecuteQuery()
+            $termSetTerms = $termSet.GetAllTerms()
+            $spContext.Load($termSetTerms)
+            $spContext.ExecuteQuery()
         
-            if(!$errorOccurred)
-            {
-                if ($termSetNode.Element("Terms") -ne $null -and $termSetNode.Element("Terms").Elements("Term") -ne $null)
-                {
+            if (!$errorOccurred) {
+                if ($termSetNode.Element("Terms") -ne $null -and $termSetNode.Element("Terms").Elements("Term") -ne $null) {
                
-                   foreach ($termNode in $termSetNode.Element("Terms").Elements("Term"))
-                   {
-                      Create-Term $termNode $null $termSet $termStore $termStore.DefaultLanguage $spContext $termSetTerms                  
-                   }
+                    foreach ($termNode in $termSetNode.Element("Terms").Elements("Term")) {
+                        Create-Term $termNode $null $termSet $termStore $termStore.DefaultLanguage $spContext $termSetTerms                  
+                    }
                 }	
             }						
         }
-        else
-          {
+        else {
             Write-Host "Name missing for the termset in Taxonomy xml"
             $client.TrackEvent("Name missing for the termset in Taxonomy xml")
-          }
+        }
 
     }
 }
 
-function Create-Term($termNode, $parentTerm, $termSet, $store, $lcid, $spContext, $termSetTerms){
+function Create-Term($termNode, $parentTerm, $termSet, $store, $lcid, $spContext, $termSetTerms) {
     $id = [GUID]::NewGuid();
     $name = Get-AttributeValue $termNode "Name"
     $isUpdated = Get-BooleanAttributeValue $termNode "isUpdated"
     
-    if($name -ne '')
-    {
+    if ($name -ne '') {
    
         $term = $null;
-        if($termSetTerms -ne $null -or $termSetTerms -ne '')
-        {
-            $term = $termSetTerms | Where-Object {$_.Name -eq $name}
-            if($term -ne $null)
-            {
+        if ($termSetTerms -ne $null -or $termSetTerms -ne '') {
+            $term = $termSetTerms | Where-Object { $_.Name -eq $name }
+            if ($term -ne $null) {
                 $spContext.Load($term);
                 $spContext.ExecuteQuery();
             }
@@ -360,50 +332,41 @@ function Create-Term($termNode, $parentTerm, $termSet, $store, $lcid, $spContext
         write-host "Processing Term $name ..." -NoNewLine 
         $client.TrackEvent("Processing Term $name ...")
 
-        if(($term -eq $null -or $term -eq '') -and -not($isUpdated) )
-        {
-            if ($parentTerm -ne $null) 
-            {
+        if (($term -eq $null -or $term -eq '') -and -not($isUpdated) ) {
+            if ($parentTerm -ne $null) {
                 $term = $parentTerm.CreateTerm($name, $lcid, $id);
             }
-            else 
-            {
+            else {
         
                 $term = $termSet.CreateTerm($name, $lcid, $id);
             }
 
             $term.IsAvailableForTagging = Get-BooleanAttributeValue $termNode "IsAvailableForTagging"
-            if($customSortOrder -ne $null)
-            {
+            if ($customSortOrder -ne $null) {
                 $term.CustomSortOrder = $customSortOrder
             }
 
             
-            if($termNode.Element("Labels") -ne $null -and $termNode.Element("Labels").Elements("Label") -ne $null)
-            {
-               foreach($label in $termNode.Element("Labels").Elements("Label"))
-               {
-                $isLanguageDefault = Get-BooleanAttributeValue $label "IsDefaultForLanguage"
-                if( $isLanguageDefault -ne $true)
-                {
-                    $labelValue = Get-AttributeValue $label "Value"
-                    $labelLanguage = Get-AttributeValue $label "Language"
-                    $labelIsDefaultLabel = Get-BooleanAttributeValue $label "IsDefaultForLanguage"
-                    $labelTerm = $term.CreateLabel($labelValue, [int]$labelLanguage, $labelIsDefaultLabel)
+            if ($termNode.Element("Labels") -ne $null -and $termNode.Element("Labels").Elements("Label") -ne $null) {
+                foreach ($label in $termNode.Element("Labels").Elements("Label")) {
+                    $isLanguageDefault = Get-BooleanAttributeValue $label "IsDefaultForLanguage"
+                    if ( $isLanguageDefault -ne $true) {
+                        $labelValue = Get-AttributeValue $label "Value"
+                        $labelLanguage = Get-AttributeValue $label "Language"
+                        $labelIsDefaultLabel = Get-BooleanAttributeValue $label "IsDefaultForLanguage"
+                        $labelTerm = $term.CreateLabel($labelValue, [int]$labelLanguage, $labelIsDefaultLabel)
+                    }
                 }
-               }
             }
 
 
-            try
-            {
+            try {
                 $spContext.Load($term);
                 $spContext.ExecuteQuery();
-	            write-host " created" -ForegroundColor Green
+                write-host " created" -ForegroundColor Green
                 $client.TrackEvent("Term created, $name")	
-	        }
-            catch
-            {
+            }
+            catch {
                 Write-host "Error occured while create Term" $name $_.Exception.Message -ForegroundColor Red
                 $errorOccurred = $true
                 
@@ -412,82 +375,71 @@ function Create-Term($termNode, $parentTerm, $termSet, $store, $lcid, $spContext
                 $client.TrackException($telemtryException)
             }
         }
-        else
-        {
+        else {
             # Rename term
-            if($term -eq $null -or $term -eq '')
-            {
+            if ($term -eq $null -or $term -eq '') {
                 Write-host "Term does not exist. It was renamed" -ForegroundColor Yellow
                 $client.TrackEvent("Term does not exist. It was renamed")
             
             }
-            else
-            {
+            else {
                 Rename-Term $termNode $term $name
             }
             
         }
      
-        if(!$errorOccurred)
-        {
-	        if ($termNode.Element("Terms") -ne $null -and $termNode.Element("Terms").Elements("Term") -ne $null) 
-            {
+        if (!$errorOccurred) {
+            if ($termNode.Element("Terms") -ne $null -and $termNode.Element("Terms").Elements("Term") -ne $null) {
                 $allTerms = $termSet.GetAllTerms()
                 $spContext.Load($allTerms)
                 $spContext.ExecuteQuery()
 
-                foreach ($childTermNode in $termNode.Element("Terms").Elements("Term")) 
-                {
+                foreach ($childTermNode in $termNode.Element("Terms").Elements("Term")) {
                     Create-Term $childTermNode $term $termSet $store $lcid $spContext $allTerms
                 }
             }
 
         }
     }
-     else
-    {
+    else {
         Write-Host "Name missing for the term in Taxonomy xml"
         $client.TrackEvent("Name missing for the term in Taxonomy xml")
     }
 }
 
-function Rename-Term($termNode, $term){
+function Rename-Term($termNode, $term) {
 
     $name = Get-AttributeValue $termNode "Name"
     $isUpdated = Get-BooleanAttributeValue $termNode "isUpdated"
-    if($isUpdated)
-    {
+    if ($isUpdated) {
         $newName = Get-AttributeValue $termNode "UpdatedName"
         $term.name = $newName
         write-host $name "updated to "$newName -ForegroundColor Green
-        $client.TrackEvent($name+ " updated to "+ $newName)
+        $client.TrackEvent($name + " updated to " + $newName)
     }
-    else
-    {
+    else {
         write-host "Already exists" -ForegroundColor Yellow
         $client.TrackEvent("Already exists")
     }
 
 }
 
-function Get-AttributeValue($node, $attributeName){
+function Get-AttributeValue($node, $attributeName) {
 
     $attributeValue = ''
-    if($node.Attribute($attributeName) -ne $null)
-    {
-        $attributeValue= $node.Attributes($attributeName).Value
+    if ($node.Attribute($attributeName) -ne $null) {
+        $attributeValue = $node.Attributes($attributeName).Value
     }
 
     return $attributeValue
 
 }
 
-function Get-BooleanAttributeValue($node, $attributeName){
+function Get-BooleanAttributeValue($node, $attributeName) {
 
     $booleanAttributeValue = $false
     $attributeValue = Get-AttributeValue $node $attributeName
-    if($attributeValue -ne '')
-    {
+    if ($attributeValue -ne '') {
         $booleanAttributeValue = [bool]::Parse($attributeValue)
     }
 

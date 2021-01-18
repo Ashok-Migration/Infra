@@ -42,12 +42,12 @@ Date:       Version: Changed By:         Info:
 #>
 [CmdletBinding()]
 param (
-    $tenant, # Enter the tenant name
-    $TemplateParametersFile,
-    $sp_user,
-    $sp_password,
-    $scope,
-    $InstrumentationKey
+	$tenant, # Enter the tenant name
+	$TemplateParametersFile,
+	$sp_user,
+	$sp_password,
+	$scope,
+	$InstrumentationKey
 )
 
 function Add-ComponentsForSites() {
@@ -80,68 +80,65 @@ function Add-ComponentsForSites() {
 }
 
 
-function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath)
-{
-    $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
+	$secstr = New-Object -TypeName System.Security.SecureString
+	$sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
 
-    $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
-    # Connect with the tenant admin credentials to the tenant
-    Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-    $connection = Get-PnPConnection
+	$tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
+	# Connect with the tenant admin credentials to the tenant
+	Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+	$connection = Get-PnPConnection
     
-    foreach($globalconfigsite in $sitefile.sites.Configsite.site)
-    {
+	foreach ($globalconfigsite in $sitefile.sites.Configsite.site) {
 		$urlprefix = "https://" + $tenant + ".sharepoint.com/sites/"
-        $globalconfigSiteUrl = $urlprefix + $globalconfigsite.Alias
-        $siteExits = Get-PnPTenantSite -Url $globalconfigSiteUrl -ErrorAction SilentlyContinue
+		$globalconfigSiteUrl = $urlprefix + $globalconfigsite.Alias
+		$siteExits = Get-PnPTenantSite -Url $globalconfigSiteUrl -ErrorAction SilentlyContinue
 
-        if ([bool] ($siteExits) -eq $true) {            
-            Write-host "site exists, adding navigation to "$globalconfigSiteUrl -ForegroundColor Green
-            Add-CustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
-        }
-    }
+		if ([bool] ($siteExits) -eq $true) {            
+			Write-host "site exists, adding navigation to "$globalconfigSiteUrl -ForegroundColor Green
+			Add-CustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
+		}
+	}
 
-    $globalconfigSiteUrl= $urlprefix + $sitefile.sites.configsite.site.alias
+	$globalconfigSiteUrl = $urlprefix + $sitefile.sites.configsite.site.alias
     
-    foreach($globalhubsite in $sitefile.sites.globalhubsite.site)
-     {
-        $globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
-        Write-host "Adding navigation to "$globalhubSiteUrl -ForegroundColor Green
-        Add-CustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
+	foreach ($globalhubsite in $sitefile.sites.globalhubsite.site) {
+		$globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
+		Write-host "Adding navigation to "$globalhubSiteUrl -ForegroundColor Green
+		Add-CustomQuickLaunchNavigationGlobal $globalhubSiteUrl $sitefile.sites.globalNav
         
-        foreach($sectorhubsite in $globalhubsite.sectorhubsite.site)
-        {
-           $sectorhubSiteUrl = $urlprefix + $sectorhubsite.Alias
-           Connect-PnPOnline  -Url $sectorhubSiteUrl -Credentials $tenantAdmin   
-           $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
+		foreach ($sectorhubsite in $globalhubsite.sectorhubsite.site) {
+			$sectorhubSiteUrl = $urlprefix + $sectorhubsite.Alias
+			Connect-PnPOnline  -Url $sectorhubSiteUrl -Credentials $tenantAdmin   
+			$siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
            
-           if ([bool] ($siteExits) -eq $true) {
+			if ([bool] ($siteExits) -eq $true) {
 				Write-Host "site exists, starting creation of other components. $sectorhubSiteUrl" -ForegroundColor Green
 				$paramsSiteColumn = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; contenttypehub = $sectorhubSiteUrl }
 				$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
-			  .$psfilecreatesitecolumnscript @paramsSiteColumn
+				.$psfilecreatesitecolumnscript @paramsSiteColumn
 
-			  Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
-               #Register the created Site as Hub Site
-               Register-PnPHubSite -Site $sectorhubSiteUrl 
-               EnableMegaMenu $sectorhubSiteUrl
-			   Add-ListAndLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
-			   Add-SiteCollectionAdmins -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -users $sitefile.sites.sectorSPAdmin.users
-                Add-GroupAndUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
-                Add-UsersToDefaultSharePointGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
-                Add-UniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
-                Add-Theme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
-                New-ModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
+				Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
+				#Register the created Site as Hub Site
+				Register-PnPHubSite -Site $sectorhubSiteUrl 
+				EnableMegaMenu $sectorhubSiteUrl
+				Add-ListAndLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
+				Edit-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
+				Add-SiteCollectionAdmins -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -users $sitefile.sites.sectorSPAdmin.users
+				Add-GroupAndUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+				Add-UsersToDefaultSharePointGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+				Add-UniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
+				Add-Theme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
+				New-ModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
 				New-WebPartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
 				Edit-RegionalSettings $sectorhubSiteUrl $tenantAdmin
-				Edit-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
 				Edit-ViewForTasksList 'My Tasks' $sectorhubSiteUrl
 				Edit-ListViewWebPartProperties $sitefile.sites.sectorPageWebpart.page.name 1 $sectorhubSiteUrl $tenantAdmin
-               New-SiteCollectionAppCatalog $sectorhubSiteUrl             
-                New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
+				New-SiteCollectionAppCatalog $sectorhubSiteUrl             
+				New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
 				New-SitePage $sectorhubSiteUrl 'MyTasks' $tenantAdmin
-				start-sleep -s 120
+				Write-Host 'System will wait for 3 minutes before proceeding' -ForegroundColor Green
+				start-sleep -s 180
 				#region my Task web part
 				$componentName = "MyTasks"
 				$pageName = 'MyTasks'
@@ -180,44 +177,41 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath)
 				Publish-SitePage $sectorhubSiteUrl $tenantAdmin '/SitePages/MyTasks.aspx'
 				Publish-SitePage $sectorhubSiteUrl $tenantAdmin '/SitePages/Home.aspx'
 				Add-CustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
-                Add-CustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
-                Edit-TopNavForExistingSectors $sectorhubsite.Alias $sitefile.sites.sectorNav.TopNav.Level1.Level2 $sitefile.sites.sectorNav.TopNav.Level1.nodeName $sectorhubsite.Title
+				Add-CustomTopNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.TopNav
+				Edit-TopNavForExistingSectors $sectorhubsite.Alias $sitefile.sites.sectorNav.TopNav.Level1.Level2 $sitefile.sites.sectorNav.TopNav.Level1.nodeName $sectorhubsite.Title
 
-               #Uncomment and run below line on new site creation only, else keep commented
-               Add-EntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
-           } 
-           Disconnect-PnPOnline          
-          }
-       }
+				#Uncomment and run below line on new site creation only, else keep commented
+				Add-EntryInConfigurationListForSectorSite $globalconfigSiteUrl $sectorhubSiteUrl $sitefile.sites.sectorAddItemConfigurationList.item $sectorhubsite.Title
+			} 
+			Disconnect-PnPOnline          
+		}
+	}
 }
 
-function Edit-TopNavForExistingSectors($sectorhubsiteAlias,$sectorNav,$TopNavName,$sectorhubsite)
-{
-    Write-Host 'Adding '$sectorhubsiteAlias' to other sectors' -foreground Green
-    foreach ($level2 in $sectorNav) {
-        if($level2.url -eq $sectorhubsiteAlias)
-        {
-         continue
-        }
-       #foreach ($site in $sitefile.sites.globalhubsite.site.sectorhubsite.site) {
-       $sectorUrl='https://'+$tenant + '.sharepoint.com/sites/'+$level2.url
-       Write-Host 'Adding '$sectorhubsiteAlias' to '$sectorUrl
-       Connect-PnPOnline -Url $sectorUrl -Credentials $tenantAdmin
+function Edit-TopNavForExistingSectors($sectorhubsiteAlias, $sectorNav, $TopNavName, $sectorhubsite) {
+	Write-Host 'Adding '$sectorhubsiteAlias' to other sectors' -foreground Green
+	foreach ($level2 in $sectorNav) {
+		if ($level2.url -eq $sectorhubsiteAlias) {
+			continue
+		}
+		#foreach ($site in $sitefile.sites.globalhubsite.site.sectorhubsite.site) {
+		$sectorUrl = 'https://' + $tenant + '.sharepoint.com/sites/' + $level2.url
+		Write-Host 'Adding '$sectorhubsiteAlias' to '$sectorUrl
+		Connect-PnPOnline -Url $sectorUrl -Credentials $tenantAdmin
    
-        $allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
-        foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
-               if($NavigationNodeTopNavigationBar.Title -eq $TopNavName)
-               {
-                   $TopNav = Get-PnPNavigationNode -id  $NavigationNodeTopNavigationBar.Id
-                   $level2currentURL=$urlprefix+$sectorhubsiteAlias
-                   $navNode= Add-PnPNavigationNode -Title $sectorhubsite -Url $level2currentURL -Location "TopNavigationBar" -Parent $TopNav.Id
-                   break
-               }
-           }
+		$allNavigationTopNavigationBar = Get-PnPNavigationNode -Location TopNavigationBar
+		foreach ($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar) {
+			if ($NavigationNodeTopNavigationBar.Title -eq $TopNavName) {
+				$TopNav = Get-PnPNavigationNode -id  $NavigationNodeTopNavigationBar.Id
+				$level2currentURL = $urlprefix + $sectorhubsiteAlias
+				$navNode = Add-PnPNavigationNode -Title $sectorhubsite -Url $level2currentURL -Location "TopNavigationBar" -Parent $TopNav.Id
+				break
+			}
+		}
    
    
-       Disconnect-PnPOnline 
-       }
+		Disconnect-PnPOnline 
+	}
 }
 
 <#
@@ -225,69 +219,63 @@ Break permission inheritance for the list
 Assign full control to owners group
 Assign read access to other groups
 #>
-function Add-UniquePermission($lists, $siteUrl)
-{
-    try {
-        Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+function Add-UniquePermission($lists, $siteUrl) {
+	try {
+		Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
 
-         foreach($list in $lists)
-          {
-            $ListName=$list.ListName
-            $spList = Get-PnPList -Identity $ListName
-        try {
+		foreach ($list in $lists) {
+			$ListName = $list.ListName
+			$spList = Get-PnPList -Identity $ListName
+			try {
     
-            If($spList)
-            {
+				If ($spList) {
 
-             #Break Permission Inheritance of the List
-             Set-PnPList -Identity $ListName -BreakRoleInheritance 
-             Write-Host -f Green "Permission Inheritance Broken for $ListName"
-             $client.TrackEvent("Permission Inheritance Broken for $ListName")
+					#Break Permission Inheritance of the List
+					Set-PnPList -Identity $ListName -BreakRoleInheritance 
+					Write-Host -f Green "Permission Inheritance Broken for $ListName"
+					$client.TrackEvent("Permission Inheritance Broken for $ListName")
 
-	        $spGroups=Get-PnPGroup
-            foreach($spGroup in $spGroups)
-            {
-                $grpPermission=$null
-                foreach ($group in $list.Permissions.Group) {
-                    if($spGroup.Title.Contains($group.Name))
-                    {
-                        $grpPermission=$group.Role
-                        break;
-                    }
-                }
-                if($null -ne $grpPermission)
-                {
-                   Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $grpPermission
-                   Write-Host -f Green "Assigned permission $grpPermission for Group "$spGroup.Title" in the list $ListName"
-             $client.TrackEvent("Assigned permission $grpPermission for Group $spGroup.Title in the list $ListName")
-                }
-                else {
-                    $defaultPermission=$list.Permissions.Group | Where-Object {$_.Name -eq "*"}[0]
-                    Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $defaultPermission.Role
-                    Write-Host -f Green "Assigned permission "$defaultPermission.Role" for Group "$spGroup.Title" in the list  $ListName"
-                    $client.TrackEvent("Assigned permission $defaultPermission.Role for Group $spGroup.Title in the list  $ListName")
-                }
-           }
-          }
-        }
-        catch {
-            $ErrorMessage = $_.Exception.Message
-            Write-Host $ErrorMessage -foreground Yellow
-            $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-            $telemtryException.Exception = $_.Exception.Message  
-            $client.TrackException($telemtryException)
-        }
+					$spGroups = Get-PnPGroup
+					foreach ($spGroup in $spGroups) {
+						$grpPermission = $null
+						foreach ($group in $list.Permissions.Group) {
+							if ($spGroup.Title.Contains($group.Name)) {
+								$grpPermission = $group.Role
+								break;
+							}
+						}
+						if ($null -ne $grpPermission) {
+							Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $grpPermission
+							Write-Host -f Green "Assigned permission $grpPermission for Group "$spGroup.Title" in the list $ListName"
+							$client.TrackEvent("Assigned permission $grpPermission for Group $spGroup.Title in the list $ListName")
+						}
+						else {
+							$defaultPermission = $list.Permissions.Group | Where-Object { $_.Name -eq "*" }[0]
+							Set-PnPListPermission -Group $spGroup.Title -Identity $ListName -AddRole $defaultPermission.Role
+							Write-Host -f Green "Assigned permission "$defaultPermission.Role" for Group "$spGroup.Title" in the list  $ListName"
+							$client.TrackEvent("Assigned permission $defaultPermission.Role for Group $spGroup.Title in the list  $ListName")
+						}
+					}
+				}
+			}
+			catch {
+				$ErrorMessage = $_.Exception.Message
+				Write-Host $ErrorMessage -foreground Yellow
+				$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+				$telemtryException.Exception = $_.Exception.Message  
+				$client.TrackException($telemtryException)
+			}
         
-        }
-        Disconnect-PnPOnline
-    }
-    catch {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		}
+		Disconnect-PnPOnline
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
 Function CreateLookupColumnForList() {
@@ -430,334 +418,316 @@ function Add-EntryInConfigurationListForSectorSite($globalconfigSiteUrl, $SiteUr
 
 #region Enable Mega Menu/ Custom Navigation block, to add QuickLaunchNavigation or TopNavigation
 
-function EnableMegaMenu($url)
-{
-    try
-    {
-        $client.TrackEvent("MegaMenu Enable Started...")
-        $web = Get-PnPWeb
-        $web.MegaMenuEnabled = $true
-        $web.Update()
-        $client.TrackEvent("MegaMenu Enable Completed...")
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+function EnableMegaMenu($url) {
+	try {
+		$client.TrackEvent("MegaMenu Enable Started...")
+		$web = Get-PnPWeb
+		$web.MegaMenuEnabled = $true
+		$web.Update()
+		$client.TrackEvent("MegaMenu Enable Completed...")
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
 }
 
-function Add-CustomQuickLaunchNavigationGlobal($url, $nodeLevel)
-{
-  try
-   {
-     $client.TrackEvent("Configure Custom Navigation, Started.")
+function Add-CustomQuickLaunchNavigationGlobal($url, $nodeLevel) {
+	try {
+		$client.TrackEvent("Configure Custom Navigation, Started.")
 
-     $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+		$connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
 
-     foreach($level1 in $nodeLevel.Level1){
+		foreach ($level1 in $nodeLevel.Level1) {
      
-     $isPresent=$false
-     $isRootPresent=$false
-     $rootNav=$null
-     $allNavigationNodeQuickLaunch=Get-PnPNavigationNode -Location QuickLaunch
-     foreach($NavigationNodeQuickLaunch in $allNavigationNodeQuickLaunch){
-            if($NavigationNodeQuickLaunch.Title -eq $level1.nodeName)
-            {
-                $isPresent=$true
-                $isRootPresent=$true
-                $rootNav = Get-PnPNavigationNode -id  $NavigationNodeQuickLaunch.Id
-                foreach ($item in $level1.Level2) {
-                    $isChildNodeExist=$rootNav.Children | Where-Object -Property Title -eq -Value $item.nodeName
-                    if($null -eq $isChildNodeExist)
-                    {
-                        $isPresent=$false
-                        break
-                    }
-                }
-                if($isRootPresent -eq $true)
-               { 
-                   break
-                }
-            }
-        }
+			$isPresent = $false
+			$isRootPresent = $false
+			$rootNav = $null
+			$allNavigationNodeQuickLaunch = Get-PnPNavigationNode -Location QuickLaunch
+			foreach ($NavigationNodeQuickLaunch in $allNavigationNodeQuickLaunch) {
+				if ($NavigationNodeQuickLaunch.Title -eq $level1.nodeName) {
+					$isPresent = $true
+					$isRootPresent = $true
+					$rootNav = Get-PnPNavigationNode -id  $NavigationNodeQuickLaunch.Id
+					foreach ($item in $level1.Level2) {
+						$isChildNodeExist = $rootNav.Children | Where-Object -Property Title -eq -Value $item.nodeName
+						if ($null -eq $isChildNodeExist) {
+							$isPresent = $false
+							break
+						}
+					}
+					if ($isRootPresent -eq $true) { 
+						break
+					}
+				}
+			}
 
-   if($isPresent -eq $false)
-     {
-     if($level1.count -eq 3)
-     {
-        $rootNavurl=$level1.url
-        $rootNavcurrentURL=$url+"/Lists/"+$rootNavurl
-        $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Url $rootNavcurrentURL -Location "QuickLaunch" -ErrorAction Stop
-     }
-     elseif($isRootPresent -eq $false)
-     {
-        $level1nodeName=$level1.nodeName       
-        $rootNavNode = Add-PnPNavigationNode -Title $level1nodeName -Url "http://linkless.header/" -Location "QuickLaunch" -ErrorAction Stop
-        $client.TrackEvent("Root navigation node created, $level1.nodeName")
-     }
-     else {
-        $rootNavNode = $rootNav
-     }
+   if ($isPresent -eq $false) {
+				if ($level1.count -eq 3) {
+					$rootNavurl = $level1.url
+					$rootNavcurrentURL = $url + "/Lists/" + $rootNavurl
+					$rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Url $rootNavcurrentURL -Location "QuickLaunch" -ErrorAction Stop
+				}
+				elseif ($isRootPresent -eq $false) {
+					$level1nodeName = $level1.nodeName       
+					$rootNavNode = Add-PnPNavigationNode -Title $level1nodeName -Url "http://linkless.header/" -Location "QuickLaunch" -ErrorAction Stop
+					$client.TrackEvent("Root navigation node created, $level1.nodeName")
+				}
+				else {
+					$rootNavNode = $rootNav
+				}
 
-      foreach($level2 in $level1.Level2){
+				foreach ($level2 in $level1.Level2) {
         
-            $TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
-            $isChildNodeExist=$TopNav.Children | Where-Object -Property Title -eq -Value $level2.nodeName
-          if($null -ne $isChildNodeExist)
-          {
-              continue
-          }
-            if($level1.count -eq 1)
-            {
-                $level2url=$level2.url
-                $level2currentURL=$urlprefix+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
-            }
-            if($level1.count -eq 2)
-            {
-                $level2url=$level2.url
-                $level2currentURL=$url+"/Lists/"+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
-            }
-            if($level1.count -eq 3)
-            {
-                $level2url=$level2.url
-                $level2currentURL=$url+"/Lists/"+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
-            }
-            if($level1.count -eq 4)
-            {
-                $level2url=$level2.url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2url $TopNav.Id -ErrorAction Stop
-            }
+					$TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
+					$isChildNodeExist = $TopNav.Children | Where-Object -Property Title -eq -Value $level2.nodeName
+					if ($null -ne $isChildNodeExist) {
+						continue
+					}
+					if ($level1.count -eq 1) {
+						$level2url = $level2.url
+						$level2currentURL = $urlprefix + $level2url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
+					}
+					if ($level1.count -eq 2) {
+						$level2url = $level2.url
+						$level2currentURL = $url + "/Lists/" + $level2url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
+					}
+					if ($level1.count -eq 3) {
+						$level2url = $level2.url
+						$level2currentURL = $url + "/Lists/" + $level2url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id -ErrorAction Stop
+					}
+					if ($level1.count -eq 4) {
+						$level2url = $level2.url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2url $TopNav.Id -ErrorAction Stop
+					}
         
             
-            $client.TrackEvent("Navigation node created, $level2.nodeName")
+					$client.TrackEvent("Navigation node created, $level2.nodeName")
         
-            $TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
+					$TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
 
-            if($TopNav.Children){
+					if ($TopNav.Children) {
             
-            $child = $TopNav.Children | Select Title, Url, Id
+						$child = $TopNav.Children | Select Title, Url, Id
             
-                foreach($child in $TopNav.Children){ 
+						foreach ($child in $TopNav.Children) { 
                  
-                    foreach($level3 in $level2.Level3){
+							foreach ($level3 in $level2.Level3) {
 
-                        if($child.Title -eq $level2.nodeName){
+								if ($child.Title -eq $level2.nodeName) {
 
-                        $level3url=$level3.url
-                        $level3currentURL=$urlprefix+$level3url
+									$level3url = $level3.url
+									$level3currentURL = $urlprefix + $level3url
 
-                        $navNode=AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id -ErrorAction Stop
+									$navNode = AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id -ErrorAction Stop
 
-                        $client.TrackEvent("Navigation node created, $level3.nodeName") 
+									$client.TrackEvent("Navigation node created, $level3.nodeName") 
         
-            }}}}}}
-    }
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        Remove-CustomNavigationQuickLaunchOnfailure $url $nodeLevel
-    }
-    Disconnect-PnPOnline
+		Remove-CustomNavigationQuickLaunchOnfailure $url $nodeLevel
+	}
+	Disconnect-PnPOnline
 }
 
-function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel)
-{
-  try
-   {
-       Write-Host -ForegroundColor Green 'Adding QuickLaunch navigation....'
-     $client.TrackEvent("Configure Custom Navigation, Started.")
+function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
+	try {
+		Write-Host -ForegroundColor Green 'Adding QuickLaunch navigation....'
+		$client.TrackEvent("Configure Custom Navigation, Started.")
 
-     $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-     Remove-PnPNavigationNode -Title Documents -Location QuickLaunch -Force
-     Remove-PnPNavigationNode -Title Pages -Location QuickLaunch -Force
-     Remove-PnPNavigationNode -Title "Site contents" -Location QuickLaunch -Force
-     foreach($level1 in $nodeLevel.Level1){
+		$connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+		Remove-PnPNavigationNode -Title Documents -Location QuickLaunch -Force
+		Remove-PnPNavigationNode -Title Pages -Location QuickLaunch -Force
+		Remove-PnPNavigationNode -Title "Site contents" -Location QuickLaunch -Force
+		foreach ($level1 in $nodeLevel.Level1) {
 
-     $isPresent=$false
-     $allNavigationNodeQuickLaunch=Get-PnPNavigationNode -Location QuickLaunch
-     foreach($NavigationNodeQuickLaunch in $allNavigationNodeQuickLaunch){
-            if($NavigationNodeQuickLaunch.Title -eq $level1.nodeName)
-            {
-                $isPresent=$true
-            }
-        }
+			$isPresent = $false
+			$allNavigationNodeQuickLaunch = Get-PnPNavigationNode -Location QuickLaunch
+			foreach ($NavigationNodeQuickLaunch in $allNavigationNodeQuickLaunch) {
+				if ($NavigationNodeQuickLaunch.Title -eq $level1.nodeName) {
+					$isPresent = $true
+				}
+			}
 
-    if($isPresent -eq $false)
-     {
-     if($level1.count -eq 3)
-     {
-        $rootNavurl=$level1.url
-        $rootNavcurrentURL=$url+"/Lists/"+$rootNavurl
+			if ($isPresent -eq $false) {
+				if ($level1.count -eq 3) {
+					$rootNavurl = $level1.url
+					$rootNavcurrentURL = $url + "/Lists/" + $rootNavurl
 
-        $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Url $rootNavcurrentURL -Location "QuickLaunch"
-     }
-     else
-     {
-        $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "QuickLaunch"
-     }
-     $client.TrackEvent("Root navigation node created, $level1.nodeName")
+					$rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Url $rootNavcurrentURL -Location "QuickLaunch"
+				}
+				else {
+					$rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "QuickLaunch"
+				}
+				$client.TrackEvent("Root navigation node created, $level1.nodeName")
 
-      foreach($level2 in $level1.Level2){
+				foreach ($level2 in $level1.Level2) {
         
-            $TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
+					$TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
 
-            if($level1.count -eq 1)
-            {
-                $level2sector=$urlprefix+$level2.sector
-                if($level2sector -eq $url)
-                {
-                    $level2url=$level2.url
-                    $level2currentURL=$urlprefix+$level2url
-                    $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
-                }               
+					if ($level1.count -eq 1) {
+						$level2sector = $urlprefix + $level2.sector
+						if ($level2sector -eq $url) {
+							$level2url = $level2.url
+							$level2currentURL = $urlprefix + $level2url
+							$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
+						}               
 
-            }
-            if($level1.count -eq 2)
-            {
-                $level2url=$level2.url
-                $level2currentURL=$url+"/Lists/"+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
-            }
-            if($level1.count -eq 3)
-            {
-                $level2url=$level2.url
-                $level2currentURL=$url+"/Lists/"+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
-            }
-            if($level1.count -eq 4)
-            {
-                $level2url=$level2.url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2url $TopNav.Id
-            }
+					}
+					if ($level1.count -eq 2) {
+						$level2url = $level2.url
+						$level2currentURL = $url + "/Lists/" + $level2url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
+					}
+					if ($level1.count -eq 3) {
+						$level2url = $level2.url
+						$level2currentURL = $url + "/Lists/" + $level2url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
+					}
+					if ($level1.count -eq 4) {
+						$level2url = $level2.url
+						$navNode = AddPnPNavigationNode $level2.nodeName $level2url $TopNav.Id
+					}
         
             
-            $client.TrackEvent("Navigation node created, $level2.nodeName")
+					$client.TrackEvent("Navigation node created, $level2.nodeName")
         
-            $TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
+					$TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
 
-            if($TopNav.Children){
+					if ($TopNav.Children) {
             
-            $child = $TopNav.Children | Select Title, Url, Id
+						$child = $TopNav.Children | Select Title, Url, Id
             
-                foreach($child in $TopNav.Children){ 
+						foreach ($child in $TopNav.Children) { 
                  
-                    foreach($level3 in $level2.Level3){
+							foreach ($level3 in $level2.Level3) {
 
-                        if($child.Title -eq $level2.nodeName){
+								if ($child.Title -eq $level2.nodeName) {
 
-                        $level3url=$level3.url
-                        $level3currentURL=$urlprefix+$level3url
+									$level3url = $level3.url
+									$level3currentURL = $urlprefix + $level3url
 
-                        $navNode=AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
+									$navNode = AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
 
-                        $client.TrackEvent("Navigation node created, $level3.nodeName") 
+									$client.TrackEvent("Navigation node created, $level3.nodeName") 
         
-            }}}}}}
+								}
+							}
+						}
+					}
+				}
+			}
          
-    }
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
 
-        Remove-CustomNavigationQuickLaunchOnfailure $url $nodeLevel
-    }
-    Disconnect-PnPOnline
+		Remove-CustomNavigationQuickLaunchOnfailure $url $nodeLevel
+	}
+	Disconnect-PnPOnline
 }
 
-function Add-CustomTopNavigationSector($url, $nodeLevel)
-{
-  try
-   {
-     $client.TrackEvent("Configure Custom Navigation, Started.")
-    Write-Host 'Adding top navigation...' -foreground Green
-     $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
+function Add-CustomTopNavigationSector($url, $nodeLevel) {
+	try {
+		$client.TrackEvent("Configure Custom Navigation, Started.")
+		Write-Host 'Adding top navigation...' -foreground Green
+		$connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
      
-     foreach($level1 in $nodeLevel.Level1){
+		foreach ($level1 in $nodeLevel.Level1) {
 
-     $isPresent=$false
-     #$allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
-     #foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
-     #       if($NavigationNodeTopNavigationBar.Title -eq $level1.nodeName)
-     #       {
-     #           $isPresent=$true
-     #       }
-     #   }
+			$isPresent = $false
+			#$allNavigationTopNavigationBar=Get-PnPNavigationNode -Location TopNavigationBar
+			#foreach($NavigationNodeTopNavigationBar in $allNavigationTopNavigationBar){
+			#       if($NavigationNodeTopNavigationBar.Title -eq $level1.nodeName)
+			#       {
+			#           $isPresent=$true
+			#       }
+			#   }
 
-    if($isPresent -eq $false)
-     {
+			if ($isPresent -eq $false) {
 
-     $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "TopNavigationBar"
-     $client.TrackEvent("Root navigation node created, $level1.nodeName")
+				$rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "TopNavigationBar"
+				$client.TrackEvent("Root navigation node created, $level1.nodeName")
 
-      foreach($level2 in $level1.Level2){
+				foreach ($level2 in $level1.Level2) {
         
-            $TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
+					$TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
 
-                $level2url=$level2.url
-                $level2currentURL=$urlprefix+$level2url
-                $navNode=AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
+					$level2url = $level2.url
+					$level2currentURL = $urlprefix + $level2url
+					$navNode = AddPnPNavigationNode $level2.nodeName $level2currentURL $TopNav.Id
         
             
-            $client.TrackEvent("Navigation node created, $level2.nodeName")
+					$client.TrackEvent("Navigation node created, $level2.nodeName")
         
-            $TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
+					$TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
 
-            if($TopNav.Children){
+					if ($TopNav.Children) {
             
-            $child = $TopNav.Children | Select Title, Url, Id
+						$child = $TopNav.Children | Select Title, Url, Id
             
-                foreach($child in $TopNav.Children){ 
+						foreach ($child in $TopNav.Children) { 
                  
-                    foreach($level3 in $level2.Level3){
+							foreach ($level3 in $level2.Level3) {
 
-                        if($child.Title -eq $level2.nodeName){
+								if ($child.Title -eq $level2.nodeName) {
 
-                        $level3url=$level3.url
-                        $level3currentURL=$urlprefix+$level3url
+									$level3url = $level3.url
+									$level3currentURL = $urlprefix + $level3url
 
-                        $navNode=AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
+									$navNode = AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
 
-                        $client.TrackEvent("Navigation node created, $level3.nodeName") 
+									$client.TrackEvent("Navigation node created, $level3.nodeName") 
         
-            }}}}}}
+								}
+							}
+						}
+					}
+				}
+			}
     
-    }
-    }
-    catch
-    {
-        $ErrorMessage = $_.Exception.Message
-        Write-Host $ErrorMessage -foreground Yellow
+		}
+	}
+	catch {
+		$ErrorMessage = $_.Exception.Message
+		Write-Host $ErrorMessage -foreground Yellow
 
-        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-        $telemtryException.Exception = $_.Exception.Message  
-        $client.TrackException($telemtryException)
-    }
-    Disconnect-PnPOnline
+		$telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+		$telemtryException.Exception = $_.Exception.Message  
+		$client.TrackException($telemtryException)
+	}
+	Disconnect-PnPOnline
 }
 
-function AddPnPNavigationNode($Title, $Url, $Parent){
-    Add-PnPNavigationNode -Title $Title -Url $Url -Location "QuickLaunch" -Parent $Parent
+function AddPnPNavigationNode($Title, $Url, $Parent) {
+	Add-PnPNavigationNode -Title $Title -Url $Url -Location "QuickLaunch" -Parent $Parent
 }
 
 #endregion
@@ -1056,17 +1026,16 @@ function Add-ListAndLibrary($url, $nodeLevel) {
 	}
 }
 
-function GrantPermissionOnListToGroup($url, $nodeLevel)
-{
+function GrantPermissionOnListToGroup($url, $nodeLevel) {
 	#GrantPermissionOnListToGroup List & Libraries
 	$client.TrackEvent("List and Library creation started.")
 		
-	 foreach ($itemList in $nodeLevel.ListAndContentTypes) {
+	foreach ($itemList in $nodeLevel.ListAndContentTypes) {
 		#Grant permission on list to Group
 		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
 		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
 		Set-PnPListPermission -Identity $itemList.ListName -AddRole "Read" -Group $GroupName
-	 }
+	}
 }
 
 function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
@@ -1085,7 +1054,7 @@ function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
 		$context.Load($web.Lists)
 		$context.Load($list.Fields)
 		$context.ExecuteQuery()
-		$field = $list.Fields | Where-Object {$_.InternalName -eq $FieldName}
+		$field = $list.Fields | Where-Object { $_.InternalName -eq $FieldName }
 		if ($field -ne $null) {
 			$field.RichText = $True
 			$field.Update()
@@ -1231,8 +1200,7 @@ function Remove-ContentTypeFromListLibrary($SiteUrl, $ListName, $ContentType) {
 	}
 }
 
-function EnableSitePagesFeatureAtSiteLevel($siteUrlNew) 
-{
+function EnableSitePagesFeatureAtSiteLevel($siteUrlNew) {
 	$client.TrackEvent("Enable SitePages Feature At SiteLevel Started.")
 	Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
 	$connection = Get-PnPConnection
@@ -1495,8 +1463,19 @@ function New-SPFXWebPart($siteUrl, $tenantAdmin, $scope) {
 				if ($null -ne $tenantApps) {
 					foreach ($tenantApp in $tenantApps) {
 						if ($tenantApp.Title -eq $app.Title) {
-							Install-PnPApp -Identity $tenantApp.Id
-							Write-Host 'App' + $app.Title + ' deployed successfully to the site' + $SiteUrl
+							try {
+								$installedApp = Get-PnPApp -Identity $tenantApp.Id
+								if ([bool]($installedApp) -eq $True) {
+									Update-PnPApp -Identity $tenantApp.Id
+									Write-Host 'App' $app.Title ' updated successfully for the site' $SiteUrl -f Green
+								}
+								Install-PnPApp -Identity $tenantApp.Id
+								Write-Host 'App' + $app.Title + ' deployed successfully to the site' + $SiteUrl -f Green
+							}
+							catch {
+								$ErrorMessage = $_.Exception.Message
+								Write-Host $ErrorMessage -ForegroundColor Red
+							}
 						}
 					}
 				}
@@ -1511,6 +1490,7 @@ function New-SPFXWebPart($siteUrl, $tenantAdmin, $scope) {
 		$client.TrackException($telemtryException)
 	}
 }
+
 
 function New-SiteCollectionAppCatalog($siteUrl) {     
 	try {  
@@ -2396,11 +2376,17 @@ function Add-CustomWebPartToPage($url, $tenantAdmin, $pageName, $webPartProperti
 		$page = Get-PnPClientSidePage -Identity $pageName -ErrorAction Stop 
 		if ($null -ne $page) {
 			if (([bool]($section) -eq $true) -and ([bool]($column) -eq $true)) {
-				Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -Section $section -Column $column -Order $order -WebPartProperties $webPartProperties
-				Write-Host 'Webpart ' $webPartName 'added successfully to the page ' $pageName -ForegroundColor Green
+				$newWebPart = Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -Section $section -Column $column -Order $order -WebPartProperties $webPartProperties
+				Write-Host 'System is waiting for 1 minute before proceeding' -ForegroundColor Green
+				Start-Sleep -s 60
+				Set-PnPClientSideWebPart -Page $pageName -Identity $newWebPart.InstanceId -PropertiesJson $webPartProperties
+				Write-Host 'Webpart ' $webPartName 'added & updated successfully to the page ' $pageName -ForegroundColor Green
 			}
 			else {
-				Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -WebPartProperties $webPartProperties
+				$newWebPart = Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -WebPartProperties $webPartProperties
+				Write-Host 'System is waiting for 1 minute before proceeding' -ForegroundColor Green
+				Start-Sleep -s 60
+				Set-PnPClientSideWebPart -Page $pageName -Identity $newWebPart.InstanceId -PropertiesJson $webPartProperties
 				Write-Host 'Webpart ' $webPartName 'added successfully to the page ' $pageName -ForegroundColor Green
 			}
 		}

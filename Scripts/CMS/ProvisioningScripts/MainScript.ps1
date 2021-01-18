@@ -37,88 +37,47 @@ param (
     $InstrumentationKey
 )
 
-Write-host "Started" -ForegroundColor Green
-
-Write-host $TemplateParametersFile -ForegroundColor Yellow
-Write-host $tenant -ForegroundColor Yellow
-
-Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
-Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
-
-$paramslogin = @{tenant=$tenant; sp_user=$sp_user; sp_password=$sp_password;}
-$psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
-$loginResult = .$psspologin  @paramslogin
-
-$params = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey}
-$paramsnewsite = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; scope=$scope; InstrumentationKey=$InstrumentationKey}
-if($null -ne $loginResult){
-    $webparams = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; fedAuth=$loginResult.FedAuth; rtFA=$loginResult.RtFa}
-}
-
-$psfileensuretermstoreadminscript = Resolve-Path $PSScriptRoot".\ensuretermstoreadmin.ps1"
-$psfilecreatetaxanomyscript = Resolve-Path $PSScriptRoot".\createtaxanomyscript.ps1"
-$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
-$psfilecreatecontenttypescript = Resolve-Path $PSScriptRoot".\createcontenttypescript.ps1"
-$psfilepublishcontenttypescript = Resolve-Path $PSScriptRoot".\publishcontenttypes.ps1"
-$psfilecreatenewsitescript = Resolve-Path $PSScriptRoot".\createnewsitescript.ps1"
-$psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsitecollectionscript.ps1"
-
-if($null -ne $webparams){
-  .$psfileensuretermstoreadminscript @webparams
-}
-.$psfilecreatetaxanomyscript @params
-.$psfilecreatesitecolumnscript @params
-.$psfilecreatecontenttypescript @params
-if($null -ne $webparams){
-    .$psfilepublishcontenttypescript @webparams
-}
-.$psfilecreatenewsitescript @paramsnewsite
-
-#region To check if all Content type exists in Global site 
-
-function checkContentTypeExists()
-{
+#region Functions
+function Get-ContentTypes() {
+    param (
+        $tenantAdmin
+    )
     Write-host "Check if Content Type Exists started..." -ForegroundColor Green
     $filePath = $PSScriptRoot + '.\resources\Site.xml'
 
     [xml]$sitefile = Get-Content -Path $filePath
-    $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
-    $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
-
-    $urlprefix = "https://"+$tenant+".sharepoint.com/sites/"
-    $globalhubsite=$sitefile.sites.globalhubsite.site.Alias
+    
+    $urlprefix = "https://" + $tenant + ".sharepoint.com/sites/"
+    $globalhubsite = $sitefile.sites.globalhubsite.site.Alias
 
     $globalhubSiteUrl = $urlprefix + $globalhubsite
 
     Connect-PnPOnline -Url $globalhubSiteUrl -Credentials $tenantAdmin
     $connection = Get-PnPConnection
 
-    $isContentTypeAvailable=$true
+    $isContentTypeAvailable = $true
     foreach ($itemList in $sitefile.sites.globalSPList.ListAndContentTypes) {
-        if([bool]($itemList.ParentCTName) -eq $false){
-        $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
-            if($ListBase -eq $null)
-            {
-                $isContentTypeAvailable=$false
+        if ([bool]($itemList.ParentCTName) -eq $false) {
+            $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
+            if ($null -eq $ListBase ) {
+                $isContentTypeAvailable = $false
                 Write-host $itemList.ContentTypeName "not available in" $globalhubSiteUrl -ForegroundColor Yellow
             }
         }
     }
-    if($isContentTypeAvailable -eq $true){
+    if ($isContentTypeAvailable -eq $true) {
         
-        $configsite=$sitefile.sites.Configsite.site.Alias
+        $configsite = $sitefile.sites.Configsite.site.Alias
         $configSiteUrl = $urlprefix + $configsite
 
         Connect-PnPOnline -Url $configSiteUrl -Credentials $tenantAdmin
         $connection = Get-PnPConnection
 
         foreach ($itemList in $sitefile.sites.ConfigurationSPList.ListAndContentTypes) {
-            if([bool]($itemList.ParentCTName) -eq $false){
+            if ([bool]($itemList.ParentCTName) -eq $false) {
                 $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
-                if($ListBase -eq $null)
-                {
-                    $isContentTypeAvailable=$false
+                if ($null -eq $ListBase) {
+                    $isContentTypeAvailable = $false
                     Write-host $itemList.ContentTypeName "not available in" $configSiteUrl -ForegroundColor Yellow
                 }
             }
@@ -129,35 +88,177 @@ function checkContentTypeExists()
     return $isContentTypeAvailable
 }
 
+function Publish-TenantApp {
+    param (
+        $tenantUrl,
+        $rootSiteUrl,
+        $tenantAdmin
+    )
+    
+    try {
+        $appsPath = $PSScriptRoot + '\resources\Apps.xml'
+        [xml]$appFile = Get-Content -Path $appsPath
+        foreach ($app in $appFile.Apps.app) {
+            if ($app.Scope -eq 'Tenant') {
+                # Add the apps to the tenant level
+                $tenantApps = Get-PnPApp -Scope Tenant
+                if ($null -ne $tenantApps) {
+                    foreach ($tenantApp in $tenantApps) {
+                        if ($tenantApp.Title -eq $app.Title) {
+                            try {
+                                Publish-PnPApp -Identity $tenantApp.Id -SkipFeatureDeployment 
+                                Write-Host 'App '$app.Title' deployed tenant-wide'  -ForegroundColor Green
+                            }
+                            catch {
+                                write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch {
+        write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+    }
+}
+
+function Add-TenantApp {
+    param (
+        $tenantUrl,
+        $rootSiteUrl,
+        $tenantAdmin
+    )
+
+    $appFolder = $PSScriptRoot + '.\SPFxWebparts\Package'
+    $allApps = Get-ChildItem $appFolder -Exclude tasmu*
+    if ($null -ne $allApps) {
+        foreach ($appToPublish in $allApps) {
+            try {
+                $installedApp = Add-PnPApp -Path $appToPublish.FullName -Scope Tenant -Publish
+                Write-Host $installedApp.Title' successfully added and published at the tenant level' -ForegroundColor Green
+            }
+            catch {
+                write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+            }
+        }
+    }
+}
+
+function Get-TenantAppCatalog {
+    param (
+        $tenantUrl,
+        $tenantAdmin
+    )
+    
+    Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+    $tenantAppCatalogUrl = Get-PnPTenantAppCatalogUrl
+    if ([bool]($tenantAppCatalogUrl) -eq $false) {
+        throw "Tenant App catalog is not configured. Please configure the Tenant App Catalog before proceeding. Admin Center URL : " + $tenantUrl
+    }
+}
+
+function ProvisionComponent {
+    try {
+        if ($null -ne $webparams) {
+            .$psfileensuretermstoreadminscript @webparams
+        }
+        .$psfilecreatetaxanomyscript @params
+        .$psfilecreatenewsitescript @paramsnewsite
+        .$psfilecreatesitecolumnscript @params
+        .$psfilecreatecontenttypescript @params
+        if ($null -ne $webparams) {
+            .$psfilepublishcontenttypescript @webparams
+        }
+        
+    }
+    catch {
+        write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+    }
+}
+
+function Enable-PublicCDNAndSiteCollectionCustomization {
+    param (
+        $tenantUrl,
+        $tenantAdmin
+    )
+
+    try {
+        Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
+        #Connect-SPOService -url $tenantUrl -credential $tenantAdmin
+        $isEnabled = Get-PnPTenantCdnEnabled -CdnType Public
+        if ([string] ($isEnabled.Value) -eq "False") {
+            #Set-SPOTenantCdnEnabled -CdnType Public -Confirm:$false
+            Set-PnPTenantCdnEnabled -CdnType Public -Enable $true
+        }
+        #Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0
+
+        Connect-PnPOnline -Url $rootSiteColUrl -Credentials $tenantAdmin
+        Set-PnPSite -Identity $rootSiteColUrl -NoScriptSite:$false
+    }
+    catch {
+        write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
+    }
+
+}
 #endregion
 
-do
-{
+Write-host "Main Script Started" -ForegroundColor Green
+Write-host $TemplateParametersFile -ForegroundColor Yellow
+Write-host $tenant -ForegroundColor Yellow
+
+$tenantUrl = "https://" + $tenant + "-admin.sharepoint.com/"
+$rootSiteColUrl = "https://" + $tenant + ".sharepoint.com/"
+$secstr = New-Object -TypeName System.Security.SecureString
+$sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
+$tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
+
+#Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
+#Import-PackageProvider -Name "NuGet" -RequiredVersion "2.8.5.208" -Force
+#Install-Module -Name SharePointPnPPowerShellOnline -Force -AllowClobber -Verbose -Scope CurrentUser
+#Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Force -AllowClobber -Verbose -Scope CurrentUser
+
+$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
+$psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
+$loginResult = .$psspologin  @paramslogin
+
+$params = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey }
+$paramsnewsite = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; scope = $scope; InstrumentationKey = $InstrumentationKey }
+if ($null -ne $loginResult) {
+    $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa }
+}
+
+#region Check if the Tenant App Catalog is available
+Get-TenantAppCatalog -tenantUrl $tenantUrl -tenantAdmin $tenantAdmin
+#endregion
+
+#region Get file references
+$psfileensuretermstoreadminscript = Resolve-Path $PSScriptRoot".\ensuretermstoreadmin.ps1"
+$psfilecreatetaxanomyscript = Resolve-Path $PSScriptRoot".\createtaxanomyscript.ps1"
+$psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
+$psfilecreatecontenttypescript = Resolve-Path $PSScriptRoot".\createcontenttypescript.ps1"
+$psfilepublishcontenttypescript = Resolve-Path $PSScriptRoot".\publishcontenttypes.ps1"
+$psfilecreatenewsitescript = Resolve-Path $PSScriptRoot".\createnewsitescript.ps1"
+$psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsitecollectionscript.ps1"
+#endregion
+
+ProvisionComponent
+
+do {
     Write-host "Sleep started for 1 minute..." -ForegroundColor Green
     start-sleep -s 60
     Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
-    $isExists= $true
-    $isExists= checkContentTypeExists
+    $isExists = $True
+    $isExists = Get-ContentTypes -tenantAdmin $tenantAdmin
 }
-until ($isExists -eq $true)
+until ($isExists -eq $True)
 
-if($isExists -eq $true)
-{
-     Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
-     #add the custom script command 
-     $tenantUrl="https://"+$tenant+"-admin.sharepoint.com/"
-     $rootSiteColUrl = "https://"+$tenant+".sharepoint.com/"
+if ($isExists -eq $True) {
+    Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
+    
+    Enable-PublicCDNAndSiteCollectionCustomization -tenantAdmin $tenantAdmin -tenantUrl $tenantUrl
+    Add-TenantApp -tenantUrl $tenantUrl -rootSiteUrl $rootSiteColUrl -tenantAdmin $tenantAdmin
+    Publish-TenantApp -tenantUrl $tenantUrl -rootSiteUrl $rootSiteColUrl -tenantAdmin $tenantAdmin
 
-     $secstr = New-Object -TypeName System.Security.SecureString
-     $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
-     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
-     Connect-SPOService -url $tenantUrl -credential $tenantAdmin
-     $isEnabled = Get-SPOTenantCdnEnabled -CdnType Public
-     if([string] ($isEnabled.Value) -eq "False"){
-          Set-SPOTenantCdnEnabled -CdnType Public -Confirm:$false
-          Set-SPOsite $rootSiteColUrl -DenyAddAndCustomizePages 0
-     }
-
-     
-     .$psfileprovisionnewsitecollectionscript @paramsnewsite
+    .$psfileprovisionnewsitecollectionscript @paramsnewsite
 }

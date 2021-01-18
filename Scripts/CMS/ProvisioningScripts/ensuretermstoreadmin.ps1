@@ -38,10 +38,10 @@ param (
     $rtFA
 )
 
-function Initialize(){
+function Initialize() {
     $contenttypehub = "https://$tenant.sharepoint.com/sites/contenttypehub"
     $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+    $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
 
     $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
@@ -54,7 +54,7 @@ function Initialize(){
     Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+    if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
         $client.Context.Cloud.RoleName = $RoleName
     }
 
@@ -87,10 +87,10 @@ $form = $response.Forms[0]
 $fields = $form.Fields
 
 $body = New-Object 'system.collections.generic.dictionary[[string],[object]]'
-$fields.keys | ForEach-Object{
+$fields.keys | ForEach-Object {
     $key = $_
     $value = $fields[$_]
-    if($key -match "ctl00_ctl00_PlaceHolderContentArea_PlaceHolderMain_sharedAppId"){
+    if ($key -match "ctl00_ctl00_PlaceHolderContentArea_PlaceHolderMain_sharedAppId") {
         $global:uid = $value
     }
 
