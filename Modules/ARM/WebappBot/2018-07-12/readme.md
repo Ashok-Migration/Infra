@@ -15,22 +15,17 @@ The default parameter values are based on the needs of deploying a webapp bot se
 | `botId` | string | | | Required. Name of the bot service.
 | `sku` | string | | | Required. Name of the SKU plan.
 | `appInsightsName` | string | | | Required. Name of the App Insights service.
-| `appId` | string | | | Required. Name of the App Id.
+| `appId` | string | | | Required. Client Id of the app registered in AD tenant (spn-bot-<env>)
 | `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
 
 ### Parameter Usage: `tags`
 
 Tag names and tag values can be provided as needed. A tag can be left without a value.
 
-```json
+``` json
 "tags": {
     "value": {
-        "Environment": "Non-Prod",
-        "Contact": "test.user@testcompany.com",
-        "PurchaseOrder": "1234",
-        "CostCenter": "7890",
-        "ServiceName": "DeploymentValidation",
-        "Role": "DeploymentValidation"
+        "Environment": "Non-Prod"
     }
 }
 ```
@@ -42,5 +37,5 @@ This is a generic module for deploying a App service. Any customization for diff
 ## Additional resources
 
 - [Introduction to Azure Bot Service](https://azure.microsoft.com/en-in/services/bot-service/)
-- [ARM Template format for •Microsoft.BotService/botServices](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-deploy-az-cli?view=azure-bot-service-4.0&tabs=csharp)
+- [ARM Template format for Microsoft.BotService/botServices](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-deploy-az-cli?view=azure-bot-service-4.0&tabs=csharp)
 - [Use tags to organize your Azure resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-using-tags)
