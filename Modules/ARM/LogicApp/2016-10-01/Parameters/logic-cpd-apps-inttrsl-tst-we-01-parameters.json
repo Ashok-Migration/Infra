@@ -1640,7 +1640,7 @@
                             "type": "SetVariable",
                             "inputs": {
                                 "name": "EmailBody",
-                                "value": "<p>Hello Translator,\n<br /><br />\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review or update translation.\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_Task_For_Translation_JSON')?['ID']}\">here</a> to view the task.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                "value": "<p>Hello Translator,\n<br /><br />\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for translation.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review or update translation.\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/SitePages/MyTasks.aspx?TaskId=@{body('Parse_Users_Task_For_Translation_JSON')?['ID']}\">here</a> to view the task.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                             }
                         },
                         "Set_FinishTranslationReminder": {
@@ -2550,6 +2550,12 @@
                                 },
                                 "SiteURL": {
                                     "type": "string"
+                                },
+                                "Version": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 }
                             },
                             "type": "object"
