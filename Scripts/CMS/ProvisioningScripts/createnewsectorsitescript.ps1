@@ -42,7 +42,7 @@ function Create-NewSiteCollection() {
  
     # Parse the parameter file and update the values of artifacts location and artifacts location SAS token if they are present
     $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
-    if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
+    if ($null -ne ($JsonParameters | Get-Member -Type NoteProperty 'parameters')) {
         $JsonParameters = $JsonParameters.parameters
     }
 

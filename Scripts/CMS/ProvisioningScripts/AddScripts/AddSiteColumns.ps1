@@ -32,7 +32,7 @@ param (
 )
 Write-host "Started" -ForegroundColor Green
 Write-host $tenant -ForegroundColor Yellow
-$arrContentTypesToPublish=@();
+$arrContentTypesToPublish = @();
 
 $siteColumns = $PSScriptRoot + '.\SiteColumns.xml'
 
@@ -44,7 +44,7 @@ $parentDirectory = $PSScriptRoot.Substring(0, $PSScriptRoot.LastIndexOf('\'))
 $psfilepublishcontenttypescript = Resolve-Path $parentDirectory".\publishcontenttypes.ps1"
 $psspologin = Resolve-Path $parentDirectory".\spologin.ps1"
 
-$paramslogin = @{tenant=$tenant; sp_user=$sp_user; sp_password=$sp_password;}
+$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
 $loginResult = .$psspologin  @paramslogin
 
 #Setup Telemetry
@@ -120,19 +120,18 @@ function AddSiteColumns {
             }
             else {
                 AddSiteColumnConditionally $siteColumn $contentType $contenttypehubConnection
-                $arrContentTypesToPublish+=$siteColumn.ContentType
+                $arrContentTypesToPublish += $siteColumn.ContentType
             }
         }
 
-       if($arrContentTypesToPublish.Length -gt 0 -and $null -ne $loginResult)
-       {
-           Write-Host 'Republishing content types' -ForegroundColor Green
-           $client.TrackEvent('Publishing content types')
-           $arrContentTypesToPublish=$arrContentTypesToPublish | Select-Object -Unique
+        if ($arrContentTypesToPublish.Length -gt 0 -and $null -ne $loginResult) {
+            Write-Host 'Republishing content types' -ForegroundColor Green
+            $client.TrackEvent('Publishing content types')
+            $arrContentTypesToPublish = $arrContentTypesToPublish | Select-Object -Unique
            
-           $webparams = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; fedAuth=$loginResult.FedAuth; rtFA=$loginResult.RtFa;arrContentTypesToPublish=$arrContentTypesToPublish}
-           .$psfilepublishcontenttypescript @webparams
-       }
+            $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa; arrContentTypesToPublish = $arrContentTypesToPublish }
+            .$psfilepublishcontenttypescript @webparams
+        }
 
         Disconnect-PnPOnline
     } 
@@ -209,7 +208,7 @@ function Create-SiteColumn( $connection, $ColumnTitle, $ColumnName, $GroupName, 
                 Required='$Required'
                 Indexed='$indexed'
                 Format='$Format'
-				Group='$GroupName'                
+                Group='$GroupName'                
                 ShowInEditForm='$showInNewEditForm'
                 ShowInNewForm='$showInNewEditForm'
                 ID='$Id'
@@ -229,38 +228,38 @@ function Create-SiteColumn( $connection, $ColumnTitle, $ColumnName, $GroupName, 
             if ($isRichText -eq $True) {
                 $Id = [GUID]::NewGuid() 
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
-				    DisplayName='$ColumnTitle' 
-				    Required='$Required' 
-				    EnforceUniqueValues='$enforceUniqueValues' 
-				    Indexed='$indexed' Format='$Format' 
-				    Group='$GroupName' 
-				    FriendlyDisplayFormat='Disabled' 
-				    StaticName='$ColumnName'
+                    DisplayName='$ColumnTitle' 
+                    Required='$Required' 
+                    EnforceUniqueValues='$enforceUniqueValues' 
+                    Indexed='$indexed' Format='$Format' 
+                    Group='$GroupName' 
+                    FriendlyDisplayFormat='Disabled' 
+                    StaticName='$ColumnName'
                     ID='$Id' 
                     UnlimitedLengthInDocumentLibrary ='TRUE'
-				    Name='$ColumnName'
+                    Name='$ColumnName'
                     RichText='TRUE'
                     RichTextMode='FullHtml'
                     ShowInEditForm='$showInNewEditForm'
                     ShowInNewForm='$showInNewEditForm'>
-		            </Field>"
+                    </Field>"
             }
             else {
                 $Id = [GUID]::NewGuid() 
                 $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
-				    DisplayName='$ColumnTitle' 
-				    Required='$Required' 
-				    EnforceUniqueValues='$enforceUniqueValues' 
-				    Indexed='$indexed' Format='$Format' 
-				    Group='$GroupName' 
-				    FriendlyDisplayFormat='Disabled' 
-				    StaticName='$ColumnName'
+                    DisplayName='$ColumnTitle' 
+                    Required='$Required' 
+                    EnforceUniqueValues='$enforceUniqueValues' 
+                    Indexed='$indexed' Format='$Format' 
+                    Group='$GroupName' 
+                    FriendlyDisplayFormat='Disabled' 
+                    StaticName='$ColumnName'
                     ID='$Id' 
                     UnlimitedLengthInDocumentLibrary ='TRUE'
-				    Name='$ColumnName'
+                    Name='$ColumnName'
                     ShowInEditForm='$showInNewEditForm'
                     ShowInNewForm='$showInNewEditForm'>
-		            </Field>"
+                    </Field>"
             }
         } 
         elseif ($columnType -eq "Number") {
@@ -279,19 +278,19 @@ function Create-SiteColumn( $connection, $ColumnTitle, $ColumnName, $GroupName, 
                 $showInNewEditForm = "TRUE"
             }
             $addNewField = Add-PnPFieldFromXml -Connection $connection "<Field Type='$ColumnType'
-				DisplayName='$ColumnTitle' 
-				Required='$Required' 
-				EnforceUniqueValues='$enforceUniqueValues' 
-				Indexed='$indexed' 
-				Group='$GroupName' 
-				FriendlyDisplayFormat='Disabled' 
+                DisplayName='$ColumnTitle' 
+                Required='$Required' 
+                EnforceUniqueValues='$enforceUniqueValues' 
+                Indexed='$indexed' 
+                Group='$GroupName' 
+                FriendlyDisplayFormat='Disabled' 
                 StaticName='$ColumnName'
                 ShowInEditForm='$showInNewEditForm'
                 ShowInNewForm='$showInNewEditForm'
                 ID='$Id' 
                 Name='$ColumnName'>
                 <Default>$defaultValue</Default>
-		        </Field>"
+                </Field>"
         }
         else {
             $Id = [GUID]::NewGuid()

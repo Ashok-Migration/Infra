@@ -46,21 +46,21 @@ Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
 Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
 
 $parentDirectory = $PSScriptRoot.Substring(0, $PSScriptRoot.LastIndexOf('\'))
-$paramslogin = @{tenant=$tenant; sp_user=$sp_user; sp_password=$sp_password;}
+$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
 $psspologin = Resolve-Path $parentDirectory".\spologin.ps1"
 $loginResult = .$psspologin  @paramslogin
 
-$params = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey}
-$paramsnewsite = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; scope=$scope; InstrumentationKey=$InstrumentationKey}
-if($null -ne $loginResult){
-    $webparams = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; fedAuth=$loginResult.FedAuth; rtFA=$loginResult.RtFa}
+$params = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey }
+$paramsnewsite = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; scope = $scope; InstrumentationKey = $InstrumentationKey }
+if ($null -ne $loginResult) {
+    $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa }
 }
 
 $psfileensuretermstoreadminscript = Resolve-Path $parentDirectory".\ensuretermstoreadmin.ps1"
 $psfilecreatetaxanomyscript = Resolve-Path $parentDirectory".\createtaxanomyscript.ps1"
 
 
-if($null -ne $webparams){
-  .$psfileensuretermstoreadminscript @webparams
+if ($null -ne $webparams) {
+    .$psfileensuretermstoreadminscript @webparams
 }
 .$psfilecreatetaxanomyscript @params

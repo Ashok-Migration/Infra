@@ -5,19 +5,18 @@ param (
     $sp_password
 )
 
-function Invoke-HttpPost($endpoint, $body, $headers, $session)
-{
-  $params = @{}
-  $params.Headers = $headers
-  $params.uri = $endpoint
-  $params.Body = $body
-  $params.Method = "POST"
-  $params.WebSession = $session
+function Invoke-HttpPost($endpoint, $body, $headers, $session) {
+    $params = @{}
+    $params.Headers = $headers
+    $params.uri = $endpoint
+    $params.Body = $body
+    $params.Method = "POST"
+    $params.WebSession = $session
 
-  $response = Invoke-WebRequest @params -ContentType "application/soap+xml; charset=utf-8" -UseDefaultCredentials -UserAgent ([string]::Empty)
-  $content = $response.Content
+    $response = Invoke-WebRequest @params -ContentType "application/soap+xml; charset=utf-8" -UseDefaultCredentials -UserAgent ([string]::Empty)
+    $content = $response.Content
 
-  return $content
+    return $content
 }
 
 $spUrl = "https://$tenant-admin.sharepoint.com"
@@ -75,6 +74,6 @@ $fedauth = $fedauthMatch.Value
 $fedauth
 
 return @{
-  FedAuth = $fedauth;
-  RtFa = $rtFa;
+    FedAuth = $fedauth;
+    RtFa    = $rtFa;
 }

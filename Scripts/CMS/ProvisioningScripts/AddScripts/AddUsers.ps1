@@ -98,9 +98,8 @@ function AddUsersToSPGroup($url, $nodeLevel, $groups) {
  
         foreach ($SPGroup in $groups) {
 
-            if($nodeLevel.Alias -eq "cms-marketplace")
-            {
-                $SPGroupName =  'Global ' + $SPGroup.Name
+            if ($nodeLevel.Alias -eq "cms-marketplace") {
+                $SPGroupName = 'Global ' + $SPGroup.Name
             }
             else {
                 $SPGroupName = $nodeLevel.Title + ' ' + $SPGroup.Name    
@@ -174,11 +173,10 @@ function AddUsersToSPGroup($url, $nodeLevel, $groups) {
                     Add-PnPUserToGroup -Identity $SPGroupName -LoginName $SPGroup.SecurityGroup -Connection $connection
                 }
             }
-            else 
-                {
-                    Write-Host $SPGroupName ' not found in '$url  -ForegroundColor Red
-                    $client.TrackEvent('$SPGroupName not found in $url')
-                }
+            else {
+                Write-Host $SPGroupName ' not found in '$url  -ForegroundColor Red
+                $client.TrackEvent('$SPGroupName not found in $url')
+            }
                    
         }
        

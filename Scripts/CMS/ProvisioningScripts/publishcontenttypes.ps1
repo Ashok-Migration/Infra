@@ -42,7 +42,7 @@ param (
 function Initialize() {
     $contenttypehub = "https://$tenant.sharepoint.com/sites/contenttypehub"
     $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+    $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
 
     $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
@@ -55,17 +55,16 @@ function Initialize() {
     Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
     $client.InstrumentationKey = $InstrumentationKey 
-    if(($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)){
+    if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
         $client.Context.Cloud.RoleName = $RoleName
     }
 
     Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
 }
 
-function PublishContentType($ct,$republish) {
+function PublishContentType($ct, $republish) {
 
-    if($republish -eq $true)
-    {
+    if ($republish -eq $true) {
         write-host "Republishing CT $($ct.Name): " -NoNewline
     }
     else {
@@ -95,18 +94,17 @@ function PublishContentType($ct,$republish) {
     $fields = $form.Fields
 
     $body = New-Object 'system.collections.generic.dictionary[[string],[object]]'
-    $fields.keys | ForEach-Object{
+    $fields.keys | ForEach-Object {
         $key = $_
         $value = $fields[$_]
-        if($key -contains "ctl00"){
+        if ($key -contains "ctl00") {
             # Skip
         }
-        else{
+        else {
             $body[$key] = $value
         }
     }
-    if($republish -eq $false)
-    {
+    if ($republish -eq $false) {
         $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'publishButton'
     }
     else {
@@ -116,21 +114,21 @@ function PublishContentType($ct,$republish) {
     $body['ctl00$PlaceHolderMain$ctl00$RptControls$okButton'] = 'OK'
     $response = Invoke-WebRequest -Uri $url -Method Post -WebSession $session -Body $body
     write-host "Done" -ForegroundColor Green
- }
+}
 
 Initialize
 
 if ($null -ne $arrContentTypesToPublish -and $arrContentTypesToPublish.Length -gt 0) {
-  foreach ($item in $arrContentTypesToPublish) {
-      $ct=Get-PnPContentType -Identity $item
-      PublishContentType $ct $true
-  }
+    foreach ($item in $arrContentTypesToPublish) {
+        $ct = Get-PnPContentType -Identity $item
+        PublishContentType $ct $true
+    }
 }
 else {
     
     $CTs = Get-PnPContentType 
     $tasmuCTs = $CTs | Where-Object { $_.Group -eq "TASMU" }
     foreach ($ct in $tasmuCTs) {
-      PublishContentType $ct $false
+        PublishContentType $ct $false
     }
 }

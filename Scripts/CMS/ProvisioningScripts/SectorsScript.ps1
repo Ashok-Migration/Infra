@@ -39,50 +39,48 @@ param (
 
 Write-host "Started provisioning sectors on " $tenant -ForegroundColor Yellow
 
-Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
-Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
+#Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
+#Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
 
-$paramslogin = @{tenant=$tenant; sp_user=$sp_user; sp_password=$sp_password;}
+$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
 $psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
 $loginResult = .$psspologin  @paramslogin
 
-$params = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey}
-$paramsnewsite = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; scope=$scope; InstrumentationKey=$InstrumentationKey}
-if($null -ne $loginResult){
-    $webparams = @{tenant=$tenant; TemplateParametersFile=$TemplateParametersFile; sp_user=$sp_user; sp_password=$sp_password; InstrumentationKey=$InstrumentationKey; fedAuth=$loginResult.FedAuth; rtFA=$loginResult.RtFa}
+$params = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey }
+$paramsnewsite = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; scope = $scope; InstrumentationKey = $InstrumentationKey }
+if ($null -ne $loginResult) {
+    $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa }
 }
 
 $psfilecreatenewsectorscript = Resolve-Path $PSScriptRoot".\createnewsectorsitescript.ps1"
 $psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsectorsitecollectionscript.ps1"
 
- .$psfilecreatenewsectorscript @paramsnewsite
+.$psfilecreatenewsectorscript @paramsnewsite
 
 #region To check if all Content type exists in Global site 
 
-function checkContentTypeExists()
-{
+function checkContentTypeExists() {
     Write-host "Check if Content Type Exists started..." -ForegroundColor Green
     $filePath = $PSScriptRoot + '.\resources\Sectors.xml'
 
     [xml]$sitefile = Get-Content -Path $filePath
     $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
+    $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
     $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr 
 
-    $urlprefix = "https://"+$tenant+".sharepoint.com/sites/"
+    $urlprefix = "https://" + $tenant + ".sharepoint.com/sites/"
     
-    $isContentTypeAvailable=$true
+    $isContentTypeAvailable = $true
     foreach ($site in $sitefile.sites.globalhubsite.site.sectorhubsite.site) {
-        $sectorsite=$site.alias    
+        $sectorsite = $site.alias    
         $sectorSiteUrl = $urlprefix + $sectorsite
         Connect-PnPOnline -Url $sectorSiteUrl -Credentials $tenantAdmin
         $connection = Get-PnPConnection
         
         foreach ($itemList in $sitefile.sites.sectorSPList.ListAndContentTypes) {
             $ListBase = Get-PnPContentType -Identity $itemList.ContentTypeName -ErrorAction SilentlyContinue -Connection $connection
-            if($ListBase -eq $null)
-            {
-                $isContentTypeAvailable=$false
+            if ($ListBase -eq $null) {
+                $isContentTypeAvailable = $false
                 Write-host $itemList.ContentTypeName "not available in" $sectorSiteUrl -ForegroundColor Yellow
             }
         }
@@ -94,18 +92,16 @@ function checkContentTypeExists()
 
 #endregion
 
-do
-{
+do {
     Write-host "Sleep started for 3 minutes..." -ForegroundColor Green
     start-sleep -s 180
     Write-host "Sleep completed for 3 minutes..." -ForegroundColor Green
-    $isExists= $true
-    $isExists= checkContentTypeExists
+    $isExists = $true
+    $isExists = checkContentTypeExists
 }
 until ($isExists -eq $true)
 
-if($isExists -eq $true)
-{
-     Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
-     .$psfileprovisionnewsitecollectionscript @paramsnewsite
+if ($isExists -eq $true) {
+    Write-host "All Content types are available, Starting the provisioning script..." -ForegroundColor Green
+    .$psfileprovisionnewsitecollectionscript @paramsnewsite
 }
