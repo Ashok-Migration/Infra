@@ -57,8 +57,8 @@
                 "Create_Marketplace_Product_Subscription": {
                   "inputs": {
                     "body": {
-                      "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],null)}",
-                      "_cpm_organisation_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'2'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                      "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                      "_cpm_organisation_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],null)}",
                       "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
                       "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
                       "cpm_description": "@body('Parse_JSON')?['value']?['description']",
@@ -88,8 +88,8 @@
                           "_Update_Marketplace_Product_Subscription": {
                             "inputs": {
                               "body": {
-                                "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_contact_value'])}",
-                                "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'2'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
+                                "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_contact_value'])}",
+                                "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
                                 "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
                                 "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
                                 "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
@@ -205,13 +205,13 @@
               {
                 "equals": [
                   "@body('Parse_JSON')?['value']?['customerTypeId']",
-                  "@string(1)"
+                  "@string(0)"
                 ]
               },
               {
                 "equals": [
                   "@body('Parse_JSON')?['value']?['customerTypeId']",
-                  "@string(2)"
+                  "@string(1)"
                 ]
               }
             ]
