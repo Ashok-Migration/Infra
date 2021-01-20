@@ -63,7 +63,7 @@ stages:
 
   - stage: Tst
     displayName: Add Tst KV Secrets
-    dependsOn: PublishArtifacts
+    dependsOn: Dev
     variables:
       - group: "Tst"
       - name: keyVaultName
@@ -78,26 +78,9 @@ stages:
               steps:
                 - template: all-secrets.yml
 
-  - stage: Tra
-    displayName: Add Tra KV Secrets
-    dependsOn: PublishArtifacts
-    variables:
-      - group: "tra"
-      - name: keyVaultName
-        value: kv-cpd-apps-tra-we-01
-    jobs:
-      - deployment: Deploy
-        displayName: Add tra Key Vault Secrets
-        environment: tra
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: all-secrets.yml
-
   - stage: uat
     displayName: Add uat KV Secrets
-    dependsOn: PublishArtifacts
+    dependsOn: Tst
     variables:
       - group: "uat"
       - name: keyVaultName

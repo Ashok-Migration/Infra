@@ -79,7 +79,7 @@ stages:
                 - template: restart-pods.yml
   - stage: Tst
     displayName: Update App Configurations for tst
-    dependsOn: PublishArtifacts
+    dependsOn: Dev
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-tst-we-01"
@@ -99,31 +99,10 @@ stages:
               steps:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
-  - stage: Tra
-    displayName: Update App Configurations for tra
-    dependsOn: PublishArtifacts
-    variables:
-      - name: appConfigName
-        value: "acst-cpd-apps-str-tra-we-01"
-      - name: aksResourceGroupName
-        value: "rg-cpd-apps-aks-tra-we-01"
-      - name: aksClusterName
-        value: "aks-cpd-apps-tra-we-01"
-      - name: env
-        value: "tra"
-    jobs:
-      - deployment: Deploy
-        displayName: Update App Configurations for tra
-        environment: tra
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: update-app-config.yml
-                - template: restart-pods.yml
+
   - stage: uat
     displayName: Update App Configurations for uat
-    dependsOn: PublishArtifacts
+    dependsOn: Tst
     variables:
       - name: appConfigName
         value: "acst-cpd-apps-str-uat-we-01"

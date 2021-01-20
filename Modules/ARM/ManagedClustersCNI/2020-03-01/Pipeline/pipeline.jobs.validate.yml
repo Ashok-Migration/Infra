@@ -7,7 +7,7 @@ jobs:
     displayName: Validate Module
     pool:
       name: $(poolName)
-      # vmImage: $(vmImage)      
+      #vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -17,6 +17,7 @@ jobs:
           targetType: inline
           script: |
             Install-Module -Name Pester -RequiredVersion 5.0.2 -Force -ErrorAction Stop
+
 
             $PesterSettings  = @{
               Script       = "$(System.DefaultWorkingDirectory)/$(modulePath)/Tests/*.tests.ps1"
@@ -36,20 +37,20 @@ jobs:
           testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
       - task: AzurePowerShell@4
-        displayName: "Validate $(moduleName) in $(resourceGroupNameNpd) via $(serviceConnectionNpd)"
+        displayName: "Validate $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)"
         inputs:
-          azureSubscription: $(serviceConnectionNpd)
+          azureSubscription: $(serviceConnectionPrd)
           ScriptType: InlineScript
           inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupNameNpd) -ErrorAction SilentlyContinue))
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
             {
-              New-AzResourceGroup -Name $(resourceGroupNameNpd) -Location "$(location)"
+              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location "$(location)"
             }
 
             $ValidationErrors = $null
 
             $DeploymentInputs = @{
-              ResourceGroupName     = "$(resourceGroupNameNpd)"
+              ResourceGroupName     = "$(resourceGroupNamePrd)"
               TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
               TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
               Mode                  = "Incremental"

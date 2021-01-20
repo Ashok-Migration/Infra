@@ -16,7 +16,7 @@ The default parameter values are based on the needs of deploying a webapp bot se
 | `sku` | string | | | Required. Name of the SKU plan.
 | `appInsightsName` | string | | | Required. Name of the App Insights service.
 | `appId` | string | | | Required. Client Id of the app registered in AD tenant (spn-bot-<env>)
-| `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
+| `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Web App Bot resource.
 
 ### Parameter Usage: `tags`
 
