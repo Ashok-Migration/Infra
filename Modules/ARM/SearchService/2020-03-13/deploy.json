@@ -18,6 +18,24 @@
                 "description": "Optional. Resource tags."
             },
             "type": "object"
+        },
+        "replicaCount": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 12,
+            "defaultValue": 1
+        },
+        "partitionCount": {
+            "type": "int",
+            "allowedValues": [
+                1,
+                2,
+                3,
+                4,
+                6,
+                12
+            ],
+            "defaultValue": 1
         }
     },
     "variables": {},
@@ -31,8 +49,8 @@
                 "name": "standard"
             },
             "properties": {
-                "replicaCount": 1,
-                "partitionCount": 1,
+                "replicaCount": "[parameters('replicaCount')]",
+                "partitionCount": "[parameters('partitionCount')]",
                 "hostingMode": "default",
                 "publicNetworkAccess": "Enabled",
                 "networkRuleSet": {
