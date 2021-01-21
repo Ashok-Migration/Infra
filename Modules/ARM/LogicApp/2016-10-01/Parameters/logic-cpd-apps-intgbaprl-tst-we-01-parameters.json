@@ -1246,7 +1246,7 @@
                         "Update_Item_Status_And_Comments_-_Approved": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\"\n}",
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\",\n\"cmsversion\": @{if(equals(body('Parse_Service_Bus_Message_JSON')?['Version'], ''), 1, add(int(body('Parse_Service_Bus_Message_JSON')?['Version']), 1))}\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
