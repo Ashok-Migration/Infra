@@ -5,7 +5,7 @@
         "webAppName": {
             "type": "String"
         },
-        "hostingPlanName": {
+        "hostingPlanId": {
             "type": "String"
         },
         "diagnosticLogsRetentionInDays": {
@@ -149,7 +149,7 @@
         "enabled": true,
         "name": "[parameters('webAppName')]",
         "hostingEnvironment": "",
-        "serverFarmId": "[concat('/subscriptions/', Subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+        "serverFarmId": "[parameters('hostingPlanId')]",
         "siteConfig": {
           "cors": {
             "allowedOrigins": [
