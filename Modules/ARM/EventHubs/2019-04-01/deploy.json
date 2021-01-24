@@ -39,6 +39,20 @@
         "description": "Specifies the messaging tier for service Bus namespace."
       }
     },
+    "isCaptureEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies if capture feature should be enabled."
+      }
+    },
+    "storageAccount_capture": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specifies the destination in case capture feature is enabled."
+      }
+    },
     "tags": {
       "type": "object",
       "defaultValue": {
@@ -49,13 +63,12 @@
     }
   },
   "variables": {
-    "eventHubNamespaceName": "[concat(parameters('projectName'), 'ns')]"
   },
   "resources": [
     {
       "apiVersion": "2017-04-01",
       "type": "Microsoft.EventHub/namespaces",
-      "name": "[variables('eventHubNamespaceName')]",
+      "name": "[parameters('projectName')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "[parameters('eventHubSku')]",
@@ -72,33 +85,48 @@
       "apiVersion": "2017-04-01",
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "condition": "[not(empty(parameters('eventHubName')))]",
-      "name": "[concat(variables('eventHubNamespaceName'), '/', parameters('eventHubName')[copyIndex('eventHubNameLoop')].name)]",
+      "name": "[concat(parameters('projectName'), '/', parameters('eventHubName')[copyIndex('eventHubNameLoop')].name)]",
       "location": "[parameters('location')]",
       "copy": {
         "name": "eventHubNameLoop",
         "count": "[if(empty(parameters('eventHubName')) , 1, length(parameters('eventHubName')))]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('projectName'))]"
       ],
       "properties": {
         "messageRetentionInDays": 7,
-        "partitionCount": 1
+        "partitionCount": 1,
+        "status": "Active",
+        "captureDescription": {
+          "enabled": "[parameters('isCaptureEnabled')]",
+          "encoding": "Avro",
+          "destination": {
+            "name": "EventHubArchive.AzureBlockBlob",
+            "properties": {
+              "storageAccountResourceId": "[parameters('storageAccount_capture')]",
+              "blobContainer": "platformevents",
+              "archiveNameFormat": "{Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}"
+            }
+          },
+          "intervalInSeconds": 300,
+          "sizeLimitInBytes": 314572800
+        }
       }
     },
     {
       "apiVersion": "2017-04-01",
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "condition": "[not(empty(parameters('consumerGroupName')))]",
-      "name": "[concat(variables('eventHubNamespaceName'), '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub, '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].consumerGroup)]",
+      "name": "[concat(parameters('projectName'), '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub, '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].consumerGroup)]",
       "location": "[parameters('location')]",
       "copy": {
         "name": "consumerGroupNameLoop",
         "count": "[if(empty(parameters('consumerGroupName')) , 1, length(parameters('consumerGroupName')))]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubNamespaceName'), parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub)]"
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('projectName'))]",
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('projectName'), parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub)]"
       ],
       "properties": {}
     }
