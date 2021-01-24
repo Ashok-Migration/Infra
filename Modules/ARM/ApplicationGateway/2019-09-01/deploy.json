@@ -200,6 +200,13 @@
       "metadata": {
         "description": "Optional. Web Application Firewall File Upload Limit."
       }
+    },
+    "firewallEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Web Application Firewall Enable or Disable."
+      }
     }
   },
   "variables": {
@@ -265,13 +272,23 @@
       "userAssignedIdentities": {
         "[parameters('managedIdentityId')]": {}
       }
+    },
+    "webApplicationFirewallConfiguration": {
+      "enabled": "[parameters('firewallEnabled')]",
+      "firewallMode": "[parameters('firewallMode')]",
+      "ruleSetType": "OWASP",
+      "ruleSetVersion": "3.0",
+      "disabledRuleGroups": [],
+      "exclusions": "[parameters('firewallExclusions')]",
+      "requestBodyCheck": "[parameters('requestBodyCheck')]",
+      "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]"
     }
   },
   "resources": [
     {
       "name": "[parameters('applicationGatewayName')]",
       "type": "Microsoft.Network/applicationGateways",
-      "apiVersion": "2019-09-01",
+      "apiVersion": "2020-05-01",
       "location": "[parameters('location')]",
       "zones": "[parameters('zones')]",
       "dependsOn": [
@@ -326,16 +343,7 @@
           "minCapacity": "[parameters('capacity')]",
           "maxCapacity": "[parameters('autoScaleMaxCapacity')]"
         },
-        "webApplicationFirewallConfiguration": {
-          "enabled": true,
-          "firewallMode": "[parameters('firewallMode')]",
-          "ruleSetType": "OWASP",
-          "ruleSetVersion": "3.0",
-          "disabledRuleGroups": [],
-          "exclusions": "[parameters('firewallExclusions')]",
-          "requestBodyCheck": "[parameters('requestBodyCheck')]",
-          "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]"
-        }
+        "webApplicationFirewallConfiguration": "[if(parameters('firewallEnabled'), variables('webApplicationFirewallConfiguration'), json('null'))]"
       },
       "resources": [
         {
