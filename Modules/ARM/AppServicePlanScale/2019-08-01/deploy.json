@@ -64,6 +64,34 @@
         "description": "The percentage to decrease the instance count when autoscale engine is initiating scale in action."
       }
     },
+    "memoryMetricThresholdToScaleOut": {
+      "type": "Int",
+      "defaultValue": 60,
+      "metadata": {
+        "description": "The metric upper threshold.  If the metric value is above this threshold then autoscale engine will initiate scale out action."
+      }
+    },
+    "memoryMetricThresholdToScaleIn": {
+      "type": "Int",
+      "defaultValue": 20,
+      "metadata": {
+        "description": "The metric lower threshold.  If the metric value is below this threshold then autoscale engine will initiate scale in action."
+      }
+    },
+    "memoryChangePercentScaleOut": {
+      "type": "Int",
+      "defaultValue": 20,
+      "metadata": {
+        "description": "The percentage to increase the instance count when autoscale engine is initiating scale out action."
+      }
+    },
+    "memoryChangePercentScaleIn": {
+      "type": "Int",
+      "defaultValue": 10,
+      "metadata": {
+        "description": "The percentage to decrease the instance count when autoscale engine is initiating scale in action."
+      }
+    },
     "autoscaleEnabled": {
       "type": "Bool",
       "metadata": {
@@ -127,6 +155,48 @@
                   "type": "PercentChangeCount",
                   "value": "[parameters('changePercentScaleIn')]",
                   "cooldown": "PT10M"
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "PercentChangeCount",
+                  "value": "[parameters('memoryChangePercentScaleOut')]",
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "MemoryPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[variables('targetResourceId')]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": "[parameters('memoryMetricThresholdToScaleOut')]",
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT5M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "PercentChangeCount",
+                  "value": "[parameters('memoryChangePercentScaleIn')]",
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "MemoryPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[variables('targetResourceId')]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": "[parameters('memoryMetricThresholdToScaleIn')]",
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
                 }
               }
             ]
