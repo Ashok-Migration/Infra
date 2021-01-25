@@ -119,6 +119,10 @@
       "metadata": {
         "description": "Optional. Switch to lock Key Vault from deletion."
       }
+    },
+    "hostnameConfigurations": {
+      "type": "array",
+      "defaultValue": []
     }
   },
   "variables": {
@@ -167,7 +171,10 @@
           "enabled": true
         }
       }
-    ]
+    ],
+    "identity": {
+      "type": "SystemAssigned"
+    }
   },
   "resources": [
     {
@@ -175,6 +182,7 @@
       "name": "[parameters('apiManagementServiceName')]",
       "type": "Microsoft.ApiManagement/service",
       "location": "[parameters('location')]",
+      "identity": "[variables('identity')]",
       "tags": "[parameters('tags')]",
       "sku": {
         "name": "[parameters('sku')]",
@@ -183,6 +191,7 @@
       "properties": {
         "publisherEmail": "[parameters('publisherEmail')]",
         "publisherName": "[parameters('publisherName')]",
+        "hostnameConfigurations": "[parameters('hostnameConfigurations')]",
         "virtualNetworkType": "[parameters('virtualNetworkType')]",
         "virtualNetworkConfiguration": "[if(equals(parameters('virtualNetworkType'),'Internal'), json(concat('{\"subnetResourceId\": \"', variables('subnetRef'), '\"}')), json('null'))]"
       },
@@ -250,28 +259,6 @@
           }
         }
       ]
-    },
-    {
-      "type": "Microsoft.ApiManagement/service/apis",
-      "apiVersion": "2019-12-01",
-      "name": "[concat(parameters('apiManagementServiceName'), '/echo-api')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementServiceName'))]"
-      ],
-      "properties": {
-        "displayName": "Echo API",
-        "apiRevision": "1",
-        "subscriptionRequired": true,
-        "serviceUrl": "",
-        "path": "echo",
-        "protocols": [
-          "https"
-        ],
-        "isCurrent": true
-      },
-      "identity": {
-        "type": "SystemAssigned"
-      }
     }
   ],
   "functions": [],

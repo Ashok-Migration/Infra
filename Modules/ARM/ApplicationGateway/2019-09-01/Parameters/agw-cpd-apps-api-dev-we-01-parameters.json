@@ -196,15 +196,19 @@
                     "name": "developer-portal-probe",
                     "properties": {
                         "protocol": "Https",
-                        "host": "developer.dev.sqcp.qa",
+                        "host": "api.dev.sqcp.qa",
                         "port": 443,
-                        "path": "/internal-status-0123456789abcdef",
+                        "path": "/status-0123456789abcdef",
                         "interval": 30,
                         "timeout": 60,
                         "unhealthyThreshold": 3,
                         "pickHostNameFromBackendHttpSettings": false,
                         "minServers": 0,
-                        "match": {}
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
                     }
                 }
             ]
@@ -217,13 +221,13 @@
                 {
                     "name": "dev-api-sqcp-httpsvaultCert",
                     "properties": {
-                        "keyVaultSecretId": "https://kv-cpd-glob-npd-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
+                        "keyVaultSecretId": "https://kv-cpd-pltf-dev-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
                     }
                 }
             ]
         },
         "managedIdentityId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-glob-npd-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-glob-npd-we-01"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-dev-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-dev-we-01"
         },
         "tags": {
             "value": {

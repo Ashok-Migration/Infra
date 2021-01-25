@@ -73,7 +73,7 @@
                         "port": 443,
                         "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
-                        "hostName": "apim-cpd-shrd-tst-we-01.azure-api.net",
+                        "hostName": "api.tst.sqcp.qa",
                         "pickHostNameFromBackendAddress": false,
                         "affinityCookieName": "ApplicationGatewayAffinity",
                         "requestTimeout": 120,
@@ -88,7 +88,7 @@
                         "port": 443,
                         "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
-                        "hostName": "apim-cpd-shrd-tst-we-01.developer.azure-api.net",
+                        "hostName": "developer.tst.sqcp.qa",
                         "pickHostNameFromBackendAddress": false,
                         "requestTimeout": 120,
                         "probe": {
@@ -178,7 +178,7 @@
                     "name": "apimprobe",
                     "properties": {
                         "protocol": "Https",
-                        "host": "apim-cpd-shrd-tst-we-01.azure-api.net",
+                        "host": "api.tst.sqcp.qa",
                         "path": "/status-0123456789abcdef",
                         "interval": 30,
                         "timeout": 120,
@@ -196,15 +196,19 @@
                     "name": "developer-portal-probe",
                     "properties": {
                         "protocol": "Https",
-                        "host": "apim-cpd-shrd-tst-we-01.developer.azure-api.net",
+                        "host": "api.tst.sqcp.qa",
                         "port": 443,
-                        "path": "/internal-status-0123456789abcdef",
+                        "path": "/status-0123456789abcdef",
                         "interval": 30,
                         "timeout": 120,
                         "unhealthyThreshold": 3,
                         "pickHostNameFromBackendHttpSettings": false,
                         "minServers": 0,
-                        "match": {}
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
                     }
                 }
             ]
@@ -217,13 +221,13 @@
                 {
                     "name": "tst-api-sqcp-httpsvaultCert",
                     "properties": {
-                        "keyVaultSecretId": "https://kv-cpd-glob-npd-we-01.vault.azure.net/secrets/Test-SQCP-Certificate/"
+                        "keyVaultSecretId": "https://kv-cpd-pltf-tst-we-01.vault.azure.net/secrets/Test-SQCP-Certificate/"
                     }
                 }
             ]
         },
         "managedIdentityId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-glob-npd-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-glob-npd-we-01"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-tst-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-tst-we-01"
         },
         "tags": {
             "value": {
