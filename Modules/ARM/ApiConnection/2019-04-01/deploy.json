@@ -11,6 +11,10 @@
     "api_id": {
       "type": "String"
     },
+    "deploy":{
+      "type": "bool",
+      "defaultValue": true
+    },
     "tags": {
       "defaultValue": {
       },
@@ -24,6 +28,7 @@
   "resources": [
     {
       "type": "Microsoft.Web/connections",
+      "condition": "[parameters('deploy')]",
       "apiVersion": "2016-06-01",
       "name": "[parameters('connection_name')]",
       "location": "westeurope",
