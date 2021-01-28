@@ -168,6 +168,21 @@
             ]
         },
         {
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2018-07-01",
+            "condition": "[not(empty(parameters('blobContainers')))]",
+            "properties": {
+                "deleteRetentionPolicy": {
+                "enabled": true,
+                "days": 30
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('cleanStorageAccountName'))]"
+            ]
+        },
+        {
             "name": "[if(empty(parameters('blobContainers')), concat(variables('cleanStorageAccountName'), '/', 'default/dummy'), concat(variables('cleanStorageAccountName'), '/default/', parameters('blobContainers')[copyIndex('blobContainersLoop')].name))]",
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2018-03-01-preview",
@@ -180,7 +195,11 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('cleanStorageAccountName'))]"
             ],
             "properties": {
-                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]"
+                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]",
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 30
+                }
             }
         }
     ],
