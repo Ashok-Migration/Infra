@@ -15,6 +15,7 @@ The default parameter values are based on the needs of deploying a diagnostic ap
 | `hostingPlanName` | string | | | Required. Name of the Hosting plan for the  App service.
 | `location` | string | `[resourceGroup().location]` | | Optional. Location for all resources.
 | `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
+| `allowedOriginEndpoint` | string |  | Url of allowed origin header to be added for CORS header access.
 
 ### Parameter Usage: `tags`
 
@@ -40,5 +41,5 @@ This is a generic module for deploying a App service. Any customization for diff
 ## Additional resources
 
 - [Introduction to Azure App Service](https://azure.microsoft.com/en-in/services/app-service/)
-- [ARM Template format for •Microsoft.Web/sites](https://docs.microsoft.com/en-us/azure/app-service/samples-resource-manager-templates)
+- [ARM Template format for ï¿½Microsoft.Web/sites](https://docs.microsoft.com/en-us/azure/app-service/samples-resource-manager-templates)
 - [Use tags to organize your Azure resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-using-tags)

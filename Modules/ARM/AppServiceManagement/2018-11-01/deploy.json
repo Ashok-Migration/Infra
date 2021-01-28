@@ -8,6 +8,12 @@
         "hostingPlanId": {
             "type": "String"
         },
+        "allowedOriginEndpoint":{
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the url which need to be added as CORS origin header so that client is able to access this resource."
+            }
+        },
         "diagnosticLogsRetentionInDays": {
             "type": "int",
             "defaultValue": 365,
@@ -150,10 +156,14 @@
         "name": "[parameters('webAppName')]",
         "hostingEnvironment": "",
         "serverFarmId": "[parameters('hostingPlanId')]",
+        "httpsOnly": true,
         "siteConfig": {
           "cors": {
             "allowedOrigins": [
-              "*"
+              "https://qnamaker-service.trafficmanager.net",
+              "https://www.qnamaker.ai",
+              "https://directline.botframework.com",
+              "[parameters('allowedOriginEndpoint')]"
             ]
           }
         }
