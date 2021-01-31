@@ -195,11 +195,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('cleanStorageAccountName'))]"
             ],
             "properties": {
-                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]",
-                "deleteRetentionPolicy": {
-                    "enabled": true,
-                    "days": 30
-                }
+                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]"
             }
         }
     ],
