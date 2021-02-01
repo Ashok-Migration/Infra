@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflowName": {
-      "value": "logic-cpd-apps-route-tra-we-01"
+      "value": "logic-cpd-apps-route-dev-we-01"
     },
     "workflowLocation": {
       "value": "westeurope"
@@ -111,7 +111,7 @@
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['apicon-cpd-apps-intst-tra-we-01']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpd-apps-intst-dev-we-01']['connectionId']"
               }
             },
             "method": "post",
@@ -190,7 +190,7 @@
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-tra-we-01']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-dev-we-01']['connectionId']"
               }
             },
             "method": "post",
@@ -210,38 +210,56 @@
         }
       }
     },
+    "accessControl": {
+      "value": {
+        "triggers": {
+          "allowedCallerIpAddresses": [
+            {
+              "addressRange": "23.97.220.18/32"
+            }
+          ]
+        },
+        "actions": {
+          "allowedCallerIpAddresses": [
+            {
+              "addressRange": "23.97.220.18/32"
+            }
+          ]
+        }
+      }
+    },
     "diagnosticLogsRetentionInDays": {
-        "value": 365
+      "value": 365
     },
     "diagnosticStorageAccountId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagdevwe01"
     },
     "workspaceId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-dev-we-01"
     },
     "eventHubAuthorizationRuleId": {
-        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
     },
     "eventHubName": {
-        "value": "evh-cpd-apps-mon-tra-we-01"
+      "value": "evh-cpd-apps-mon-dev-we-01"
     },
     "tags": {
       "value": {
-        "Environment": "Training"
+        "Environment": "Development"
       }
     },
     "connectionParameters": {
       "value": {
         "$connections": {
           "value": {
-            "apicon-cpd-apps-intsb-tra-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-tra-we-01",
-              "connectionName": "apicon-cpd-apps-intsb-tra-we-01",
+            "apicon-cpd-apps-intsb-dev-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-dev-we-01",
+              "connectionName": "apicon-cpd-apps-intsb-dev-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
             },
-            "apicon-cpd-apps-intst-tra-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intst-tra-we-01",
-              "connectionName": "apicon-cpd-apps-intst-tra-we-01",
+            "apicon-cpd-apps-intst-dev-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intst-dev-we-01",
+              "connectionName": "apicon-cpd-apps-intst-dev-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
             }
           }

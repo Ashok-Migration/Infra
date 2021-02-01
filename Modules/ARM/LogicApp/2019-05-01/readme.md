@@ -2,7 +2,7 @@
 
 This module is used to deploy an Azure Logic App.
 
-This module is the 2016-10-01 version which does not have accessControl by IP parameters. Use the 2019-05-01 module if you need this feature, i.e. when using a HTTP Trigger. 
+This 2019-05-01 version of the Module allows for Access Control - i.e. restricting access to the content, trigger and actions of the Logic App with IP address ranges. 
 
 ## Resources
 
@@ -18,6 +18,7 @@ This module is the 2016-10-01 version which does not have accessControl by IP pa
 | `logicAppState` | string | `Enabled` | | Optional.
 | `definition` | string | | | Optional.
 | `parameters` | object | {} | Complex structure, see below. | Optional.
+| `accessControl` | object | {} | Complex structure, see below. | Optional. The access control to the Logic App based on IP Ranges
 | `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
 
 ### Parameter Usage: `tags`
@@ -33,6 +34,55 @@ Tag names and tag values can be provided as needed. A tag can be left without a 
         "CostCenter": "7890",
         "ServiceName": "DeploymentValidation",
         "Role": "DeploymentValidation"
+    }
+}
+```
+
+### Parameter Usage: `accessControl`
+
+```json
+"accessControl": {
+    "value": {
+        "triggers": {
+            "allowedCallerIpAddresses": [
+                {
+                "addressRange": "XXX.XXX.XXX.XXX-XXX.XXX.XXX.XXX" OR "XXX.XXX.XXX.XXX/XX"
+                }
+            ],
+            "openAuthenticationPolicies": {
+                "policies": {}
+            }
+        },
+        "contents": {
+            "allowedCallerIpAddresses": [
+                {
+                "addressRange": "XXX.XXX.XXX.XXX-XXX.XXX.XXX.XXX" OR "XXX.XXX.XXX.XXX/XX"
+                }
+            ],
+            "openAuthenticationPolicies": {
+                "policies": {}
+            }
+        },
+        "actions": {
+            "allowedCallerIpAddresses": [
+                {
+                "addressRange": "XXX.XXX.XXX.XXX-XXX.XXX.XXX.XXX" OR "XXX.XXX.XXX.XXX/XX"
+                }
+            ],
+            "openAuthenticationPolicies": {
+                "policies": {}
+            }
+        },
+        "workflowManagement": {
+            "allowedCallerIpAddresses": [
+                {
+                "addressRange": "XXX.XXX.XXX.XXX-XXX.XXX.XXX.XXX" OR "XXX.XXX.XXX.XXX/XX"
+                }
+            ],
+            "openAuthenticationPolicies": {
+                "policies": {}
+            }
+        }
     }
 }
 ```
