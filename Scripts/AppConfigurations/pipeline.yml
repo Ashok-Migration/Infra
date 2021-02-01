@@ -45,6 +45,12 @@ stages:
         value: "aks-cpd-apps-sbx-we-01"
       - name: env
         value: "sbx"
+      - name: botApiName
+        value: "app-cpd-apps-bot-sbx-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpd-apps-qnasync-sbx-we-01"
+      - name: luisTraFuncName
+        value: "func-cpd-apps-luistra-sbx-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for sbx
@@ -55,6 +61,8 @@ stages:
               steps:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
+                - template: restart-appservice.yml
+                    
   - stage: Dev
     displayName: Update App Configurations for dev
     dependsOn: PublishArtifacts
@@ -67,6 +75,12 @@ stages:
         value: "aks-cpd-apps-dev-we-01"
       - name: env
         value: "dev"
+      - name: botApiName
+        value: "app-cpd-apps-bot-dev-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpd-apps-qnasync-dev-we-01"
+      - name: luisTraFuncName
+        value: "func-cpd-apps-luistra-dev-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for dev
@@ -77,6 +91,7 @@ stages:
               steps:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
+                - template: restart-appservice.yml
   - stage: Tst
     displayName: Update App Configurations for tst
     dependsOn: Dev
@@ -89,6 +104,12 @@ stages:
         value: "aks-cpd-apps-tst-we-01"
       - name: env
         value: "tst"
+      - name: botApiName
+        value: "app-cpd-apps-bot-tst-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpd-apps-qnasync-tst-we-01"
+      - name: luisTraFuncName
+        value: "func-cpd-apps-luistra-tst-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for tst
@@ -99,6 +120,7 @@ stages:
               steps:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
+                - template: restart-appservice.yml
 
   - stage: uat
     displayName: Update App Configurations for uat
@@ -112,6 +134,12 @@ stages:
         value: "aks-cpd-apps-uat-we-01"
       - name: env
         value: "uat"
+      - name: botApiName
+        value: "app-cpd-apps-bot-uat-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpd-apps-qnasync-uat-we-01"
+      - name: luisTraFuncName
+        value: "func-cpd-apps-luistra-uat-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for uat
@@ -122,3 +150,4 @@ stages:
               steps:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
+                - template: restart-appservice.yml

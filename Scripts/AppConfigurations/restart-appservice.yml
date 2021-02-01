@@ -1,0 +1,22 @@
+steps:
+
+  - task: AzureAppServiceManage@0
+    displayName: Restart Bot api
+    inputs:
+      azureSubscription: $(azureSubscription)
+      action: 'Restart Azure App Service'
+      webAppName: $(botApiName)
+      
+  - task: AzureAppServiceManage@0
+    displayName: Restart function app qnasync
+    inputs:
+      azureSubscription: $(azureSubscription)
+      action: 'Restart Azure App Service'
+      webAppName: $(qnaSyncFuncName)
+      
+  - task: AzureAppServiceManage@0
+    displayName: Restart function app luistra
+    inputs:
+      azureSubscription: $(azureSubscription)
+      action: 'Restart Azure App Service'
+      webAppName: $(luisTraFuncName)
