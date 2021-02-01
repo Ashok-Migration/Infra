@@ -108,6 +108,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
             $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
             .$psfilecreatesitecolumnscript @paramsSiteColumn
             Connect-PnPOnline -Url $globalconfigSiteUrl -Credentials $tenantAdmin
+            Set-PnPTenantSite -Url $globalconfigSiteUrl -SharingCapability ExternalUserSharingOnly
             Add-ListAndLibrary $globalconfigSiteUrl $sitefile.sites.ConfigurationSPList
             Edit-SiteColumns $globalconfigSiteUrl $sitefile.sites.updateSiteColumns.configChange $tenantAdmin
             Add-UniquePermission $sitefile.sites.UniquePermissions.List $globalconfigSiteUrl
@@ -147,6 +148,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
             $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
             .$psfilecreatesitecolumnscript @paramsSiteColumn
             Connect-PnPOnline -Url $globalhubSiteUrl -Credentials $tenantAdmin
+            Set-PnPTenantSite -Url $globalhubSiteUrl -SharingCapability ExternalUserSharingOnly
             Add-ListAndLibrary $globalhubSiteUrl $sitefile.sites.globalSPList
             Add-FieldsAndListProductDocuments($globalhubSiteUrl)
             Edit-SiteColumns $globalhubSiteUrl $sitefile.sites.updateSiteColumns.globalChange $tenantAdmin
@@ -221,6 +223,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
                 .$psfilecreatesitecolumnscript @paramsSiteColumn
 
                 Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
+                Set-PnPTenantSite -Url $sectorhubSiteUrl -SharingCapability ExternalUserSharingOnly
                 ####Register the created Site as Hub Site
                 try {
                     Register-PnPHubSite -Site $sectorhubSiteUrl

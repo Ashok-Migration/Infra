@@ -119,6 +119,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
                 .$psfilecreatesitecolumnscript @paramsSiteColumn
 
                 Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
+                Set-PnPTenantSite -Url $sectorhubSiteUrl -SharingCapability ExternalUserSharingOnly
                 ####Register the created Site as Hub Site
                 try {
                     Register-PnPHubSite -Site $sectorhubSiteUrl

@@ -240,6 +240,7 @@ function ProvisionSiteComponents {
                     $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
                     .$psfilecreatesitecolumnscript @paramsSiteColumn
                     Connect-PnPOnline -Url $entitySiteUrl -Credentials $tenantAdmin
+                    Set-PnPTenantSite -Url $entitySiteUrl -SharingCapability ExternalUserSharingOnly
                     #Register the created Team Site as Associated Site for SectorHubSite
                     Add-PnPHubSiteAssociation -Site $entitySiteUrl -HubSite $sectorhubSiteUrl
                     EnableMegaMenu $entitySiteUrl
