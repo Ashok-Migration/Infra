@@ -63,7 +63,7 @@
     "defaultFallbackRegion": "[variables('cloudEnvironmentSettings')[parameters('cloudEnvironment')].defaultFallbackRegion]",
     "nonDefaultRegionList": "[variables('cloudEnvironmentSettings')[parameters('cloudEnvironment')].nonDefaultRegionList]",
     "workspaceRegion": "[if(contains(variables('logAnalyticsNormalizedLocationsString'), variables('normalizedLocation')), variables('normalizedLocation'), if(contains(variables('nonDefaultRegionList'), variables('normalizedLocation')), variables('nonDefaultFallbackRegion'), variables('defaultFallbackRegion')))]",
-    "consumerGroupName": "smartparkingtelemetry"
+    "consumerGroupName": "[concat(parameters('hubname'),'/events/smartparkingtelemetry')]"
   },
   "resources": [
     {
@@ -123,7 +123,10 @@
     {
       "type": "Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups",
       "apiVersion": "2020-03-01",
-      "name": "[variables('consumerGroupName')]"
+      "name": "[variables('consumerGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+      ]
     }
   ],
   "functions": [],
