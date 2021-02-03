@@ -212,9 +212,8 @@ function ProvisionSiteComponents {
       $connection = Get-PnPConnection
 
       $sectorhubSiteUrl = $urlprefix + $sectorhubsite.Alias
-                   
       $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -ErrorAction SilentlyContinue
-           
+      $themeSector = $sectorhubsite.Theme  
       if ([bool] ($siteExits) -eq $true) {
                
         Add-CustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
@@ -227,9 +226,7 @@ function ProvisionSiteComponents {
         $connection = Get-PnPConnection
 
         $entitySiteUrl = $urlprefix + $entityassociatedsite.Alias
-                   
         $siteExits = Get-PnPTenantSite -Url $entitySiteUrl -ErrorAction SilentlyContinue
-                    
         if ([bool] ($siteExits) -eq $true) {
                    
           Write-Host "site exists, starting creation of other components. $entitySiteUrl" -ForegroundColor Green
@@ -246,7 +243,7 @@ function ProvisionSiteComponents {
           Add-GroupAndUsers $entitySiteUrl $sitefile.sites.entitySPGroup $entityassociatedsite.Title
           Set-GroupViewSettings -SiteURL $entitySiteUrl -tenantAdmin -Groups $sitefile.sites.entitySPGroup
           Add-UsersToDefaultSharePointGroup $entitySiteUrl $sitefile.sites.entitySPGroup $entityassociatedsite.Title
-          Add-Theme $sitefile.sites.entitytheme.Name $entitySiteUrl $tenantAdmin $tenantUrl
+          Add-Theme $themeSector $entitySiteUrl $tenantAdmin $tenantUrl
           New-ModernPage $entitySiteUrl $sitefile.sites.entityPageWebpart
           New-WebPartToPage $entitySiteUrl $sitefile.sites.entityPageWebpart
           Edit-RegionalSettings $entitySiteUrl $tenantAdmin
@@ -2361,42 +2358,42 @@ function AddPnPNavigationNode($Title, $Url, $Parent) {
 #region Apply theme block
 
 function Add-Theme($themeName, $url, $tenantAdmin, $tenantUrl) {
-        
-  $themeSector = @{
-    "themePrimary"         = "#009cad";
-    "themeLighterAlt"      = "#f2fbfc";
-    "themeLighter"         = "#cbeef2";
-    "themeLight"           = "#a1e0e7";
-    "themeTertiary"        = "#52c2ce";
-    "themeSecondary"       = "#16a7b7";
-    "themeDarkAlt"         = "#008c9c";
-    "themeDark"            = "#007784";
-    "themeDarker"          = "#005761";
-    "neutralLighterAlt"    = "#faf9f8";
-    "neutralLighter"       = "#f3f2f1";
-    "neutralLight"         = "#edebe9";
-    "neutralQuaternaryAlt" = "#e1dfdd";
-    "neutralQuaternary"    = "#d0d0d0";
-    "neutralTertiaryAlt"   = "#c8c6c4";
-    "neutralTertiary"      = "#c2c2c2";
-    "neutralSecondary"     = "#858585";
-    "neutralPrimaryAlt"    = "#4b4b4b";
-    "neutralPrimary"       = "#333333";
-    "neutralDark"          = "#272727";
-    "black"                = "#1d1d1d";
-    "white"                = "#ffffff";
+  $themefilePath = $PSScriptRoot + '\resources\Themes.xml'
+  [xml]$themefile = Get-Content -Path $themefilePath
+  $themeToApply = $themefile.themes.$themeName
+  
+  $theme = @{
+    "themePrimary" = $themeToApply.themePrimary;
+    "themeLighterAlt" = $themeToApply.themeLighterAlt;
+    "themeLighter" = $themeToApply.themeLighter;
+    "themeLight" = $themeToApply.themeLight;
+    "themeTertiary" = $themeToApply.themeTertiary;
+    "themeSecondary" = $themeToApply.themeSecondary;
+    "themeDarkAlt" = $themeToApply.themeDarkAlt;
+    "themeDark" = $themeToApply.themeDark;
+    "themeDarker" = $themeToApply.themeDarker;
+    "neutralLighterAlt" = $themeToApply.neutralLighterAlt;
+    "neutralLighter" = $themeToApply.neutralLighter;
+    "neutralLight" = $themeToApply.neutralLight;
+    "neutralQuaternaryAlt" = $themeToApply.neutralQuaternaryAlt;
+    "neutralQuaternary" = $themeToApply.neutralQuaternary;
+    "neutralTertiaryAlt" = $themeToApply.neutralTertiaryAlt;
+    "neutralTertiary" = $themeToApply.neutralTertiary;
+    "neutralSecondary" = $themeToApply.neutralSecondary;
+    "neutralPrimaryAlt" = $themeToApply.neutralPrimaryAlt;
+    "neutralPrimary" = $themeToApply.neutralPrimary;
+    "neutralDark" = $themeToApply.neutralDark;
+    "black" = $themeToApply.black;
+    "white" = $themeToApply.white;
   }
-
   try {
     $client.TrackEvent("Started applying themes")
-    if ($themeName -eq "TASMU Sector") {
       try {
         Add-ThemeToSiteCollection $themeName $url $tenantAdmin
       }
       catch {
-        Add-ThemeAndApply $themeName $tenantUrl $url $tenantAdmin $themeSector
+        Add-ThemeAndApply $themeName $tenantUrl $url $tenantAdmin $theme
       }
-    } 
     $client.TrackEvent("Themes applied successfully.")
   }
   catch {

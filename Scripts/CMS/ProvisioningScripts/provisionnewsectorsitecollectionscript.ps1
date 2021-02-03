@@ -111,37 +111,37 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       $sectorhubSiteUrl = $urlprefix + $sectorhubsite.Alias
       Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
       $siteExits = Get-PnPTenantSite -Url $sectorhubSiteUrl -Connection $connection -ErrorAction SilentlyContinue
-           
+      $themeSector = $sectorhubsite.Theme     
       if ([bool] ($siteExits) -eq $true) {
         Write-Host "site exists, starting creation of other components. $sectorhubSiteUrl" -ForegroundColor Green
         $paramsSiteColumn = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; contenttypehub = $sectorhubSiteUrl }
         $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
         .$psfilecreatesitecolumnscript @paramsSiteColumn
 
-        Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
-        Set-PnPTenantSite -Url $sectorhubSiteUrl -SharingCapability ExternalUserSharingOnly
-        ####Register the created Site as Hub Site
-        try {
-          Register-PnPHubSite -Site $sectorhubSiteUrl
-        }
-        catch {
-          $ErrorMessage = $_.Exception.Message
-          Write-Host $ErrorMessage -ForegroundColor Yellow
-        }
-        EnableMegaMenu $sectorhubSiteUrl
-        Add-ListAndLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
-        Edit-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
-        Add-GroupAndUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
-        Add-UsersToDefaultSharePointGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
-        Add-UniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
-        Add-Theme $sitefile.sites.sectortheme.Name $sectorhubSiteUrl $tenantAdmin $tenantUrl
-        New-ModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart 
-        New-WebPartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
-        Edit-RegionalSettings $sectorhubSiteUrl $tenantAdmin
-        Edit-ViewForTasksList 'My Tasks' $sectorhubSiteUrl
-        New-SiteCollectionAppCatalog $sectorhubSiteUrl
-        New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
-        New-SitePage $sectorhubSiteUrl 'MyTasks' $tenantAdmin
+                Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
+                Set-PnPTenantSite -Url $sectorhubSiteUrl -SharingCapability ExternalUserSharingOnly
+                ####Register the created Site as Hub Site
+                try {
+                    Register-PnPHubSite -Site $sectorhubSiteUrl
+                }
+                catch {
+                    $ErrorMessage = $_.Exception.Message
+                    Write-Host $ErrorMessage -ForegroundColor Yellow
+                }
+                EnableMegaMenu $sectorhubSiteUrl
+                Add-ListAndLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
+                Edit-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
+                Add-GroupAndUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+                Add-UsersToDefaultSharePointGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+                Add-UniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
+                Add-Theme $themeSector $sectorhubSiteUrl $tenantAdmin $tenantUrl
+                New-ModernPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart 
+                New-WebPartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
+                Edit-RegionalSettings $sectorhubSiteUrl $tenantAdmin
+                Edit-ViewForTasksList 'My Tasks' $sectorhubSiteUrl
+                New-SiteCollectionAppCatalog $sectorhubSiteUrl
+                New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
+                New-SitePage $sectorhubSiteUrl 'MyTasks' $tenantAdmin
 				
         #region my Task web part
         $componentName = "MyTasks"
@@ -703,42 +703,42 @@ function AddPnPNavigationNode($Title, $Url, $Parent) {
 #region Apply theme block
 
 function Add-Theme($themeName, $url, $tenantAdmin, $tenantUrl) {
-		
-  $themeSector = @{
-    "themePrimary"         = "#009cad";
-    "themeLighterAlt"      = "#f2fbfc";
-    "themeLighter"         = "#cbeef2";
-    "themeLight"           = "#a1e0e7";
-    "themeTertiary"        = "#52c2ce";
-    "themeSecondary"       = "#16a7b7";
-    "themeDarkAlt"         = "#008c9c";
-    "themeDark"            = "#007784";
-    "themeDarker"          = "#005761";
-    "neutralLighterAlt"    = "#faf9f8";
-    "neutralLighter"       = "#f3f2f1";
-    "neutralLight"         = "#edebe9";
-    "neutralQuaternaryAlt" = "#e1dfdd";
-    "neutralQuaternary"    = "#d0d0d0";
-    "neutralTertiaryAlt"   = "#c8c6c4";
-    "neutralTertiary"      = "#c2c2c2";
-    "neutralSecondary"     = "#858585";
-    "neutralPrimaryAlt"    = "#4b4b4b";
-    "neutralPrimary"       = "#333333";
-    "neutralDark"          = "#272727";
-    "black"                = "#1d1d1d";
-    "white"                = "#ffffff";
+  $themefilePath = $PSScriptRoot + '\resources\Themes.xml'
+  [xml]$themefile = Get-Content -Path $themefilePath
+  $themeToApply = $themefile.themes.$themeName
+  
+  $theme = @{
+    "themePrimary" = $themeToApply.themePrimary;
+    "themeLighterAlt" = $themeToApply.themeLighterAlt;
+    "themeLighter" = $themeToApply.themeLighter;
+    "themeLight" = $themeToApply.themeLight;
+    "themeTertiary" = $themeToApply.themeTertiary;
+    "themeSecondary" = $themeToApply.themeSecondary;
+    "themeDarkAlt" = $themeToApply.themeDarkAlt;
+    "themeDark" = $themeToApply.themeDark;
+    "themeDarker" = $themeToApply.themeDarker;
+    "neutralLighterAlt" = $themeToApply.neutralLighterAlt;
+    "neutralLighter" = $themeToApply.neutralLighter;
+    "neutralLight" = $themeToApply.neutralLight;
+    "neutralQuaternaryAlt" = $themeToApply.neutralQuaternaryAlt;
+    "neutralQuaternary" = $themeToApply.neutralQuaternary;
+    "neutralTertiaryAlt" = $themeToApply.neutralTertiaryAlt;
+    "neutralTertiary" = $themeToApply.neutralTertiary;
+    "neutralSecondary" = $themeToApply.neutralSecondary;
+    "neutralPrimaryAlt" = $themeToApply.neutralPrimaryAlt;
+    "neutralPrimary" = $themeToApply.neutralPrimary;
+    "neutralDark" = $themeToApply.neutralDark;
+    "black" = $themeToApply.black;
+    "white" = $themeToApply.white;
   }
-
   try {
     $client.TrackEvent("Started applying themes")
-    if ($themeName -eq "TASMU Sector") {
       try {
         Add-ThemeToSiteCollection $themeName $url $tenantAdmin
       }
       catch {
-        Add-ThemeAndApply $themeName $tenantUrl $url $tenantAdmin $themeSector
+        Add-ThemeAndApply $themeName $tenantUrl $url $tenantAdmin $theme
       }
-    } 
     $client.TrackEvent("Themes applied successfully.")
   }
   catch {
@@ -2448,46 +2448,46 @@ function Add-SiteCollectionAdmins {
 }
 
 function Set-GroupViewSettings {
-  param (
-    $SiteURL,
-    $tenantAdmin,
-    $Groups
-  )
+    param (
+      $SiteURL,
+      $tenantAdmin,
+      $Groups
+    )
  
-  try {
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
-    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+    try {
+        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+        Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
-    $admin = $tenantAdmin.UserName
-    $password = $tenantAdmin.Password
-    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+        $admin = $tenantAdmin.UserName
+        $password = $tenantAdmin.Password
+        $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
   
-    #Setup the context
-    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
-    $Ctx.Credentials = $credentials
+        #Setup the context
+        $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+        $Ctx.Credentials = $credentials
  
-    foreach ($SPGroup in $Groups.group) {
-      #Get the Group
-      $Group = $Ctx.web.SiteGroups.GetByName($SPGroup.Name)
-      $Ctx.Load($Group)
-      $Ctx.ExecuteQuery()
+        foreach ($SPGroup in $Groups.group) {
+            #Get the Group
+            $Group = $Ctx.web.SiteGroups.GetByName($SPGroup.Name)
+            $Ctx.Load($Group)
+            $Ctx.ExecuteQuery()
  
-      #Set Group settings: Who can view the membership of the group? Everyone
-      $Group.OnlyAllowMembersViewMembership = $False
-      $Group.Update()
-      $Ctx.ExecuteQuery()
+            #Set Group settings: Who can view the membership of the group? Everyone
+            $Group.OnlyAllowMembersViewMembership = $False
+            $Group.Update()
+            $Ctx.ExecuteQuery()
  
-      Write-host "Group Settings Updated for the group " $SPGroup.Name -ForegroundColor Green
+            Write-host "Group Settings Updated for the group " $SPGroup.Name -ForegroundColor Green
+        }
+    }
+    catch {
+        $ErrorMessage = $_.Exception.Message
+        Write-Host $ErrorMessage -foreground Red
+
+        $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+        $telemtryException.Exception = $_.Exception.Message  
+        $client.TrackException($telemtryException)
     }
   }
-  catch {
-    $ErrorMessage = $_.Exception.Message
-    Write-Host $ErrorMessage -foreground Red
-
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
-  }
-}
 
 Add-ComponentsForSites
