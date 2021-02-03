@@ -29,36 +29,36 @@ Date:       Version: Changed By:         Info:
 #>
 [CmdletBinding()]
 param (
-    $tenant, # Enter the tenant name
-    $TemplateParametersFile,
-    $sp_user,
-    $sp_password,
-    $InstrumentationKey,
-    $fedAuth,
-    $rtFA
+  $tenant, # Enter the tenant name
+  $TemplateParametersFile,
+  $sp_user,
+  $sp_password,
+  $InstrumentationKey,
+  $fedAuth,
+  $rtFA
 )
 
 function Initialize() {
-    $contenttypehub = "https://$tenant.sharepoint.com/sites/contenttypehub"
-    $secstr = New-Object -TypeName System.Security.SecureString
-    $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
-    $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
+  $contenttypehub = "https://$tenant.sharepoint.com/sites/contenttypehub"
+  $secstr = New-Object -TypeName System.Security.SecureString
+  $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
+  $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
 
-    $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
-    $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
-    if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
-        $JsonParameters = $JsonParameters.parameters
-        $RoleName = $JsonParameters.RoleName.value
-    }
+  $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
+  $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
+  if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
+    $JsonParameters = $JsonParameters.parameters
+    $RoleName = $JsonParameters.RoleName.value
+  }
 
-    Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
-    $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
-    $client.InstrumentationKey = $InstrumentationKey 
-    if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
-        $client.Context.Cloud.RoleName = $RoleName
-    }
+  Add-Type -Path (Resolve-Path $PSScriptRoot'.\Assemblies\Microsoft.ApplicationInsights.dll')
+  $client = New-Object Microsoft.ApplicationInsights.TelemetryClient  
+  $client.InstrumentationKey = $InstrumentationKey 
+  if (($null -ne $client.Context) -and ($null -ne $client.Context.Cloud)) {
+    $client.Context.Cloud.RoleName = $RoleName
+  }
 
-    Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
+  Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
 }
 
 Initialize
@@ -88,13 +88,13 @@ $fields = $form.Fields
 
 $body = New-Object 'system.collections.generic.dictionary[[string],[object]]'
 $fields.keys | ForEach-Object {
-    $key = $_
-    $value = $fields[$_]
-    if ($key -match "ctl00_ctl00_PlaceHolderContentArea_PlaceHolderMain_sharedAppId") {
-        $global:uid = $value
-    }
+  $key = $_
+  $value = $fields[$_]
+  if ($key -match "ctl00_ctl00_PlaceHolderContentArea_PlaceHolderMain_sharedAppId") {
+    $global:uid = $value
+  }
 
-    $body[$key] = $value
+  $body[$key] = $value
 }
 
 $body['ctl00$ctl00$PlaceHolderContentArea$PlaceHolderMain$adminPicker$hiddenSpanData'] = $sp_user
