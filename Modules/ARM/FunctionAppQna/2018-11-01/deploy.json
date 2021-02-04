@@ -115,60 +115,61 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [],
-            "properties": {
-                "name": "[parameters('functionAppName')]",
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "AppConfig",
-                            "value": "[parameters('appConfigEndpoint')]"
-                        },
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
-                        },
-                        {
-                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').ConnectionString]"
-                        },
-                        {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
-                        },
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        },
-                      {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "[parameters('runtimeValue')]"
-                        },
-                        {
-                            "name": "ServiceBusConnectionString",
-                            "value": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('serviceBusSecretUri'),')')]"
-                        },
-                        {
-                            "name": "TimeInterval",
-                            "value": "0 0 */12 * * *"
-                        },
-                        {
-                            "name": "RefreshInterval",
-                            "value": "0 0 0 * * *"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(parameters('functionAppName'))]"
-                        }
-                    ],
-                    "alwaysOn": "[parameters('alwaysOn')]"
+          "properties": {
+            "name": "[parameters('functionAppName')]",
+            "httpsOnly": true,
+            "siteConfig": {
+              "appSettings": [
+                {
+                  "name": "AppConfig",
+                  "value": "[parameters('appConfigEndpoint')]"
                 },
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-                "clientAffinityEnabled": true
+                {
+                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                  "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
+                },
+                {
+                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                  "value": "[reference(parameters('appInsightsResourceId'), '2015-05-01').ConnectionString]"
+                },
+                {
+                  "name": "AzureWebJobsStorage",
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                },
+                {
+                  "name": "FUNCTIONS_EXTENSION_VERSION",
+                  "value": "~3"
+                },
+                {
+                  "name": "FUNCTIONS_WORKER_RUNTIME",
+                  "value": "[parameters('runtimeValue')]"
+                },
+                {
+                  "name": "ServiceBusConnectionString",
+                  "value": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('serviceBusSecretUri'),')')]"
+                },
+                {
+                  "name": "TimeInterval",
+                  "value": "0 0 */12 * * *"
+                },
+                {
+                  "name": "RefreshInterval",
+                  "value": "0 0 0 * * *"
+                },
+                {
+                  "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', listKeys(resourceId(parameters('storageResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                },
+                {
+                  "name": "WEBSITE_CONTENTSHARE",
+                  "value": "[toLower(parameters('functionAppName'))]"
+                }
+              ],
+              "alwaysOn": "[parameters('alwaysOn')]"
             },
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+            "clientAffinityEnabled": true
+          },
             "resources": [
                 {
                     "type": "Microsoft.Web/sites/providers/diagnosticsettings",
