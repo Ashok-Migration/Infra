@@ -1,287 +1,286 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "networkSecurityGroupName": {
-        "value": "nsg-cpd-data-daisvcs-tra-we-01"
-      },
-      "networkSecurityGroupSecurityRules": {
-        "value": [
-          {
-            "name": "AzureDataExplorerManagement",
-            "properties": {
-              "description": "AzureDataExplorerManagement",
-              "protocol": "TCP",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "AzureDataExplorerManagement",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 1000,
-              "direction": "Inbound",
-              "destinationPortRanges": [],
-              "destinationApplicationSecurityGroups": [],
-              "sourceApplicationSecurityGroups": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": [],
-              "sourcePortRanges": []
-            }
-          },
-          {
-            "name": "ADXHealthMonitoring",
-            "properties": {
-              "description": "ADXHealthMonitoring",
-              "protocol": "TCP",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "213.199.136.176",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 1010,
-              "direction": "Inbound",
-              "destinationPortRanges": [],
-              "destinationApplicationSecurityGroups": [],
-              "sourceApplicationSecurityGroups": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": [],
-              "sourcePortRanges": []
-            }
-          },
-          {
-            "name": "ADXHealthMonitoring2",
-            "properties": {
-              "description": "ADXHealthMonitoring",
-              "protocol": "TCP",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "23.97.212.5",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 1011,
-              "direction": "Inbound",
-              "destinationPortRanges": [],
-              "destinationApplicationSecurityGroups": [],
-              "sourceApplicationSecurityGroups": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": [],
-              "sourcePortRanges": []
-            },
-            {
-              "name": "Storage",
-              "properties": {
-                "description": "Storage",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "Storage",
-                "access": "Allow",
-                "priority": 1000,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "AzureDataLake",
-              "properties": {
-                "description": "AzureDataLake",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "AzureDataLake",
-                "access": "Allow",
-                "priority": 1010,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "EventHub",
-              "properties": {
-                "description": "EventHub",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "EventHub",
-                "access": "Allow",
-                "priority": 1020,
-                "direction": "Outbound",
-                "destinationPortRanges": [
-                  "443",
-                  "5671"
-                ],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "AzureMonitor",
-              "properties": {
-                "description": "AzureMonitor",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "AzureMonitor",
-                "access": "Allow",
-                "priority": 1030,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "ADXMonitorConfiguration",
-              "properties": {
-                "description": "ADXMonitorConfiguration",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "52.174.4.112",
-                "access": "Allow",
-                "priority": 1040,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "AzureActiveDirectory",
-              "properties": {
-                "description": "AzureActiveDirectory",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "AzureActiveDirectory",
-                "access": "Allow",
-                "priority": 1050,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "Certificate_authority",
-              "properties": {
-                "description": "Certificate_authority",
-                "protocol": "TCP",
-                "sourcePortRange": "*",
-                "destinationPortRange": "80",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "Internet",
-                "access": "Allow",
-                "priority": 1060,
-                "direction": "Outbound",
-                "destinationPortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": [],
-                "sourcePortRanges": []
-              }
-            },
-            {
-              "name": "DataFactoryManagement_443",
-              "properties": {
-                "description": "DataFactoryManagement_443",
-                "protocol": "*",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "DataFactoryManagement",
-                "destinationAddressPrefix": "*",
-                "access": "Allow",
-                "priority": 1040,
-                "direction": "Inbound",
-                "sourcePortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "destinationPortRanges": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": []
-              }
-            },
-            {
-              "name": "DataFactory_443",
-              "properties": {
-                "description": "DataFactory_443",
-                "protocol": "*",
-                "sourcePortRange": "*",
-                "destinationPortRange": "443",
-                "sourceAddressPrefix": "DataFactory",
-                "destinationAddressPrefix": "*",
-                "access": "Allow",
-                "priority": 1050,
-                "direction": "Inbound",
-                "sourcePortRanges": [],
-                "destinationApplicationSecurityGroups": [],
-                "sourceApplicationSecurityGroups": [],
-                "destinationPortRanges": [],
-                "sourceAddressPrefixes": [],
-                "destinationAddressPrefixes": []
-              }
-            }
-      ]
-      },
-      "flowLogsDeloy": {
-        "value": true
-      },
-      "flowLogsEnabled": {
-        "value": true
-      },
-      "flowLogStorageAccountRGName": {
-        "value": "rg-cpd-pltf-mon-npd-we-01"
-      },
-      "flowLogStorageAccountName": {
-        "value": "stcpdpltfnsgflnpdwe01"
-      },
-      "workspaceRGName":      {
-          "value": "rg-cpd-pltf-mon-npd-we-01"  
-      },
-      "workspaceName":      {
-          "value": "log-cpd-pltf-npd-we-01"
-      },
-      "NSGFlowsubscriptionid": {
-          "value": "d0694def-b27e-4bb7-900d-437fbeb802da"
-      },
-      "diagnosticLogsRetentionInDays": 
-      {
-        "value": 365
-      },
-      "lockForDeletion": {
-        "value": false
-      },
-      "tags": {
-        "value": {
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-cpd-data-daisvcs-tra-we-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "AzureDataExplorerManagement",
+          "properties": {
+            "description": "AzureDataExplorerManagement",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "AzureDataExplorerManagement",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 1000,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "ADXHealthMonitoring",
+          "properties": {
+            "description": "ADXHealthMonitoring",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "213.199.136.176",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 1010,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "ADXHealthMonitoring2",
+          "properties": {
+            "description": "ADXHealthMonitoring",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "23.97.212.5",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 1011,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Storage",
+          "properties": {
+            "description": "Storage",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "Storage",
+            "access": "Allow",
+            "priority": 1000,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureDataLake",
+          "properties": {
+            "description": "AzureDataLake",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "AzureDataLake",
+            "access": "Allow",
+            "priority": 1010,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "EventHub",
+          "properties": {
+            "description": "EventHub",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "EventHub",
+            "access": "Allow",
+            "priority": 1020,
+            "direction": "Outbound",
+            "destinationPortRanges": [
+              "443",
+              "5671"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureMonitor",
+          "properties": {
+            "description": "AzureMonitor",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "AzureMonitor",
+            "access": "Allow",
+            "priority": 1030,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "ADXMonitorConfiguration",
+          "properties": {
+            "description": "ADXMonitorConfiguration",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "52.174.4.112",
+            "access": "Allow",
+            "priority": 1040,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureActiveDirectory",
+          "properties": {
+            "description": "AzureActiveDirectory",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "AzureActiveDirectory",
+            "access": "Allow",
+            "priority": 1050,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Certificate_authority",
+          "properties": {
+            "description": "Certificate_authority",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "destinationPortRange": "80",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "Internet",
+            "access": "Allow",
+            "priority": 1060,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "DataFactoryManagement_443",
+          "properties": {
+            "description": "DataFactoryManagement_443",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "DataFactoryManagement",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 1040,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "DataFactory_443",
+          "properties": {
+            "description": "DataFactory_443",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "DataFactory",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 1050,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
         }
-      }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cpd-pltf-mon-npd-we-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcpdpltfnsgflnpdwe01"
+    },
+    "workspaceRGName": {
+      "value": "rg-cpd-pltf-mon-npd-we-01"
+    },
+    "workspaceName": {
+      "value": "log-cpd-pltf-npd-we-01"
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "d0694def-b27e-4bb7-900d-437fbeb802da"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {}
     }
   }
+}
