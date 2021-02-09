@@ -26,7 +26,7 @@ export default class SectorCustomStyleApplicationCustomizer
     // check for entity
     var entityCheck = siteName.split("-");
     if (entityCheck.length == 4) {
-      var sectorSiteName = entityCheck[1] + "-" + entityCheck[2] + "-" + entityCheck[3];
+      var sectorSiteName = entityCheck[0] + "-" + entityCheck[1] + "-" + entityCheck[2];
       cssUrl = "/Style%20Library/" + sectorSiteName + "-customstyle.css";
     }
 

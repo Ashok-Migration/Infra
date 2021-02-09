@@ -1627,8 +1627,13 @@ function New-View($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
     if ([bool]($viewExists) -eq $false) {
       Write-Host "View not found ,so creating a new View in $listNameForView"  -ForegroundColor Green
       $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
-      $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
 
+      if($ListTemplate -eq 'PictureLibrary')  {
+        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -ViewType Grid -SetAsDefault -ErrorAction Stop
+      }
+      else  {
+        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
+      }
       #delete the LinkTitle from default view
       Edit-FieldsToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
     }
