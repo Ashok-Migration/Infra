@@ -54,7 +54,7 @@
         "backendAddressPools": {
             "value": [
                 {
-                    "name": "agw-ingress",
+                    "name": "agw-cpd-apps-aks-uat-we-01",
                     "properties": {
                         "backendAddresses": [
                             {
@@ -77,7 +77,7 @@
                         "affinityCookieName": "ApplicationGatewayAffinity",
                         "requestTimeout": 120,
                         "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/agw-ingress-probe"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/marketplace-portal-probe"
                         }
                     }
                 },
@@ -92,7 +92,7 @@
                         "path": "/eservices/",
                         "requestTimeout": 120,
                         "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/agw-ingress-probe"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/mytasmu-portal-probe"
                         }
                     }
                 },
@@ -107,7 +107,7 @@
                         "path": "/adminportal/",
                         "requestTimeout": 120,
                         "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/agw-ingress-probe"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/cpadmin-portal-probe"
                         }
                     }
                 },
@@ -121,7 +121,7 @@
                         "path": "/account/",
                         "requestTimeout": 120,
                         "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/agw-ingress-probe"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/account-portal-probe"
                         }
                     }
                 }
@@ -270,11 +270,65 @@
         "probes": {
             "value": [
                 {
-                    "name": "agw-ingress-probe",
+                    "name": "mytasmu-portal-probe",
                     "properties": {
                         "protocol": "Http",
                         "host": "172.20.74.4",
-                        "path": "/config/api/feature",
+                        "path": "/eservices/",
+                        "interval": 30,
+                        "timeout": 120,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "account-portal-probe",
+                    "properties": {
+                        "protocol": "Http",
+                        "host": "172.20.74.4",
+                        "path": "/account/",
+                        "interval": 30,
+                        "timeout": 120,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "cpadmin-portal-probe",
+                    "properties": {
+                        "protocol": "Http",
+                        "host": "172.20.74.4",
+                        "path": "/*",
+                        "interval": 30,
+                        "timeout": 120,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "marketplace-portal-probe",
+                    "properties": {
+                        "protocol": "Http",
+                        "host": "172.20.74.4",
+                        "path": "/",
                         "interval": 30,
                         "timeout": 120,
                         "unhealthyThreshold": 3,
