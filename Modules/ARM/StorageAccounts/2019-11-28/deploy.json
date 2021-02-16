@@ -93,6 +93,10 @@
                 "description": "Optional. Switch to lock storage from deletion."
             }
         },
+        "blobCorsRules": {
+            "type": "array",
+            "defaultValue":[]
+        },
         "tags": {
             "type": "object",
             "defaultValue": {},
@@ -173,6 +177,9 @@
             "apiVersion": "2018-07-01",
             "condition": "[not(empty(parameters('blobContainers')))]",
             "properties": {
+                "cors": {
+                    "corsRules": "[parameters('blobCorsRules')]"
+                },
                 "deleteRetentionPolicy": {
                 "enabled": true,
                 "days": 30
