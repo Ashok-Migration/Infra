@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "actionGroupName": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique name (within the Resource Group) for the Action group."
+        }
+      },
+      "tags": {
+        "defaultValue": {},
+        "metadata": {
+          "description": "Optional. Resource tags."
+        },
+        "type": "object"
+      },
+      "actionGroupShortName": {
+        "type": "string",
+        "metadata": {
+          "description": "Short name (maximum 12 characters) for the Action group."
+        }
+      },
+      "emailReceiverName": {
+        "type": "string",
+        "metadata": {
+          "description": "Email receiver Name."
+        }
+      },    
+      "emailAddress": {
+        "type": "string",
+        "metadata": {
+          "description": "Receiver's email address."
+        }
+      }    
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Insights/actionGroups",
+        "apiVersion": "2018-03-01",
+        "name": "[parameters('actionGroupName')]",
+        "location": "Global",
+        "tags":"[parameters('tags')]",
+        "properties": {
+          "groupShortName": "[parameters('actionGroupShortName')]",
+          "enabled": true,
+          "smsReceivers": [
+          ],
+          "emailReceivers": [
+            {
+                "name": "[parameters('emailReceiverName')]",
+                "emailAddress": "[parameters('emailAddress')]"
+            }
+          ],
+          "webhookReceivers": [
+          ]
+        }
+      }
+    ],
+    "functions": [],
+    "outputs": {}
+  }

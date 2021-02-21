@@ -1,14 +1,14 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {  
+    "parameters": {
         "webAppName": {
             "type": "String"
         },
         "hostingPlanId": {
             "type": "String"
         },
-        "allowedOriginEndpoint":{
+        "allowedOriginEndpoint": {
             "type": "string",
             "metadata": {
                 "description": "Specifies the url which need to be added as CORS origin header so that client is able to access this resource."
@@ -52,11 +52,11 @@
             }
         },
         "tags": {
-          "defaultValue": {},
-          "metadata": {
-            "description": "Optional. Resource tags."
-          },
-          "type": "object"
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
         },
         "location": {
             "type": "string",
@@ -64,16 +64,116 @@
             "metadata": {
                 "description": "Location for all resources"
             }
+        },
+        "alertSeverity": {
+            "type": "int",
+            "defaultValue": 3,
+            "allowedValues": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "metadata": {
+                "description": "Severity of alert {0,1,2,3,4}"
+            }
+        },
+        "isEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether the alert is enabled"
+            }
+        },
+        "operator": {
+            "type": "string",
+            "defaultValue": "GreaterThan",
+            "allowedValues": [
+                "Equals",
+                "NotEquals",
+                "GreaterThan",
+                "GreaterThanOrEqual",
+                "LessThan",
+                "LessThanOrEqual"
+            ],
+            "metadata": {
+                "description": "Operator comparing the current value with the threshold value."
+            }
+        },
+        "threshold": {
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+                "description": "The threshold value at which the alert is activated."
+            }
+        },
+        "timeAggregation": {
+            "type": "string",
+            "defaultValue": "Average",
+            "allowedValues": [
+                "Average",
+                "Minimum",
+                "Maximum",
+                "Total",
+                "Count"
+            ],
+            "metadata": {
+                "description": "How the data that is collected should be combined over time."
+            }
+        },
+        "windowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H",
+                "PT6H",
+                "PT12H",
+                "PT24H"
+            ],
+            "metadata": {
+                "description": "Period of time used to monitor alert activity based on the threshold. Must be between one minute and one day. ISO 8601 duration format."
+            }
+        },
+        "evaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H"
+            ],
+            "metadata": {
+                "description": "how often the metric alert is evaluated represented in ISO 8601 duration format"
+            }
+        },
+        "actionGroupId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The ID of the action group that is triggered when the alert is activated or deactivated"
+            }
         }
     },
     "variables": {
-      "diagnosticsMetrics": [
+        "actions": [
+            {
+                "actionGroupId": "[parameters('actionGroupId')]"
+            }
+        ],
+        "diagnosticsMetrics": [
             {
                 "category": "AllMetrics",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             }
         ],
@@ -82,124 +182,185 @@
                 "category": "AppServiceAntivirusScanAuditLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceHTTPLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceConsoleLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceAppLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceFileAuditLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceAuditLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServiceIPSecAuditLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             },
             {
                 "category": "AppServicePlatformLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
+            }
+        ],
+        "alerts": [
+            {
+                "alertName": "Http 403",
+                "alertDescription": "unauthorized response",
+                "metricName": "Http403",
+                "alertSeverity": 3,
+                "isEnabled": true,
+                "metricNamespace": "Microsoft.Web/sites",
+                "operator": "GreaterThan",
+                "threshold": "100",
+                "timeAggregation": "Count"
+            },
+            {
+                "alertName": "Http 401",
+                "alertDescription": "forbidden response",
+                "metricName": "Http401",
+                "alertSeverity": 3,
+                "isEnabled": true,
+                "metricNamespace": "Microsoft.Web/sites",
+                "operator": "GreaterThan",
+                "threshold": "100",
+                "timeAggregation": "Count"
             }
         ]
     },
-    "resources": [        
-    {
-      "comments": "Web app",
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2018-02-01",
-      "name": "[parameters('webAppName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "enabled": true,
-        "name": "[parameters('webAppName')]",
-        "hostingEnvironment": "",
-        "serverFarmId": "[parameters('hostingPlanId')]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "AlwaysOn": true,
-          "detailedErrorLoggingEnabled": true,
-          "httpLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": [
-              "https://qnamaker-service.trafficmanager.net",
-              "https://www.qnamaker.ai",
-              "https://directline.botframework.com",
-              "[parameters('allowedOriginEndpoint')]"
-            ]
-          }
+    "resources": [
+        {
+            "comments": "Web app",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('webAppName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "enabled": true,
+                "name": "[parameters('webAppName')]",
+                "hostingEnvironment": "",
+                "serverFarmId": "[parameters('hostingPlanId')]",
+                "httpsOnly": true,
+                "siteConfig": {
+                    "AlwaysOn": true,
+                    "detailedErrorLoggingEnabled": true,
+                    "httpLoggingEnabled": true,
+                    "requestTracingEnabled": true,
+                    "cors": {
+                        "allowedOrigins": [
+                            "https://qnamaker-service.trafficmanager.net",
+                            "https://www.qnamaker.ai",
+                            "https://directline.botframework.com",
+                            "[parameters('allowedOriginEndpoint')]"
+                        ]
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Web/sites/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('webAppName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+                    }
+                }
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [],
+            "tags": "[parameters('tags')]"
+        },
+        {
+            "name": "[concat(variables('alerts')[copyIndex()].alertName,'-',parameters('webAppName'))]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "dependsOn": [
+                "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
+            ],
+            "properties": {
+                "description": "[variables('alerts')[copyIndex()].alertDescription]",
+                "severity": "[variables('alerts')[copyIndex()].alertSeverity]",
+                "enabled": "[variables('alerts')[copyIndex()].isEnabled]",
+                "scopes": [
+                    "[resourceId('Microsoft.Web/sites/', parameters('webAppName'))]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "[variables('alerts')[copyIndex()].metricName]",
+                            "metricNamespace": "[variables('alerts')[copyIndex()].metricNamespace]",
+                            "dimensions": [],
+                            "operator": "[variables('alerts')[copyIndex()].operator]",
+                            "threshold": "[variables('alerts')[copyIndex()].threshold]",
+                            "timeAggregation": "[variables('alerts')[copyIndex()].timeAggregation]"
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), variables('actions'))]"
+            },
+            "copy": {
+                "name": "httpAlerts",
+                "count": "[length(variables('alerts'))]"
+            }
         }
-      },
-      "resources": [
-          {
-              "type": "Microsoft.Web/sites/providers/diagnosticsettings",
-              "apiVersion": "2017-05-01-preview",
-              "name": "[concat(parameters('webAppName'), '/Microsoft.Insights/service')]",
-              "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
-              "dependsOn": [
-                  "[concat('Microsoft.Web/sites/', parameters('webAppName'))]"
-              ],
-              "properties": {
-                  "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
-                  "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
-                  "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                  "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
-                  "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
-                  "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
-              }
-          }
-      ],
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "dependsOn": [
-      ],
-    "tags": "[parameters('tags')]"
-    }
     ],
     "functions": [],
-    "outputs": {        
-    }
+    "outputs": {}
 }

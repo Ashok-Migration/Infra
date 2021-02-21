@@ -62,6 +62,7 @@ Code for all infrastructure components.
 All resources must be added to this sheet.
 
 # ARM Modules
+1. ActionGroup
 1. AnalysisServices       
 1. ApiConnection          
 1. ApiManagement          
