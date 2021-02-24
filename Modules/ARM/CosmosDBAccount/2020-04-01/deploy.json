@@ -59,6 +59,24 @@
         "description": "Max stale requests. Required for BoundedStaleness. Valid ranges, Single Region: 10 to 1000000. Multi Region: 100000 to 1000000."
       }
     },
+    "isVirtualNetworkFilterEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "To enable or disable virtual network filter."
+      }
+    },
+    "virtualNetworkRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Virtual Network Rules."
+      }
+    },
+    "ipRules": {
+      "type": "array",
+      "defaultValue": []
+    },
     "tags": {
       "defaultValue": {},
       "metadata": {
@@ -107,7 +125,10 @@
         "consistencyPolicy": "[variables('consistencyPolicy')[parameters('defaultConsistencyLevel')]]",
         "locations": "[variables('locations')]",
         "databaseAccountOfferType": "Standard",
-        "enableAutomaticFailover": "[parameters('automaticFailover')]"
+        "enableAutomaticFailover": "[parameters('automaticFailover')]",
+        "isVirtualNetworkFilterEnabled": "[parameters('isVirtualNetworkFilterEnabled')]",
+        "virtualNetworkRules": "[parameters('virtualNetworkRules')]",
+        "ipRules": "[parameters('ipRules')]"
       },
       "tags": "[parameters('tags')]"
     }
