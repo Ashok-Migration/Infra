@@ -63,7 +63,6 @@
                       "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
                       "cpm_description": "@body('Parse_JSON')?['value']?['description']",
                       "cpm_externalreferencenumber": "@{body('Parse_JSON')?['value']?['id']}",
-                      "cpm_name": "@{body('Parse_JSON')?['value']?['name']}",
                       "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
                       "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
                     },
@@ -93,7 +92,6 @@
                                 "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
                                 "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
                                 "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
-                                "cpm_name": "@{if(empty(body('Parse_JSON')?['value']?['name']),items('For_each')?['cpm_name'],body('Parse_JSON')?['value']?['name'])}",
                                 "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
                                 "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
                               },
