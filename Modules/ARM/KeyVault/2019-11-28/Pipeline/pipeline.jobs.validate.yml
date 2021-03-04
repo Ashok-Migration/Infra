@@ -7,7 +7,7 @@ jobs:
     displayName: Validate Module
     pool:
       name: $(poolName)
-      # vmImage: $(vmImage)      
+      #vmImage: $(vmImage)      
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -17,7 +17,6 @@ jobs:
           targetType: inline
           script: |
             Install-Module -Name Pester -RequiredVersion 5.0.2 -Force -ErrorAction Stop
-
 
             $PesterSettings  = @{
               Script       = "$(System.DefaultWorkingDirectory)/$(modulePath)/Tests/*.tests.ps1"

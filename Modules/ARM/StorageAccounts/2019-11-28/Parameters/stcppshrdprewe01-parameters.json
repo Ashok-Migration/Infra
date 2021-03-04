@@ -1,0 +1,64 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "stcppshrdprewe01"
+    },
+    "storageAccountKind": {
+      "value": "StorageV2"
+    },
+    "storageAccountSku": {
+      "value": "Standard_LRS"
+    },
+    "storageAccountAccessTier": {
+      "value": "Hot"
+    },
+    "vNetId": {
+      "value": ""
+    },
+    "networkAcls": {
+      "value": {}
+    },
+    "blobContainers": {
+      "value": [
+        {
+          "name": "app",
+          "publicAccess": "Blob"
+        },
+        {
+          "name": "content",
+          "publicAccess": "Blob"
+        }
+      ]
+    },
+    "lockForDeletion": {
+      "value": true
+    },
+    "blobCorsRules": {
+      "value": [
+        {
+          "allowedOrigins": [
+            "https://tasmucpb2cprod.b2clogin.com"
+          ],
+          "allowedMethods": [
+            "GET",
+            "OPTIONS"
+          ],
+          "maxAgeInSeconds": 200,
+          "exposedHeaders": [
+            "*"
+          ],
+          "allowedHeaders": [
+            "*"
+          ]
+        }
+      ]
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    }
+  }
+  }

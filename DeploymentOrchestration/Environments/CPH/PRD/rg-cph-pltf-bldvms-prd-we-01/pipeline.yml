@@ -3,6 +3,8 @@ name: $(resourceGroupName)
 variables:
 - name: PoolName
   value: "tasmumsagents"
+#- name: vmImage
+#  value: windows-latest
 - name: templateFilePath
   value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-pltf-bldvms-prd-we-01/deploy.json
 - name: parameterFilePath
@@ -34,6 +36,7 @@ stages:
     displayName: Validate Template
     pool:
       name: $(PoolName)
+    #   vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
@@ -67,6 +70,7 @@ stages:
     displayName: Deploy Template
     pool:
       name: $(PoolName)
+    #   vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupName)
@@ -94,6 +98,7 @@ stages:
       displayName: Scan Resource Group
       pool:
         name: $(PoolName)
+      #   vmImage: $(vmImage)
       steps:
         - task: AzSKSVTs@4
           displayName: Scan $(resourceGroupName)

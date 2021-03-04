@@ -1,0 +1,344 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workflowName": {
+			"value": "logic-cpp-apps-intprdt-pre-we-01"
+		},
+		"workflowLocation": {
+			"value": "westeurope"
+		},
+		"workflowSchema": {
+			"value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+		},
+		"workflowTriggers": {
+			"value": {
+				"When_a_resource_event_occurs": {
+					"inputs": {
+						"body": {
+							"properties": {
+								"destination": {
+									"endpointType": "webhook",
+									"properties": {
+										"endpointUrl": "@{listCallbackUrl()}"
+									}
+								},
+								"filter": {
+									"includedEventTypes": [
+										"product-created",
+										"product-updated",
+										"product-deleted"
+									]
+								},
+								"topic": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.EventGrid/domains/egd-cpp-apps-int-pre-we-01/topics/d365"
+							}
+						},
+						"host": {
+							"connection": {
+								"name": "@parameters('$connections')['apicon-cpp-apps-integ-pre-we-01']['connectionId']"
+							}
+						},
+						"path": "/subscriptions/@{encodeURIComponent('8964f3c1-44f5-4094-80eb-4334845bdfb1')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+						"queries": {
+							"x-ms-api-version": "2017-06-15-preview"
+						}
+					},
+					"splitOn": "@triggerBody()",
+					"type": "ApiConnectionWebhook"
+				}
+			}
+		},
+		"workflowActions": {
+			"value": {
+				"Parse_Event_Grid_Data_JSON": {
+					"inputs": {
+						"content": "@triggerBody()?['data']",
+						"schema": {
+							"properties": {
+								"Id": {
+									"type": "string"
+								},
+								"LocalizedValues": {
+									"properties": {
+										"Ar": {
+											"properties": {
+												"id": {
+													"type": "string"
+												},
+												"longDescription": {
+													"type": [
+														"string",
+														"null"
+													]
+												},
+												"name": {
+													"type": "string"
+												},
+												"productUrl": {
+													"type": [
+														"string",
+														"null"
+													]
+												},
+												"shortDescription": {
+													"type": [
+														"string",
+														"null"
+													]
+												}
+											},
+											"type": "object"
+										}
+									},
+									"type": "object"
+								},
+								"Value": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"longDescription": {
+											"type": [
+												"string",
+												"null"
+											]
+										},
+										"name": {
+											"type": "string"
+										},
+										"productUrl": {
+											"type": [
+												"string",
+												"null"
+											]
+										},
+										"shortDescription": {
+											"type": [
+												"string",
+												"null"
+											]
+										}
+									},
+									"type": "object"
+								}
+							},
+							"type": "object"
+						}
+					},
+					"runAfter": {},
+					"type": "ParseJson"
+				},
+				"Perform_on_Event_Type": {
+					"actions": {
+						"Check_If_Product_Exists": {
+							"actions": {
+								"Add_Product_List_Item": {
+									"inputs": {
+										"body": {
+											"body": "{\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"ProductId\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['id']}\",\n\"arProductName\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\", \"Url\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\" }\n}",
+											"headers": {
+												"Accept": "application/json;odata=nometadata",
+												"Content-Type": "application/json"
+											},
+											"method": "POST",
+											"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items"
+										},
+										"host": {
+											"connection": {
+												"name": "@parameters('$connections')['apicon-cpp-apps-intspo-pre-we-01']['connectionId']"
+											}
+										},
+										"method": "post",
+										"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
+									},
+									"runAfter": {},
+									"type": "ApiConnection"
+								}
+							},
+							"else": {
+								"actions": {
+									"Update_Delete_Product_List_Item": {
+										"inputs": {
+											"body": {
+												"body": "{\n\"Title\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['name']}\",\n\"ProductId\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['id']}\",\n\"arProductName\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['name']}\",\n\"ProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['shortDescription']}\",\n\"arProductShortDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['shortDescription']}\",\n\"ProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['longDescription']}\",\n\"arProductLongDescription\": \"@{body('Parse_Event_Grid_Data_JSON')?['LocalizedValues']?['Ar']?['longDescription']}\",\n\"ProductReferenceURL\": { \"Description\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\", \"Url\": \"@{body('Parse_Event_Grid_Data_JSON')?['Value']?['productUrl']}\" }\n}",
+												"headers": {
+													"Accept": "application/json;odata=nometadata",
+													"Content-Type": "application/json",
+													"If-Match": "*",
+													"X-HTTP-Method": "@{if(equals(triggerBody()?['eventType'], 'product-updated'), 'MERGE', 'DELETE')}"
+												},
+												"method": "POST",
+												"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items(@{first(body('Parse_Product_List_Item_JSON')?['value'])?['ID']})"
+											},
+											"host": {
+												"connection": {
+													"name": "@parameters('$connections')['apicon-cpp-apps-intspo-pre-we-01']['connectionId']"
+												}
+											},
+											"method": "post",
+											"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
+										},
+										"runAfter": {},
+										"type": "ApiConnection"
+									}
+								}
+							},
+							"expression": {
+								"and": [
+									{
+										"equals": [
+											"@length(body('Parse_Product_List_Item_JSON')?['value'])",
+											0
+										]
+									}
+								]
+							},
+							"runAfter": {
+								"Parse_Product_List_Item_JSON": [
+									"Succeeded"
+								]
+							},
+							"type": "If"
+						},
+						"Get_Product_Item": {
+							"inputs": {
+								"body": {
+									"headers": {
+										"Accept": "application/json;odata=nometadata",
+										"Content-Type": "application/json"
+									},
+									"method": "GET",
+									"uri": "/_api/web/lists/GetByTitle('@{parameters('ProductsList')}')/items?$filter=ProductId eq '@{body('Parse_Event_Grid_Data_JSON')?['Id']}'"
+								},
+								"host": {
+									"connection": {
+										"name": "@parameters('$connections')['apicon-cpp-apps-intspo-pre-we-01']['connectionId']"
+									}
+								},
+								"method": "post",
+								"path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('MarketplaceUrl')))}/httprequest"
+							},
+							"runAfter": {},
+							"type": "ApiConnection"
+						},
+						"Parse_Product_List_Item_JSON": {
+							"inputs": {
+								"content": "@body('Get_Product_Item')",
+								"schema": {
+									"properties": {
+										"value": {
+											"items": {
+												"properties": {
+													"ID": {
+														"type": "integer"
+													},
+													"ProductId": {
+														"type": "string"
+													},
+													"Title": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							},
+							"runAfter": {
+								"Get_Product_Item": [
+									"Succeeded"
+								]
+							},
+							"type": "ParseJson"
+						}
+					},
+					"expression": {
+						"or": [
+							{
+								"equals": [
+									"@triggerBody()?['eventType']",
+									"product-created"
+								]
+							},
+							{
+								"equals": [
+									"@triggerBody()?['eventType']",
+									"product-updated"
+								]
+							},
+							{
+								"equals": [
+									"@triggerBody()?['eventType']",
+									"product-deleted"
+								]
+							}
+						]
+					},
+					"runAfter": {
+						"Parse_Event_Grid_Data_JSON": [
+							"Succeeded"
+						]
+					},
+					"type": "If"
+				}
+			}
+		},
+		"workflowParameters": {
+			"value": {
+				"$connections": {
+					"defaultValue": {},
+					"type": "Object"
+				},
+				"MarketplaceUrl": {
+					"defaultValue": "https://tasmusqcppreprod.sharepoint.com/sites/cms-marketplace",													
+					"type": "String"
+				},
+				"ProductsList": {
+					"defaultValue": "Products",
+					"type": "String"
+				}
+			}
+		},
+		"diagnosticLogsRetentionInDays": {
+			"value": 365
+		},
+		"diagnosticStorageAccountId": {
+			"value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprewe01"
+		},
+		"workspaceId": {
+			"value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-pre-we-01"
+		},
+		"eventHubAuthorizationRuleId": {
+			"value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+		},
+		"eventHubName": {
+			"value": "evh-cpp-apps-mon-pre-we-01"
+		},
+		"tags": {
+			"value": {
+				"Environment": "Pre-Production"
+			}
+		},
+		"connectionParameters": {
+			"value": {
+				"$connections": {
+					"value": {
+						"apicon-cpp-apps-integ-pre-we-01": {
+							"connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integ-pre-we-01",
+							"connectionName": "apicon-cpp-apps-integ-pre-we-01",
+							"id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+						},
+						"apicon-cpp-apps-intspo-pre-we-01": {
+							"connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intspo-pre-we-01",
+							"connectionName": "apicon-cpp-apps-intspo-pre-we-01",
+							"id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline"
+						}
+					}
+				}
+			}
+		}
+	}
+}

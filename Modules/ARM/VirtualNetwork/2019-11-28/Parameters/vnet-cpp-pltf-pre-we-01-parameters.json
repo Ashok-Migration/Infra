@@ -1,0 +1,360 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cpp-pltf-pre-we-01"
+        } ,
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.20.88.0/22",
+                "172.20.92.0/22",
+                "172.20.96.0/23",
+                "172.20.98.0/23",
+                "172.20.100.0/22",
+                "172.20.104.0/22",
+                "172.20.108.0/22"
+            ]
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-cpp-apps-aks-pre-we-01",
+                    "addressPrefix": "172.20.88.0/22",
+                    "networkSecurityGroupName": "nsg-cpp-apps-aks-pre-we-01",
+                    "routeTableName": "route-cpp-apps-aks-pre-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.AzureCosmosDB",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-agw-pre-we-01",
+                    "addressPrefix": "172.20.92.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-apps-agw-pre-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-agwweb-pre-we-01",
+                    "addressPrefix": "172.20.92.64/26",
+                    "networkSecurityGroupName": "nsg-cpp-apps-agwweb-pre-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-agwapi-pre-we-01",
+                    "addressPrefix": "172.20.92.192/26",
+                    "networkSecurityGroupName": "nsg-cpp-apps-agwapi-pre-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-apim-pre-we-01",
+                    "addressPrefix": "172.20.92.128/26",
+                    "networkSecurityGroupName": "nsg-cpp-apps-apim-pre-we-01",
+                    "routeTableName": "route-cpp-apps-apim-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-agwntf-pre-we-01",
+                    "addressPrefix": "172.20.93.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-apps-agwntf-pre-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-apps-bkend-pre-we-01",
+                    "addressPrefix": "172.20.94.0/24",
+                    "networkSecurityGroupName": "nsg-cpp-apps-bkend-pre-we-01",
+                    "routeTableName": "route-cpp-apps-bkend-pre-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.AzureCosmosDB",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-apps-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-apps-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-dbrpub-pre-we-01",
+                    "addressPrefix": "172.20.96.0/25",
+                    "networkSecurityGroupName": "nsg-cpp-data-dbrpub-pre-we-01",
+                    "routeTableName": "route-cpp-data-dbrpub-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks/workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-dbrpri-pre-we-01",
+                    "addressPrefix": "172.20.96.128/25",
+                    "networkSecurityGroupName": "nsg-cpp-data-dbrpri-pre-we-01",
+                    "routeTableName": "route-cpp-data-dbrpri-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks/workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-daisvcs-pre-we-01",
+                    "addressPrefix": "172.20.97.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-data-daisvcs-pre-we-01",
+                    "routeTableName": "route-cpp-data-daisvcs-pre-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.KeyVault",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-hdi-pre-we-01",
+                    "addressPrefix": "172.20.97.64/26",
+                    "networkSecurityGroupName": "nsg-cpp-data-hdi-pre-we-01",
+                    "routeTableName": "route-cpp-data-hdi-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-hdi-pre-we-02",
+                    "addressPrefix": "172.20.97.128/26",
+                    "networkSecurityGroupName": "nsg-cpp-data-hdi-pre-we-02",
+                    "routeTableName": "route-cpp-data-hdi-pre-we-02",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-sqlmi-pre-we-01",
+                    "addressPrefix": "172.20.97.192/26",
+                    "networkSecurityGroupName": "nsg-cpp-data-sqlmi-pre-we-01",
+                    "routeTableName": "route-cpp-data-sqlmi-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-data-bkup-pre-we-01",
+                    "addressPrefix": "172.20.98.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-data-bkup-pre-we-01",
+                    "routeTableName": "route-cpp-data-bkup-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-data-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-data-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-6d-web-pre-we-01",
+                    "addressPrefix": "172.20.100.128/26",
+                    "networkSecurityGroupName": "nsg-cpp-6d-web-pre-we-01",
+                    "routeTableName": "route-cpp-6d-web-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-6d-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-6d-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-6d-app-pre-we-01",
+                    "addressPrefix": "172.20.100.0/25",
+                    "networkSecurityGroupName": "nsg-cpp-6d-app-pre-we-01",
+                    "routeTableName": "route-cpp-6d-app-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-6d-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-6d-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-6d-db-pre-we-01",
+                    "addressPrefix": "172.20.100.192/26",
+                    "networkSecurityGroupName": "nsg-cpp-6d-db-pre-we-01",
+                    "routeTableName": "route-cpp-6d-db-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-6d-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-6d-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-gis-web-pre-we-01",
+                    "addressPrefix": "172.20.101.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-gis-web-pre-we-01",
+                    "routeTableName": "route-cpp-gis-web-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-gis-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-gis-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-gis-app-pre-we-01",
+                    "addressPrefix": "172.20.101.64/26",
+                    "networkSecurityGroupName": "nsg-cpp-gis-app-pre-we-01",
+                    "routeTableName": "route-cpp-gis-app-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-gis-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-gis-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-gis-db-pre-we-01",
+                    "addressPrefix": "172.20.101.128/26",
+                    "networkSecurityGroupName": "nsg-cpp-gis-db-pre-we-01",
+                    "routeTableName": "route-cpp-gis-db-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-gis-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-gis-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-bpm-web-pre-we-01",
+                    "addressPrefix": "172.20.101.192/26",
+                    "networkSecurityGroupName": "nsg-cpp-bpm-web-pre-we-01",
+                    "routeTableName": "route-cpp-bpm-web-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-bpm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-bpm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-bpm-app-pre-we-01",
+                    "addressPrefix": "172.20.102.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-bpm-app-pre-we-01",
+                    "routeTableName": "route-cpp-bpm-app-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-bpm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-bpm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-bpm-db-pre-we-01",
+                    "addressPrefix": "172.20.102.64/26",
+                    "networkSecurityGroupName": "nsg-cpp-bpm-db-pre-we-01",
+                    "routeTableName": "route-cpp-bpm-db-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-bpm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-bpm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-itsm-web-pre-we-01",
+                    "addressPrefix": "172.20.102.128/26",
+                    "networkSecurityGroupName": "nsg-cpp-itsm-web-pre-we-01",
+                    "routeTableName": "route-cpp-itsm-web-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-itsm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-itsm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-itsm-app-pre-we-01",
+                    "addressPrefix": "172.20.102.192/26",
+                    "networkSecurityGroupName": "nsg-cpp-itsm-app-pre-we-01",
+                    "routeTableName": "route-cpp-itsm-app-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-itsm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-itsm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-itsm-db-pre-we-01",
+                    "addressPrefix": "172.20.103.0/26",
+                    "networkSecurityGroupName": "nsg-cpp-itsm-db-pre-we-01",
+                    "routeTableName": "route-cpp-itsm-db-pre-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-itsm-sec-pre-we-01",
+                    "routesRGName": "rg-cpp-itsm-net-pre-we-01"
+                },
+                {
+                    "name": "snet-cpp-thrd-agw-pre-we-01",
+                    "addressPrefix": "172.20.103.64/26",
+                    "networkSecurityGroupName": "nsg-cpp-thrd-agw-pre-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"rg-cpp-thrd-agw-pre-we-01",
+                    "routesRGName": ""
+                }             
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+          "value": {
+            "Environment": "PreProduction"
+          }
+        }
+    }
+}

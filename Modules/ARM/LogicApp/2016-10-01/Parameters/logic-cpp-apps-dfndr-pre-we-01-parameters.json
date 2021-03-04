@@ -1,0 +1,303 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-apps-dfndr-pre-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_an_Azure_Security_Center_Alert_is_created_or_triggered": {
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": {
+              "callback_url": "@{listCallbackUrl()}"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-ascalrt-pre-we-01']['connectionId']"
+              }
+            },
+            "path": "/Microsoft.Security/Alert/subscribe"
+          }
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "File_name_condition": {
+          "actions": {
+            "Condition": {
+              "actions": {
+                "List_records": {
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['apicon-cpp-apps-intcds-pre-we-01']['connectionId']"
+                      }
+                    },
+                    "method": "get",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('f6b361ba6d45486cbd290a2236efa4.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_annotationextensions'))}/items",
+                    "queries": {
+                      "$filter": "cpm_annotationid eq @{variables('FileId')}",
+                      "$top": 1
+                    }
+                  },
+                  "runAfter": {},
+                  "type": "ApiConnection"
+                },
+                "Records_count": {
+                  "actions": {
+                    "For_each": {
+                      "actions": {
+                        "Update_Attachment_Extension": {
+                          "inputs": {
+                            "body": {
+                              "_ownerid_type": "",
+                              "cpm_isunsafe": true
+                            },
+                            "host": {
+                              "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-apps-intcds-pre-we-01']['connectionId']"
+                              }
+                            },
+                            "method": "patch",
+                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('f6b361ba6d45486cbd290a2236efa4.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_annotationextensions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_annotationextensionid']))}"
+                          },
+                          "runAfter": {},
+                          "type": "ApiConnection"
+                        }
+                      },
+                      "foreach": "@body('List_records')?['value']",
+                      "runAfter": {},
+                      "type": "Foreach"
+                    }
+                  },
+                  "else": {
+                    "actions": {
+                      "Terminate_Update": {
+                        "inputs": {
+                          "runError": {
+                            "code": "404",
+                            "message": "No records found to update for Attachment Extension entity."
+                          },
+                          "runStatus": "Failed"
+                        },
+                        "runAfter": {},
+                        "type": "Terminate"
+                      }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "greater": [
+                          "@length(body('List_records')?['value'])",
+                          0
+                        ]
+                      }
+                    ]
+                  },
+                  "runAfter": {
+                    "List_records": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "If"
+                }
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['container']",
+                      "casefiles"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['container']",
+                      "case-files"
+                    ]
+                  }
+                ]
+              },
+              "runAfter": {},
+              "type": "If"
+            }
+          },
+          "else": {
+            "actions": {
+              "Terminate_File_Name": {
+                "inputs": {
+                  "runError": {
+                    "code": "404",
+                    "message": "File name cannot be blank"
+                  },
+                  "runStatus": "Failed"
+                },
+                "runAfter": {},
+                "type": "Terminate"
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "not": {
+                  "equals": [
+                    "@empty(variables('FileId'))",
+                    "@true"
+                  ]
+                }
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_File_Id": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "Initialize_File_Id": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileId",
+                "type": "string",
+                "value": "@{replace(variables('FileIdSubstring'),concat('.',last(split(variables('FileIdSubstring'),'.'))),'')}"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_File_Name": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Initialize_File_Name": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileIdSubstring",
+                "type": "string",
+                "value": "@{split(body('Parse_JSON')?['blob'],'_')[0]}"
+              }
+            ]
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Parse_JSON": {
+          "inputs": {
+            "content": "@triggerBody()?['ExtendedProperties']",
+            "schema": {
+              "properties": {
+                "alert Id": {
+                  "type": "string"
+                },
+                "api type": {
+                  "type": "string"
+                },
+                "authentication type": {
+                  "type": "string"
+                },
+                "azure AD user": {
+                  "type": "string"
+                },
+                "blob": {
+                  "type": "string"
+                },
+                "client location": {
+                  "type": "string"
+                },
+                "container": {
+                  "type": "string"
+                },
+                "detection source": {
+                  "type": "string"
+                },
+                "investigation steps": {
+                  "type": "string"
+                },
+                "killChainIntent": {
+                  "type": "string"
+                },
+                "malware description": {
+                  "type": "string"
+                },
+                "operations types": {
+                  "type": "string"
+                },
+                "potential causes": {
+                  "type": "string"
+                },
+                "resourceType": {
+                  "type": "string"
+                },
+                "service type": {
+                  "type": "string"
+                },
+                "threat report": {
+                  "type": "string"
+                },
+                "threat report summary": {
+                  "type": "string"
+                },
+                "user agent": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpp-apps-ascalrt-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-ascalrt-pre-we-01",
+              "connectionName": "apicon-cpp-apps-ascalrt-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/ascalert"
+            },
+            "apicon-cpp-apps-intcds-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intcds-pre-we-01",
+              "connectionName": "apicon-cpp-apps-intcds-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+            }
+          }
+        }
+      }
+    }
+  }
+}

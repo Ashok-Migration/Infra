@@ -1,0 +1,64 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  paths:
+    include:
+      - Scripts/AppConfigurations/keyvaultref/*
+      - Scripts/AppConfigurations/settings/*
+
+variables:
+  - name: PoolName
+    value: "tasmumsiagents"
+  - name: azureSubscription
+    value: sqcp-ado-spn-pre
+pool:
+  name: $(PoolName)
+
+stages:
+  - stage: PublishArtifacts
+    jobs:
+      - job: PublishArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: Scripts/AppConfigurations
+              Contents: "**"
+              TargetFolder: "$(build.artifactstagingdirectory)/configurations"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: Scripts/AppConfigurations
+              artifact: "configurations"
+              publishLocation: "pipeline"
+
+  - stage: Pre
+    displayName: Update App Configurations for pre
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-cpp-apps-str-pre-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpp-apps-aks-pre-we-01"
+      - name: aksClusterName
+        value: "aks-cpp-apps-pre-we-01"
+      - name: env
+        value: "pre"
+      - name: botApiName
+        value: "app-cpp-apps-bot-pre-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpp-apps-qnasync-pre-we-01"
+      - name: luisTraFuncName
+        value: "func-cpp-apps-luistra-pre-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for pre
+        environment: pre
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+                - template: restart-pods.yml
+                - template: restart-appservice.yml

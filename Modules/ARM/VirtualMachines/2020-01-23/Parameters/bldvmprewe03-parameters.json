@@ -1,0 +1,123 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNames": {
+            "value": [
+                "bldvmprewe03"
+            ]
+        },
+        "vmSize": {
+            "value": "Standard_D8s_v3"
+        },
+        "imageResourceId": {
+            "value": {
+                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-bldvms-prd-we-01/providers/Microsoft.Compute/images/imgbldvmprdwe01"
+            }
+        },
+        "osDisk": {
+            "value": {
+                "createOption": "fromImage",
+                "diskSizeGB": "256",
+                "managedDisk": {
+                    "storageAccountType": "Premium_LRS"
+                }
+            }
+        },
+        "dataDisks": {
+            "value": [
+                {
+                    "caching": "ReadOnly",
+                    "createOption": "Empty",
+                    "diskSizeGB": "128",
+                    "managedDisk": {
+                        "storageAccountType": "Premium_LRS"
+                    }
+                },
+                {
+                    "caching": "ReadOnly",
+                    "createOption": "Empty",
+                    "diskSizeGB": "128",
+                    "managedDisk": {
+                        "storageAccountType": "Premium_LRS"
+                    }
+                },
+                {
+                    "caching": "ReadOnly",
+                    "createOption": "Empty",
+                    "diskSizeGB": "128",
+                    "managedDisk": {
+                        "storageAccountType": "Premium_LRS"
+                    }
+                }
+            ]
+        },
+        "NetworkDetails": {
+            "value": {
+                "vnetRG": "rg-cph-pltf-net-prd-we-01",
+                "vnet": "vnet-cph-pltf-prd-we-01",
+                "subnet": "snet-cph-pltf-iacbl-prd-we-01"
+            }
+        },
+        "adminUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-we-01"
+                },
+                "secretName": "adminUsername"
+            }
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-we-01"
+                },
+                "secretName": "bldvmprewe03Password"
+            }
+        },
+        "availabilitySetName": {
+            "value": ""
+        },
+        "vmIPAddress": {
+            "value": "172.20.32.13"
+        },
+        "dnsServers": {
+            "value": []
+        },
+        "useAvailabilityZone": {
+            "value": false
+        },
+        "lockForDeletion": {
+            "value": true
+        },
+        "enableBootDiagnostics": {
+            "value": false
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        },
+        "enablePublicIP": {
+            "value": true
+        },
+        "enableIPForwarding": {
+            "value": true
+        }
+    }
+}

@@ -1,0 +1,261 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpp-data-pre-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "When_events_are_available_in_Event_Hub": {
+                    "recurrence": {
+                        "frequency": "Minute",
+                        "interval": 3
+                    },
+                    "splitOn": "@triggerBody()",
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-data-eh-pre-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/@{encodeURIComponent('eh-cpp-sp-ta-we-01')}/events/batch/head",
+                        "queries": {
+                            "consumerGroupName": "ehcg-cpp-sp-ta-la-we-01",
+                            "contentType": "application/json",
+                            "maximumEventsCount": 50
+                        }
+                    }
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "For_each": {
+                    "foreach": "@body('Parse_JSON')?['ContentData']",
+                    "actions": {
+                        "Check_Complaint_Exist": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "ExtRefNumber": "@{items('For_each')?['deviceid']}"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpp-data-sql-pre-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/procedures/@{encodeURIComponent(encodeURIComponent('[dbo].[uspCheckCRMComplaintExist]'))}"
+                            }
+                        },
+                        "Condition": {
+                            "actions": {
+                                "Create_Complaint_Request": {
+                                    "runAfter": {},
+                                    "type": "Http",
+                                    "inputs": {
+                                        "authentication": {
+                                            "audience": "5b22938c-00b4-4706-893a-7e3018826129",
+                                            "clientId": "97010afe-db4c-4d98-adef-959e1354bda2",
+                                            "secret": "Fc49q8kV-.27Yb9On7-52K02..--9GQjsJ",
+                                            "tenant": "fa525e36-bf96-43bf-8932-79524b82ce2a",
+                                            "type": "ActiveDirectoryOAuth"
+                                        },
+                                        "body": {
+                                          "categoryId": "b107bd5c-2a24-eb11-a813-000d3ad96b23",
+                                          "channelid": 700610000,
+                                          "extRefNumber": "@{items('For_each')?['deviceid']}",
+                                          "originId": 700610000,
+                                          "profileId": "3e4fcbd9-57d6-ea11-a813-000d3a20fe20",
+                                          "subCategoryId": "519134b1-b024-eb11-a813-000d3ab945d0",
+                                          "title": "Logic App Test"
+                                        },
+                                        "method": "POST",
+                                        "uri": "http://tst-api.tasmu.trafficmanager.net/case/api/supportrequests"
+                                    }
+                                },
+                                "Log_Complaint_Output_to_DB": {
+                                    "runAfter": {
+                                        "Create_Complaint_Request": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "ResponseBody": "@{body('Create_Complaint_Request')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpp-data-sql-pre-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/procedures/@{encodeURIComponent(encodeURIComponent('[dbo].[uspLogCRMComplaint]'))}"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Check_Complaint_Exist": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@body('Check_Complaint_Exist')?['returncode']",
+                                            0
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        }
+                    },
+                    "runAfter": {
+                        "Parse_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Foreach"
+                },
+                "Parse_JSON": {
+                    "runAfter": {},
+                    "type": "ParseJson",
+                    "inputs": {
+                        "content": "@triggerBody()",
+                        "schema": {
+                            "properties": {
+                                "ContentData": {
+                                    "items": {
+                                        "properties": {
+                                            "alarmend": {
+                                                "type": "string"
+                                            },
+                                            "alarmid": {
+                                                "type": "string"
+                                            },
+                                            "alarmstart": {
+                                                "type": "string"
+                                            },
+                                            "alarmtypeid": {
+                                                "type": "integer"
+                                            },
+                                            "deviceid": {
+                                                "type": "integer"
+                                            },
+                                            "devicevalueid": {
+                                                "type": "integer"
+                                            },
+                                            "value": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "alarmid",
+                                            "alarmstart",
+                                            "alarmend",
+                                            "deviceid",
+                                            "devicevalueid",
+                                            "value",
+                                            "alarmtypeid"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                },
+                                "Properties": {
+                                    "properties": {
+                                        "x-opt-enqueued-time": {
+                                            "type": "string"
+                                        },
+                                        "x-opt-offset": {
+                                            "type": "string"
+                                        },
+                                        "x-opt-sequence-number": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "SystemProperties": {
+                                    "properties": {
+                                        "EnqueuedTimeUtc": {
+                                            "type": "string"
+                                        },
+                                        "Offset": {
+                                            "type": "string"
+                                        },
+                                        "PartitionKey": {},
+                                        "SequenceNumber": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": "Pre-Production"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                      "apicon-cpp-data-eh-pre-we-01": {
+                        "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-data-eh-pre-we-01",
+                        "connectionName": "apicon-cpp-data-eh-pre-we-01",
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/eventhubs"
+                      },
+                      "apicon-cpp-data-sql-pre-we-01": {
+                        "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-data-sql-pre-we-01",
+                        "connectionName": "apicon-cpp-data-sql-pre-we-01",
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/sql"
+                      }
+                    }
+                }
+            }
+        }
+    }
+}

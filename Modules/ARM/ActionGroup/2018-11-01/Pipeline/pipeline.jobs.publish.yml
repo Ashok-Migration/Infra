@@ -3,7 +3,7 @@ jobs:
     displayName: Publish Artifact
     pool:
       name: $(poolName)
-      
+      #vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -17,6 +17,7 @@ jobs:
     displayName: Publish Component Prd
     pool:
       name: $(poolName)
+      #vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -32,8 +33,8 @@ jobs:
           azureSubscription: $(serviceConnectionPrd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNamePrd)" --subscription "$(componentStorageAccountSubscriptionIdPrd)"           
-        
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNamePrd)" --subscription "$(componentStorageAccountSubscriptionIdPrd)"
+
       - task: AzureCLI@1
         displayName: Copy Module to $(componentStorageAccountNamePrd)
         inputs:
@@ -42,11 +43,11 @@ jobs:
           inlineScript: |
             az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
 
-
   - job: PublishComponentNpd
     displayName: Publish Component Npd
     pool:
       name: $(poolName)
+      #vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -62,8 +63,8 @@ jobs:
           azureSubscription: $(serviceConnectionNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameNpd)" --subscription "$(componentStorageAccountSubscriptionIdNpd)"           
-        
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameNpd)" --subscription "$(componentStorageAccountSubscriptionIdNpd)"
+
       - task: AzureCLI@1
         displayName: Copy Module to $(componentStorageAccountNameNpd)
         inputs:

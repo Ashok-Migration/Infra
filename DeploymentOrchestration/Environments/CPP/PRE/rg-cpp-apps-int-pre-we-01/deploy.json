@@ -1,0 +1,1246 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"utcYear": {
+			"type": "string",
+			"defaultValue": "[utcNow('yyyy')]",
+			"metadata": {
+				"description": "Optional. Year data used to generate a SAS token. Default is the current year."
+			}
+		}
+	},
+	"variables": {
+		"lockForDeletion": false,
+		"CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+		"accountSasProperties": {
+			"signedServices": "bt",
+			"signedPermission": "racuw",
+			"signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+			"signedResourceTypes": "co",
+			"signedProtocol": "https"
+		},
+		"componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
+		"storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+		"componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+		"containerName": "components",
+		"modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+		"location": "[deployment().location]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-rg-cpp-apps-int-pre-we-01",
+			"location": "[variables('location')]",
+			"dependsOn": [],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-apps-int-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"apiVersion": "2019-10-01",
+			"name": "[variables('CUA')]",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"template": {
+					"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+					"contentVersion": "1.0.0.0",
+					"resources": []
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-egd-cpp-apps-int-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'EventGridDomain/2020-06-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'EventGridDomain/2020-06-01/Parameters/egd-cpp-apps-int-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sb-cpp-apps-int-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespace/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespace/2017-04-01/Parameters/sb-cpp-apps-int-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intprodsync-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intprodsync-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-qnaadd-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-qnaadd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intntf-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intntf-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intsec-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intsec-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-int6dbill-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-int6dbill-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intd365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intd365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-into365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-into365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intchglog-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intchglog-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intaprvl-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intaprvl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intgbaprl-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intgbaprl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intcoreapi-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intcoreapi-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbq-cpp-apps-intiotalert-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceQueue/2017-04-01/Parameters/sbq-cpp-apps-intiotalert-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-cog-cpp-apps-cmstrsl-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpp-apps-cmstrsl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-plan-cpp-apps-int-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/Parameters/plan-cpp-apps-int-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-intbpa-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppBPA/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppBPA/2018-11-01/Parameters/func-cpp-apps-intbpa-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-intntf-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppNTF/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppNTF/2018-11-01/Parameters/func-cpp-apps-intntf-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-d365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/Parameters/func-cpp-apps-d365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-o365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionApp/2018-11-01/Parameters/func-cpp-apps-o365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-acm-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppCE/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppCE/2018-11-01/Parameters/func-cpp-apps-acm-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-stcppappsintprewe01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppappsintprewe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-into365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/apicon-cpp-apps-into365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intsb-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sbq-cpp-apps-intchglog-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionServiceBus/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionServiceBus/2019-04-01/Parameters/apicon-cpp-apps-intsb-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intspo-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/apicon-cpp-apps-intspo-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-integd-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-egd-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionEventGridPublish/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionEventGridPublish/2019-04-01/Parameters/apicon-cpp-apps-integd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intst-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-stcppappsintprewe01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/Parameters/apicon-cpp-apps-intst-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-strst-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/Parameters/apicon-cpp-apps-strst-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-apimtst-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/Parameters/apicon-cpp-apps-apimtst-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-integ-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionEventGrid/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionEventGrid/2019-04-01/Parameters/apicon-cpp-apps-integ-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intcog-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-cog-cpp-apps-cmstrsl-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCognitiveService/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCognitiveService/2019-04-01/Parameters/apicon-cpp-apps-intcog-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intkv-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/Parameters/apicon-cpp-apps-intkv-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-intcds-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/Parameters/apicon-cpp-apps-intcds-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-ascalrt-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/apicon-cpp-apps-ascalrt-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-prdcds-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionCommonDataService/2019-04-01/Parameters/apicon-cpp-apps-prdcds-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intsec-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-integd-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intsec-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intprdt-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-integd-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intprdt-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-inttrsl-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01",
+				"DEP-apicon-cpp-apps-into365-pre-we-01",
+				"DEP-apicon-cpp-apps-intcog-pre-we-01",
+				"DEP-cog-cpp-apps-cmstrsl-pre-we-01",
+				"DEP-apicon-cpp-apps-intkv-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-inttrsl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intaprv1-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01",
+				"DEP-apicon-cpp-apps-into365-pre-we-01",
+				"DEP-apicon-cpp-apps-intkv-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intaprv1-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intgbaprl-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01",
+				"DEP-apicon-cpp-apps-into365-pre-we-01",
+				"DEP-apicon-cpp-apps-intkv-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intgbaprl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-secsync-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intspo-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-secsync-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-route-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01",
+				"DEP-apicon-cpp-apps-intst-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-route-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-6dbill-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intsb-pre-we-01",
+				"DEP-apicon-cpp-apps-integd-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-6dbill-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-6dhook-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-6dhook-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-mpsidx-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-intkv-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-mpsidx-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-mpsd365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01",
+				"DEP-logic-cpp-apps-mpsidx-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-mpsd365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-mpso365-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01",
+				"DEP-logic-cpp-apps-mpsidx-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-mpso365-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intfile-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01",
+				"DEP-apicon-cpp-apps-strst-pre-we-01",
+				"DEP-apicon-cpp-apps-intcds-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intfile-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-dfndr-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-ascalrt-pre-we-01",
+				"DEP-apicon-cpp-apps-intcds-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-dfndr-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-intsubs-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01",
+				"DEP-apicon-cpp-apps-prdcds-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-intsubs-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-apimt-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integd-pre-we-01",
+				"DEP-apicon-cpp-apps-intkv-pre-we-01",
+				"DEP-apicon-cpp-apps-apimtst-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-apimt-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-qnasync-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-qnasync-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-copyqna-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-sbt-cpp-apps-qnasync-pre-we-01",
+				"DEP-sb-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-copyqna-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		}
+	],
+	"outputs": {}
+}
