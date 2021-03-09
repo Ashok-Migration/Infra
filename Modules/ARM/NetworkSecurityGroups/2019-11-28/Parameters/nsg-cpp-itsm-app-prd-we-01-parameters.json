@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-cpp-itsm-app-prd-we-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "Deny_All_Inbound",
+          "properties": {
+            "description": "Deny_All_Inbound",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "Any",
+            "destinationAddressPrefix": "Any",
+            "access": "Deny",
+            "priority": 5000,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+	        }
+        },
+        {
+          "name": "Deny_All_Outbound",
+          "properties": {
+            "description": "Deny_All_Outbound",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "Any",
+            "destinationAddressPrefix": "Any",
+            "access": "Deny",
+            "priority": 5000,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+	        }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cph-pltf-mon-prd-we-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcphpltfnsgflprdwe01"
+    },
+    "workspaceRGName": {
+      "value": "rg-cph-pltf-mon-prd-we-01"
+    },
+    "workspaceName": {
+      "value": "log-cph-pltf-prd-we-01"
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    }
+  }
+}
