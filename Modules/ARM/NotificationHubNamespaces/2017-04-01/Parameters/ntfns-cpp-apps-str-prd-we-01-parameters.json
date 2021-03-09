@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westeurope"
+        },
+        "namespaceName": {
+            "value": "ntfns-cpp-apps-str-prd-we-01"
+        },
+        "notificationHubName": {
+            "value": "ntf-cpp-apps-str-prd-we-01"
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        },
+        "authorizationRules": {
+            "value": [
+                {
+                    "name": "RootManageSharedAccessKey",
+                    "properties": {
+                        "rights": [
+                            "Listen",
+                            "Manage",
+                            "Send"
+                        ]
+                    }
+                },
+                {
+                    "name": "SendListenAccess",
+                    "properties": {
+                        "rights": [
+                            "Listen",
+                            "Send"
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
