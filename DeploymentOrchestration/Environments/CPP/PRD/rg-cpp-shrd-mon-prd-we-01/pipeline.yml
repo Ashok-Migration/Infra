@@ -6,6 +6,8 @@ variables:
 
   - name: PoolName
     value: "tasmumsiprdagents"
+  #- name: vmImage
+  #  value: windows-latest
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPP/PRD/rg-cpp-shrd-mon-prd-we-01/deploy.json
   - name: parameterFilePath
@@ -36,7 +38,7 @@ stages:
         displayName: Validate Template
         pool:
           name: $(PoolName)
-          # vmImage: $(vmImage) 
+          #vmImage: $(vmImage) 
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
