@@ -37,26 +37,29 @@ param (
   $InstrumentationKey
 )
 
-Write-host "Started provisioning sectors on " $tenant -ForegroundColor Yellow
+function Install-RequiredModules{
+    Write-Host "Uninstalling PnP.PowerShell module" -ForegroundColor Green
+    $pnpPowerShellModule = Get-InstalledModule -Name PnP.PowerShell -ErrorAction SilentlyContinue
 
-$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
-$psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
-$loginResult = .$psspologin  @paramslogin
+    if($null -ne $pnpPowerShellModule){
+        Write-Host 'PnP.PowerShell moudule found. Uninstalling ...' -ForegroundColor Green
+        Uninstall-Module -Name PnP.PowerShell -AllVersions -ErrorAction SilentlyContinue -Force
+    }
+    else{
+        Write-Host 'PnP.PowerShell moudule not found.' -ForegroundColor Yellow
+    }
 
-$params = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey }
-$paramsnewsite = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; scope = $scope; InstrumentationKey = $InstrumentationKey }
-if ($null -ne $loginResult) {
-  $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa }
+    Write-host "Installing SharePointPnPPowerShellOnline module" -ForegroundColor Green
+    $pnpPowerShellModule = Get-InstalledModule -Name SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue
+    if($null -eq $pnpPowerShellModule){
+        Write-host "Installing SharePointPnPPowerShellOnline module not found. Installing ..." -ForegroundColor Green
+        Install-Module -Name SharePointPnPPowerShellOnline -Scope CurrentUser -Force
+    }
 }
-
-$psfilecreatenewsectorscript = Resolve-Path $PSScriptRoot".\createnewsectorsitescript.ps1"
-$psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsectorsitecollectionscript.ps1"
-
-.$psfilecreatenewsectorscript @paramsnewsite
 
 #region To check if all Content type exists in Global site 
 
-function checkContentTypeExists() {
+function Get-ContentTypes() {
   Write-host "Check if Content Type Exists started..." -ForegroundColor Green
   $filePath = $PSScriptRoot + '.\resources\Sectors.xml'
 
@@ -89,12 +92,31 @@ function checkContentTypeExists() {
 
 #endregion
 
+Install-RequiredModules
+
+Write-host "Started provisioning sectors on " $tenant -ForegroundColor Yellow
+
+$paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
+$psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
+$loginResult = .$psspologin  @paramslogin
+
+$params = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey }
+$paramsnewsite = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; scope = $scope; InstrumentationKey = $InstrumentationKey }
+if ($null -ne $loginResult) {
+  $webparams = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; fedAuth = $loginResult.FedAuth; rtFA = $loginResult.RtFa }
+}
+
+$psfilecreatenewsectorscript = Resolve-Path $PSScriptRoot".\createnewsectorsitescript.ps1"
+$psfileprovisionnewsitecollectionscript = Resolve-Path $PSScriptRoot".\provisionnewsectorsitecollectionscript.ps1"
+
+.$psfilecreatenewsectorscript @paramsnewsite
+
 do {
   Write-host "Sleep started for 1 minute..." -ForegroundColor Green
   start-sleep -s 60
   Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
   $isExists = $true
-  $isExists = checkContentTypeExists
+  $isExists = Get-ContentTypes
 }
 until ($isExists -eq $true)
 

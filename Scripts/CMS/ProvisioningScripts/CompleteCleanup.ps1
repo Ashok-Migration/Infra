@@ -99,10 +99,10 @@ function CompleteCleanup($sitefile, $scXML, $siteColumnfilePathfile, $termsfile)
   Remove-SiteCollections $sitefile
 
   # delete ContentTypes from Contenttypehub
-  Remove-ContentTypes $scXML
+  #Remove-ContentTypes $scXML
 
   # delete Site Columns from Contenttypehub
-  Remove-Fields $siteColumnfilePathfile
+  #Remove-Fields $siteColumnfilePathfile
 
   # delete Taxanomy from Term Store
   #Remove-TaxonomyGroup $termsfile
@@ -153,7 +153,7 @@ function Remove-SiteCollections($sitefile) {
       if ([bool] ($siteExits) -eq $true) {
         Write-Host 'Site exists ' $globalhubSiteUrl -ForegroundColor Green
         Write-Host 'Starting the removal process' -ForegroundColor Green
-        Remove-ListAndLibrary  -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.globalSPList
+        Remove-Lists -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.globalSPList
         Remove-SiteContentTypeGroup $globalhubSiteUrl $SiteColumnGroup $tenantAdmin
         Remove-SiteColumnGroup $globalhubSiteUrl $SiteColumnGroup $tenantAdmin
 
@@ -191,7 +191,7 @@ function Remove-SiteCollections($sitefile) {
           Write-Host 'Site exists ' $sectorhubSiteUrl -ForegroundColor Green
           Write-Host 'Starting the removal process' -ForegroundColor Green
 
-          Remove-ListAndLibrary  -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.sectorSPList
+          Remove-Lists -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.sectorSPList
           Remove-SiteContentTypeGroup $sectorhubSiteUrl $SiteColumnGroup $tenantAdmin
           Remove-SiteColumnGroup $sectorhubSiteUrl $SiteColumnGroup $tenantAdmin
 
@@ -208,6 +208,7 @@ function Remove-SiteCollections($sitefile) {
           $client.TrackEvent("Site Exists so, Remove-PnPTenantSite Started for $sectorhubSiteUrl")
 					
           try {
+            Unregister-PnPHubSite -Site $globalhubSiteUrl -Force
             Remove-PnPTenantSite -Url $sectorhubSiteUrl -Force -SkipRecycleBin
             Clear-PnPTenantRecycleBinItem -Url $sectorhubSiteUrl -Wait -Force
           }
@@ -281,7 +282,7 @@ function Remove-SiteCollections($sitefile) {
         Write-Host 'Site exists ' $globalSiteUrl -ForegroundColor Green
         Write-Host 'Starting the removal process' -ForegroundColor Green
 
-        Remove-ListAndLibrary  -siteUrl $globalSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.ConfigurationSPList
+        Remove-Lists -siteUrl $globalSiteUrl -tenantAdmin $tenantAdmin -nodeLevel $sitefile.sites.ConfigurationSPList
         Remove-SiteContentTypeGroup $globalSiteUrl $SiteColumnGroup $tenantAdmin
         Remove-SiteColumnGroup $globalSiteUrl $SiteColumnGroup $tenantAdmin
 
@@ -322,7 +323,7 @@ function Remove-SiteCollections($sitefile) {
     }
   }
 
-  Remove-DeletedSites -tenantUrl $tenantUrl -tenantAdmin $tenantAdmin
+  #Remove-DeletedSites -tenantUrl $tenantUrl -tenantAdmin $tenantAdmin
 
   Disconnect-PnPOnline
 }
@@ -418,29 +419,7 @@ function Remove-Fields($siteColumnfilePathfile) {
   $client.TrackEvent("Delete Site Columns Started...")
 	 
   foreach ($field in $siteColumnfilePathfile.SiteFields.Field) {
-    try {
-      $getField = Get-PNPField -identity $field.ColumnName -ErrorAction SilentlyContinue
-		
-      if ([bool] ($getField) -eq $true) {
-        $colName = $field.ColumnName
-        Write-Host "Field $colName Exists so, Remove-PnPField Started."
-        $client.TrackEvent("Field  $colName Exists so, Remove-PnPField Started.")
-				
-        Remove-PnPField -Identity $field.ColumnName -Force -Connection $connection
-				
-        Write-Host "Field  $colName  Removed."
-        $client.TrackEvent("Field  $colName  Removed.")
-      }
-		 
-    }
-    catch {
-      $ErrorMessage = $_.Exception.Message
-      Write-Host $ErrorMessage -foreground Red
-
-      $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-      $telemtryException.Exception = $_.Exception.Message  
-      $client.TrackException($telemtryException)
-    }
+    Remove-Field -field $field -connection $connection
   }
 
   Disconnect-PnPOnline
@@ -618,7 +597,7 @@ Function Remove-SiteContentTypeGroup($SiteURL, $SiteColumnGroup, $tenantAdmin) {
         }
         catch {
           write-host -f Red "Error Removing Site Content Type!" $CT.name $_.Exception.Message
-
+          Remove-ContentType -SiteURL $SiteURL -ContentTypeName $CT.Name -tenantAdmin $tenantAdmin
         }
       }
       Write-host -f Green "Site Content Type Deleted Successfully!"
@@ -756,9 +735,11 @@ function Remove-ItemsFromRecycleBin {
     #Move All Deleted Items to 2nd Stage Recycle bin
     $Ctx.Site.RecycleBin.MoveAllToSecondStage()
     $Ctx.ExecuteQuery()
+    Write-Host 'Moving all deleted items to 2nd stage recycle bin' -ForegroundColor Yellow
     #Delete All Items from 2nd Stage Recycle bin
     $Ctx.Site.RecycleBin.DeleteAllSecondStageItems()
     $Ctx.ExecuteQuery()
+    Write-Host 'All items are deleted from 2nd stage recycle bin' -ForegroundColor Green
   }
   catch {
     write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
@@ -776,8 +757,11 @@ function Remove-AppFromSite {
     Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
     $App = Get-PnPApp | Where-Object { $_.Title -eq $appName }
     if ([bool]($App) -eq $true) {
+      Write-Host $appName 'found at ' $siteUrl
+      Write-Host 'Unistalling and removing ' $appName 'from ' $siteUrl
       Uninstall-PnPApp -Identity $App.Id
       Remove-PnPApp -Identity $App.Id
+      Write-Host $appName 'is unistalled and removed from the site collection ' $siteUrl
     }
   }
   catch {
@@ -807,7 +791,7 @@ function Get-AppsFromXmlFileAndRemove {
   }
 }
 
-function Remove-ListAndLibrary {
+function Remove-Lists {
   param (
     $siteUrl,
     $tenantAdmin,
@@ -815,13 +799,8 @@ function Remove-ListAndLibrary {
   )
 	
   try {
-    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
     foreach ($itemList in $nodeLevel.ListAndContentTypes) {
-      $listName = $itemList.ListName
-      $removeList = Remove-PnPList -Identity $listName -Force
-      Write-Host $listName 'deleted successfully from the site ' $siteUrl -ForegroundColor Green
-
-      Remove-ItemsFromRecycleBin -SiteUrl $siteUrl -tenantAdmin $tenantAdmin
+      Remove-List -listName $itemList.ListName -siteUrl $siteUrl -tenantAdmin $tenantAdmin
     }
   }
   catch {
@@ -858,6 +837,182 @@ function Remove-ProductLookupFields {
     if ([bool]($fieldProductNameExists) -eq $true) {
       Remove-PnPField -Identity ProductName -Force
     }
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage -foreground Red
+
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+  }
+}
+
+function Get-ContentTypeReferences() {
+  param (
+    $SiteURL,
+    $ContentTypeName,
+    $tenantAdmin
+  )
+  Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+  Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+
+  $admin = $tenantAdmin.UserName
+  $password = $tenantAdmin.Password
+  $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+
+  try {
+    Write-host -f Yellow "Processing Site:" $SiteURL
+ 
+    #Setup the context
+    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+    $Ctx.Credentials = $credentials
+     
+    #Get All Lists of the Web
+    $Ctx.Load($Ctx.Web)
+    $Ctx.Load($Ctx.Web.Lists)
+    $Ctx.Load($ctx.Web.Webs)
+    $Ctx.ExecuteQuery()
+ 
+    #Get content types of each list from the web
+    $ContentTypeUsages = @()
+    foreach ($List in $Ctx.Web.Lists) {
+      $ContentTypes = $List.ContentTypes
+      $Ctx.Load($ContentTypes)
+      $Ctx.Load($List.RootFolder)
+      $Ctx.ExecuteQuery()
+             
+      #Get List URL
+      If ($Ctx.Web.ServerRelativeUrl -ne "/") {
+        $ListURL = $("{0}{1}" -f $Ctx.Web.Url.Replace($Ctx.Web.ServerRelativeUrl, ''), $List.RootFolder.ServerRelativeUrl)
+      }
+      else {
+        $ListURL = $("{0}{1}" -f $Ctx.Web.Url, $List.RootFolder.ServerRelativeUrl)
+      }
+   
+      #Get each content type data
+      foreach ($CType in $ContentTypes) {
+        If ($CType.Name -eq $ContentTypeName) {
+          $ContentTypeUsage = New-Object PSObject
+          $ContentTypeUsage | Add-Member NoteProperty SiteURL($SiteURL)
+          $ContentTypeUsage | Add-Member NoteProperty ListName($List.Title)
+          $ContentTypeUsage | Add-Member NoteProperty ListURL($ListURL)
+          $ContentTypeUsage | Add-Member NoteProperty ContentTypeName($CType.Name)
+          $ContentTypeUsages += $ContentTypeUsage
+          Write-host -f Green "Found the Content Type at:" $ListURL
+          #delete the list/library first and then delete it from the recycle bin stage 1 & stage 2
+          Remove-List -siteUrl $SiteURL -listName $list.Title -tenantAdmin $tenantAdmin
+        }
+      }
+    }
+    #Iterate through each subsite of the current web and call the function recursively
+    foreach ($Subweb in $Ctx.web.Webs) {
+      #Call the function recursively to process all subsites underneaththe current web
+      Get-ContentTypeReferences $Subweb.url $ContentTypeName
+    }
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage -foreground Red
+  
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+  }
+}
+
+function Remove-ContentType() {
+  param
+  (
+    $SiteURL,
+    $ContentTypeName,
+    $tenantAdmin
+  )
+ 
+  try {
+    $admin = $tenantAdmin.UserName
+    $password = $tenantAdmin.Password
+    $Credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+ 
+    #Setup the context
+    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+    $Ctx.Credentials = $Credentials
+     
+    #Get the content type from web
+    $ContentTypeColl = $Ctx.Web.ContentTypes
+    $Ctx.Load($ContentTypeColl)
+    $Ctx.ExecuteQuery()
+         
+    #Check if the content type exists in the site       
+    $ContentType = $ContentTypeColl | Where-Object { $_.Name -eq $ContentTypeName }
+    If ($Null -eq $ContentType) {
+      Write-host "Content Type '$ContentTypeName' doesn't exists in '$SiteURL'" -f Yellow
+    }
+    else {
+      #delete the content type
+      $ContentType.DeleteObject()
+      $Ctx.ExecuteQuery()
+ 
+      Write-host "Content Type '$ContentTypeName' deleted successfully!" -ForegroundColor Green
+    }
+  }
+  catch {
+    write-host -f Red "Error Deleting Content Type!" $_.Exception.Message
+    Get-ContentTypeReferences -ContentTypeName $ContentTypeName -SiteURL $SiteURL -tenantAdmin $tenantAdmin
+    #Try to delete the content type again
+    $ContentType = Get-PnPContentType -Identity $ContentTypeName
+    If ($ContentType) {
+      Write-Host 'Content type :' $ContentType 'found.Trying to delete it' -ForegroundColor Yellow
+      Remove-PnPContentType -Identity $ContentTypeName -Force
+      Write-Host $ContentType 'deleted successfully' -ForegroundColor Green
+    }
+  }
+}
+
+function Remove-Field {
+  param (
+    $field,
+    $connection
+  )
+  
+  try {
+    $getField = Get-PnpField -identity $field.ColumnName -Connection $connection -ErrorAction SilentlyContinue
+  
+    if ([bool] ($getField) -eq $true) {
+      $colName = $field.ColumnName
+      Write-Host "Field $colName Exists so, Remove-PnPField Started."
+      $client.TrackEvent("Field  $colName Exists so, Remove-PnPField Started.")
+      
+      Remove-PnPField -Identity $field.ColumnName -Force -Connection $connection
+      
+      Write-Host "Field  $colName  Removed."
+      $client.TrackEvent("Field  $colName  Removed.")
+    }
+   
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage -foreground Red
+
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+  }
+}
+
+function Remove-List {
+  param (
+    $listName,
+    $siteUrl,
+    $tenantAdmin
+  )
+  
+  try {
+    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    $removedList = Remove-PnPList -Identity $listName -Force
+    Write-Host $listName 'deleted successfully from the site ' $siteUrl -ForegroundColor Green
+    Write-Host 'Emptying the recycle bin' -ForegroundColor Yellow
+    Remove-ItemsFromRecycleBin -SiteUrl $siteUrl -tenantAdmin $tenantAdmin
   }
   catch {
     $ErrorMessage = $_.Exception.Message

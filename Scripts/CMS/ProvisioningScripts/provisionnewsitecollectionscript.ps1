@@ -87,6 +87,10 @@ function Add-ComponentsForSites() {
   Add-FileToRootSiteCollection $rootSiteCollection $tenantAdmin $destinationPath $sourceFiles
   #endregion 
 
+  #region Add Everyone except external users to the visitor gtoup
+  AddEveryoneDefaultUserToVisitorGroup -siteUrl $rootSiteCollection -tenantAdmin $tenantAdmin
+  #endregion
+
   Write-Host "Provisioning completed successfully" -ForegroundColor Green
   $client.TrackEvent("Completed.")
 }
@@ -97,7 +101,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
   $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
   $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
     
-  foreach ($globalconfigsite in $sitefile.sites.Configsite.site) {
+ foreach ($globalconfigsite in $sitefile.sites.Configsite.site) {
     $urlprefix = "https://" + $tenant + ".sharepoint.com/sites/"
     $globalconfigSiteUrl = $urlprefix + $globalconfigsite.Alias
     Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
@@ -112,16 +116,17 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       Set-PnPTenantSite -Url $globalconfigSiteUrl -SharingCapability ExternalUserSharingOnly
       Add-ListAndLibrary $globalconfigSiteUrl $sitefile.sites.ConfigurationSPList
       Edit-SiteColumns $globalconfigSiteUrl $sitefile.sites.updateSiteColumns.configChange $tenantAdmin
+      Add-SiteCollectionAdmins -siteUrl $globalconfigSiteUrl -tenantAdmin $tenantAdmin -users $sitefile.sites.configSPAdmin.users
       Add-UniquePermission $sitefile.sites.UniquePermissions.List $globalconfigSiteUrl
       Add-CustomQuickLaunchNavigationGlobal $globalconfigSiteUrl $sitefile.sites.globalConfigNav
       New-SPFXWebPart $globalconfigSiteUrl $tenantAdmin 'Global'
-
+      
       #check if the navigation webpart is present on the page or not
       $navigationContentWP = Get-PnPClientSideComponent -Page Home.aspx | Where-Object { $_.Title -eq "Navigation Content" }
       if ([bool]($navigationContentWP) -eq $True) {
         Remove-PnPClientSideComponent -Page "Home" -InstanceId $navigationContentWP.InstanceId -Force
       }
-
+      
       #region Add the Navigation Content webpart to the page
       $marketplaceUrl = $urlprefix + $sitefile.sites.globalhubsite.site.Alias
       $webpartName = "Navigation Content"
@@ -130,13 +135,17 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       $property.showEntities = $false
       $property.marketplaceUrl = $marketplaceUrl
       $prop = $property | ConvertTo-Json
-
+      
+      Write-host "Sleep started for 2 minutes..." -ForegroundColor Green
+      start-sleep -s 120
+      Write-host "Sleep completed for 2 minutes..." -ForegroundColor Green
+      
       Add-CustomWebPartToPage $globalconfigSiteUrl $tenantAdmin $pageName $prop $webpartName
       #endregion
       Publish-SitePage $globalconfigSiteUrl $tenantAdmin '/SitePages/Home.aspx'
     }
   }
-
+  
   foreach ($globalhubsite in $sitefile.sites.globalhubsite.site) {
     $isGlobalHubSite = $true
     $globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
@@ -150,13 +159,16 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       .$psfilecreatesitecolumnscript @paramsSiteColumn
       Connect-PnPOnline -Url $globalhubSiteUrl -Credentials $tenantAdmin
       Set-PnPTenantSite -Url $globalhubSiteUrl -SharingCapability ExternalUserSharingOnly
+      New-SiteCollectionAppCatalog $globalhubSiteUrl         
+      New-SPFXWebPart $globalhubSiteUrl $tenantAdmin 'Marketplace'
       Add-ListAndLibrary $globalhubSiteUrl $sitefile.sites.globalSPList
       Add-FieldsAndListProductDocuments($globalhubSiteUrl)
       Edit-SiteColumns $globalhubSiteUrl $sitefile.sites.updateSiteColumns.globalChange $tenantAdmin
       Remove-SiteColumns $globalhubSiteUrl $sitefile.sites.deleteSiteColumns $tenantAdmin
       Add-SiteCollectionAdmins -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -users $sitefile.sites.globalSPAdmin.users
       Add-GroupAndUsers $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
-      Set-GroupViewSettings -SiteURL $globalhubSiteUrl -tenantAdmin $tenantAdmin -Groups $sitefile.sites.globalSPGroup
+      Edit-GroupOwner $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
+      Set-GroupViewSettings -SiteURL $globalhubSiteUrl -tenantAdmin $tenantAdmin -Groups $sitefile.sites.globalSPGroup -siteAlias $globalhubsite.Title
       Add-UsersToDefaultSharePointGroup $globalhubSiteUrl $sitefile.sites.globalSPGroup $globalhubsite.Title
       Add-UniquePermission $sitefile.sites.UniquePermissions.List $globalhubSiteUrl
       Add-Theme $themeGlobal $globalhubSiteUrl $tenantAdmin $tenantUrl
@@ -165,41 +177,44 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       New-WebPartToPage $globalhubSiteUrl $sitefile.sites.globalPageWebpart
       Edit-RegionalSettings $globalhubSiteUrl $tenantAdmin
       Edit-ViewForTasksList 'My Tasks' $globalhubSiteUrl
-      New-SiteCollectionAppCatalog $globalhubSiteUrl         
-      New-SPFXWebPart $globalhubSiteUrl $tenantAdmin 'Marketplace'
-
+      
+      
       #region My Task web part
       $componentName = "MyTasks"
       $pageName = 'MyTasks'
       $translationTaskContentTypeId = Get-ContentTypeId $globalhubSiteUrl $tenantAdmin "TASMU Translation Tasks" "My Tasks"
       $approverTaskContentTypeId = Get-ContentTypeId $globalhubSiteUrl $tenantAdmin "TASMU Approval Tasks" "My Tasks"
       $myTaskListId = Get-ListId $globalhubSiteUrl $tenantAdmin "My Tasks"
-
+      
       $property = @{}
       $property.webPartTitle = "My Tasks"
       $property.itemsPerPage = 30
       $property.viewMode = "Detailed"
-      $property.arWebPartTitle = "My Tasks"
+      $property.arWebPartTitle = "المهام الموكلة إليّ"
       $property.list = $myTaskListId.Guid
       $property.translationTaskContentType = $translationTaskContentTypeId.StringValue
       $property.approvalTaskContentType = $approverTaskContentTypeId.StringValue
       $prop = $property | ConvertTo-Json
             
+      Write-host "Sleep started for 2 minutes..." -ForegroundColor Green
+      start-sleep -s 120
+      Write-host "Sleep completed for 2 minutes..." -ForegroundColor Green
+      
       Add-CustomWebPartToPage $globalhubSiteUrl $tenantAdmin $pageName $prop $componentName 
       Publish-SitePage $globalhubSiteUrl $tenantAdmin '/SitePages/MyTasks.aspx'
-
+      
       $pageName = 'Home'
       $property = @{}
       $property.webPartTitle = "My Tasks"
       $property.itemsPerPage = 5
       $property.viewMode = "Compact"
-      $property.arWebPartTitle = "My Tasks"
+      $property.arWebPartTitle = "المهام الموكلة إليّ"
       $property.list = $myTaskListId.Guid
       $property.translationTaskContentType = $translationTaskContentTypeId.StringValue
       $property.approvalTaskContentType = $approverTaskContentTypeId.StringValue
       $property.seeAllLink = $globalhubSiteUrl + '/SitePages/MyTasks.aspx'
       $prop = $property | ConvertTo-Json
-
+      
       Add-CustomWebPartToPage $globalhubSiteUrl $tenantAdmin $pageName $prop $componentName 1 1 0
       #endregion
       Edit-ListViewWebPartProperties $sitefile.sites.globalPageWebpart.page.name 1 $globalhubSiteUrl $tenantAdmin
@@ -210,7 +225,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
 
       #Add-Files $globalhubSiteUrl $sitefile.sites.globalUploadFiles
     }
-                
+               
     foreach ($sectorhubsite in $globalhubsite.sectorhubsite.site) {
       $isGlobalHubSite = $False
       $isSectorHubSite = $True
@@ -233,7 +248,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
           $paramsSiteColumn = @{tenant = $tenant; TemplateParametersFile = $TemplateParametersFile; sp_user = $sp_user; sp_password = $sp_password; InstrumentationKey = $InstrumentationKey; contenttypehub = $sectorhubSiteUrl }
           $psfilecreatesitecolumnscript = Resolve-Path $PSScriptRoot".\createsitecolumnscript.ps1"
           .$psfilecreatesitecolumnscript @paramsSiteColumn
-
+          
           Connect-PnPOnline -Url $sectorhubSiteUrl -Credentials $tenantAdmin
           Set-PnPTenantSite -Url $sectorhubSiteUrl -SharingCapability ExternalUserSharingOnly
           ####Register the created Site as Hub Site
@@ -245,11 +260,14 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
             Write-Host $ErrorMessage -ForegroundColor Yellow
           }
           EnableMegaMenu $sectorhubSiteUrl
+          New-SiteCollectionAppCatalog $sectorhubSiteUrl
+          New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
           Add-ListAndLibrary $sectorhubSiteUrl $sitefile.sites.sectorSPList
           Edit-SiteColumns $sectorhubSiteUrl $sitefile.sites.updateSiteColumns.sectorChange $tenantAdmin
           Add-SiteCollectionAdmins -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -users $sitefile.sites.sectorSPAdmin.users
           Add-GroupAndUsers $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
-          Set-GroupViewSettings -SiteURL $sectorhubSiteUrl -tenantAdmin $tenantAdmin -Groups $sitefile.sites.sectorSPGroup
+          Edit-GroupOwner $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
+          Set-GroupViewSettings -SiteURL $sectorhubSiteUrl -tenantAdmin $tenantAdmin -Groups $sitefile.sites.sectorSPGroup -siteAlias $sectorhubsite.Title
           Add-UsersToDefaultSharePointGroup $sectorhubSiteUrl $sitefile.sites.sectorSPGroup $sectorhubsite.Title
           Add-UniquePermission $sitefile.sites.UniquePermissions.List $sectorhubSiteUrl
           Add-Theme $themeSector $sectorhubSiteUrl $tenantAdmin $tenantUrl
@@ -257,47 +275,49 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
           New-WebPartToPage $sectorhubSiteUrl $sitefile.sites.sectorPageWebpart
           Edit-RegionalSettings $sectorhubSiteUrl $tenantAdmin
           Edit-ViewForTasksList 'My Tasks' $sectorhubSiteUrl
-          New-SiteCollectionAppCatalog $sectorhubSiteUrl
-          New-SPFXWebPart $sectorhubSiteUrl $tenantAdmin 'Sector'
           New-SitePage $sectorhubSiteUrl 'MyTasks' $tenantAdmin
                 
           #region my Task web part
           $componentName = "MyTasks"
           $pageName = 'MyTasks'
-          $translationTaskContentTypeId = Get-ContentTypeId $sectorhubSiteUrl $tenantAdmin "TASMU Translation Tasks"
-          $approverTaskContentTypeId = Get-ContentTypeId $sectorhubSiteUrl $tenantAdmin "TASMU Approval Tasks"
+          $translationTaskContentTypeId = Get-ContentTypeId $sectorhubSiteUrl $tenantAdmin "TASMU Translation Tasks" "My Tasks"
+          $approverTaskContentTypeId = Get-ContentTypeId $sectorhubSiteUrl $tenantAdmin "TASMU Approval Tasks" "My Tasks"
           $myTaskListId = Get-ListId $sectorhubSiteUrl $tenantAdmin "My Tasks"
-
+          
           $property = @{}
           $property.webPartTitle = "My Tasks"
           $property.itemsPerPage = 30
           $property.viewMode = "Detailed"
-          $property.arWebPartTitle = "My Tasks"
+          $property.arWebPartTitle = "المهام الموكلة إليّ"
           $property.list = $myTaskListId.Guid
           $property.translationTaskContentType = $translationTaskContentTypeId.StringValue
           $property.approvalTaskContentType = $approverTaskContentTypeId.StringValue
           $prop = $property | ConvertTo-Json
-
+          
+          Write-host "Sleep started for 2 minutes..." -ForegroundColor Green
+          start-sleep -s 120
+          Write-host "Sleep completed for 2 minutes..." -ForegroundColor Green
+          
           Add-CustomWebPartToPage $sectorhubSiteUrl $tenantAdmin $pageName $prop $componentName
-
+          
           $pageName = 'Home'
-
+          
           $property = @{}
           $property.webPartTitle = "My Tasks"
           $property.itemsPerPage = 5
           $property.viewMode = "Compact"
-          $property.arWebPartTitle = "My Tasks"
+          $property.arWebPartTitle = "المهام الموكلة إليّ"
           $property.list = $myTaskListId
           $property.list = $myTaskListId.Guid
           $property.translationTaskContentType = $translationTaskContentTypeId.StringValue
           $property.approvalTaskContentType = $approverTaskContentTypeId.StringValue
           $property.seeAllLink = $sectorhubSiteUrl + '/SitePages/MyTasks.aspx'
           $prop = $property | ConvertTo-Json
-
+          
           Add-CustomWebPartToPage $sectorhubSiteUrl $tenantAdmin $pageName $prop $componentName 1 1 0
           #endregion
           Publish-SitePage $sectorhubSiteUrl $tenantAdmin '/SitePages/MyTasks.aspx'
-
+          
           Edit-ListViewWebPartProperties $sitefile.sites.sectorPageWebpart.page.name 1 $sectorhubSiteUrl $tenantAdmin
           Publish-SitePage $sectorhubSiteUrl $tenantAdmin '/SitePages/Home.aspx'
           Add-CustomQuickLaunchNavigationSector $sectorhubSiteUrl $sitefile.sites.sectorNav.QuickLaunchNav
@@ -309,58 +329,11 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
         }
         
       } 
-       
-      # Entity provisioning   
-      #    foreach($orgassociatedsite in $sectorhubsite.orgassociatedsite.site)
-      #     {
-
-      #        Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
-      #        $connection = Get-PnPConnection
-
-      #        $isGlobalHubSite = $False
-      #        $isSectorHubSite = $False
-      #        $isOrgSite = $True
-      #        $orgSiteUrl = $urlprefix + $orgassociatedsite.Alias
-                                       
-      #        $siteExits = Get-PnPTenantSite -Url $orgSiteUrl -ErrorAction SilentlyContinue
-                    
-      #        if ([bool] ($siteExits) -eq $true) {
-                   
-      #            #Register the created Team Site as Associated Site for SectorHubSite
-      #            Add-PnPHubSiteAssociation -Site $orgSiteUrl -HubSite $sectorhubSiteUrl
-      #            Write-Verbose "Association succeeded" -Verbose
-      #            EnableMegaMenu $orgSiteUrl
-      #            Add-ListAndLibrary $orgSiteUrl $sitefile.sites.orgSPList
-      #            Add-GroupAndUsers $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
-      #            Add-UsersToDefaultSharePointGroup $orgSiteUrl $sitefile.sites.orgSPGroup $orgassociatedsite.Title
-      #            Add-CustomQuickLaunchNavigationSector $orgSiteUrl $sitefile.sites.orgNav.QuickLaunchNav
-      #            Add-Theme $sitefile.sites.orgtheme.Name $orgSiteUrl $tenantAdmin $tenantUrl
-                                    
-      #            New-ModernPage $orgSiteUrl $sitefile.sites.orgPageWebpart
-      #            New-WebPartToPage $orgSiteUrl $sitefile.sites.orgPageWebpart
-      #			 $webpartkeyHeight = 1
-      #		     Edit-ListViewWebPartProperties $sitefile.sites.orgPageWebpart.page.name $webpartkeyHeight
-      #		     Edit-RegionalSettings $orgSiteUrl $tenantAdmin
-      #            #Add-Files $orgSiteUrl $sitefile.sites.orgUploadFiles
-      #            Edit-SiteColumns $orgSiteUrl $sitefile.sites.updateSiteColumns.orgChange $tenantAdmin
-      #            Edit-ViewForTasksList 'My Tasks' $orgSiteUrl
-                   
-      #            #Check and add the app catalog             
-      #            New-SiteCollectionAppCatalog $orgSiteUrl             
-      #            #Check and add the spfx webpart   
-      #            $appName = "sector-custom-style-client-side-solution"          
-      #            New-SPFXWebPart $orgSiteUrl $tenantAdmin $appName
-
-      #            #Uncomment and run below line on new site creation only, else keep commented
-      #            AddEntryInConfigurationListForOrgSite $globalconfigSiteUrl $orgSiteUrl $sitefile.sites.orgAddItemConfigurationList.item $orgassociatedsite.Title
-                   
-      #        }               
-      #      }          
-
     }
   }
+  
   #set at Search Configuration tenant level, Uncomment to execute it
-  $serchConfigPath = $PSScriptRoot + '\resources\Add-SearchConfiguration.xml'
+  $serchConfigPath = $PSScriptRoot + '\resources\SearchConfiguration.xml'
   Add-SearchConfiguration $scope $serchConfigPath
   #Disconnect-PnPOnline   
 }
@@ -468,7 +441,14 @@ function Add-FieldsAndListProductDocuments($globalhubSiteUrl) {
       #Call the function to add Content Type to list
       $ListBase = Get-PnPContentType -Identity $nodeList.ContentTypeName -ErrorAction Stop -Connection $connection
       Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
-      $contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
+      #original code
+      #$contentTypeToList = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
+
+      #region New Code for adding content type to list
+      Add-ContentTypeToList -SiteURL $globalhubSiteUrl -ListName $ListName -CTypeName $nodeList.ContentTypeName -tenantAdmin $tenantAdmin
+      #Set Default Content Type of the List
+      Set-PnPDefaultContentTypeToList -List $ListName -ContentType $nodeList.ContentTypeName 
+      #endregion
       Write-Host $ListBase.Name 'content type added to the List ' $ListName -ForegroundColor Green
       $client.TrackEvent("Content Type, $ContentTypeName added to List, $ListName")
 
@@ -537,7 +517,7 @@ Function Add-LookupField() {
   }
 }
 
-Function CreateLookupColumnForList() {
+Function New-LookupColumnForList() {
   param
   (
     [Parameter(Mandatory = $true)] [string] $SiteURL,
@@ -590,20 +570,19 @@ function New-ContentType($contenttypehub, $ContentTypeName, $ContentTypeDesc, $P
   try {
     $ContentTypeExist = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
     #Check for existence of  site content type
-    if ([bool]($ContentTypeExist) -eq $false) {
-      Write-Host 'Content Type not found ,so creating a new contenttype' $ContentTypeName -Foreground Green
-      $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
-      $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
-      $addContentType = Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
-    }
-    else {
+    if ([bool]($ContentTypeExist) -eq $true) {
       Write-Host "$ContentTypeName already exists" -ForeGround Yellow
       $client.TrackEvent("$ContentTypeName already exists")
-
-    }  
+    } 
+    else{
+        Write-Host 'Content Type not found ,so creating a new contenttype' $ContentTypeName -Foreground Green
+       $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
+       $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
+       $addContentType = Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
+    }
   }
   catch {
-    $ErrorMessage = $_.Exception.Message
+        $ErrorMessage = $_.Exception.Message
     Write-Host $ErrorMessage -foreground Red
     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
     $telemtryException.Exception = $_.Exception.Message  
@@ -639,8 +618,13 @@ function Add-EntryInConfigurationListForGlobalSite($globalconfigSiteUrl, $SiteUr
     $client.TrackEvent("Addding entry In Configuration List for the site $SiteUrl")
 
     Connect-PnPOnline -Url $globalconfigSiteUrl -Credentials $tenantAdmin
+
     $configListName = $node.configListName
-    $addListItem = Add-PnPListItem -List $configListName -Values @{"SiteURL" = $SiteUrl; "SiteLevel" = $node.SiteLevel; "ListNames" = $node.ListNames; "Approvers" = $node.Approvers; "CriticalApprovers" = $node.CriticalApprovers; "Translators" = $node.Translators }
+    $query = "<View><Query><Where><Eq><FieldRef Name='SiteURL'/><Value Type='Text'>" + $siteUrl + "</Value></Eq></Where></Query></View>" 
+    $listItem = Get-PnPListItem -List $configListName -Query $query
+    if ([bool]($listItem) -eq $false) {
+      $addListItem = Add-PnPListItem -List $configListName -Values @{"SiteURL" = $SiteUrl; "SiteLevel" = $node.SiteLevel; "ListNames" = $node.ListNames; "Approvers" = $node.Approvers; "CriticalApprovers" = $node.CriticalApprovers; "Translators" = $node.Translators }
+    }
   }
   catch {
     $ErrorMessage = $_.Exception.Message
@@ -658,9 +642,13 @@ function Add-EntryInConfigurationListForSectorSite($globalconfigSiteUrl, $SiteUr
     $client.TrackEvent("Addding entry In Configuration List for the site $SiteUrl")
 
     Connect-PnPOnline -Url $globalconfigSiteUrl -Credentials $tenantAdmin
-    $sectorApprovers = $node.Approvers.Replace('Sector', $value)
-    $sectorTranslators = $node.Translators.Replace('Sector', $value)
-    $addListItem = Add-PnPListItem -List $node.configListName -Values @{"SiteURL" = $SiteUrl; "SiteLevel" = $node.SiteLevel; "ListNames" = $node.ListNames; "Sector" = $value; "Approvers" = $sectorApprovers; "Translators" = $sectorTranslators }
+    $query = "<View><Query><Where><Eq><FieldRef Name='SiteURL'/><Value Type='Text'>" + $siteUrl + "</Value></Eq></Where></Query></View>" 
+    $listItem = Get-PnPListItem -List $node.configListName -Query $query
+    if ([bool]($listItem) -eq $false) {
+      $sectorApprovers = $node.Approvers.Replace('Sector', $value)
+      $sectorTranslators = $node.Translators.Replace('Sector', $value)
+      $addListItem = Add-PnPListItem -List $node.configListName -Values @{"SiteURL" = $SiteUrl; "SiteLevel" = $node.SiteLevel; "ListNames" = $node.ListNames; "Sector" = $value; "Approvers" = $sectorApprovers; "Translators" = $sectorTranslators }
+    }
   }
   catch {
     $ErrorMessage = $_.Exception.Message
@@ -694,12 +682,15 @@ function Add-SearchConfiguration($scope, $serchConfigPath) {
   try {
     if (Test-Path $serchConfigPath) {
       $client.TrackEvent("Search Configuration Started at Tenent Level.")
+      Write-Host 'Search Configuration Started at Tenent Level.' -ForegroundColor Green
       Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
       Set-PnPSearchConfiguration -Path $serchConfigPath -Scope $scope
       $client.TrackEvent("Completed.")
+      Write-Host 'Search Configuration Completed at Tenent Level.' -ForegroundColor Green
     }
     else {
       $client.TrackEvent("Search Configuration Completed at Tenent Level.")
+      Write-Host 'Search Configuration Completed at Tenent Level.' -ForegroundColor Green
     }
   }
   catch {
@@ -909,7 +900,7 @@ function Add-CustomQuickLaunchNavigationGlobal($url, $nodeLevel) {
 function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
   try {
     $client.TrackEvent("Configure Custom Navigation, Started.")
-
+    Write-Host "Configure Custom Navigation, Started."
     $connection = Connect-PnPOnline -Url $url -Credentials $tenantAdmin
     Remove-PnPNavigationNode -Title Documents -Location QuickLaunch -Force
     Remove-PnPNavigationNode -Title Pages -Location QuickLaunch -Force
@@ -935,6 +926,7 @@ function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
           $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "QuickLaunch"
         }
         $client.TrackEvent("Root navigation node created, $level1.nodeName")
+        Write-Host "Root navigation node created" $level1.nodeName
 
         foreach ($level2 in $level1.Level2) {
         
@@ -971,6 +963,7 @@ function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
         
             
           $client.TrackEvent("Navigation node created, $level2.nodeName")
+          Write-Host "Navigation node created" $level2.nodeName
         
           $TopNav = Get-PnPNavigationNode -Id $rootNavNode.Id
 
@@ -983,6 +976,7 @@ function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
                   $level3currentURL = $urlprefix + $level3url
                   AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
                   $client.TrackEvent("Navigation node created, $level3.nodeName") 
+                  Write-Host "Navigation node created" $level3.nodeName
                 }
               }
             }
@@ -1006,7 +1000,7 @@ function Add-CustomQuickLaunchNavigationSector($url, $nodeLevel) {
 function Add-CustomTopNavigationSector($url, $nodeLevel) {
   try {
     $client.TrackEvent("Configure Custom Navigation, Started.")
-
+    Write-Host "Configure Custom Top Navigation, Started."
     Connect-PnPOnline -Url $url -Credentials $tenantAdmin
      
     foreach ($level1 in $nodeLevel.Level1) {
@@ -1027,6 +1021,7 @@ function Add-CustomTopNavigationSector($url, $nodeLevel) {
           $rootNavNode = Add-PnPNavigationNode -Title $level1.nodeName -Location "TopNavigationBar"
         }
         $client.TrackEvent("Root navigation node created, $level1.nodeName")
+        Write-Host "Root navigation node created" $level1.nodeName
 
         foreach ($level2 in $level1.Level2) {
           $TopNav = Get-PnPNavigationNode -id  $rootNavNode.Id
@@ -1044,7 +1039,7 @@ function Add-CustomTopNavigationSector($url, $nodeLevel) {
                   $level3currentURL = $urlprefix + $level3url
                   AddPnPNavigationNode $level3.nodeName $level3currentURL $child.Id
                   $client.TrackEvent("Navigation node created, $level3.nodeName") 
-        
+                  Write-Host "Navigation node created" $level3.nodeName
                 }
               }
             }
@@ -1226,6 +1221,41 @@ function Add-GroupAndUsers($url, $nodeLevel, $siteAlias) {
   Disconnect-PnPOnline
 }
 
+function Edit-GroupOwner($url, $nodeLevel, $siteAlias) {
+  $siteUrl = $url
+  $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+   
+  try {
+
+    foreach ($SPGroup in $nodeLevel.group) {
+      if ($siteAlias -eq "TASMU CMS") {
+        $SPGroupName = 'Global ' + $SPGroup.Name
+      }
+      else {
+        $SPGroupName = $siteAlias + ' ' + $SPGroup.Name
+      }
+      $groupExists = Get-PnPGroup $SPGroupName -Connection $connection -ErrorAction SilentlyContinue
+        
+      if ([bool]($groupExists) -eq $true) {
+        try {
+          $ownerGroup = Get-PnPGroup -AssociatedOwnerGroup
+          #Set Group Owner
+          Set-PnPGroup -Identity $SPGroupName -Owner $ownerGroup.Title
+          Write-Host 'Group Owner updated for the group ' $SPGroupName 'successfully' -ForegroundColor Green
+        }
+        catch {
+          $ErrorMessage = $_.Exception.Message
+          Write-Host $ErrorMessage -foreground Red
+        }
+      }
+    }      
+  }   
+  catch {            
+    Write-Host $_.Exception.Message -ForegroundColor Red
+  }
+  Disconnect-PnPOnline
+}
+
 function Add-UsersToDefaultSharePointGroup($url, $nodeLevel, $siteAlias) {
   $siteUrl = $url
   $connection = Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
@@ -1343,7 +1373,7 @@ function Add-ListAndLibrary($url, $nodeLevel) {
             
     $ListURL = $ListURL -replace '\s', ''
             
-    New-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem $itemList.Data.Item $itemList.ParentCTName $itemList.GroupName $itemList.EnforceUniqueValues
+    New-ListAddContentType $tenantAdmin $siteUrlNew $itemList.ListName $itemList.ListTemplate $ListURL $itemList.ContentTypeName $itemList.Field.LookupListName $itemList.Field.LookupField $itemList.projectedField $itemList.Field.ColumnName $itemList.Field.ColumnTitle $itemList.Field.Type $itemList.columnItem $itemList.Data.Item $itemList.ParentCTName $itemList.GroupName $itemList.Field.EnforceUniqueValues $itemList.Field.Required
 
     if (Get-PnPList -Identity $itemList.ListName) {     
       New-View $itemList.ListName $siteUrlNew $itemList.defaultviewfields $itemList.ListTemplate
@@ -1402,7 +1432,7 @@ function Set-FieldToRichText($SiteUrl, $ListName, $FieldName) {
   }
 }
 
-function New-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems, $Items, $ParentContentTypeName, $GroupName, $enforceUniqueValues) {
+function New-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTemplate, $ListURL, $ContentTypeName, $LookupListName, $LookupField, $ProjectedFields, $LookupFieldColumnName, $LookupFieldColumnTitle, $LookupFieldType, $ColumnItems, $Items, $ParentContentTypeName, $GroupName, $enforceUniqueValues, $required) {
   Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
   Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
 
@@ -1416,7 +1446,7 @@ function New-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTempl
       else {
         $enforceUniqueValues = 'TRUE' 
       }
-      CreateLookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields -GroupName $GroupName -EnforceUniqueValues $enforceUniqueValues  $connection
+      New-LookupColumnForList -SiteURL $siteUrlNew -ListName $ListName -Name $LookupFieldColumnName -DisplayName $LookupFieldColumnTitle -LookupListName $LookupListName -LookupField $LookupField -LookupType $LookupFieldType -ProjectedFields $ProjectedFields -GroupName $GroupName -EnforceUniqueValues $enforceUniqueValues -IsRequired $required $connection
     }
         
     if ([bool]($ParentContentTypeName) -eq $true) {
@@ -1442,13 +1472,13 @@ function New-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTempl
           $client.TrackEvent("List/Library created, $ListName")
         }
       }
-
+      
       $List = Get-PnPList -Identity $ListURL -ErrorAction Stop
       if ($ContentTypeName -ne '') {
 
         $ListBase = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
         Set-PnPList -Identity $ListName -EnableContentTypes $true -EnableVersioning $true
-        $addContentType = Add-PnPContentTypeToList -List $List -ContentType $ListBase -DefaultContentType -ErrorAction Stop
+        $addContentType = Add-PnPContentTypeToList -List $List -ContentType $ContentTypeName -DefaultContentType -ErrorAction Stop
         $client.TrackEvent("Content Type, $ContentTypeName added to List, $ListName")
 
         if ($ListName -eq "My Tasks") {
@@ -1498,7 +1528,7 @@ function New-ListAddContentType($tenantAdmin, $siteUrlNew, $ListName, $ListTempl
         }
         Write-Host "Adding item to " $ListName  -ForegroundColor Green
         $client.TrackEvent("Adding item to $ListName")
-        $addListItem = Add-PnPListItem -List  'TranslateConfig' -Values $hash
+        $addListItem = Add-PnPListItem -List $ListName -Values $hash
       }
     }
     else {
@@ -1600,74 +1630,7 @@ function RenameColumn($siteColUrl, $ListName, $ColumnName, $DisplayName, $spoCtx
 #endregion
 
 #region --CreateView--
-function New-View($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
-    
-  $client.TrackEvent("View creation started for list, $listNameForView.")
-  #Connect with the tenant admin credentials to the tenant
-  #Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
-
-  try {
-             
-    if ($ListTemplate -eq 'DocumentLibrary') {
-      $viewExists = Get-PnPView -List $listNameForView -Identity "All Documents" -ErrorAction SilentlyContinue
-      $defaultviewName = 'All Documents'
-    }
-    else {
-      $viewExists = Get-PnPView -List $listNameForView -Identity "All Items" -ErrorAction SilentlyContinue
-      $defaultviewName = 'All Items'
-    }
-         
-         
-    foreach ($field in $fields) {
-      $defaultviewfields += @($field.name)
-    }
-
-    $client.TrackEvent("Fields ready for default view creation.")
-
-    if ([bool]($viewExists) -eq $false) {
-      Write-Host "View not found ,so creating a new View in $listNameForView"  -ForegroundColor Green
-      $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
-
-      if($ListTemplate -eq 'PictureLibrary')  {
-        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -ViewType Grid -SetAsDefault -ErrorAction Stop
-      }
-      else  {
-        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
-      }
-      #delete the LinkTitle from default view
-      Edit-FieldsToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
-    }
-    else {
-      Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
-      $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-
-      New-ColumnToDefaultView -SiteUrl $siteUrlNew -Fields $defaultviewfields -ListName $listNameForView
-            
-      #delete the LinkTitle from default view
-      Edit-FieldsToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
-    }
-
-    #region update the sorting order for the view 
-    Edit-View $siteUrlNew $tenantAdmin $defaultviewName $listNameForView
-    #endregion
-    $client.TrackEvent("View sorting order is modified for $defaultviewName for the list $listNameForView")
-  }
-  catch {
-    $ErrorMessage = $_.Exception.Message
-    Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Red
-
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
-
-    Remove-ListOnFailure $siteUrlNew $listNameForView
-  }
-  #Disconnect-PnPOnline
-}
-
 function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields) {
-  #Connect with the tenant admin credentials to the tenant
-  #Connect-PnPOnline -Url $siteUrlNew -Credentials $tenantAdmin
 
   try {
     $viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
@@ -1689,20 +1652,83 @@ function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields)
         $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
         $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ErrorAction Stop
       }
-     
-      $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
-      Write-Host "$customViewName - View created in $listNameForView"  -ForegroundColor Green
-      $client.TrackEvent("$customViewName - View created in $listNameForView")
     }
     else {
       Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
       $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+
+      #New-ColumnToCustomView -SiteUrl $siteUrlNew -Fields $customViewfields -ListName $listNameForView -ViewName $customViewName
     }
 
     #region update the sorting order for the view 
     Edit-View $siteUrlNew $tenantAdmin $customViewName $listNameForView
     #endregion
     $client.TrackEvent("View sorting order is modified for $customViewName for the list $listNameForView")
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Red
+
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+
+    Remove-ListOnFailure $siteUrlNew $listNameForView
+  }
+  #Disconnect-PnPOnline
+}
+
+function New-View($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
+    
+  $client.TrackEvent("View creation started for list, $listNameForView.")
+  try {
+             
+    if ($ListTemplate -eq 'DocumentLibrary') {
+      $defaultviewName = 'All Documents'
+    }
+    else {
+      if ($ListTemplate -eq 'PictureLibrary') {
+        $defaultViewName = 'All Images'
+      }
+      else {
+        $defaultviewName = 'All Items'
+      }
+    }
+    
+    $viewExists = Get-PnPView -List $listNameForView -Identity $defaultviewName -ErrorAction SilentlyContinue
+         
+    foreach ($field in $fields) {
+      $defaultviewfields += @($field.name)
+    }
+
+    $client.TrackEvent("Fields ready for default view creation.")
+
+    if ([bool]($viewExists) -eq $false) {
+      Write-Host "View not found ,so creating a new View in $listNameForView"  -ForegroundColor Green
+      $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
+      if ($ListTemplate -eq 'PictureLibrary') {
+        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -ViewType Grid -SetAsDefault -ErrorAction Stop
+      }
+      else {
+        $addView = Add-PnPView -List $listNameForView -Title $defaultviewName -Fields $defaultviewfields -SetAsDefault -ErrorAction Stop
+      }
+      #delete the LinkTitle from default view
+      Edit-FieldsToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
+    }
+    else {
+      Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
+      $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+
+      New-ColumnToDefaultView -SiteUrl $siteUrlNew -Fields $defaultviewfields -ListName $listNameForView
+            
+      #delete the LinkTitle from default view
+      Edit-FieldsToDefaultView -ListName $listNameForView $defaultviewName $siteUrlNew
+    }
+
+    #region update the sorting order for the view 
+    Edit-View $siteUrlNew $tenantAdmin $defaultviewName $listNameForView
+    #endregion
+    $client.TrackEvent("View sorting order is modified for $defaultviewName for the list $listNameForView")
   }
   catch {
     $ErrorMessage = $_.Exception.Message
@@ -1861,6 +1887,64 @@ function New-ColumnToDefaultView($SiteUrl, $Fields, $ListName) {
       $viewQuery = '<OrderBy><FieldRef Name="Modified" Ascending="FALSE"/></OrderBy>'
       $list.DefaultView.ViewQuery = $viewQuery
       $list.DefaultView.Update()
+    }
+    $context.ExecuteQuery()
+  }
+  catch {
+    Write-Host $_.Exception.Message -ForegroundColor Red
+
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+
+    Remove-ListOnFailure $SiteUrl $ListName
+  }
+}
+
+function New-ColumnToCustomView($SiteUrl, $Fields, $ListName,$ViewName) {
+  Write-Host "Updating view for $ListName..."  -ForegroundColor Green
+  $client.TrackEvent("Updating view for $ListName...")
+  $admin = $tenantAdmin.UserName
+  $password = $tenantAdmin.Password
+  $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+  $context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
+  $context.Credentials = $credentials
+  $web = $context.Web
+  $list = $web.Lists.GetByTitle($ListName)
+  $customView = $List.Views.GetByTitle($ViewName)
+    
+  $context.Load($web)
+  $context.Load($web.Lists)
+  $context.Load($list.Fields)
+  $context.Load($customView)
+  $context.ExecuteQuery()
+
+  try {
+    [int]$fieldOrder = 0
+    foreach ($f in $Fields) {
+      $field = $list.Fields | Where-Object { $_.InternalName -eq $f } | Select-Object -First 1
+      if ($null -ne $field) {
+        $isField = $customView | Where-Object { $_ -eq $field.Title -or $_ -eq $field.InternalName }
+        if ($null -eq $isField) {
+          $defaultFields.Add($field.InternalName)
+        }
+        $customView.MoveFieldTo($field.InternalName, $fieldOrder)
+      }      
+      $list.DefaultView.Update()
+      $fieldOrder++
+    }
+
+    # If view contains Pinned column, then sort with Pinned then Modified Date
+    $isContainsPinned = $list.Fields | Where-Object { $_.InternalName -eq 'Pinned' }
+    if ($null -ne $isContainsPinned) {
+      $viewQuery = '<OrderBy><FieldRef Name="Pinned" Ascending="FALSE" /><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
+      $list.$customView.ViewQuery = $viewQuery
+      $list.$customView.Update()
+    }
+    else {
+      $viewQuery = '<OrderBy><FieldRef Name="Modified" Ascending="FALSE"/></OrderBy>'
+      $list.$customView.ViewQuery = $viewQuery
+      $list.$customView.Update()
     }
     $context.ExecuteQuery()
   }
@@ -2067,7 +2151,7 @@ function New-ModernPage($url, $nodeLevel) {
 
     foreach ($modernPage in $nodeLevel.page) {
       $modernPagename = $modernPage.name
-      $page = Get-PnPClientSidePage -Identity $modernPage.name -ErrorAction SilentlyContinue           
+      $page = Get-PnPClientSidePage -Identity $modernPagename -ErrorAction SilentlyContinue           
       if ($null -ne $page) {    
         Remove-PnPClientSidePage -Identity $modernPagename -Force        
         Write-Host $modernPagename 'found. Removing the page ' -ForegroundColor Yellow
@@ -2395,13 +2479,14 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
 
     foreach ($objfield in $node.changeDateOnly) {
       try {
-        Write-Host "Update-SiteColumns, DateTime to Date for Content Type started for- "+ $objfield.ListName -foreground Green
+        Write-Host "Update-SiteColumns, DateTime to Date for Content Type started for- " $objfield.ListName -foreground Green
         $client.TrackEvent("Update-SiteColumns, DateTime to Date for Content Type started for- " + $objfield.ListName)           
         Connect-PnPOnline -Url $url -Credentials $tenantAdmin
         $field = Get-PNPField -identity $objfield.ColumnInternalName -List $objfield.ListName
         [xml]$schemaXml = $field.SchemaXml
         $schemaXml.Field.Format = $objfield.DisplayFormat
         Set-PnPField -List $objfield.ListName  -Identity $objfield.ColumnInternalName -Values @{ SchemaXml = $schemaXml.OuterXml }
+        Write-Host $objfield.ColumnInternalName 'updated successfully !!!' -foreground Green
             
       }
       catch {
@@ -2416,7 +2501,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
 
     foreach ($objfield in $node.changeContentTierChoice) {
       try {
-        Write-Host "Edit-SiteColumns, Choice value for Content Type started for- "+ $objfield.ListName -foreground Green
+        Write-Host "Edit-SiteColumns, Choice value for Content Type started for- " $objfield.ListName -foreground Green
         $client.TrackEvent("Edit-SiteColumns, Choice value for Content Type started for- " + $objfield.ListName)           
         #Get the List
         $List = $context.Web.Lists.GetByTitle($objfield.ListName)
@@ -2456,7 +2541,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
 
     #region Updating the change Title Fields
     foreach ($item in $node.changeTitle) {
-      Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+      Write-Host "Changing Display Name for "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
       $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
       if ([bool]($field) -eq $true) {
         $field.Title = $item.NewTitle
@@ -2470,7 +2555,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
     #region Change the required value
     foreach ($item in $node.changeRequiredField) {
       try {
-        Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+        Write-Host "Changing "$item.ColumnInternalName" as required column for the list: "$item.ListName -foreground Green
         $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
         if ([bool]($field) -eq $true) {
           if ($item.Required -eq "True") {
@@ -2497,7 +2582,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
     #region Hide columns
     foreach ($item in $node.hideColumn) {
       try {
-        Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+        Write-Host "Hiding "$item.ColumnInternalName" column for the list: "$item.ListName -foreground Green
         $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
         if ([bool]($field) -eq $true) {
           $field.Hidden = $true
@@ -2519,7 +2604,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
     #region Change enforce unique value columns
     foreach ($item in $node.changeEnforceUniqueValue) {
       try {
-        Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+        Write-Host "Changing the EnforceUniqueValues as True for the column "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
         $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
         if ([bool]($field) -eq $true) {
           $field.Indexed = $true
@@ -2542,7 +2627,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
     #region Update multi select column
     <#foreach($item in $node.updateUserSelectionMode){
             try{
-                Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+                Write-Host "Updating the user selection mode for the column "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
                 $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
                 if([bool]($field) -eq $true){
                     $field.Required = $false
@@ -2558,7 +2643,7 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
 
     #region Remove from edit form
     foreach ($item in $node.removeFromEditForm) {
-      Write-Host "Edit-SiteColumns, "$item.ColumnInternalName" for the list: "$item.ListName -foreground Green
+      Write-Host "Removing the column "$item.ColumnInternalName" to show in new and edit form for the list: "$item.ListName -foreground Green
       $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
       if ([bool]($field) -eq $true) {
         $field.SetShowInEditForm($false)
@@ -2633,19 +2718,6 @@ function Edit-FieldsToDefaultView($ListName, $ViewName, $url) {
 
     $ColumnName = "LinkFilename"
 
-    #Check if view doesn't have the column already
-    If ($ListView.ViewFields -contains $ColumnName) {
-      #Remove Column from View
-      $ListView.ViewFields.Remove($ColumnName)
-      $ListView.Update()
-      $Context.ExecuteQuery()
-      Write-Host -f Green "Column '$ColumnName' Removed from View '$ViewName'!"
-    }
-    else {
-      Write-Host -f Yellow "Column '$ColumnName' doesn't exist in View '$ViewName'!"
-    }
-
-    $ColumnName = "DocIcon"
     #Check if view doesn't have the column already
     If ($ListView.ViewFields -contains $ColumnName) {
       #Remove Column from View
@@ -2785,7 +2857,7 @@ function Get-ContentTypeId($url, $tenantAdmin, $contentTypeName, $listName) {
 function Get-ListId($url, $tenantAdmin, $listTitle) {
   try {
     Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-    $List = Get-PnPList -Identity $listTitle
+    $list = Get-PnPList -Identity $listTitle
     return $list.Id
   }
   catch {
@@ -2924,8 +2996,10 @@ function Add-SiteCollectionAdmins {
     
   try {
     Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
-    foreach ($user in $users) {
-      Add-PnPSiteCollectionAdmin -Owners $user.user.email
+    foreach ($user in $users.user) {
+      Write-host 'System is going to add ' $user.email 'as the Site Collection Admin for site :' $siteUrl -ForegroundColor Yellow
+      Add-PnPSiteCollectionAdmin -Owners $user.email
+      Write-host $user.email 'added successfully as the Site Collection Admin for site :' $siteUrl -ForegroundColor Green
     }
   }
   catch {
@@ -2942,13 +3016,14 @@ function Set-GroupViewSettings {
   param (
     $SiteURL,
     $tenantAdmin,
-    $Groups
+    $Groups,
+    $siteAlias
   )
  
   try {
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
     Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
-
+ 
     $admin = $tenantAdmin.UserName
     $password = $tenantAdmin.Password
     $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
@@ -2958,8 +3033,14 @@ function Set-GroupViewSettings {
     $Ctx.Credentials = $credentials
  
     foreach ($SPGroup in $Groups.group) {
+      if ($siteAlias -eq "TASMU CMS") {
+        $SPGroupName = 'Global ' + $SPGroup.Name
+      }
+      else {
+        $SPGroupName = $siteAlias + ' ' + $SPGroup.Name
+      }
       #Get the Group
-      $Group = $Ctx.web.SiteGroups.GetByName($SPGroup.Name)
+      $Group = $Ctx.web.SiteGroups.GetByName($SPGroupName)
       $Ctx.Load($Group)
       $Ctx.ExecuteQuery()
  
@@ -2974,7 +3055,7 @@ function Set-GroupViewSettings {
   catch {
     $ErrorMessage = $_.Exception.Message
     Write-Host $ErrorMessage -foreground Red
-
+ 
     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
     $telemtryException.Exception = $_.Exception.Message  
     $client.TrackException($telemtryException)
@@ -3001,6 +3082,97 @@ function Get-ContentTypeForSectors() {
     }
   }
   return $isContentTypeAvailable
+}
+
+function Add-ContentTypeToList() {
+  param
+  (
+    $SiteURL,
+    $ListName,
+    $CTypeName,
+    $tenantAdmin
+  )
+ 
+  Try {
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+
+    $admin = $tenantAdmin.UserName
+    $password = $tenantAdmin.Password
+    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin , $password)
+    #Setup the context
+    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($SiteURL)
+    $Ctx.Credentials = $Credentials
+         
+    #Get the List
+    $List = $Ctx.web.Lists.GetByTitle($ListName)
+    $Ctx.Load($List)
+    $Ctx.ExecuteQuery()
+         
+    #Enable managemnt of content type in list - if its not enabled already
+    If ($List.ContentTypesEnabled -ne $True) {
+      $List.ContentTypesEnabled = $True
+      $List.Update()
+      $Ctx.ExecuteQuery()
+      Write-host "Content Types Enabled in the List!" -f Yellow
+    }
+ 
+    #Get all existing content types of the list
+    $ListContentTypes = $List.ContentTypes
+    $Ctx.Load($ListContentTypes)
+ 
+    #Get the content type to Add to list
+    $ContentTypeColl = $Ctx.Web.ContentTypes
+    $Ctx.Load($ContentTypeColl)
+    $Ctx.ExecuteQuery()
+         
+    #Check if the content type exists in the site       
+    $CTypeToAdd = $ContentTypeColl | Where-Object { $_.Name -eq $CTypeName }
+    If ($Null -eq $CTypeToAdd) {
+      Write-host "Content Type '$CTypeName' doesn't exists in  '$SiteURL'" -f Yellow
+      Return
+    }
+ 
+    #Check if content type added to the list already
+    $ListContentType = $ListContentTypes | Where-Object { $_.Name -eq $CTypeName }
+    If ($Null -ne $ListContentType) {
+      Write-host "Content type '$CTypeName' already exists in the List!" -ForegroundColor Yellow
+    }
+    else {
+      #Add content Type to the list or library
+      $AddedCtype = $List.ContentTypes.AddExistingContentType($CTypeToAdd)
+      $Ctx.ExecuteQuery()
+            
+      Write-host "Content Type '$CTypeName' Added to '$ListName' Successfully!" -ForegroundColor Green
+    }
+  }
+  Catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage -foreground Red
+  
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+  }
+}
+
+function AddEveryoneDefaultUserToVisitorGroup {
+  param (
+    $siteUrl,
+    $tenantAdmin
+  )
+  try {
+    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    $Group = Get-PnPGroup -AssociatedVisitorGroup
+    Add-PnPUserToGroup -Identity $Group -LoginName "everyone except external users"
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage -foreground Red
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+  }
 }
 
 Add-ComponentsForSites

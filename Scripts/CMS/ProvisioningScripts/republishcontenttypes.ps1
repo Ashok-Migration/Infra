@@ -25,7 +25,7 @@ Connect-PnPOnline -Url $contenttypehub -Credentials $tenantAdmin
 $CTs = Get-PnPContentType 
 $tasmuCTs = $CTs | Where-Object { $_.Group -eq "TASMU" }
 foreach ($ct in $tasmuCTs) {
-  write-host "Unpublishing CT $($ct.Name): " -NoNewline    
+  write-host "Re-publishing CT $($ct.Name): " -NoNewline    
     
   $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession 
   $cookieCollection = New-Object System.Net.CookieCollection 

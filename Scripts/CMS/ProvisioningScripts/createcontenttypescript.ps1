@@ -88,6 +88,8 @@ function Read-FileAndCreateContentTypes($scXML) {
     
   #Add Site collection Admin
   Add-PnPSiteCollectionAdmin -Owners $sp_user
+
+  Write-Host 'Creating content types ' -ForegroundColor Green
  
   #create all the content Types
   foreach ($contentItem in $scXML.Descendants("contentItem")) {
@@ -99,6 +101,8 @@ function Read-FileAndCreateContentTypes($scXML) {
       Add-ContentType $tenantAdmin $contenttypehub $contentTypeName $contentTypeName $parentCTName $groupName $connection
     }
   }
+
+  Write-Host 'Adding site columns to content types' -ForegroundColor Green
  
   #add columns to the content Types
   foreach ($columnItem in $scXML.Descendants("columnItem")) {
@@ -127,23 +131,23 @@ function Add-ContentType($tenantAdmin, $contenttypehub, $ContentTypeName, $Conte
   try {
     $ContentTypeExist = Get-PnPContentType -Identity $ContentTypeName -ErrorAction Stop -Connection $connection
     #Check for existence of  site content type
-    if ([bool]($ContentTypeExist) -eq $false) {
+    if ([bool]($ContentTypeExist) -eq $true) {
+      Write-Host "$ContentTypeName already exists"
+      $client.TrackEvent("$ContentTypeName already exists")
+    }
+    else{
       Write-Host "Content Type not found ,so creating a new contenttype- $ContentTypeName....."
       $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
       $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
       Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
     }
-    else {
-      Write-Host "$ContentTypeName already exists"
-      $client.TrackEvent("$ContentTypeName already exists")
-    }  
   }
   catch {
-    $ErrorMessage = $_.Exception.Message
-    Write-Host $ErrorMessage -foreground Yellow
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
+      $ErrorMessage = $_.Exception.Message
+      Write-Host $ErrorMessage -foreground Yellow
+      $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+      $telemtryException.Exception = $_.Exception.Message  
+      $client.TrackException($telemtryException)
   } 
 }
 

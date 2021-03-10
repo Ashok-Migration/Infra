@@ -227,9 +227,31 @@ function Enable-PublicCDNAndSiteCollectionCustomization {
   catch {
     write-host "Error: $($_.Exception.Message)" -foregroundcolor Red
   }
-
 }
+
+function Install-Modules{
+    Write-Host "Uninstalling PnP.PowerShell module" -ForegroundColor Green
+    $pnpPowerShellModule = Get-InstalledModule -Name PnP.PowerShell -ErrorAction SilentlyContinue
+
+    if($null -ne $pnpPowerShellModule){
+        Write-Host 'PnP.PowerShell moudule found. Uninstalling ...' -ForegroundColor Green
+        Uninstall-Module -Name PnP.PowerShell -AllVersions -ErrorAction SilentlyContinue -Force
+    }
+    else{
+        Write-Host 'PnP.PowerShell moudule not found.' -ForegroundColor Yellow
+    }
+
+    Write-host "Installing SharePointPnPPowerShellOnline module" -ForegroundColor Green
+    $pnpPowerShellModule = Get-InstalledModule -Name SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue
+    if($null -eq $pnpPowerShellModule){
+        Write-host "Installing SharePointPnPPowerShellOnline module not found. Installing ..." -ForegroundColor Green
+        Install-Module -Name SharePointPnPPowerShellOnline -Scope CurrentUser -Force
+    }
+}
+
 #endregion
+
+Install-Modules
 
 Write-host "Main Script Started" -ForegroundColor Green
 Write-host $TemplateParametersFile -ForegroundColor Yellow

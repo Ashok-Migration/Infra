@@ -3,9 +3,10 @@
   <globalhubsite>
     <site Title="TASMU CMS" Alias="cms-marketplace" Type="CommunicationSite" Theme="TASMUGlobal">
       <sectorhubsite>
-        <site Title="Healthcare" Alias="cms-sector-healthcare" Type="CommunicationSite" Theme="TASMUSectorHealthcare">
+        <!--Add the sector and the entity (as child node) as per the below xml format-->
+        <site Title="Logistics" Alias="cms-sector-logistics" Type="CommunicationSite" Theme="TASMUSectorLogistics">
           <entityassociatedsite>
-            <site Title="Swift" Alias="cms-sector-healthcare-swiftorg" Type="CommunicationSite"/>
+            <site Title="Swift" Alias="cms-sector-logistics-swiftorg" Type="CommunicationSite"/>
           </entityassociatedsite>
         </site>
       </sectorhubsite>
@@ -16,27 +17,32 @@
     <site Title="Global" Alias="cms-global" Type="CommunicationSite"></site>
   </Configsite>
 
-  <!--Theme Config for Entity-->
-  <entitytheme Name="TASMU Sector"></entitytheme>
+  <entitySPAdmin>
+    <users>
+      <user email="cms.admin@tasmusqcp.onmicrosoft.com"></user>
+      <user email="cms.automation@tasmusqcp.onmicrosoft.com"></user>
+    </users>
+  </entitySPAdmin>
 
   <!--Sharepoint Group Config for Entity-->
 
   <entitySPGroup>
     <group Name="Approvers" Description="Use this group to grant people Approvers permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-      <users email="cms.automation@tasmusqcpuat.onmicrosoft.com"></users>
+      <users email="cms.automation@tasmusqcp.onmicrosoft.com"></users>
       <ADGroup Name="Marketing Managers"></ADGroup>
     </group>
     <group Name="Translators" Description="Use this group to grant people Translators permissions" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-      <users email="cms.automation@tasmusqcpuat.onmicrosoft.com"></users>
+      <users email="cms.automation@tasmusqcp.onmicrosoft.com"></users>
     </group>
     <defaultgroup Name="Members" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-      <users email="cms.automation@tasmusqcpuat.onmicrosoft.com"></users>
+      <users email="cms.automation@tasmusqcp.onmicrosoft.com"></users>
     </defaultgroup>
     <defaultgroup Name="Visitors" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-      <users email="cms.automation@tasmusqcpuat.onmicrosoft.com"></users>
+      <users email="cms.automation@tasmusqcp.onmicrosoft.com"></users>
     </defaultgroup>
     <defaultgroup Name="Owners" Description="" isUsers="True" Role="Contribute" isADGroup="False" SecurityGroup="">
-      <users email="cms.automation@tasmusqcpuat.onmicrosoft.com"></users>
+      <users email="cms.automation@tasmusqcp.onmicrosoft.com"></users>
+      <users email="cms.admin@tasmusqcp.onmicrosoft.com"></users>
     </defaultgroup>
   </entitySPGroup>
 
@@ -60,11 +66,14 @@
       <customViewfields name="TaskComments"></customViewfields>
     </ListAndContentTypes>
     <ListAndContentTypes ListName="Public Documents" ContentTypeName="TASMU Documents" ListTemplate="DocumentLibrary" customView="Home">
-      <defaultviewfields name="Title"></defaultviewfields>
+      <defaultviewfields name="DocIcon"></defaultviewfields>
+      <defaultviewfields name="LinkFilenameNoMenu"></defaultviewfields>
+      <defaultviewfields name="cdnurl"></defaultviewfields>
       <defaultviewfields name="Created"></defaultviewfields>
       <defaultviewfields name="Modified"></defaultviewfields>
 
-      <customViewfields name="Title"></customViewfields>
+      <customViewfields name="DocIcon"></customViewfields>
+      <customViewfields name="LinkFilenameNoMenu"></customViewfields>
       <customViewfields name="Created"></customViewfields>
       <customViewfields name="Modified"></customViewfields>
     </ListAndContentTypes>
@@ -122,11 +131,14 @@
       <customViewfields name="ContentStatus"></customViewfields>
     </ListAndContentTypes>
     <ListAndContentTypes ListName="Media Assets" ContentTypeName="TASMU Media Assets" ListTemplate="PictureLibrary" customView="Home">
-      <defaultviewfields name="Title"></defaultviewfields>
+      <defaultviewfields name="DocIcon"></defaultviewfields>
+      <defaultviewfields name="LinkFilenameNoMenu"></defaultviewfields>
+      <defaultviewfields name="cdnurl"></defaultviewfields>
       <defaultviewfields name="Created"></defaultviewfields>
       <defaultviewfields name="Modified"></defaultviewfields>
 
-      <customViewfields name="Title"></customViewfields>
+      <customViewfields name="DocIcon"></customViewfields>
+      <customViewfields name="LinkFilenameNoMenu"></customViewfields>
       <customViewfields name="Created"></customViewfields>
       <customViewfields name="Modified"></customViewfields>
     </ListAndContentTypes>
@@ -262,44 +274,43 @@
   <!--Custom Navigation config for Global/Sector/Entity-->
   <globalConfigNav>
     <Level1 nodeName="Sectors" count="1">
-      <Level2 nodeName="Healthcare" url="cms-sector-healthcare">
-        <Level3 nodeName="Swift" url="cms-sector-healthcare-swiftorg"/>
+      <!--Update below nodeName and url with the sector where the new entity needs to be created-->
+      <Level2 nodeName="Logistics" url="cms-sector-logistics">
+        <!--Update below nodeName and url with the entity-->
+        <Level3 nodeName="Swift" url="cms-sector-logistics-swiftorg"/>
       </Level2>
     </Level1>
   </globalConfigNav>
 
   <globalNav>
     <Level1 nodeName="Sectors" count="1">
-      <Level2 nodeName="Healthcare" url="cms-sector-healthcare">
-        <Level3 nodeName="Swift" url="cms-sector-healthcare-swiftorg"/>
+      <!--Update below nodeName and url with the sector where the new entity needs to be created-->
+      <Level2 nodeName="Logistics" url="cms-sector-logistics">
+        <!--Update below nodeName and url with the entity-->
+        <Level3 nodeName="Swift" url="cms-sector-logistics-swiftorg"/>
       </Level2>
     </Level1>
   </globalNav>
+  
   <sectorNav>
     <QuickLaunchNav>
       <Level1 nodeName="Entities" count="1">
-        <Level2 nodeName="Swift" sector="cms-sector-transportation" url="cms-sector-transportation-swiftorg"></Level2>
+        <!--Update below nodeName with the Entity Name (as nodeName), sector tag contains the sector alias and update the entity url-->
+        <Level2 nodeName="Swift" sector="cms-sector-logistics" url="cms-sector-logistics-swiftorg"></Level2>
       </Level1>
     </QuickLaunchNav>
     <TopNav>
       <Level1 nodeName="Sectors">
-        <Level2 nodeName="Transportation" url="cms-sector-transportation">
-        </Level2>
-        <Level2 nodeName="Healthcare" url="cms-sector-healthcare">
-          <Level3 nodeName="Swift" url="cms-sector-healthcare-swiftorg"/>
-        </Level2>
+         <!--Update below nodeName and url with the sector where the new entity needs to be created-->
         <Level2 nodeName="Logistics" url="cms-sector-logistics">
-        </Level2>
-        <Level2 nodeName="Sports" url="cms-sector-sports">
-        </Level2>
-        <Level2 nodeName="Environment" url="cms-sector-environment">
+          <!--Update below nodeName and url with the entity-->
+          <Level3 nodeName="Swift" url="cms-sector-logistics-swiftorg"/>
         </Level2>
       </Level1>
     </TopNav>
   </sectorNav>
 
   <entityNav>
-    
     <QuickLaunchNav>
       <Level1 nodeName="Manage Content" count="2">
         <Level2 nodeName="News Articles" url="/Lists/NewsArticles"></Level2>
@@ -323,18 +334,32 @@
     <entityChange>
       <changeDateOnly ColumnInternalName="ApprovedDate" ColumnTitle="Approved Date" DisplayFormat="DateOnly" ListName="News Articles" ContentTypeName="TASMU News Articles"></changeDateOnly>
 
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Announcements" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Public Documents" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Sponsors" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Media Assets" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Projects" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Videos" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Contacts" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Events List" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="Campaigns" Format="None"></changeContentTierChoice>
-      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Entity" DefaultValue="Entity" ListName="News Articles" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Announcements" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Sponsors" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Projects" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Videos" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Contacts" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Events List" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="Campaigns" Format="None"></changeContentTierChoice>
+      <changeContentTierChoice ColumnInternalName="ContentTier" GroupName="TASMU" choicevalue="Sector" DefaultValue="Sector" ListName="News Articles" Format="None"></changeContentTierChoice>
 
       <changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Sponsors" ContentTypeName="TASMU Sponsors" NewTitle="Sponsor Name"></changeTitle>
+      <changeTitle ColumnInternalName="Title" ColumnTitle="Title" GroupName="TASMU" ListName="Products" ContentTypeName="TASMU Products" NewTitle="Product Name"></changeTitle>
+
+      <hideColumn ColumnInternalName="Title" ListName="Contacts" ContentTypeName="TASMU Contacts" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Announcements" ContentTypeName="TASMU Announcements" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Public Documents" ContentTypeName="TASMU Documents" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Sponsors" ContentTypeName="TASMU Sponsors" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Media Assets" ContentTypeName="TASMU Media Assets" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Projects" ContentTypeName="TASMU Projects" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Videos" ContentTypeName="TASMU Videos" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Contacts" ContentTypeName="TASMU Contacts" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Events List" ContentTypeName="TASMU Events" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="Campaigns" ContentTypeName="TASMU Campaigns" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cmsversion" ListName="News Articles" ContentTypeName="TASMU News Articles" GroupName="TASMU"></hideColumn>
+
+      <hideColumn ColumnInternalName="cdnurl" ListName="Public Documents" ContentTypeName="TASMU Documents" GroupName="TASMU"></hideColumn>
+      <hideColumn ColumnInternalName="cdnurl" ListName="Media Assets" ContentTypeName="TASMU Media Assets" GroupName="TASMU"></hideColumn>
     </entityChange>
   </updateSiteColumns>
 
