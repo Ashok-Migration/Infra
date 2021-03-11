@@ -200,6 +200,66 @@
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
+                },
+                {
+                    "name": "tra-mytasmu-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendIPConfigurations/agw-cpd-apps-web-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "mytasmu.tra.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
+                },
+                {
+                    "name": "tra-marketplace-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendIPConfigurations/agw-cpd-apps-web-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "marketplace.tra.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
+                },
+                {
+                    "name": "tra-accounts-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendIPConfigurations/agw-cpd-apps-web-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "account.tra.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
+                },
+                {
+                    "name": "tra-cpadmin-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendIPConfigurations/agw-cpd-apps-web-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "cpadmin.tra.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
                 }
             ]
         },
@@ -262,6 +322,54 @@
                         },
                         "backendHttpSettings": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/backendHttpSettingsCollection/account-tra-sqcp-http"
+                        }
+                    }
+                },
+                {
+                    "name": "tra-mytasmu-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-mytasmu-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/redirectConfigurations/tra-mytasmu-redirect"
+                        }
+                    }
+                },
+                {
+                    "name": "tra-marketplace-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-marketplace-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/redirectConfigurations/tra-marketplace-redirect"
+                        }
+                    }
+                },
+                {
+                    "name": "tra-accounts-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-accounts-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/redirectConfigurations/tra-accounts-redirect"
+                        }
+                    }
+                },
+                {
+                    "name": "tra-cpadmin-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-cpadmin-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/redirectConfigurations/tra-cpadmin-redirect"
                         }
                     }
                 }
@@ -343,6 +451,74 @@
                 }
             ]
         },
+        "redirectConfigurations": {
+            "value": [
+                {
+                    "name": "tra-mytasmu-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-mytasmu-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/requestRoutingRules/tra-mytasmu-redirect"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "tra-marketplace-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-marketplace-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/requestRoutingRules/tra-marketplace-redirect"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "tra-accounts-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-accounts-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/requestRoutingRules/tra-accounts-redirect"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "tra-cpadmin-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/httpListeners/tra-cpadmin-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tra-we-01/requestRoutingRules/tra-cpadmin-redirect"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "firewallMode": {
             "value": "Prevention"
         },
@@ -374,7 +550,11 @@
             "value": "rg-cpd-pltf-net-tra-we-01"
         },
         "zones": {
-            "value": []
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
         },
         "diagnosticLogsRetentionInDays": {
             "value": 365
