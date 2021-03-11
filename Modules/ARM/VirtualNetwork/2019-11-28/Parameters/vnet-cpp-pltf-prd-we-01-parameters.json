@@ -31,6 +31,7 @@
                             ]
                         }
                     ],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -40,6 +41,7 @@
                     "networkSecurityGroupName": "nsg-cpp-apps-agw-prd-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -49,6 +51,7 @@
                     "networkSecurityGroupName": "nsg-cpp-apps-agwweb-prd-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -58,6 +61,7 @@
                     "networkSecurityGroupName": "nsg-cpp-apps-agwapi-prd-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -65,17 +69,19 @@
                     "name": "snet-cpp-apps-apim-prd-we-01",
                     "addressPrefix": "172.20.116.128/26",
                     "networkSecurityGroupName": "nsg-cpp-apps-apim-prd-we-01",
-                    "routeTableName": "route-cpp-pltf-apim-prd-we-01",
+                    "routeTableName": "route-cpp-apps-apim-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
                 {
                     "name": "snet-cpp-apps-agwntf-prd-we-01",
                     "addressPrefix": "172.20.117.0/26",
-                    "networkSecurityGroupName": "-cpp-apps-agwntf-prd-we-01",
+                    "networkSecurityGroupName": "nsg-cpp-apps-agwntf-prd-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -92,6 +98,7 @@
                             ]
                         }
                     ],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-apps-sec-prd-we-01",
                     "routesRGName": "rg-cpp-apps-net-prd-we-01"
                 },
@@ -100,6 +107,15 @@
                     "addressPrefix": "172.20.120.0/25",
                     "networkSecurityGroupName": "nsg-cpp-data-dbrpub-prd-we-01",
                     "routeTableName": "route-cpp-data-dbrpub-prd-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks/workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -109,6 +125,14 @@
                     "networkSecurityGroupName": "nsg-cpp-data-dbrpri-prd-we-01",
                     "routeTableName": "route-cpp-data-dbrpri-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks/workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -117,7 +141,20 @@
                     "addressPrefix": "172.20.121.0/26",
                     "networkSecurityGroupName": "nsg-cpp-data-daisvcs-prd-we-01",
                     "routeTableName": "route-cpp-data-daisvcs-prd-we-01",
-                    "serviceEndpoints": [],
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.KeyVault",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -127,6 +164,7 @@
                     "networkSecurityGroupName": "nsg-cpp-data-hdi-prd-we-01",
                     "routeTableName": "route-cpp-data-hdi-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -136,6 +174,7 @@
                     "networkSecurityGroupName": "nsg-cpp-data-hdi-prd-we-02",
                     "routeTableName": "route-cpp-data-hdi-prd-we-02",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -145,6 +184,7 @@
                     "networkSecurityGroupName": "nsg-cpp-data-sqlmi-prd-we-01",
                     "routeTableName": "route-cpp-data-sqlmi-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -154,6 +194,7 @@
                     "networkSecurityGroupName": "nsg-cpp-data-bkup-prd-we-01",
                     "routeTableName": "route-cpp-data-bkup-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-data-sec-prd-we-01",
                     "routesRGName": "rg-cpp-data-net-prd-we-01"
                 },
@@ -163,6 +204,7 @@
                     "networkSecurityGroupName": "nsg-cpp-6d-web-prd-we-01",
                     "routeTableName": "route-cpp-6d-web-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-6d-sec-prd-we-01",
                     "routesRGName": "rg-cpp-6d-net-prd-we-01"
                 },
@@ -172,6 +214,7 @@
                     "networkSecurityGroupName": "nsg-cpp-6d-app-prd-we-01",
                     "routeTableName": "route-cpp-6d-app-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-6d-sec-prd-we-01",
                     "routesRGName": "rg-cpp-6d-net-prd-we-01"
                 },
@@ -181,6 +224,7 @@
                     "networkSecurityGroupName": "nsg-cpp-6d-db-prd-we-01",
                     "routeTableName": "route-cpp-6d-db-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-6d-sec-prd-we-01",
                     "routesRGName": "rg-cpp-6d-net-prd-we-01"
                 },
@@ -190,6 +234,7 @@
                     "networkSecurityGroupName": "nsg-cpp-gis-web-prd-we-01",
                     "routeTableName": "route-cpp-gis-web-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-gis-sec-prd-we-01",
                     "routesRGName": "rg-cpp-gis-net-prd-we-01"
                 },
@@ -199,6 +244,7 @@
                     "networkSecurityGroupName": "nsg-cpp-gis-app-prd-we-01",
                     "routeTableName": "route-cpp-gis-app-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-gis-sec-prd-we-01",
                     "routesRGName": "rg-cpp-gis-net-prd-we-01"
                 },
@@ -208,6 +254,7 @@
                     "networkSecurityGroupName": "nsg-cpp-gis-db-prd-we-01",
                     "routeTableName": "route-cpp-gis-db-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-gis-sec-prd-we-01",
                     "routesRGName": "rg-cpp-gis-net-prd-we-01"
                 },
@@ -217,6 +264,7 @@
                     "networkSecurityGroupName": "nsg-cpp-bpm-web-prd-we-01",
                     "routeTableName": "route-cpp-bpm-web-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-bpm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-bpm-net-prd-we-01"
                 },
@@ -226,6 +274,7 @@
                     "networkSecurityGroupName": "nsg-cpp-bpm-app-prd-we-01",
                     "routeTableName": "route-cpp-bpm-app-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-bpm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-bpm-net-prd-we-01"
                 },
@@ -235,6 +284,7 @@
                     "networkSecurityGroupName": "nsg-cpp-bpm-db-prd-we-01",
                     "routeTableName": "route-cpp-bpm-db-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-bpm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-bpm-net-prd-we-01"
                 },
@@ -244,6 +294,7 @@
                     "networkSecurityGroupName": "nsg-cpp-itsm-web-prd-we-01",
                     "routeTableName": "route-cpp-itsm-web-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-itsm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-itsm-net-prd-we-01"
                 },
@@ -253,6 +304,7 @@
                     "networkSecurityGroupName": "nsg-cpp-itsm-app-prd-we-01",
                     "routeTableName": "route-cpp-itsm-app-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-itsm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-itsm-net-prd-we-01"
                 },
@@ -262,6 +314,7 @@
                     "networkSecurityGroupName": "nsg-cpp-itsm-db-prd-we-01",
                     "routeTableName": "route-cpp-itsm-db-prd-we-01",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-itsm-sec-prd-we-01",
                     "routesRGName": "rg-cpp-itsm-net-prd-we-01"
                 },
@@ -271,10 +324,10 @@
                     "networkSecurityGroupName": "nsg-cpp-thrd-agw-prd-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
+                    "delegations": [],
                     "nsgsRGName":"rg-cpp-thrd-agw-prd-we-01",
                     "routesRGName": ""
-                }
-             
+                }             
             ]
         },
         "ddosProtectionPlanId": {
