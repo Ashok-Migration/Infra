@@ -63,6 +63,49 @@
                     "resources": []
                 }
             }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-10-01",
+          "name": "DEP-aks-cpd-apps-dev-we-02",
+          "resourceGroup": "rg-cpd-apps-aks-dev-we-01",
+          "dependsOn": [
+            "DEP-rg-cpd-apps-aks-dev-we-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'ManagedClustersCNI/2021-03-11/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'ManagedClustersCNI/2021-03-11/Parameters/aks-cpd-apps-dev-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-10-01",
+          "name": "mi-cpd-apps-aks-dev-we-02",
+          "resourceGroup": "rg-cpd-apps-aksnode-dev-we-02",
+          "dependsOn": [
+            "DEP-rg-cpd-apps-aks-dev-we-01",
+            "DEP-aks-cpd-apps-dev-we-02"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'ManagedIdentity/2018-11-30/Parameters/mi-cpd-apps-aks-dev-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
         }
     ],
     "outputs": {}
