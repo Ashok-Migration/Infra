@@ -59,6 +59,19 @@
         "description": "Max stale requests. Required for BoundedStaleness. Valid ranges, Single Region: 10 to 1000000. Multi Region: 100000 to 1000000."
       }
     },
+    "locations": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "locationName": "[parameters('location')]",
+          "failoverPriority": 0,
+          "isZoneRedundant": false
+        }
+      ],
+      "metadata": {
+        "description": "Locations for geo-replication"
+      }
+    },
     "isVirtualNetworkFilterEnabled": {
       "type": "bool",
       "defaultValue": false,
@@ -143,13 +156,6 @@
         "defaultConsistencyLevel": "Strong"
       }
     },
-    "locations": [
-      {
-        "locationName": "[parameters('location')]",
-        "failoverPriority": 0,
-        "isZoneRedundant": false
-      }
-    ],
     "diagnosticsMetrics": [
       {
         "category": "Requests",
@@ -236,7 +242,7 @@
       "location": "[parameters('location')]",
       "properties": {
         "consistencyPolicy": "[variables('consistencyPolicy')[parameters('defaultConsistencyLevel')]]",
-        "locations": "[variables('locations')]",
+        "locations": "[parameters('locations')]",
         "databaseAccountOfferType": "Standard",
         "enableAutomaticFailover": "[parameters('automaticFailover')]",
         "isVirtualNetworkFilterEnabled": "[parameters('isVirtualNetworkFilterEnabled')]",
