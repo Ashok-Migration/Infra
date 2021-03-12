@@ -211,8 +211,7 @@ Below example deploys API Management instance apim-cpd-apps-dev-we-01 to Resourc
             "name": "DEP-apim-cpd-apps-dev-we-01",
             "resourceGroup": "rg-cpd-apps-dev-we-01",
             "dependsOn": [
-                "DEP-rg-cpd-apps-dev-we-01",
-                "DEP-appi-cpd-apps-dev-we-01"
+                "DEP-rg-cpd-apps-dev-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
