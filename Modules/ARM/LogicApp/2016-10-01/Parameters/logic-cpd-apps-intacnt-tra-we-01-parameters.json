@@ -1,0 +1,369 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-intacnt-tra-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_resource_event_occurs": {
+          "inputs": {
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "account-updated"
+                  ]
+                },
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-dev-we-01/topics/6dbilling"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-tra-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpd-apps-intacnt-tra-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
+          },
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook"
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "CustomerTypeId_Field_Validation_Check": {
+          "actions": {
+            "CustomerType": {
+              "cases": {
+                "Organisation": {
+                  "actions": {
+                    "Checking_if_organisation_record_contain_data_or_not": {
+                      "actions": {
+                        "For_each": {
+                          "actions": {
+                            "Update_Organisation": {
+                              "inputs": {
+                                "body": {
+                                  "cpm_customersegment": 923080003
+                                },
+                                "host": {
+                                  "connection": {
+                                    "name": "@parameters('$connections')['apicon-cpd-apps-pflcds-tra-we-01']['connectionId']"
+                                  }
+                                },
+                                "method": "patch",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('orgce9e8c6c.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('accounts'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['accountid']))}"
+                              },
+                              "runAfter": {},
+                              "type": "ApiConnection"
+                            }
+                          },
+                          "foreach": "@body('Get_Organisation')?['value']",
+                          "runAfter": {},
+                          "type": "Foreach"
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "OrganisationNotFoundMessage": {
+                            "inputs": {
+                              "runError": {
+                                "code": "400",
+                                "message": "No Organisation Found"
+                              },
+                              "runStatus": "Failed"
+                            },
+                            "runAfter": {},
+                            "type": "Terminate"
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "greater": [
+                              "@length(body('Get_Organisation')?['value'])",
+                              0
+                            ]
+                          }
+                        ]
+                      },
+                      "runAfter": {
+                        "Get_Organisation": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "If"
+                    },
+                    "Get_Organisation": {
+                      "inputs": {
+                        "host": {
+                          "connection": {
+                            "name": "@parameters('$connections')['apicon-cpd-apps-pflcds-tra-we-01']['connectionId']"
+                          }
+                        },
+                        "method": "get",
+                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('orgce9e8c6c.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('accounts'))}/items",
+                        "queries": {
+                          "$filter": "accountid eq '@{body('Parse_JSON')?['value']?['customerId']}'",
+                          "$top": 1
+                        }
+                      },
+                      "runAfter": {},
+                      "type": "ApiConnection"
+                    }
+                  },
+                  "case": 1
+                },
+                "profile": {
+                  "actions": {
+                    "Checking_if_profile_record_contain_data_or_not": {
+                      "actions": {
+                        "For_each_2": {
+                          "actions": {
+                            "Update_Profile": {
+                              "inputs": {
+                                "body": {
+                                  "_ownerid_type": "",
+                                  "_parentcustomerid_type": "",
+                                  "cpm_customersegment": 923080003
+                                },
+                                "host": {
+                                  "connection": {
+                                    "name": "@parameters('$connections')['apicon-cpd-apps-pflcds-tra-we-01']['connectionId']"
+                                  }
+                                },
+                                "method": "patch",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('orgce9e8c6c.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('contacts'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each_2')?['contactid']))}"
+                              },
+                              "runAfter": {},
+                              "type": "ApiConnection"
+                            }
+                          },
+                          "foreach": "@body('Get_Profile')?['value']",
+                          "runAfter": {},
+                          "type": "Foreach"
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "ProfileNotFoundMessage": {
+                            "inputs": {
+                              "runError": {
+                                "code": "400",
+                                "message": "No Profile Found"
+                              },
+                              "runStatus": "Failed"
+                            },
+                            "runAfter": {},
+                            "type": "Terminate"
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "greater": [
+                              "@length(body('Get_Profile')?['value'])",
+                              0
+                            ]
+                          }
+                        ]
+                      },
+                      "runAfter": {
+                        "Get_Profile": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "If"
+                    },
+                    "Get_Profile": {
+                      "inputs": {
+                        "host": {
+                          "connection": {
+                            "name": "@parameters('$connections')['apicon-cpd-apps-pflcds-tra-we-01']['connectionId']"
+                          }
+                        },
+                        "method": "get",
+                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('orgce9e8c6c.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('contacts'))}/items",
+                        "queries": {
+                          "$filter": "contactid eq '@{body('Parse_JSON')?['value']?['customerId']}'",
+                          "$top": 1
+                        }
+                      },
+                      "runAfter": {},
+                      "type": "ApiConnection"
+                    }
+                  },
+                  "case": 0
+                }
+              },
+              "default": {
+                "actions": {}
+              },
+              "expression": "@int(body('Parse_JSON')?['value']?['customerTypeId'])",
+              "runAfter": {},
+              "type": "Switch"
+            }
+          },
+          "else": {
+            "actions": {
+              "Terminate": {
+                "inputs": {
+                  "runError": {
+                    "code": "400",
+                    "message": "Invalid customerTypeId/StatusId."
+                  },
+                  "runStatus": "Failed"
+                },
+                "runAfter": {},
+                "type": "Terminate"
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "or": [
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['customerTypeId']",
+                      "@string(0)"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['customerTypeId']",
+                      "@string(1)"
+                    ]
+                  }
+                ]
+              },
+              {
+                "or": [
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['statusId']",
+                      "@string(2)"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@body('Parse_JSON')?['value']?['statusId']",
+                      "@string(4)"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "Parse_JSON": {
+          "inputs": {
+            "content": "@triggerBody()?['data']",
+            "schema": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "value": {
+                  "properties": {
+                    "customerId": {
+                      "minLength": 1,
+                      "required": true,
+                      "type": "string"
+                    },
+                    "customerTypeId": {
+                      "minLength": 1,
+                      "required": true,
+                      "type": "string"
+                    },
+                    "statusId": {
+                      "minLength": 1,
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpd-apps-mon-tra-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Training"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpd-apps-integ-tra-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-tra-we-01",
+              "connectionName": "apicon-cpd-apps-integ-tra-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            },
+            "apicon-cpd-apps-pflcds-tra-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-pflcds-tra-we-01",
+              "connectionName": "apicon-cpd-apps-pflcds-tra-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+            }
+          }
+        }
+      }
+    }
+  }
+}
