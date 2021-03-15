@@ -549,6 +549,7 @@
       "resourceGroup": "rg-cpd-apps-int-dev-we-01",
       "dependsOn": [
         "DEP-rg-cpd-apps-int-dev-we-01",
+        "DEP-sb-cpd-apps-int-dev-we-01",
         "DEP-sbq-cpd-apps-intchglog-dev-we-01"
       ],
       "properties": {
@@ -677,7 +678,8 @@
       "name": "DEP-apicon-cpd-apps-integ-dev-we-01",
       "resourceGroup": "rg-cpd-apps-int-dev-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-apps-int-dev-we-01"
+        "DEP-rg-cpd-apps-int-dev-we-01",
+        "DEP-egd-cpd-apps-int-dev-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -822,12 +824,59 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
+      "name": "DEP-logic-cpd-apps-qnacopy-dev-we-01",
+      "resourceGroup": "rg-cpd-apps-int-dev-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-int-dev-we-01",
+        "DEP-apicon-cpd-apps-intsb-dev-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-qnacopy-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-logic-cpd-apps-qnakbsync-dev-we-01",
+      "resourceGroup": "rg-cpd-apps-int-dev-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-int-dev-we-01",
+        "DEP-apicon-cpd-apps-intsb-dev-we-01",
+        "DEP-apicon-cpd-apps-integ-dev-we-01",
+        "DEP-apicon-cpd-apps-integd-dev-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-qnakbsync-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
       "name": "DEP-logic-cpd-apps-intsec-dev-we-01",
       "resourceGroup": "rg-cpd-apps-int-dev-we-01",
       "dependsOn": [
         "DEP-rg-cpd-apps-int-dev-we-01",
         "DEP-apicon-cpd-apps-intspo-dev-we-01",
-        "DEP-apicon-cpd-apps-integd-dev-we-01"
+        "DEP-apicon-cpd-apps-integd-dev-we-01",
+        "DEP-apicon-cpd-apps-integ-dev-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -850,7 +899,8 @@
       "dependsOn": [
         "DEP-rg-cpd-apps-int-dev-we-01",
         "DEP-apicon-cpd-apps-intspo-dev-we-01",
-        "DEP-apicon-cpd-apps-integd-dev-we-01"
+        "DEP-apicon-cpd-apps-integd-dev-we-01",
+        "DEP-apicon-cpd-apps-integ-dev-we-01"
       ],
       "properties": {
         "mode": "Incremental",
