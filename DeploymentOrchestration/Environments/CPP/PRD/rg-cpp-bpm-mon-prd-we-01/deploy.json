@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "M-DEP-rg-cpp-bpm-mon-prd-we-01",
+            "name": "DEP-rg-cpp-bpm-mon-prd-we-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -56,7 +56,7 @@
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "rg-cpp-bpm-mon-prd-we-01",
             "dependsOn": [
-                "M-DEP-rg-cpp-bpm-mon-prd-we-01"
+                "DEP-rg-cpp-bpm-mon-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -68,14 +68,14 @@
             }
         }
 
-            //******************  diag storage*/
+           
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "M-DEP-stcppbpmdiagprewe01",
+            "name": "DEP-stcppbpmdiagprdwe01",
             "resourceGroup": "rg-cpp-bpm-mon-prd-we-01",
             "dependsOn": [
-                "M-DEP-rg-cpp-bpm-mon-prd-we-01"
+                "DEP-rg-cpp-bpm-mon-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -86,19 +86,19 @@
                     "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppbpmdiagprewe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppbpmdiagprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
-       //******************  Automation account 
+       
        {         
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "M-DEP-aut-cpp-bpm-prd-we-01",
+      "name": "DEP-aut-cpp-bpm-prd-we-01",
       "resourceGroup": "rg-cpp-bpm-mon-prd-we-01",
       "dependsOn": [
-        "M-DEP-rg-cpp-bpm-mon-prd-we-01",
-        "M-DEP-stcppbpmdiagprewe01"
+        "DEP-rg-cpp-bpm-mon-prd-we-01",
+        "DEP-stcppbpmdiagprdwe01"
                 
       ],
       "properties": {
@@ -114,16 +114,16 @@
         }
       }
     },
-        //******************  LogAnalytics
+        
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "M-DEP-log-cpp-bpm-prd-we-01",
+            "name": "DEP-log-cpp-bpm-prd-we-01",
             "resourceGroup": "rg-cpp-bpm-mon-prd-we-01",
             "dependsOn": [
-                "M-DEP-rg-cpp-bpm-mon-prd-we-01",
-                "M-DEP-stcppbpmdiagprewe01",
-                "M-DEP-aut-cpp-bpm-prd-we-01"
+                "DEP-rg-cpp-bpm-mon-prd-we-01",
+                "DEP-stcppbpmdiagprdwe01",
+                "DEP-aut-cpp-bpm-prd-we-01"
             ],
             "properties": {
                 "mode": "Incremental",

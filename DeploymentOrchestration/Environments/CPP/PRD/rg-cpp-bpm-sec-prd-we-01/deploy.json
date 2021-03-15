@@ -22,7 +22,7 @@
       "signedProtocol": "https"
     },
 
-    "componentStorageAccountId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpd-pltf-iacstg-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgnpdwe01",
+    "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
     "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
     "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
     "containerName": "components",
@@ -129,7 +129,31 @@
                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-bpm-db-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-        }
+        },
+
+        
+    {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-kv-cpp-bpm-prd-we-01",
+            "resourceGroup": "rg-cpp-bpm-sec-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-bpm-sec-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpp-bpm-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },    
+
 
     ],
     "outputs": {
