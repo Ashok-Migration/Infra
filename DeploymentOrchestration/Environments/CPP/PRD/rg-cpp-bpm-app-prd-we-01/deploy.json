@@ -66,6 +66,104 @@
                     "resources": []
                 }
             }
+        },
+  
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-vmbpmwmprdwe01",
+            "resourceGroup": "rg-cpp-bpm-app-prd-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-bpm-app-prd-we-01",
+                
+                
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/Parameters/vmbpmwmprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }                                  
+           }
+        },
+       
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-vmbpmwmprdwe02",
+            "resourceGroup": "rg-cpp-bpm-app-prd-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-bpm-app-prd-we-01",
+                
+               
+                
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/Parameters/vmbpmwmprdwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+           }
+        },
+
+    
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-vmbpmumprdwe03",
+            "resourceGroup": "rg-cpp-bpm-app-prd-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-bpm-app-prd-we-01",
+                
+               
+                
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines-mod/2020-01-23/Parameters/vmbpmumprdwe03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+           }
+        },
+        
+           
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-stcppbpmstgprdwe01",
+            "resourceGroup": "rg-cpp-bpm-app-prd-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-bpm-app-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentstorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppbpmstgprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
     ],
     "outputs": {
