@@ -66,6 +66,20 @@
         "description": "Enable zone redundancy of registry's home replica. Requires registry location to support availability zones."
       }
     },
+    "acrReplicaLocation": {
+      "type": "string",
+      "defaultValue": "westeurope",
+      "metadata": {
+        "description": "Short name for registry replica location."
+      }
+    },
+    "acrReplicaZoneRedundancy": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Enable zone redundancy of registry replica. Requires replica location to support availability zones."
+      }
+    },
     "tags": {
       "defaultValue": {},
       "metadata": {
@@ -108,7 +122,7 @@
     {
       "name": "[parameters('acrName')]",
       "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2019-05-01",
+      "apiVersion": "2020-11-01-preview",
       "location": "[parameters('location')]",
       "comments": "Container registry for storing docker images",
       "tags": "[parameters('tags')]",
@@ -121,6 +135,20 @@
         "zoneRedundancy": "[parameters('acrZoneRedundancy')]"
       },
       "resources": [
+        {
+          "type": "Microsoft.ContainerRegistry/registries/replications",
+          "apiVersion": "2020-11-01-preview",
+          "name": "[concat(parameters('acrName'), '/', parameters('acrReplicaLocation'))]",
+          "location": "[parameters('acrReplicaLocation')]",
+          "condition": "[not(equals(parameters('acrReplicaLocation'), 'location'))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.ContainerRegistry/registries/', parameters('acrName'))]"
+          ],
+          "properties": {
+            "regionEndpointEnabled": true,
+            "zoneRedundancy": "[parameters('acrReplicaZoneRedundancy')]"
+          }
+        },
         {
           "type": "Microsoft.ContainerRegistry/registries/providers/diagnosticsettings",
           "apiVersion": "2017-05-01-preview",
