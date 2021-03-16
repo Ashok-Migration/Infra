@@ -1,121 +1,121 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "workflowName": {
-        "value": "logic-cpp-apps-6dbill-pre-we-01"
-      },
-      "workflowLocation": {
-        "value": "westeurope"
-      },
-      "workflowSchema": {
-        "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
-      },
-      "workflowTriggers": {
-        "value": {
-          "When_a_message_is_received_in_a_queue_(auto-complete)": {
-            "recurrence": {
-              "frequency": "Second",
-              "interval": 1
-            },
-            "type": "ApiConnection",
-            "inputs": {
-              "host": {
-                "connection": {
-                  "name": "@parameters('$connections')['apicon-cpp-apps-intsb-pre-we-01']['connectionId']"
-                }
-              },
-              "method": "get",
-              "path": "/@{encodeURIComponent(encodeURIComponent('events.6dbilling'))}/messages/head",
-              "queries": {
-                "queueType": "Main"
-              }
-            }
-          }
-        }
-      },
-      "workflowActions": {
-        "value": {
-          "DecodeMessage": {
-            "runAfter": {},
-            "type": "InitializeVariable",
-            "inputs": {
-              "variables": [
-                {
-                  "name": "Message",
-                  "type": "object",
-                  "value": "@json(base64ToString(triggerBody()?['ContentData']))"
-                }
-              ]
-            }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-apps-6dbill-pre-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_message_is_received_in_a_queue_(auto-complete)": {
+          "recurrence": {
+            "frequency": "Second",
+            "interval": 1
           },
-          "Publish_Event": {
-            "runAfter": {
-              "DecodeMessage": [
-                "Succeeded"
-              ]
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-intsb-pre-we-01']['connectionId']"
+              }
             },
-            "type": "ApiConnection",
-            "inputs": {
-              "body": [
-                "@variables('Message')"
-              ],
-              "host": {
-                "connection": {
-                  "name": "@parameters('$connections')['apicon-cpp-apps-integd-pre-we-01']['connectionId']"
-                }
-              },
-              "method": "post",
-              "path": "/eventGrid/api/events"
+            "method": "get",
+            "path": "/@{encodeURIComponent(encodeURIComponent('events.6dbilling'))}/messages/head",
+            "queries": {
+              "queueType": "Main"
             }
           }
         }
-      },
-      "workflowParameters": {
-        "value": {
-          "$connections": {
-            "defaultValue": {},
-            "type": "Object"
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "DecodeMessage": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Message",
+                "type": "object",
+                "value": "@json(base64ToString(triggerBody()?['ContentData']))"
+              }
+            ]
+          }
+        },
+        "Publish_Event": {
+          "runAfter": {
+            "DecodeMessage": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": [
+              "@variables('Message')"
+            ],
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-integd-pre-we-01']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/eventGrid/api/events"
           }
         }
-      },
-      "diagnosticLogsRetentionInDays": {
-          "value": 365
-      },
-      "diagnosticStorageAccountId": {
-          "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprewe01"
-      },
-      "workspaceId": {
-          "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-pre-we-01"
-      },
-      "eventHubAuthorizationRuleId": {
-          "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
-      },
-      "eventHubName": {
-          "value": "evh-cpp-apps-mon-pre-we-01"
-      },
-      "tags": {
-        "value": {
-          "Environment": "Pre-Production"
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
         }
-      },
-      "connectionParameters": {
-        "value": {
-          "$connections": {
-            "value": {
-              "apicon-cpp-apps-intsb-pre-we-01": {
-                "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intsb-pre-we-01",
-                "connectionName": "apicon-cpp-apps-intsb-pre-we-01",
-                "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
-              },
-              "apicon-cpp-apps-integd-pre-we-01": {
-                "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integd-pre-we-01",
-                "connectionName": "apicon-cpp-apps-integd-pre-we-01",
-                "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
-              }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprewe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-pre-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpp-apps-intsb-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intsb-pre-we-01",
+              "connectionName": "apicon-cpp-apps-intsb-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+            },
+            "apicon-cpp-apps-integd-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integd-pre-we-01",
+              "connectionName": "apicon-cpp-apps-integd-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
             }
           }
         }
       }
     }
   }
+}

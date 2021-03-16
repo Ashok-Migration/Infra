@@ -38,6 +38,359 @@
             "value": {
                 "Check_For_Sensitivity_Type": {
                     "actions": {
+                        "Expand_critical_users_and_append": {
+                            "actions": {
+                                "Check_for_user": {
+                                    "actions": {
+                                        "Append_to_array_variable": {
+                                            "inputs": {
+                                                "name": "ApproverUserId",
+                                                "value": "@items('Expand_critical_users_and_append')?['Id']"
+                                            },
+                                            "runAfter": {
+                                                "Append_to_string_variable": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "AppendToArrayVariable"
+                                        },
+                                        "Append_to_string_variable": {
+                                            "inputs": {
+                                                "name": "ApproverEmail",
+                                                "value": "@{items('Expand_critical_users_and_append')?['Email']};"
+                                            },
+                                            "runAfter": {},
+                                            "type": "AppendToStringVariable"
+                                        }
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Check_for_AAD_or_M365_Group": {
+                                                "actions": {
+                                                    "For_each_critical_group_member": {
+                                                        "actions": {
+                                                            "Check_for_null_value_in_mail": {
+                                                                "actions": {
+                                                                    "Add_UserId_to_ApproverUserId": {
+                                                                        "actions": {
+                                                                            "Append_to_ApproverUserId_-_Critical": {
+                                                                                "inputs": {
+                                                                                    "name": "ApproverUserId",
+                                                                                    "value": "@items('Add_UserId_to_ApproverUserId')?['Id']"
+                                                                                },
+                                                                                "runAfter": {},
+                                                                                "type": "AppendToArrayVariable"
+                                                                            }
+                                                                        },
+                                                                        "foreach": "@body('Parse_Site_User_Response')?['value']",
+                                                                        "runAfter": {
+                                                                            "Append_to_ApproverEmail_-_Critical": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "Foreach"
+                                                                    },
+                                                                    "Append_to_ApproverEmail_-_Critical": {
+                                                                        "inputs": {
+                                                                            "name": "ApproverEmail",
+                                                                            "value": "@{items('For_each_critical_group_member')?['mail']};"
+                                                                        },
+                                                                        "runAfter": {
+                                                                            "Parse_Site_User_Response": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "AppendToStringVariable"
+                                                                    },
+                                                                    "Get_Site_User_Id": {
+                                                                        "inputs": {
+                                                                            "body": {
+                                                                                "headers": {
+                                                                                    "Accept": "application/json;odata=nometadata",
+                                                                                    "Content-Type": "application/json"
+                                                                                },
+                                                                                "method": "GET",
+                                                                                "uri": "/_api/web/siteusers?$filter=Email eq '@{items('For_each_critical_group_member')?['mail']}'"
+                                                                            },
+                                                                            "host": {
+                                                                                "connection": {
+                                                                                    "name": "@parameters('$connections')['apicon-cpp-apps-intspo-pre-we-01']['connectionId']"
+                                                                                }
+                                                                            },
+                                                                            "method": "post",
+                                                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                                                        },
+                                                                        "runAfter": {},
+                                                                        "type": "ApiConnection"
+                                                                    },
+                                                                    "Parse_Site_User_Response": {
+                                                                        "inputs": {
+                                                                            "content": "@body('Get_Site_User_Id')",
+                                                                            "schema": {
+                                                                                "properties": {
+                                                                                    "value": {
+                                                                                        "items": {
+                                                                                            "properties": {
+                                                                                                "Email": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "Expiration": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "Id": {
+                                                                                                    "type": "integer"
+                                                                                                },
+                                                                                                "IsEmailAuthenticationGuestUser": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsHiddenInUI": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsShareByEmailGuestUser": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsSiteAdmin": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "LoginName": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "PrincipalType": {
+                                                                                                    "type": "integer"
+                                                                                                },
+                                                                                                "Title": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "UserId": {
+                                                                                                    "properties": {
+                                                                                                        "NameId": {
+                                                                                                            "type": "string"
+                                                                                                        },
+                                                                                                        "NameIdIssuer": {
+                                                                                                            "type": "string"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "type": "object"
+                                                                                                },
+                                                                                                "UserPrincipalName": {
+                                                                                                    "type": "string"
+                                                                                                }
+                                                                                            },
+                                                                                            "required": [
+                                                                                                "Id",
+                                                                                                "IsHiddenInUI",
+                                                                                                "LoginName",
+                                                                                                "Title",
+                                                                                                "PrincipalType",
+                                                                                                "Email",
+                                                                                                "Expiration",
+                                                                                                "IsEmailAuthenticationGuestUser",
+                                                                                                "IsShareByEmailGuestUser",
+                                                                                                "IsSiteAdmin",
+                                                                                                "UserId",
+                                                                                                "UserPrincipalName"
+                                                                                            ],
+                                                                                            "type": "object"
+                                                                                        },
+                                                                                        "type": "array"
+                                                                                    }
+                                                                                },
+                                                                                "type": "object"
+                                                                            }
+                                                                        },
+                                                                        "runAfter": {
+                                                                            "Get_Site_User_Id": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "ParseJson"
+                                                                    }
+                                                                },
+                                                                "expression": {
+                                                                    "and": [
+                                                                        {
+                                                                            "not": {
+                                                                                "equals": [
+                                                                                    "@items('For_each_critical_group_member')?['mail']",
+                                                                                    null
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "runAfter": {},
+                                                                "type": "If"
+                                                            }
+                                                        },
+                                                        "foreach": "@body('Parse_Critical_Group_Member_JSON')?['value']",
+                                                        "runAfter": {
+                                                            "Parse_Critical_Group_Member_JSON": [
+                                                                "Succeeded"
+                                                            ]
+                                                        },
+                                                        "type": "Foreach"
+                                                    },
+                                                    "Get_Critical_Group_Members": {
+                                                        "inputs": {
+                                                            "authentication": {
+                                                                "audience": "https://graph.microsoft.com",
+                                                                "authority": "https://login.microsoft.com",
+                                                                "clientId": "@body('Get_ClientId')?['value']",
+                                                                "password": "@body('Get_CertificatePassword')?['value']",
+                                                                "pfx": "@body('Get_CertificatePfxKey')?['value']",
+                                                                "tenant": "@body('Get_TenantId')?['value']",
+                                                                "type": "ActiveDirectoryOAuth"
+                                                            },
+                                                            "method": "GET",
+                                                            "uri": "https://graph.microsoft.com/v1.0/groups/@{last(split(items('Expand_critical_users_and_append')?['LoginName'],'|'))}/members"
+                                                        },
+                                                        "runAfter": {},
+                                                        "type": "Http"
+                                                    },
+                                                    "Parse_Critical_Group_Member_JSON": {
+                                                        "inputs": {
+                                                            "content": "@body('Get_Critical_Group_Members')",
+                                                            "schema": {
+                                                                "properties": {
+                                                                    "@@odata.context": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "@@odata.type": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "businessPhones": {
+                                                                                    "items": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "type": "array"
+                                                                                },
+                                                                                "displayName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "givenName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "id": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "jobTitle": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "mail": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "mobilePhone": {},
+                                                                                "officeLocation": {},
+                                                                                "preferredLanguage": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "surname": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "userPrincipalName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "@@odata.type",
+                                                                                "id",
+                                                                                "businessPhones",
+                                                                                "displayName",
+                                                                                "givenName",
+                                                                                "jobTitle",
+                                                                                "mail",
+                                                                                "mobilePhone",
+                                                                                "officeLocation",
+                                                                                "preferredLanguage",
+                                                                                "surname",
+                                                                                "userPrincipalName"
+                                                                            ],
+                                                                            "type": "object"
+                                                                        },
+                                                                        "type": "array"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "runAfter": {
+                                                            "Get_Critical_Group_Members": [
+                                                                "Succeeded"
+                                                            ]
+                                                        },
+                                                        "type": "ParseJson"
+                                                    }
+                                                },
+                                                "expression": {
+                                                    "or": [
+                                                        {
+                                                            "equals": [
+                                                                "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                                3
+                                                            ]
+                                                        },
+                                                        {
+                                                            "equals": [
+                                                                "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                                4
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "runAfter": {},
+                                                "type": "If"
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                    1
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "runAfter": {},
+                                    "type": "If"
+                                }
+                            },
+                            "foreach": "@body('Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON')?['value']",
+                            "runAfter": {
+                                "Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
                         "Get_Users_from_SharePoint_Critical_Approvers_Group": {
                             "inputs": {
                                 "body": {
@@ -46,7 +399,7 @@
                                         "Content-Type": "application/json"
                                     },
                                     "method": "GET",
-                                    "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['CriticalApprovers']}')/users?$select=Email,Id"
+                                    "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['CriticalApprovers']}')/users?$select=Email,Id,PrincipalType,LoginName"
                                 },
                                 "host": {
                                     "connection": {
@@ -58,37 +411,6 @@
                             },
                             "runAfter": {},
                             "type": "ApiConnection"
-                        },
-                        "Loop_Critical_Approvers_Group": {
-                            "actions": {
-                                "Append_to_ApproverEmail_-_Critical": {
-                                    "inputs": {
-                                        "name": "ApproverEmail",
-                                        "value": "@{items('Loop_Critical_Approvers_Group')?['Email']};"
-                                    },
-                                    "runAfter": {},
-                                    "type": "AppendToStringVariable"
-                                },
-                                "Append_to_ApproverUserId_-_Critical_": {
-                                    "inputs": {
-                                        "name": "ApproverUserId",
-                                        "value": "@items('Loop_Critical_Approvers_Group')?['Id']"
-                                    },
-                                    "runAfter": {
-                                        "Append_to_ApproverEmail_-_Critical": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "AppendToArrayVariable"
-                                }
-                            },
-                            "foreach": "@body('Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON')?['value']",
-                            "runAfter": {
-                                "Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Foreach"
                         },
                         "Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON": {
                             "inputs": {
@@ -103,11 +425,19 @@
                                                     },
                                                     "Id": {
                                                         "type": "integer"
+                                                    },
+                                                    "LoginName": {
+                                                        "type": "string"
+                                                    },
+                                                    "PrincipalType": {
+                                                        "type": "integer"
                                                     }
                                                 },
                                                 "required": [
                                                     "Id",
-                                                    "Email"
+                                                    "Email",
+                                                    "PrincipalType",
+                                                    "LoginName"
                                                 ],
                                                 "type": "object"
                                             },
@@ -130,7 +460,7 @@
                                 "value": "Global Critical"
                             },
                             "runAfter": {
-                                "Loop_Critical_Approvers_Group": [
+                                "Expand_critical_users_and_append": [
                                     "Succeeded"
                                 ]
                             },
@@ -139,6 +469,359 @@
                     },
                     "else": {
                         "actions": {
+                            "Expand_users_and_append": {
+                                "actions": {
+                                    "Check_for_user_2": {
+                                        "actions": {
+                                            "Append_to_array_variable_2": {
+                                                "inputs": {
+                                                    "name": "ApproverUserId",
+                                                    "value": "@items('Expand_users_and_append')?['Id']"
+                                                },
+                                                "runAfter": {
+                                                    "Append_to_string_variable_2": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "AppendToArrayVariable"
+                                            },
+                                            "Append_to_string_variable_2": {
+                                                "inputs": {
+                                                    "name": "ApproverEmail",
+                                                    "value": "@{items('Expand_users_and_append')?['Email']};"
+                                                },
+                                                "runAfter": {},
+                                                "type": "AppendToStringVariable"
+                                            }
+                                        },
+                                        "else": {
+                                            "actions": {
+                                                "Check_for_AAD_or_M365_Group_2": {
+                                                    "actions": {
+                                                        "For_each_group_member": {
+                                                            "actions": {
+                                                                "Check_for_null_value_in_mail_2": {
+                                                                    "actions": {
+                                                                        "Add_UserId_to_ApproverUserId_2": {
+                                                                            "actions": {
+                                                                                "Append_to_ApproverUserId": {
+                                                                                    "inputs": {
+                                                                                        "name": "ApproverUserId",
+                                                                                        "value": "@items('Add_UserId_to_ApproverUserId_2')?['Id']"
+                                                                                    },
+                                                                                    "runAfter": {},
+                                                                                    "type": "AppendToArrayVariable"
+                                                                                }
+                                                                            },
+                                                                            "foreach": "@body('Parse_Site_User_Response_2')?['value']",
+                                                                            "runAfter": {
+                                                                                "Append_to_ApproverEmail": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "Foreach"
+                                                                        },
+                                                                        "Append_to_ApproverEmail": {
+                                                                            "inputs": {
+                                                                                "name": "ApproverEmail",
+                                                                                "value": "@{items('For_each_group_member')?['mail']};"
+                                                                            },
+                                                                            "runAfter": {
+                                                                                "Parse_Site_User_Response_2": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "AppendToStringVariable"
+                                                                        },
+                                                                        "Get_Site_User_Id_2": {
+                                                                            "inputs": {
+                                                                                "body": {
+                                                                                    "headers": {
+                                                                                        "Accept": "application/json;odata=nometadata",
+                                                                                        "Content-Type": "application/json"
+                                                                                    },
+                                                                                    "method": "GET",
+                                                                                    "uri": "/_api/web/siteusers?$filter=Email eq '@{items('For_each_group_member')?['mail']}'"
+                                                                                },
+                                                                                "host": {
+                                                                                    "connection": {
+                                                                                        "name": "@parameters('$connections')['apicon-cpp-apps-intspo-pre-we-01']['connectionId']"
+                                                                                    }
+                                                                                },
+                                                                                "method": "post",
+                                                                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                                                            },
+                                                                            "runAfter": {},
+                                                                            "type": "ApiConnection"
+                                                                        },
+                                                                        "Parse_Site_User_Response_2": {
+                                                                            "inputs": {
+                                                                                "content": "@body('Get_Site_User_Id_2')",
+                                                                                "schema": {
+                                                                                    "properties": {
+                                                                                        "value": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "Email": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "Expiration": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "Id": {
+                                                                                                        "type": "integer"
+                                                                                                    },
+                                                                                                    "IsEmailAuthenticationGuestUser": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsHiddenInUI": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsShareByEmailGuestUser": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsSiteAdmin": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "LoginName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "PrincipalType": {
+                                                                                                        "type": "integer"
+                                                                                                    },
+                                                                                                    "Title": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "UserId": {
+                                                                                                        "properties": {
+                                                                                                            "NameId": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "NameIdIssuer": {
+                                                                                                                "type": "string"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        "type": "object"
+                                                                                                    },
+                                                                                                    "UserPrincipalName": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "Id",
+                                                                                                    "IsHiddenInUI",
+                                                                                                    "LoginName",
+                                                                                                    "Title",
+                                                                                                    "PrincipalType",
+                                                                                                    "Email",
+                                                                                                    "Expiration",
+                                                                                                    "IsEmailAuthenticationGuestUser",
+                                                                                                    "IsShareByEmailGuestUser",
+                                                                                                    "IsSiteAdmin",
+                                                                                                    "UserId",
+                                                                                                    "UserPrincipalName"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array"
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                }
+                                                                            },
+                                                                            "runAfter": {
+                                                                                "Get_Site_User_Id_2": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "ParseJson"
+                                                                        }
+                                                                    },
+                                                                    "expression": {
+                                                                        "and": [
+                                                                            {
+                                                                                "not": {
+                                                                                    "equals": [
+                                                                                        "@items('For_each_group_member')?['mail']",
+                                                                                        null
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "runAfter": {},
+                                                                    "type": "If"
+                                                                }
+                                                            },
+                                                            "foreach": "@body('Parse_Group_Member_JSON')?['value']",
+                                                            "runAfter": {
+                                                                "Parse_Group_Member_JSON": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "Foreach"
+                                                        },
+                                                        "Get_Group_Members": {
+                                                            "inputs": {
+                                                                "authentication": {
+                                                                    "audience": "https://graph.microsoft.com",
+                                                                    "authority": "https://login.microsoft.com",
+                                                                    "clientId": "@body('Get_ClientId')?['value']",
+                                                                    "password": "@body('Get_CertificatePassword')?['value']",
+                                                                    "pfx": "@body('Get_CertificatePfxKey')?['value']",
+                                                                    "tenant": "@body('Get_TenantId')?['value']",
+                                                                    "type": "ActiveDirectoryOAuth"
+                                                                },
+                                                                "method": "GET",
+                                                                "uri": "https://graph.microsoft.com/v1.0/groups/@{last(split(items('Expand_users_and_append')?['LoginName'],'|'))}/members"
+                                                            },
+                                                            "runAfter": {},
+                                                            "type": "Http"
+                                                        },
+                                                        "Parse_Group_Member_JSON": {
+                                                            "inputs": {
+                                                                "content": "@body('Get_Group_Members')",
+                                                                "schema": {
+                                                                    "properties": {
+                                                                        "@@odata.context": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "value": {
+                                                                            "items": {
+                                                                                "properties": {
+                                                                                    "@@odata.type": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "businessPhones": {
+                                                                                        "items": {
+                                                                                            "type": [
+                                                                                                "string",
+                                                                                                "null"
+                                                                                            ]
+                                                                                        },
+                                                                                        "type": "array"
+                                                                                    },
+                                                                                    "displayName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "givenName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "id": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "jobTitle": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "mail": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "mobilePhone": {},
+                                                                                    "officeLocation": {},
+                                                                                    "preferredLanguage": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "surname": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "userPrincipalName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    }
+                                                                                },
+                                                                                "required": [
+                                                                                    "@@odata.type",
+                                                                                    "id",
+                                                                                    "businessPhones",
+                                                                                    "displayName",
+                                                                                    "givenName",
+                                                                                    "jobTitle",
+                                                                                    "mail",
+                                                                                    "mobilePhone",
+                                                                                    "officeLocation",
+                                                                                    "preferredLanguage",
+                                                                                    "surname",
+                                                                                    "userPrincipalName"
+                                                                                ],
+                                                                                "type": "object"
+                                                                            },
+                                                                            "type": "array"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "runAfter": {
+                                                                "Get_Group_Members": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "ParseJson"
+                                                        }
+                                                    },
+                                                    "expression": {
+                                                        "or": [
+                                                            {
+                                                                "equals": [
+                                                                    "@items('Expand_users_and_append')?['PrincipalType']",
+                                                                    3
+                                                                ]
+                                                            },
+                                                            {
+                                                                "equals": [
+                                                                    "@items('Expand_users_and_append')?['PrincipalType']",
+                                                                    4
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "runAfter": {},
+                                                    "type": "If"
+                                                }
+                                            }
+                                        },
+                                        "expression": {
+                                            "and": [
+                                                {
+                                                    "equals": [
+                                                        "@items('Expand_users_and_append')?['PrincipalType']",
+                                                        1
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "runAfter": {},
+                                        "type": "If"
+                                    }
+                                },
+                                "foreach": "@body('Parse_Users_From_SharePoint_Approvers_Group_JSON')?['value']",
+                                "runAfter": {
+                                    "Parse_Users_From_SharePoint_Approvers_Group_JSON": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Foreach"
+                            },
                             "Get_Users_From_SharePoint_Approvers_Group": {
                                 "inputs": {
                                     "body": {
@@ -147,7 +830,7 @@
                                             "Content-Type": "application/json"
                                         },
                                         "method": "GET",
-                                        "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['Approvers']}')/users?$select=Email,Id"
+                                        "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['Approvers']}')/users?$select=Email,Id,PrincipalType,LoginName"
                                     },
                                     "host": {
                                         "connection": {
@@ -159,37 +842,6 @@
                                 },
                                 "runAfter": {},
                                 "type": "ApiConnection"
-                            },
-                            "Loop_Approvers_Group": {
-                                "actions": {
-                                    "Append_to_ApproverEmail": {
-                                        "inputs": {
-                                            "name": "ApproverEmail",
-                                            "value": ";@{items('Loop_Approvers_Group')?['Email']};"
-                                        },
-                                        "runAfter": {},
-                                        "type": "AppendToStringVariable"
-                                    },
-                                    "Append_to_ApproverUserId": {
-                                        "inputs": {
-                                            "name": "ApproverUserId",
-                                            "value": "@items('Loop_Approvers_Group')?['Id']"
-                                        },
-                                        "runAfter": {
-                                            "Append_to_ApproverEmail": [
-                                                "Succeeded"
-                                            ]
-                                        },
-                                        "type": "AppendToArrayVariable"
-                                    }
-                                },
-                                "foreach": "@body('Parse_Users_From_SharePoint_Approvers_Group_JSON')?['value']",
-                                "runAfter": {
-                                    "Parse_Users_From_SharePoint_Approvers_Group_JSON": [
-                                        "Succeeded"
-                                    ]
-                                },
-                                "type": "Foreach"
                             },
                             "Parse_Users_From_SharePoint_Approvers_Group_JSON": {
                                 "inputs": {
@@ -204,11 +856,19 @@
                                                         },
                                                         "Id": {
                                                             "type": "integer"
+                                                        },
+                                                        "LoginName": {
+                                                            "type": "string"
+                                                        },
+                                                        "PrincipalType": {
+                                                            "type": "integer"
                                                         }
                                                     },
                                                     "required": [
                                                         "Id",
-                                                        "Email"
+                                                        "Email",
+                                                        "PrincipalType",
+                                                        "LoginName"
                                                     ],
                                                     "type": "object"
                                                 },
@@ -231,7 +891,7 @@
                                     "value": "Global"
                                 },
                                 "runAfter": {
-                                    "Loop_Approvers_Group": [
+                                    "Expand_users_and_append": [
                                         "Succeeded"
                                     ]
                                 },
@@ -360,6 +1020,106 @@
                     },
                     "type": "Wait"
                 },
+                "Get_CertificatePassword": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-apps-intkv-pre-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-CertificatePassword')}/value"
+                    },
+                    "runAfter": {
+                        "Get_TenantId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_CertificatePfxKey": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-apps-intkv-pre-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-CertificatePfxKey')}/value"
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTitle": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_ClientId": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-apps-intkv-pre-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-ClientId')}/value"
+                    },
+                    "runAfter": {
+                        "Get_CertificatePfxKey": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_TenantId": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpp-apps-intkv-pre-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-TenantId')}/value"
+                    },
+                    "runAfter": {
+                        "Get_ClientId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
                 "Get_Translators_Approvers_Group_From_Config": {
                     "inputs": {
                         "body": {
@@ -486,7 +1246,7 @@
                         "Update_Item_Status_And_Comments_-_Approved": {
                             "inputs": {
                                 "body": {
-                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\"\n}",
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\",\n\"cmsversion\": @{if(equals(body('Parse_Service_Bus_Message_JSON')?['Version'], ''), 1, add(int(body('Parse_Service_Bus_Message_JSON')?['Version']), 1))}\n}",
                                     "headers": {
                                         "Accept": "application/json;odata=verbose",
                                         "Content-Type": "application/json",
@@ -842,13 +1602,19 @@
                                 },
                                 "SiteURL": {
                                     "type": "string"
+                                },
+                                "Version": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 }
                             },
                             "type": "object"
                         }
                     },
                     "runAfter": {
-                        "Initialize_ApproverTitle": [
+                        "Get_CertificatePassword": [
                             "Succeeded"
                         ]
                     },
@@ -990,7 +1756,7 @@
                 "Set_EmailBody_Approval_Request": {
                     "inputs": {
                         "name": "EmailBody",
-                        "value": "<p>Hello @{variables('ApproverTitle')} Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/Lists/MyTasks/EditForm.aspx?ID=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                        "value": "<p>Hello @{variables('ApproverTitle')} Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/SitePages/MyTasks.aspx?TaskId=@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
                     },
                     "runAfter": {
                         "Update_Item_Status_to_Pending_Approval": [
@@ -1265,6 +2031,11 @@
                             "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intspo-pre-we-01",
                             "connectionName": "apicon-cpp-apps-intspo-pre-we-01",
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline"
+                        },
+                        "apicon-cpp-apps-intkv-pre-we-01": {
+                            "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intkv-pre-we-01",
+                            "connectionName": "apicon-cpp-apps-intkv-pre-we-01",
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
                         }
                     }
                 }
