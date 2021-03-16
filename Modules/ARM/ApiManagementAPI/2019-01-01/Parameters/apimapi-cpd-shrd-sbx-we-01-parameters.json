@@ -2,17 +2,28 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "apiDescription": {
+            "value": "Event Integration API for Sandbox"
+        },
+        "apiDisplayName": {
+            "value": "Event Integration API"
+        },
         "apiManagementServiceName": {
             "value": "apim-cpd-shrd-sbx-we-01"
         },
         "apiName": {
             "value": "EventIntegrationApi"
         },
-        "apiDisplayName": {
-            "value": "Event Integration API"
-        },
-        "apiDescription": {
-            "value": "Event Integration API for Sandbox"
+        "apiOperations": {
+            "value": [
+                {
+                    "description": "Send messages to Event Integration Architecture",
+                    "displayName": "Messages",
+                    "method": "POST",
+                    "operationName": "messages",
+                    "urlTemplate": "/messages"
+                }
+            ]
         },
         "apiPath": {
             "value": "eventintegration"
@@ -23,25 +34,17 @@
         "apiPolicyLogicAppRG": {
             "value": "rg-cpd-apps-int-sbx-we-01"
         },
-        "openIdConfigUrl": {
-            "value": "https://login.microsoftonline.com/24f9d756-bf0c-43e9-ad5e-2073ae2d6698/v2.0/.well-known/openid-configuration"
-        },
         "audienceId": {
             "value": "bc67474e-612b-4d7f-b75a-ac54d45f143a"
         },
         "issuerUrl": {
             "value": "https://tasmucpb2cnonprod.b2clogin.com/24f9d756-bf0c-43e9-ad5e-2073ae2d6698/v2.0/"
         },
-        "apiOperations": {
-            "value": [
-                {
-                    "operationName": "messages",
-                    "displayName": "Messages",
-                    "urlTemplate": "/messages",
-                    "method": "POST",
-                    "description": "Send messages to Event Integration Architecture"
-                }
-            ]
+        "openIdConfigUrl": {
+            "value": "https://login.microsoftonline.com/24f9d756-bf0c-43e9-ad5e-2073ae2d6698/v2.0/.well-known/openid-configuration"
+        },
+        "subscriptionRequired": {
+            "value": "false"
         }
     }
 }
