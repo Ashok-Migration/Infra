@@ -2,7 +2,7 @@
 
 This module is used to deploy a Azure Cache for Redis instance.
 
-This module is the 2019-07-01 version which does not has availability zones. Use the 2021-03-16 module if you need availability zones. 
+This module is the 2019-07-01 version which does not has availability zones. Use the 2020-06-01 module if you need availability zones. 
 
 ## Resources
 

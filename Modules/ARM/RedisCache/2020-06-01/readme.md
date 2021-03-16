@@ -2,7 +2,8 @@
 
 This module is used to deploy a Azure Cache for Redis instance.
 
-This module is the 2021-03-16 version which has availability zones. Use the 2019-07-01 module if you don't need availability zones. 
+This module is the 2020-06-01 version which has availability zones. Use the 2019-07-01 module if you don't need availability zones. 
+Availability zones for Azure Cache for Redis are in Preview mode hence there are some limitations as Scaling, clustering, and persistence are not yet supported on zone redundant caches.
 
 ## Resources
 
@@ -15,9 +16,11 @@ This module is the 2021-03-16 version which has availability zones. Use the 2019
 | `enableNonSslPort` | bool | false | true/false | Set to true to allow access to redis on port 6379, without SSL tunneling (less secure).
 | `location` | string | `[resourceGroup().location]` | | Optional. Location for all resources.
 | `zones` | array | [] | | Required. Sets the availability zones.
+| `redisVersion` | string | 4 | | Redis version.
+| `replicasPerMaster` | int | 3 | | Replicas per master.
 | `redisCacheCapacity` | int | 1 | 1,2,3,4 | The size of the new Azure Redis Cache instance. Valid family and capacity combinations are (C0..C6, P1..P4).
 | `redisCacheName` | string | | | The name of the Azure Redis Cache to create.
-| `redisShardCount` | int | | | Number of highly available shards to create in the cluster. Requires Premium SKU.
+| `redisConfiguration` | object | {} | | Optional. Redis configuration.
 | `diagnosticLogsRetentionInDays` | int | 365 |  | Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely.
 | `diagnosticStorageAccountId` | string |  |  | Optional. Resource identifier of the Diagnostic Storage Account.
 | `workspaceId` | string |  |  | Optional. Resource identifier of Log Analytics.

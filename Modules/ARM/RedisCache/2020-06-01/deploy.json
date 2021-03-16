@@ -23,6 +23,20 @@
         "description": "Availability zones"
       }
     },
+    "redisVersion": {
+     "type": "string",
+     "defaultValue": "4",
+     "metadata": {
+       "description": "Redis version"
+     } 
+    },
+    "replicasPerMaster": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Replicas per master."
+      }
+    },
     "redisCacheCapacity": {
       "allowedValues": [
         1,
@@ -42,11 +56,12 @@
       },
       "type": "string"
     },
-    "redisShardCount": {
+    "redisConfiguration": {
+      "defaultValue": {},
       "metadata": {
-        "description": "Number of highly available shards to create in the cluster. Requires Premium SKU."
+        "description": "Optional. Redis Configuration."
       },
-      "type": "int"
+      "type": "object"
     },
     "diagnosticLogsRetentionInDays": {
       "type": "int",
@@ -109,14 +124,16 @@
   "resources": [
     {
       "type": "Microsoft.Cache/Redis",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2020-06-01",
       "name": "[parameters('redisCacheName')]",
       "location": "[parameters('location')]",
       "zones": "[parameters('zones')]",
       "tags": "[parameters('tags')]",
       "properties": {
         "enableNonSslPort": "[parameters('enableNonSslPort')]",
-        "shardCount": "[parameters('redisShardCount')]",
+        "redisVersion": "[parameters('redisVersion')]",
+        "redisConfiguration": "[parameters('redisConfiguration')]",
+        "replicasPerMaster": "[parameters('replicasPerMaster')]",
         "sku": {
           "capacity": "[parameters('redisCacheCapacity')]",
           "family": "P",
