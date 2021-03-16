@@ -66,6 +66,77 @@
                     "resources": []
                 }
             }
+        },
+
+           
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-stcppgisdiagprdwe01",
+            "resourceGroup": "rg-cpp-gis-mon-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-gis-mon-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppgisdiagprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+       
+       {         
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-aut-cpp-gis-prd-we-01",
+      "resourceGroup": "rg-cpp-gis-mon-prd-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-gis-mon-prd-we-01",
+        "DEP-stcppgisdiagprdwe01"
+                
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/Parameters/aut-cpp-gis-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+        
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-log-cpp-gis-prd-we-01",
+            "resourceGroup": "rg-cpp-gis-mon-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-gis-mon-prd-we-01",
+                "DEP-stcppgisdiagprdwe01",
+                "DEP-aut-cpp-gis-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/Parameters/log-cpp-gis-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+           }
         }
     ],
     "outputs": {
