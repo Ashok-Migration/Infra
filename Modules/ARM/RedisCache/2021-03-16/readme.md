@@ -2,7 +2,7 @@
 
 This module is used to deploy a Azure Cache for Redis instance.
 
-This module is the 2019-07-01 version which does not has availability zones. Use the 2021-03-16 module if you need availability zones. 
+This module is the 2021-03-16 version which has availability zones. Use the 2019-07-01 module if you don't need availability zones. 
 
 ## Resources
 
@@ -14,6 +14,7 @@ This module is the 2019-07-01 version which does not has availability zones. Use
 | :-             | :-   | :-            | :-              | :-          |
 | `enableNonSslPort` | bool | false | true/false | Set to true to allow access to redis on port 6379, without SSL tunneling (less secure).
 | `location` | string | `[resourceGroup().location]` | | Optional. Location for all resources.
+| `zones` | array | [] | | Required. Sets the availability zones.
 | `redisCacheCapacity` | int | 1 | 1,2,3,4 | The size of the new Azure Redis Cache instance. Valid family and capacity combinations are (C0..C6, P1..P4).
 | `redisCacheName` | string | | | The name of the Azure Redis Cache to create.
 | `redisShardCount` | int | | | Number of highly available shards to create in the cluster. Requires Premium SKU.
