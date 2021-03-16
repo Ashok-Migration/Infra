@@ -23,7 +23,7 @@ stop-Service -Name "Spooler" -Force
 get-Service -Name "Spooler"
 
 write-host "**********set path**********"
-Set-Location Modules\ARM\VirtualMachines\2020-01-23\Scripts
+Set-Location Modules\ARM\VirtualMachines-mod\2020-01-23\Scripts
 Get-Location
 
 write-host "**********disk initializetion**********"
@@ -43,7 +43,7 @@ Set-Item -Path WSMan:\localhost\MaxEnvelopeSizeKb -Value 2048
 write-host "**********starting Hardanning  process**********"
 
 Start-DscConfiguration -Path .\AzSC_WindowsServer2019 -Force -Wait -Verbose 
-# Start-DscConfiguration -Path .\Modules\ARM\VirtualMachines\2020-01-23\Scripts\AzSC_WindowsServer2019 -Force -Verbose –Wait
+# Start-DscConfiguration -Path .\Modules\ARM\VirtualMachines-mod\2020-01-23\Scripts\AzSC_WindowsServer2019 -Force -Verbose –Wait
 write-host " **************************************"
 
 write-host " restarting computer"
