@@ -106,6 +106,13 @@
       "metadata": {
         "description": "Optional. Tags of the Logic App resource."
       }
+    },
+    "LogicAppIntegrationAccount": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The ID to use for the integration account"
+      }
     }
   },
   "variables": {
@@ -128,7 +135,10 @@
           "enabled": true
         }
       }
-    ]
+    ],
+    "integrationAccount": {
+      "id": "[parameters('LogicAppIntegrationAccount')]"
+    }
   },
   "resources": [
     {
@@ -148,7 +158,8 @@
         },
         "parameters": "[parameters('connectionParameters')]",
         "state": "[parameters('logicAppState')]",
-        "accessControl": "[parameters('accessControl')]"
+        "accessControl": "[parameters('accessControl')]",
+        "integrationAccount": "[if(empty(parameters('LogicAppIntegrationAccount')), json('null'), variables('integrationAccount'))]"
       },
       "resources": [
         {

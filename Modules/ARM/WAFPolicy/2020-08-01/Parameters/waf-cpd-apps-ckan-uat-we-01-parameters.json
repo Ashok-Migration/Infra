@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "wafName": {
+            "value": "waf-cpd-apps-ckan-uat-we-01"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "applicationGateways": {
+            "value": [
+                {
+                    "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01"
+                }
+            ]
+        },
+        "requestBodyCheck": {
+            "value": true
+        },
+        "maxRequestBodySizeInKb": {
+            "value": 128
+        },
+        "fileUploadLimitInMb": {
+            "value": 100
+        },
+        "state": {
+            "value": "Enabled"
+        },
+        "mode": {
+            "value": "Prevention"
+        },
+        "managedRuleSets": {
+            "value": [
+                {
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.0",
+                    "ruleGroupOverrides": []
+                }
+            ]
+        },
+        "exclusions": {
+            "value": [
+                {
+                    "matchVariable": "RequestCookieNames",
+                    "selectorMatchOperator": "StartsWith",
+                    "selector": "auth_tkt"
+                }
+            ]
+        },
+        "tags": {
+            "value": {
+                "Environment": "UAT"
+            }
+        }
+    }
+}

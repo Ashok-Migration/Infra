@@ -1,0 +1,91 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "wafName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Resource Name."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope",
+      "metadata": {
+        "description": "Resource Location."
+      }
+    },
+    "applicationGateways": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "requestBodyCheck": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "maxRequestBodySizeInKb": {
+      "type": "int",
+      "defaultValue": 128
+    },
+    "fileUploadLimitInMb": {
+      "type": "int",
+      "defaultValue": 100
+    },
+    "state": {
+      "type": "string",
+      "defaultValue": "Enabled"
+    },
+    "mode": {
+      "type": "string",
+      "defaultValue": "Prevention"
+    },
+    "managedRuleSets": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "ruleSetType": "OWASP",
+          "ruleSetVersion": "3.0",
+          "ruleGroupOverrides": []
+        }
+      ]
+    },
+    "exclusions": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+      "apiVersion": "2020-08-01",
+      "name": "[parameters('wafName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "customRules": [],
+        "applicationGateways": "[parameters('applicationGateways')]",
+        "policySettings": {
+          "requestBodyCheck": "[parameters('requestBodyCheck')]",
+          "maxRequestBodySizeInKb": "[parameters('maxRequestBodySizeInKb')]",
+          "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]",
+          "state": "[parameters('state')]",
+          "mode": "[parameters('mode')]"
+        },
+        "managedRules": {
+          "managedRuleSets": "[parameters('managedRuleSets')]",
+          "exclusions": "[parameters('exclusions')]"
+        }
+      },
+      "tags": "[parameters('tags')]"
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}
