@@ -16,6 +16,9 @@ The default parameter values are based on the needs of deploying a diagnostic ap
 | `location` | string | `[resourceGroup().location]` | | Optional. Location for all resources.
 | `tags` | object | {} | Complex structure, see below. | Optional. Tags of the Virtual Network Gateway resource.
 | `allowedOriginEndpoint` | string |  | Url of allowed origin header to be added for CORS header access.
+| `http401Threshold` | string | 80 |  |The threshold value at which the alert Http 401 is activated.
+| `http403Threshold` | string | 80 |  |The threshold value at which the alert Http 403 is activated.
+| `actionGroupId` | string |  |  | The ID of the action group that is triggered when the alert is activated or deactivated.
 
 ### Parameter Usage: `tags`
 

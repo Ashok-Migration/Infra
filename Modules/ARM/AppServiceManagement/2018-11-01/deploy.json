@@ -65,63 +65,6 @@
                 "description": "Location for all resources"
             }
         },
-        "alertSeverity": {
-            "type": "int",
-            "defaultValue": 3,
-            "allowedValues": [
-                0,
-                1,
-                2,
-                3,
-                4
-            ],
-            "metadata": {
-                "description": "Severity of alert {0,1,2,3,4}"
-            }
-        },
-        "isEnabled": {
-            "type": "bool",
-            "defaultValue": true,
-            "metadata": {
-                "description": "Specifies whether the alert is enabled"
-            }
-        },
-        "operator": {
-            "type": "string",
-            "defaultValue": "GreaterThan",
-            "allowedValues": [
-                "Equals",
-                "NotEquals",
-                "GreaterThan",
-                "GreaterThanOrEqual",
-                "LessThan",
-                "LessThanOrEqual"
-            ],
-            "metadata": {
-                "description": "Operator comparing the current value with the threshold value."
-            }
-        },
-        "threshold": {
-            "type": "string",
-            "defaultValue": "80",
-            "metadata": {
-                "description": "The threshold value at which the alert is activated."
-            }
-        },
-        "timeAggregation": {
-            "type": "string",
-            "defaultValue": "Average",
-            "allowedValues": [
-                "Average",
-                "Minimum",
-                "Maximum",
-                "Total",
-                "Count"
-            ],
-            "metadata": {
-                "description": "How the data that is collected should be combined over time."
-            }
-        },
         "windowSize": {
             "type": "string",
             "defaultValue": "PT5M",
@@ -151,6 +94,20 @@
             ],
             "metadata": {
                 "description": "how often the metric alert is evaluated represented in ISO 8601 duration format"
+            }
+        },
+        "http401Threshold":{
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+            "description": "The threshold value at which the alert Http 401 is activated."
+            }
+        },
+        "http403Threshold":{
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+                "description": "The threshold value at which the alert Http 403 is activated."
             }
         },
         "actionGroupId": {
@@ -252,8 +209,8 @@
                 "isEnabled": true,
                 "metricNamespace": "Microsoft.Web/sites",
                 "operator": "GreaterThan",
-                "threshold": "100",
-                "timeAggregation": "Count"
+                "threshold": "[parameters('http403Threshold')]",
+                "timeAggregation": "Average"
             },
             {
                 "alertName": "Http 401",
@@ -263,8 +220,8 @@
                 "isEnabled": true,
                 "metricNamespace": "Microsoft.Web/sites",
                 "operator": "GreaterThan",
-                "threshold": "100",
-                "timeAggregation": "Count"
+                "threshold": "[parameters('http401Threshold')]",
+                "timeAggregation": "Average"
             }
         ]
     },

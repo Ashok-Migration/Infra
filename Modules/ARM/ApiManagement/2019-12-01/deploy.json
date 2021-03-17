@@ -117,15 +117,96 @@
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "Optional. Switch to lock Key Vault from deletion."
+        "description": "Optional. Switch to lock APIM from deletion."
       }
     },
     "hostnameConfigurations": {
       "type": "array",
       "defaultValue": []
+    },
+    "windowSize": {
+        "type": "string",
+        "defaultValue": "PT5M",
+        "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H",
+            "PT6H",
+            "PT12H",
+            "PT24H"
+        ],
+        "metadata": {
+            "description": "Period of time used to monitor alert activity based on the threshold. Must be between one minute and one day. ISO 8601 duration format."
+        }
+    },
+    "evaluationFrequency": {
+        "type": "string",
+        "defaultValue": "PT1M",
+        "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H"
+        ],
+        "metadata": {
+            "description": "how often the metric alert is evaluated represented in ISO 8601 duration format"
+        }
+    },
+    "requestsThreshold":{
+        "type": "string",
+        "defaultValue": "1000",
+        "metadata": {
+            "description": "The threshold value (count) at which the alert for metric Requests is activated."
+        }
+    },
+    "durationThreshold":{
+        "type": "string",
+        "defaultValue": "10000",
+        "metadata": {
+            "description": "The threshold value (in milliseconds) at which the Overall Duration of Gateway Requests alert is activated."
+        }
+    },
+    "actionGroupId": {
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+            "description": "The ID of the action group that is triggered when the alert is activated or deactivated"
+        }
     }
   },
   "variables": {
+    "actions": [
+      {
+        "actionGroupId": "[parameters('actionGroupId')]"
+      }
+    ],
+    "alerts": [
+      {
+        "alertName": "Overall Duration of Gateway Requests",
+        "alertDescription": "Overall Duration of Gateway Requests in milliseconds",
+        "metricName": "Duration",
+        "alertSeverity": 3,
+        "isEnabled": true,
+        "metricNamespace": "Microsoft.ApiManagement/service",
+        "operator": "GreaterThan",
+        "threshold": "[parameters('durationThreshold')]",
+        "timeAggregation": "Average"
+      },
+      {
+        "alertName": "Requests",
+        "alertDescription": "Gateway request metrics with multiple dimensions",
+        "metricName": "Requests",
+        "alertSeverity": 3,
+        "isEnabled": true,
+        "metricNamespace": "Microsoft.ApiManagement/service",
+        "operator": "GreaterThan",
+        "threshold": "[parameters('requestsThreshold')]",
+        "timeAggregation": "Total"
+      }
+    ],
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "diagnosticsMetrics": [
@@ -235,7 +316,46 @@
           }
         }
       ]
-    }
+    },
+      {
+      "name": "[concat(variables('alerts')[copyIndex()].alertName,'-',parameters('apiManagementServiceName'))]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "location": "global",
+      "apiVersion": "2018-03-01",
+      "tags": {},
+      "dependsOn": [
+          "[concat('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]"
+      ],
+      "properties": {
+          "description": "[variables('alerts')[copyIndex()].alertDescription]",
+          "severity": "[variables('alerts')[copyIndex()].alertSeverity]",
+          "enabled": "[variables('alerts')[copyIndex()].isEnabled]",
+          "scopes": [
+              "[resourceId('Microsoft.ApiManagement/service/', parameters('apiManagementServiceName'))]"
+          ],
+          "evaluationFrequency": "[parameters('evaluationFrequency')]",
+          "windowSize": "[parameters('windowSize')]",
+          "criteria": {
+              "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+              "allOf": [
+                  {
+                      "name": "1st criterion",
+                      "metricName": "[variables('alerts')[copyIndex()].metricName]",
+                      "metricNamespace": "[variables('alerts')[copyIndex()].metricNamespace]",
+                      "dimensions": [],
+                      "operator": "[variables('alerts')[copyIndex()].operator]",
+                      "threshold": "[variables('alerts')[copyIndex()].threshold]",
+                      "timeAggregation": "[variables('alerts')[copyIndex()].timeAggregation]"
+                  }
+              ]
+          },
+          "actions": "[if(empty(parameters('actionGroupId')), json('null'), variables('actions'))]"
+      },
+      "copy": {
+          "name": "metricAlerts",
+          "count": "[length(variables('alerts'))]"
+      }
+  }    
   ],
   "functions": [],
   "outputs": {}
