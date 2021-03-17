@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "connectionName": {
+      "value": "apicon-cpd-apps-ckankv-uat-we-01"
+    },
+    "displayName": {
+      "value": "apicon-cpd-apps-ckankv-uat-we-01"
+    },
+    "vaultName":{
+      "value": "kv-cpd-apps-uat-we-01"
+    },
+    "apiId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
+    },
+    "clientId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-glob-npd-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-glob-npd-we-01"
+        },
+        "secretName": "sqcp-ado-spn-client-id"
+      }
+    },
+    "clientSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-glob-npd-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-glob-npd-we-01"
+        },
+        "secretName": "sqcp-ado-spn-client-secret"
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "UAT"
+      }
+    }
+  }
+}
