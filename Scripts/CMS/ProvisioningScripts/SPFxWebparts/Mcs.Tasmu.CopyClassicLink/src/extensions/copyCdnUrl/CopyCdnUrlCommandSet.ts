@@ -7,66 +7,54 @@ import {
   IListViewCommandSetExecuteEventParameters
 } from '@microsoft/sp-listview-extensibility';
 import { SPComponentLoader } from '@microsoft/sp-loader';
-import * as strings from 'CopyClassicLinkCommandSetStrings';
+import * as strings from 'CopyCdnUrlCommandSetStrings';
 import * as copy from 'copy-to-clipboard';
 import swal from 'sweetalert2';
 
-export interface ICopyClassicLinkCommandSetProperties {
+/**
+ * If your command set uses the ClientSideComponentProperties JSON input,
+ * it will be deserialized into the BaseExtension.properties object.
+ * You can define an interface to describe it.
+ */
+export interface ICopyCdnUrlCommandSetProperties {
   showToastr: string;
 }
 
-const LOG_SOURCE: string = 'CopyClassicLinkCommandSet';
+const LOG_SOURCE: string = 'CopyCdnUrlCommandSet';
 
-export default class CopyClassicLinkCommandSet extends BaseListViewCommandSet<ICopyClassicLinkCommandSetProperties> {
+export default class CopyCdnUrlCommandSet extends BaseListViewCommandSet<ICopyCdnUrlCommandSetProperties> {
 
   @override
   public onInit(): Promise<void> {
-    Log.info(LOG_SOURCE, 'Initialized CopyClassicLinkCommandSet');
+    Log.info(LOG_SOURCE, 'Initialized CopyCdnUrlCommandSet');
     return Promise.resolve();
   }
 
   @override
   public onListViewUpdated(event: IListViewCommandSetListViewUpdatedParameters): void {
-    const copyClassicLinkCommand: Command = this.tryGetCommand('COPY_CLASSIC_LINK');
-    if (copyClassicLinkCommand) {
+    const copyCDNUrlcommand: Command = this.tryGetCommand('COPY_CDN_URL');
+    if (copyCDNUrlcommand) {
       const locale: string = this.context.pageContext.cultureInfo.currentUICultureName;
       if (locale.indexOf('ar') > -1) {
-        copyClassicLinkCommand.title ="نسخ الرابط التقليدي";
+        copyCDNUrlcommand.title = "نسخ رابط شبكة توصيل المحتوى";
       }
       // This command should be hidden unless exactly one row is selected.
-      copyClassicLinkCommand.visible = event.selectedRows.length === 1;
+      copyCDNUrlcommand.visible = event.selectedRows.length === 1;
     }
   }
 
   @override
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
-      case 'COPY_CLASSIC_LINK':
-        const itemName: string = event.selectedRows[0].getValueByName('FileRef');
-        const absoluteUrl: string = this.context.pageContext.web.absoluteUrl;
-        const fullItemUrl: string = `${absoluteUrl.substring(0, absoluteUrl.indexOf('.com') + 4)}${itemName}`;
-        copy(fullItemUrl);
-        if (this.properties.showToastr.toLowerCase() === "yes") {
-          this.showToastr();
-        }
-        else {
-          this.showSwal(fullItemUrl);
-        }
+      case 'COPY_CDN_URL':
+        const cdnUrl: string = event.selectedRows[0].getValueByName('cdnurl');
+        copy(cdnUrl);
+        this.showSwal(cdnUrl);
         break;
       default:
         throw new Error('Unknown command');
     }
   }
-
-  private async showToastr() {
-    let toastr: any = await import(
-      /* webpackChunkName: 'toastr-js' */
-      'toastr'
-    );
-    SPComponentLoader.loadCss('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css');
-    toastr.success(`${strings.LinkCopiedLabel} ${strings.UseCopiedLinkLabel}`);
-  }
-
   private async showSwal(fullItemUrl: string) {
     let imageExtensions: Array<string> = ["jpg", "jpeg", "png"];
     let re = /(?:\.([^.]+))?$/;

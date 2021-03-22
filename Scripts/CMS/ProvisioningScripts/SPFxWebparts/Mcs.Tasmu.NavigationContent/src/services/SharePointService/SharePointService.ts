@@ -42,8 +42,26 @@ export class SharePointService implements ISharePointService {
       const sitePromises = await Promise.all([getSitesInHubSite, getSitePermission]);
       console.log('URL: ', item.SiteUrl, 'PERM: ', sitePromises[1]);
       item.HasPermission = sitePromises[1];
+
+      // Override Title of the site
+      var requestTitleUri = `${item.SiteUrl}/_api/web/title`;
+      var responseTitle: SPHttpClientResponse = await this._spHttpClient.fetch(requestTitleUri, SPHttpClient.configurations.v1, httpClientOptions);
+      var responseTitleJson: any = await responseTitle.json();
+      var localeTitle = responseTitleJson.value;
+      item.Title = localeTitle;
+
       item.Sites = sitePromises[0] ? sitePromises[0] : [];
 
+      // Override title of Entity Tites
+      if (item.Sites.length > 0) {
+        for (let i = 0; i < item.Sites.length; i++) {
+          var requestEntityTitleUri = `${item.Sites[i].Url}/_api/web/title`;
+          var responseEntityTitle = await this._spHttpClient.fetch(requestEntityTitleUri, SPHttpClient.configurations.v1, httpClientOptions);
+          var responseEntityTitleJson = await responseEntityTitle.json();
+          var localeEntityTitle = responseEntityTitleJson.value;
+          item.Sites[i].Title = localeEntityTitle;
+        }
+      }
       // If associated hubsites is 0, then dont show Hub Site
       return item;
     });
@@ -76,6 +94,7 @@ export class SharePointService implements ISharePointService {
       };
       return site;
     });
+
     return sitesInHubSite.filter(site => {
       return !Guid.parse(site.SiteId).equals(Guid.parse(hubSiteId));
     });
