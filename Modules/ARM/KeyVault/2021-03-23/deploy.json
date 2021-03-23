@@ -72,6 +72,22 @@
                 "description": "Optional. Switch to enable Key Vault's soft delete feature."
             }
         },
+        "softDeleteRetentionInDays": {
+            "type": "int",
+            "defaultValue": 90,
+            "minValue": 7,
+            "maxValue": 90,
+            "metadata": {
+                "description": "Optional. Days to retain deleted vaults."
+            }
+        },
+        "enablePurgeProtection": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Optional. Switch to force a mandatory retention period for deleted vaults and vault objects."
+            }
+        },
         "vnetResourceGroup": {
             "type": "string",
             "defaultValue": "rg-cpd-pltf-net-dev-we-01",
@@ -202,7 +218,7 @@
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "apiVersion": "2018-02-14",
+            "apiVersion": "2019-09-01",
             "name": "[parameters('keyVaultName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('tags')]",
@@ -211,6 +227,8 @@
                 "enabledForTemplateDeployment": "[parameters('enableVaultForTemplateDeployment')]",
                 "enabledForDiskEncryption": "[parameters('enableVaultForDiskEncryption')]",
                 "enableSoftDelete": "[parameters('enableSoftDelete')]",
+                "softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+                "enablePurgeProtection": "[parameters('enablePurgeProtection')]",
                 "tenantId": "[subscription().tenantId]",
                 "accessPolicies": "[parameters('accessPolicies')]",
                 "sku": {
@@ -255,7 +273,7 @@
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2015-06-01",
+            "apiVersion": "2019-09-01",
             "condition": "[not(empty(parameters('secretsObject').secrets))]",
             "name": "[if(empty(parameters('secretsObject').secrets), concat(parameters('keyVaultName'), '/', 'dummy'), concat(parameters('keyVaultName'), '/', parameters('secretsObject').secrets[copyIndex()].secretName))]",
             "properties": {
