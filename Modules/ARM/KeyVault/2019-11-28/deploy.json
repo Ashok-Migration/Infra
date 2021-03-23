@@ -72,6 +72,22 @@
                 "description": "Optional. Switch to enable Key Vault's soft delete feature."
             }
         },
+        "softDeleteRetentionInDays": {
+            "type": "int",
+            "defaultValue": 7,
+            "minValue": 7,
+            "maxValue": 90,
+            "metadata": {
+                "description": "Optional. Days to retain deleted vaults."
+            }
+        },
+        "enablePurgeProtection": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Optional. Switch to force a mandatory retention period for deleted vaults and vault objects."
+            }
+        },
         "vnetResourceGroup": {
             "type": "string",
             "defaultValue": "rg-cpd-pltf-net-dev-we-01",
@@ -211,6 +227,8 @@
                 "enabledForTemplateDeployment": "[parameters('enableVaultForTemplateDeployment')]",
                 "enabledForDiskEncryption": "[parameters('enableVaultForDiskEncryption')]",
                 "enableSoftDelete": "[parameters('enableSoftDelete')]",
+                "softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+                "enablePurgeProtection": "[parameters('enablePurgeProtection')]",
                 "tenantId": "[subscription().tenantId]",
                 "accessPolicies": "[parameters('accessPolicies')]",
                 "sku": {

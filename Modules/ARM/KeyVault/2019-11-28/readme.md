@@ -19,6 +19,9 @@ This module deploys Key Vault, with resource lock.
 | `secretsObject` | object | `{}` | Complex structure, see below. | Optional. All secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object
 | `enableVaultForDeployment` | bool | `true` | | Optional. Specifies if the vault is enabled for deployment by script or compute
 | `enableVaultForTemplateDeployment` | bool | `true` | | Optional. Specifies if the vault is enabled for a template deployment
+| `enableSoftDelete` | bool | `true` | | Optional. Switch to enable Key Vault's soft delete feature.
+| `softDeleteRetentionInDays` | int | 7 | | Optional. Days to retain deleted vaults.
+| `enablePurgeProtection` | bool | `false` | | Optional. Switch to force a mandatory retention period for deleted vaults and vault objects.
 | `enableVaultForDiskEncryption` | bool | `true` | | Optional. Specifies if the azure platform has access to the vault for enabling disk encryption scenarios.
 | `vaultSku` | string | `Premium` | Premium, Standard |Optional. Specifies the SKU for the vault
 | `vNetId` | string | "" | | Optional. Virtual Network Identifier used to create a service endpoint.
