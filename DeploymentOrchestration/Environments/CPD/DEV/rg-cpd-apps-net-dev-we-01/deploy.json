@@ -133,6 +133,69 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
+            "name": "DEP-route-cpd-apps-plancog-dev-we-01",
+            "resourceGroup": "rg-cpd-apps-net-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-net-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-apps-plancog-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-route-cpd-apps-planint-dev-we-01",
+            "resourceGroup": "rg-cpd-apps-net-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-net-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-apps-planint-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-route-cpd-apps-planpt-dev-we-01",
+            "resourceGroup": "rg-cpd-apps-net-dev-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-net-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpd-apps-planpt-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
             "name": "DEP-route-cpd-apps-testvms-dev-we-01",
             "resourceGroup": "rg-cpd-apps-net-dev-we-01",
             "dependsOn": [
