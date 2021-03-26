@@ -1,2 +1,2 @@
 This template deploys an Application Gateway
-Module Version - 2019-09-01
+Module Version - 2020-03-26

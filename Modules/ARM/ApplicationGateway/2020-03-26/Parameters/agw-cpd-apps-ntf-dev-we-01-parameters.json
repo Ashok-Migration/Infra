@@ -6,7 +6,7 @@
             "value": "Static"
         },
         "applicationGatewayName": {
-            "value": "agw-cpd-apps-ntf-tra-we-01"
+            "value": "agw-cpd-apps-ntf-dev-we-01"
         },
         "autoScaleMaxCapacity": {
             "value": 10
@@ -18,10 +18,10 @@
             "value": "westeurope"
         },
         "privateIPAddress": {
-            "value": "172.20.86.36"
+            "value": "172.20.42.197"
         },
         "publicIpAddressName": {
-            "value": "agw-cpd-apps-ntf-tra-we-01-ip"
+            "value": "agw-cpd-apps-ntf-dev-we-01-ip"
         },
         "publicIpZones": {
             "value": []
@@ -33,7 +33,7 @@
             "value": "WAF_v2"
         },
         "subnetName": {
-            "value": "snet-cpd-apps-agwntf-tra-we-01"
+            "value": "snet-cpd-apps-agwntf-dev-we-01"
         },
         "frontendPorts": {
             "value": [
@@ -54,11 +54,11 @@
         "backendAddressPools": {
             "value": [
                 {
-                    "name": "apim-cpd-shrd-tra-we-01",
+                    "name": "apim-cpd-shrd-dev-we-01",
                     "properties": {
                         "backendAddresses": [
                             {
-                                "ipAddress": "172.20.82.77"
+                                "ipAddress": "172.20.42.77"
                             }
                         ]
                     }
@@ -68,17 +68,17 @@
         "backendHttpSettingsCollection": {
             "value": [
                 {
-                    "name": "apim-tra-sqcp-https",
+                    "name": "apim-dev-sqcp-https",
                     "properties": {
                         "port": 443,
                         "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
-                        "hostName": "api.trn.sqcp.qa",
+                        "hostName": "api.dev.sqcp.qa",
                         "path": "/notification/",
                         "pickHostNameFromBackendAddress": false,
                         "requestTimeout": 60,
                         "probe": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/probes/apimprobe"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/probes/apimprobe"
                         }
                     }
                 }
@@ -87,19 +87,19 @@
         "httpListeners": {
             "value": [
                 {
-                    "name": "tra-ntf-sqcp-https",
+                    "name": "dev-ntf-sqcp-https",
                     "properties": {
                         "frontendIPConfiguration": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/frontendIPConfigurations/agw-cpd-apps-ntf-tra-we-01-privateip"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/frontendIPConfigurations/agw-cpd-apps-ntf-dev-we-01-privateip"
                         },
                         "frontendPort": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/frontendPorts/port_443"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/frontendPorts/port_443"
                         },
                         "protocol": "Https",
                         "sslCertificate": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/sslCertificates/tra-ntf-sqcp-httpsvaultCert"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/sslCertificates/dev-ntf-sqcp-httpsvaultCert"
                         },
-                        "hostName": "notification.trn.sqcp.qa",
+                        "hostName": "notification.dev.sqcp.qa",
                         "hostNames": [],
                         "requireServerNameIndication": true
                     }
@@ -109,17 +109,17 @@
         "requestRoutingRules": {
             "value": [
                 {
-                    "name": "tra-ntf-sqcp-443",
+                    "name": "dev-ntf-sqcp-443",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/httpListeners/tra-ntf-sqcp-https"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/httpListeners/dev-ntf-sqcp-https"
                         },
                         "backendAddressPool": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/backendAddressPools/apim-cpd-shrd-tra-we-01"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/backendAddressPools/apim-cpd-shrd-dev-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-tra-we-01/backendHttpSettingsCollection/apim-tra-sqcp-https"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-dev-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ntf-dev-we-01/backendHttpSettingsCollection/apim-dev-sqcp-https"
                         }
                     }
                 }
@@ -131,7 +131,7 @@
                     "name": "apimprobe",
                     "properties": {
                         "protocol": "Https",
-                        "host": "apim-cpd-shrd-tra-we-01.azure-api.net",
+                        "host": "api.dev.sqcp.qa",
                         "path": "/status-0123456789abcdef",
                         "interval": 30,
                         "timeout": 60,
@@ -153,15 +153,15 @@
         "sslCertificates": {
             "value": [
                 {
-                    "name": "tra-ntf-sqcp-httpsvaultCert",
+                    "name": "dev-ntf-sqcp-httpsvaultCert",
                     "properties": {
-                        "keyVaultSecretId": "https://kv-cpd-pltf-tra-we-01.vault.azure.net/secrets/TRN-SQCP-Certificate/"
+                        "keyVaultSecretId": "https://kv-cpd-pltf-dev-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
                     }
                 }
             ]
         },
         "managedIdentityId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-tra-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-tra-we-01"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-dev-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-dev-we-01"
         },
         "requestBodyCheck": {
             "value": false
@@ -177,17 +177,17 @@
         },
         "tags": {
             "value": {
-                "Environment": "Training"
+                "Environment": "Development"
             }
         },
         "tier": {
             "value": "WAF_v2"
         },
         "virtualNetworkName": {
-            "value": "vnet-cpd-pltf-tra-we-01"
+            "value": "vnet-cpd-pltf-dev-we-01"
         },
         "vnetResourceGroup": {
-            "value": "rg-cpd-pltf-net-tra-we-01"
+            "value": "rg-cpd-pltf-net-dev-we-01"
         },
         "zones": {
             "value": [
@@ -196,20 +196,46 @@
                 "3"
             ]
         },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "wafPolicyName": {
+            "value": "waf-cpd-apps-ntf-dev-we-01"
+        },
+        "managedRuleSets": {
+            "value": [
+                {
+                    "ruleSetType": "Microsoft_BotManagerRuleSet",
+                    "ruleSetVersion": "0.1",
+                    "ruleGroupOverrides": []
+                },
+                {
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.1",
+                    "ruleGroupOverrides": []
+                }
+            ]
+        },
+        "firewallEnabled": {
+            "value": true
+        },
         "diagnosticLogsRetentionInDays": {
             "value": 365
         },
         "diagnosticStorageAccountId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagdevwe01"
         },
         "workspaceId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-dev-we-01"
         },
         "eventHubAuthorizationRuleId": {
-            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
         },
         "eventHubName": {
-            "value": "evh-cpd-apps-mon-tra-we-01"
+            "value": "evh-cpd-apps-mon-dev-we-01"
         },
         "fileUploadLimitInMb": {
             "value": 30
