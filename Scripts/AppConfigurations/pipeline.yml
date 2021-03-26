@@ -134,6 +134,40 @@ stages:
                 - template: restart-pods.yml
                 - template: restart-appservice.yml
 
+  - stage: tra
+    displayName: Update App Configurations for tra
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-cpd-apps-str-tra-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpd-apps-aks-tra-we-01"
+      - name: aksClusterName
+        value: "aks-cpd-apps-tra-we-01"
+      - name: env
+        value: "tra"
+      - name: botApiName
+        value: "app-cpd-apps-bot-tra-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpd-apps-qnasync-tra-we-01"
+      - name: luisTraFuncName
+        value: "func-cpd-apps-luistra-tra-we-01"
+      - name: intBPAFuncName
+        value: "func-cpd-apps-intbpa-tra-we-01"
+      - name: intntfFuncName
+        value: "func-cpd-apps-intntf-tra-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for tra
+        environment: tra
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+                - template: restart-pods.yml
+                - template: restart-appservice.yml
+
   - stage: uat
     displayName: Update App Configurations for uat
     dependsOn: Tst

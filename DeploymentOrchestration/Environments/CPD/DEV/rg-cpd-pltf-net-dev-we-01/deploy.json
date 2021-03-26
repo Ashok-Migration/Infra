@@ -13,7 +13,6 @@
     "variables": {
         "lockForDeletion": false,
         "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
-
         "accountSasProperties": {
             "signedServices": "bt",
             "signedPermission": "racuw",
@@ -27,7 +26,6 @@
         "containerName": "components",
         "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
         "location": "[deployment().location]"
-
     },
     "resources": [
         {
@@ -35,8 +33,7 @@
             "apiVersion": "2019-08-01",
             "name": "DEP-rg-cpd-pltf-net-dev-we-01",
             "location": "[variables('location')]",
-            "dependsOn": [
-            ],
+            "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
                 "debugSetting": {
@@ -297,8 +294,28 @@
                     "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cpd-privatelink.servicebus.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cpd-privatelink.westeurope.azmk8s.io",
+            "resourceGroup": "rg-cpd-pltf-net-dev-we-01",
+            "dependsOn": [
+                "DEP-vnet-cpd-pltf-dev-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cpd-privatelink.westeurope.azmk8s.io-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
     ],
-    "outputs": {
-    }
+    "outputs": {}
 }

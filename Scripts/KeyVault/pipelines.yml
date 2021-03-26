@@ -77,7 +77,22 @@ stages:
             deploy:
               steps:
                 - template: all-secrets-npd.yml
-
+  - stage: Tra
+    displayName: Add Tra KV Secrets
+    dependsOn: PublishArtifacts
+    variables:
+      - group: "Tra"
+      - name: keyVaultName
+        value: kv-cpd-apps-tra-we-01
+    jobs:
+      - deployment: Deploy
+        displayName: Add tra Key Vault Secrets
+        environment: tra
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: all-secrets-npd.yml
   - stage: uat
     displayName: Add uat KV Secrets
     dependsOn: Tst
