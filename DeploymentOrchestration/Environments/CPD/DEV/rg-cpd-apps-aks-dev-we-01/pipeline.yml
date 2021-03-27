@@ -2,7 +2,7 @@ name: $(resourceGroupName)
 
 variables:
   - name: PoolName
-    value: "tasmumsagents"
+    value: "platformapispool"
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPD/DEV/rg-cpd-apps-aks-dev-we-01/deploy.json
   - name: parameterFilePath
@@ -15,16 +15,36 @@ variables:
     value: sqcp-ado-spn-dev
   - name: subscriptionId
     value: d0694def-b27e-4bb7-900d-437fbeb802da
+  - name: clusterName
+    value: aks-cpd-apps-dev-we-01
+  - name: clusterManagedIdentity
+    value: mi-cpd-apps-aks-dev-we-01
+  - name: kubernetesVersion
+    value: 1.18.10
+  - name: privateDNSZoneResourceId
+    value: /subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/privateDnsZones/privatelink.westeurope.azmk8s.io
+  - name: subnetResourceId
+    value: /subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-aks-dev-we-01
+  - name: nodeResourceGroup
+    value: rg-cpd-apps-aksnode-dev-we-01
+  - name: nodeCount
+    value: 3
+  - name: minCount
+    value: 3
+  - name: maxCount
+    value: 10
+  - name: maxPods
+    value: 30
+  - name: nodeVMSize
+    value: Standard_DS2_v2
+  - name: zones
+    value: 1 2 3
+  - name: aksServicePrincipal
+    value: "cb37a940-37f2-483f-abfd-8492eeaebc96"
+  # - name: aksServicePrincipalSecret
+  #   value: "added to pipeline variables"
 
 trigger: none
-#trigger:
-#  batch: true
-#  branches:
-#    include:
-#      - master
-#  paths:
-#    include:
-#    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
 
 stages:
   - stage: Validate
@@ -60,6 +80,40 @@ stages:
                 }
               azurePowerShellVersion: LatestVersion
 
+  - stage: DeployManagedCluster
+    jobs:
+      - job: DeployManagedCluster
+        displayName: Deploy Managed Cluster
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzureCLI@2
+            displayName: "Create Managed Cluster"
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                az extension add --name aks-preview --version 0.5.5
+                az aks create -n $(clusterName) -g $(resourceGroupName) --location $(location) --kubernetes-version $(kubernetesVersion) --generate-ssh-keys --enable-private-cluster --network-plugin azure --network-policy azure --load-balancer-sku standard --dns-name-prefix $(clusterName)-dns --vnet-subnet-id $(subnetResourceId) --docker-bridge-address 172.17.0.1/16 --dns-service-ip 10.0.0.10 --service-cidr 10.0.0.0/16 --private-dns-zone $(privateDNSZoneResourceId) --node-resource-group $(nodeResourceGroup) --nodepool-name apps --enable-cluster-autoscaler --node-count $(nodeCount) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux --max-pods $(maxPods) --max-count $(maxCount) --min-count $(minCount) --skip-subnet-role-assignment --service-principal $(aksServicePrincipal) --client-secret $(aksServicePrincipalSecret)
+
+          - task: AzureCLI@2
+            displayName: "Add Nodepool"
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                jobsPool=$(az aks nodepool show --cluster-name $(clusterName) --name jobs -g $(resourceGroupName) --query 'name' -o json)
+
+                if [[ "$jobsPool" != '"jobs"' ]]
+
+                then az aks nodepool add --cluster-name $(clusterName) --name jobs -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
+
+                else echo "jobs node pool already exists"
+
+                fi
+
   - stage: DeployTemplate
     jobs:
       - job: DeployTemplate
@@ -87,19 +141,3 @@ stages:
                 }
                 New-AzDeployment @DeploymentInputs
               azurePowerShellVersion: LatestVersion
-
-  - stage: SecurityVerification
-    jobs:
-      - job: ScanResourceGroup
-        displayName: Scan Resource Group
-        pool:
-          name: $(PoolName)
-        steps:
-          - task: AzSKSVTs@4
-            displayName: Scan $(resourceGroupName)
-            continueOnError: true
-            inputs:
-              ConnectedServiceNameARM: '$(serviceConnection)'
-              GenerateMethodParameterSetSelection: 'ResourceGroupName'
-              ResourceGroupName: '$(resourceGroupName)'
-              SubscriptionId: '$(subscriptionId)'
