@@ -1,0 +1,101 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNames": {
+            "value": [
+                "jmpappsaksnpdwe01"
+            ]
+        },
+        "vmSize": {
+            "value": "Standard_B4ms"
+        },
+        "imageResourceId": {
+            "value": {
+                "publisher": "microsoftvisualstudio",
+                "offer": "visualstudio2019",
+                "sku": "vs-2019-ent-ws2019",
+                "version": "latest"
+            }
+        },
+        "osDisk": {
+            "value": {
+                "createOption": "fromImage",
+                "diskSizeGB": "128",
+                "managedDisk": {
+                    "storageAccountType": "Premium_LRS"
+                }
+            }
+        },
+        "dataDisks": {
+            "value": []
+        },
+        "NetworkDetails": {
+            "value": {
+                "vnetRG": "rg-cph-mgmt-net-prd-we-01",
+                "vnet": "vnet-cph-mgmt-prd-we-01",
+                "subnet": "snet-cph-mgmt-apps-npd-we-01 "
+            }
+        },
+        "adminUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-ndd-we-01"
+                },
+                "secretName": "adminUsername"
+            }
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-npd-we-01"
+                },
+                "secretName": "jmpappsaksnpdwe01Password"
+            }
+        },
+        "availabilitySetName": {
+            "value": ""
+        },
+        "vmIPAddress": {
+            "value": "172.20.37.102"
+        },
+        "dnsServers": {
+            "value": []
+        },
+        "useAvailabilityZone": {
+            "value": true
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "enableBootDiagnostics": {
+            "value": false
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiaguatwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-uat-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": "Non-Production"
+            }
+        },
+        "enablePublicIP": {
+            "value": false
+        },
+        "enableIPForwarding": {
+            "value": true
+        }
+    }
+}
