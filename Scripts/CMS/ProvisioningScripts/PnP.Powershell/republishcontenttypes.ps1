@@ -27,7 +27,6 @@ $tasmuCTs = $CTs | Where-Object { $_.Group -eq "TASMU" }
 foreach ($ct in $tasmuCTs) {
   write-host "Unpublishing CT $($ct.Name): " -NoNewline    
     
-    
   $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession 
   $cookieCollection = New-Object System.Net.CookieCollection 
   $cookie1 = New-Object System.Net.Cookie 
@@ -61,10 +60,10 @@ foreach ($ct in $tasmuCTs) {
       $body[$key] = $value
     }
   }
-  $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'unpublishButton'
+  $body['ctl00$PlaceHolderMain$actionSection$RadioGroupAction'] = 'republishButton'
   $body['ctl00$PlaceHolderMain$ctl00$RptControls$okButton'] = 'OK'
   $response = Invoke-WebRequest -Uri $url -Method Post -WebSession $session -Body $body
   write-host "Done" -ForegroundColor Green 
 }
 
-Write-Host 'Content types unpublished completed in Content Type Hub successfully' -ForegroundColor Green
+Write-Host 'Content type re-published completed in Content Type Hub successfully' -ForegroundColor Green

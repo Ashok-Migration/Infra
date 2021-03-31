@@ -252,7 +252,7 @@ function Add-UniquePermission($lists, $siteUrl) {
           foreach ($spGroup in $spGroups) {
             $grpPermission = $null
             foreach ($group in $list.Permissions.Group) {
-              if ($spGroup.Title.Contains($group.Name)) {
+              if ($spGroup.Title.ToLower().Contains($group.Name.ToLower())) {
                 $grpPermission = $group.Role
                 break;
               }
@@ -699,7 +699,7 @@ function Add-CustomTopNavigationSector($url, $globalConfigSiteUrl, $nodeLevel) {
 
               #region Check for Entity Also
               foreach ($entity in $entities.GetEnumerator()) {
-                if ($entity.Name.Contains($sector.Value)) {
+                if ($entity.Name.ToLower().Contains($sector.Value.ToLower())) {
                   $sectorNode = Get-PnPNavigationNode -Id $sectorId
                   $isEntityNodeExists = $sectorNode | Where-Object -Property Title -eq $entity.Value
                   if ($null -eq $isEntityNodeExists) {
@@ -1367,7 +1367,6 @@ function RenameColumn($siteColUrl, $ListName, $ColumnName, $DisplayName, $spoCtx
 
 #region --CreateView--
 function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields) {
-
   try {
     $viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
     $arHomeViewName = "الرئيسية"
@@ -1387,13 +1386,11 @@ function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields)
       else {
         $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
         $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ErrorAction Stop
-      }
+      } 
     }
     else {
       Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
       $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-
-      New-ColumnToCustomView -SiteUrl $siteUrlNew -Fields $customViewfields -ListName $listNameForView -ViewName $customViewName
     }
 
     #region update the sorting order for the view 
@@ -2367,12 +2364,12 @@ function Edit-SiteColumns($url, $node, $tenantAdmin) {
         }
       }
       catch {
-        $field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
-        if ([bool]($field) -eq $true) {
-          $field.ReadOnlyField = $true
-          $field.Update()
-          $field.Context.ExecuteQuery()
-        }
+        #$field = Get-PnPField -List $item.ListName -Identity $item.ColumnInternalName
+        #if ([bool]($field) -eq $true) {
+        #  $field.ReadOnlyField = $true
+        #  $field.Update()
+        #  $field.Context.ExecuteQuery()
+        #}
       }
     }
     #endregion

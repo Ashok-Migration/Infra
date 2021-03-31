@@ -6,8 +6,7 @@ param (
   $sp_password
 )
 
-Write-host "Started" -ForegroundColor Green
-Write-host $tenant -ForegroundColor Yellow
+Write-Host "Content types un-publishing started for the tenant : " $tenant -ForegroundColor Green
 
 $paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }
 $psspologin = Resolve-Path $PSScriptRoot".\spologin.ps1"
@@ -67,4 +66,4 @@ foreach ($ct in $tasmuCTs) {
   write-host "Done" -ForegroundColor Green 
 }
 
-Write-Host 'Content types unpublished completed in Content Type Hub successfully' -ForegroundColor Green
+Write-Host 'Content types unpublished completed in Content Type Hub successfully' $ctUrl -ForegroundColor Green

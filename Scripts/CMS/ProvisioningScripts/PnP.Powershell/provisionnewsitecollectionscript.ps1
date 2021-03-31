@@ -101,7 +101,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
   $sp_password.ToCharArray() | ForEach-Object { $secstr.AppendChar($_) }
   $tenantAdmin = new-object -typename System.Management.Automation.PSCredential -argumentlist $sp_user, $secstr
     
- foreach ($globalconfigsite in $sitefile.sites.Configsite.site) {
+  foreach ($globalconfigsite in $sitefile.sites.Configsite.site) {
     $urlprefix = "https://" + $tenant + ".sharepoint.com/sites/"
     $globalconfigSiteUrl = $urlprefix + $globalconfigsite.Alias
     Connect-PnPOnline -Url $tenantUrl -Credentials $tenantAdmin
@@ -123,9 +123,9 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       New-SPFXWebPart $globalconfigSiteUrl $tenantAdmin 'Global'
       
       #check if the navigation webpart is present on the page or not
-      $navigationContentWP = Get-PnPClientSideComponent -Page Home.aspx | Where-Object { $_.Title -eq "Navigation Content" }
+      $navigationContentWP = Get-PnPPageComponent -Page Home.aspx | Where-Object { $_.Title -eq "Navigation Content" }
       if ([bool]($navigationContentWP) -eq $True) {
-        Remove-PnPClientSideComponent -Page "Home" -InstanceId $navigationContentWP.InstanceId -Force
+        Remove-PnPPageComponent -Page "Home" -InstanceId $navigationContentWP.InstanceId -Force
       }
       
       #region Add the Navigation Content webpart to the page
@@ -140,13 +140,13 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       Write-host "Sleep started for 2 minutes..." -ForegroundColor Green
       start-sleep -s 120
       Write-host "Sleep completed for 2 minutes..." -ForegroundColor Green
-      
+
       Add-CustomWebPartToPage $globalconfigSiteUrl $tenantAdmin $pageName $prop $webpartName
       #endregion
       Publish-SitePage $globalconfigSiteUrl $tenantAdmin '/SitePages/Home.aspx'
     }
   }
-  
+
   foreach ($globalhubsite in $sitefile.sites.globalhubsite.site) {
     $isGlobalHubSite = $true
     $globalhubSiteUrl = $urlprefix + $globalhubsite.Alias
@@ -226,7 +226,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
 
       #Add-Files $globalhubSiteUrl $sitefile.sites.globalUploadFiles
     }
-               
+                
     foreach ($sectorhubsite in $globalhubsite.sectorhubsite.site) {
       $isGlobalHubSite = $False
       $isSectorHubSite = $True
@@ -240,7 +240,7 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
           start-sleep -s 60
           Write-host "Sleep completed for 1 minute..." -ForegroundColor Green
           $isContentTypeExistsSectors = $true
-          $isContentTypeExistsSectors = Get-ContentTypeForSectors -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin
+          #$isContentTypeExistsSectors = Get-ContentTypeForSectors -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin
         }
         until ($isContentTypeExistsSectors -eq $true)
 
@@ -294,11 +294,11 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
           $property.translationTaskContentType = $translationTaskContentTypeId.StringValue
           $property.approvalTaskContentType = $approverTaskContentTypeId.StringValue
           $prop = $property | ConvertTo-Json
-          
+
           Write-host "Sleep started for 2 minutes..." -ForegroundColor Green
           start-sleep -s 120
           Write-host "Sleep completed for 2 minutes..." -ForegroundColor Green
-          
+
           Add-CustomWebPartToPage $sectorhubSiteUrl $tenantAdmin $pageName $prop $componentName
           
           $pageName = 'Home'
@@ -332,7 +332,6 @@ function ProvisionSiteCollections($sitefile, $tenantUrl, $appsPath) {
       } 
     }
   }
-  
   #set at Search Configuration tenant level, Uncomment to execute it
   $serchConfigPath = $PSScriptRoot + '\resources\SearchConfiguration.xml'
   Add-SearchConfiguration $scope $serchConfigPath
@@ -575,19 +574,21 @@ function New-ContentType($contenttypehub, $ContentTypeName, $ContentTypeDesc, $P
       Write-Host "$ContentTypeName already exists" -ForeGround Yellow
       $client.TrackEvent("$ContentTypeName already exists")
     } 
-    else{
-       Write-Host 'Content Type not found ,so creating a new contenttype' $ContentTypeName -Foreground Green
-       $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
-       $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
-       $addContentType = Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
-    }
   }
   catch {
+    try {
+        Write-Host 'Content Type not found ,so creating a new contenttype' $ContentTypeName -Foreground Green
+      $client.TrackEvent("Content Type not found ,so creating a new contenttype- $ContentTypeName.....")
+      $ParentCT = Get-PnPContentType -Identity $ParentCTName -Connection $connection
+      $addContentType = Add-PnPContentType -Name $ContentTypeName -Description $ContentTypeDesc -Group $GroupName -ParentContentType $ParentCT -ErrorAction Stop -Connection $connection
+    }
+    catch {
         $ErrorMessage = $_.Exception.Message
     Write-Host $ErrorMessage -foreground Red
     $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
     $telemtryException.Exception = $_.Exception.Message  
     $client.TrackException($telemtryException)
+    }
   } 
 }
 
@@ -1211,7 +1212,7 @@ function Add-GroupAndUsers($url, $nodeLevel, $siteAlias) {
 
         if ($SPGroup.SecurityGroup -ne '') {
           # Add Security group as member to Sharepoint group
-          Add-PnPUserToGroup -Identity $SPGroupName -LoginName $SPGroup.SecurityGroup
+          Add-PnPGroupMember -Group $SPGroupName -LoginName $SPGroup.SecurityGroup
         }
       }       
     }      
@@ -1328,7 +1329,7 @@ function Add-UsersToDefaultSharePointGroup($url, $nodeLevel, $siteAlias) {
 
         if ($SPGroup.SecurityGroup -ne '') {
           # Add Security group as member to Sharepoint group
-          Add-PnPUserToGroup -Identity $SPGroup.Name -LoginName $SPGroup.SecurityGroup
+          Add-PnPGroupMember -Group $SPGroup.Name -LoginName $SPGroup.SecurityGroup
         }
       }
         
@@ -1631,54 +1632,6 @@ function RenameColumn($siteColUrl, $ListName, $ColumnName, $DisplayName, $spoCtx
 #endregion
 
 #region --CreateView--
-function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields) {
-
-  try {
-    $viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
-    $arHomeViewName = "الرئيسية"
-    if ([bool]($viewExists) -eq $false) {
-      Write-Host "View not found ,so creating a new View in $listNameForView"  -ForegroundColor Green
-      $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
-
-      foreach ($field in $fields) {
-        $customViewfields += @($field.name)
-      }
-      #check for picture library
-      $list = Get-PnPList -Identity $listNameForView -ErrorAction Stop
-      if ($list.BaseTemplate -eq 109) {
-        $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ViewType Grid -ErrorAction Stop  
-        $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ViewType Grid -ErrorAction Stop
-      }
-      else {
-        $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
-        $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ErrorAction Stop
-      }
-    }
-    else {
-      Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
-      $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
-
-      New-ColumnToCustomView -SiteUrl $siteUrlNew -Fields $customViewfields -ListName $listNameForView -ViewName $customViewName
-    }
-
-    #region update the sorting order for the view 
-    Edit-View $siteUrlNew $tenantAdmin $customViewName $listNameForView
-    #endregion
-    $client.TrackEvent("View sorting order is modified for $customViewName for the list $listNameForView")
-  }
-  catch {
-    $ErrorMessage = $_.Exception.Message
-    Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Red
-
-    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
-    $telemtryException.Exception = $_.Exception.Message  
-    $client.TrackException($telemtryException)
-
-    Remove-ListOnFailure $siteUrlNew $listNameForView
-  }
-  #Disconnect-PnPOnline
-}
-
 function New-View($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
     
   $client.TrackEvent("View creation started for list, $listNameForView.")
@@ -1730,6 +1683,54 @@ function New-View($listNameForView, $siteUrlNew, $fields, $ListTemplate) {
     Edit-View $siteUrlNew $tenantAdmin $defaultviewName $listNameForView
     #endregion
     $client.TrackEvent("View sorting order is modified for $defaultviewName for the list $listNameForView")
+  }
+  catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Host $ErrorMessage "in Site $siteUrlNew  List $listNameForView " -foreground Red
+
+    $telemtryException = New-Object "Microsoft.ApplicationInsights.DataContracts.ExceptionTelemetry"  
+    $telemtryException.Exception = $_.Exception.Message  
+    $client.TrackException($telemtryException)
+
+    Remove-ListOnFailure $siteUrlNew $listNameForView
+  }
+  #Disconnect-PnPOnline
+}
+
+function New-CustomView($listNameForView, $siteUrlNew, $customViewName, $fields) {
+
+  try {
+    $viewExists = Get-PnPView -List $listNameForView -Identity $customViewName -ErrorAction SilentlyContinue
+    $arHomeViewName = "الرئيسية"
+    if ([bool]($viewExists) -eq $false) {
+      Write-Host "View not found ,so creating a new View in $listNameForView"  -ForegroundColor Green
+      $client.TrackEvent("View not found ,so creating a new View in $listNameForView")
+
+      foreach ($field in $fields) {
+        $customViewfields += @($field.name)
+      }
+      #check for picture library
+      $list = Get-PnPList -Identity $listNameForView -ErrorAction Stop
+      if ($list.BaseTemplate -eq 109) {
+        $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ViewType Grid -ErrorAction Stop  
+        $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ViewType Grid -ErrorAction Stop
+      }
+      else {
+        $addView = Add-PnPView -List $listNameForView -Title $customViewName -Fields $customViewfields -ErrorAction Stop
+        $addArHomeView = Add-PnPView -List $listNameForView -Title $arHomeViewName -Fields $customViewfields -ErrorAction Stop
+      }
+    }
+    else {
+      Write-Host "View already exists in List $listNameForView site- $siteUrlNew " -ForegroundColor Yellow
+      $client.TrackEvent("View already exists in List $listNameForView site- $siteUrlNew ")
+
+      New-ColumnToCustomView -SiteUrl $siteUrlNew -Fields $customViewfields -ListName $listNameForView -ViewName $customViewName
+    }
+
+    #region update the sorting order for the view 
+    Edit-View $siteUrlNew $tenantAdmin $customViewName $listNameForView
+    #endregion
+    $client.TrackEvent("View sorting order is modified for $customViewName for the list $listNameForView")
   }
   catch {
     $ErrorMessage = $_.Exception.Message
@@ -1913,11 +1914,13 @@ function New-ColumnToCustomView($SiteUrl, $Fields, $ListName,$ViewName) {
   $web = $context.Web
   $list = $web.Lists.GetByTitle($ListName)
   $customView = $List.Views.GetByTitle($ViewName)
+  $defaultFields = $customView.ViewFields
     
   $context.Load($web)
   $context.Load($web.Lists)
   $context.Load($list.Fields)
   $context.Load($customView)
+  $context.Load($defaultFields)
   $context.ExecuteQuery()
 
   try {
@@ -1925,11 +1928,11 @@ function New-ColumnToCustomView($SiteUrl, $Fields, $ListName,$ViewName) {
     foreach ($f in $Fields) {
       $field = $list.Fields | Where-Object { $_.InternalName -eq $f } | Select-Object -First 1
       if ($null -ne $field) {
-        $isField = $customView | Where-Object { $_ -eq $field.Title -or $_ -eq $field.InternalName }
+        $isField = $defaultFields | Where-Object { $_ -eq $field.Title -or $_ -eq $field.InternalName }
         if ($null -eq $isField) {
           $defaultFields.Add($field.InternalName)
         }
-        $customView.MoveFieldTo($field.InternalName, $fieldOrder)
+        $defaultFields.MoveFieldTo($field.InternalName, $fieldOrder)
       }      
       $list.DefaultView.Update()
       $fieldOrder++
@@ -1939,13 +1942,13 @@ function New-ColumnToCustomView($SiteUrl, $Fields, $ListName,$ViewName) {
     $isContainsPinned = $list.Fields | Where-Object { $_.InternalName -eq 'Pinned' }
     if ($null -ne $isContainsPinned) {
       $viewQuery = '<OrderBy><FieldRef Name="Pinned" Ascending="FALSE" /><FieldRef Name="Modified" Ascending="FALSE" /></OrderBy>'
-      $list.$customView.ViewQuery = $viewQuery
-      $list.$customView.Update()
+      $list.DefaultView.ViewQuery = $viewQuery
+      $list.DefaultView.Update()
     }
     else {
       $viewQuery = '<OrderBy><FieldRef Name="Modified" Ascending="FALSE"/></OrderBy>'
-      $list.$customView.ViewQuery = $viewQuery
-      $list.$customView.Update()
+      $list.DefaultView.ViewQuery = $viewQuery
+      $list.DefaultView.Update()
     }
     $context.ExecuteQuery()
   }
@@ -1973,10 +1976,10 @@ function New-WebPartToPage($url, $nodeLevel) {
     Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
 
     $pagename = $nodeLevel.webpartSection.pagename
-    $page = Get-PnPClientSidePage -Identity $pagename -ErrorAction Stop           
+    $page = Get-PnPPage -Identity $pagename -ErrorAction Stop           
         
     if ($null -ne $page) {
-      Add-PnPClientSidePageSection -Page $page -SectionTemplate $nodeLevel.webpartSection.SectionTemplate -ErrorAction Stop
+      Add-PnPPageSection -Page $page -SectionTemplate $nodeLevel.webpartSection.SectionTemplate -ErrorAction Stop
         
       foreach ($webpartSection in $nodeLevel.webpartSection) {
         foreach ($webpartSection in $webpartSection.webpart) {
@@ -2007,12 +2010,12 @@ function New-WebPartToPage($url, $nodeLevel) {
               $jsonProperties = '{"selectedListId":"' + $list.Id + '","listTitle":"' + $webpartSection.ListTitleDisplay + '","webpartHeightKey":1,"hideCommandBar":false,"selectedViewId":"' + $ListView.Id + '"}'
             }
                     
-            $listWebpart = Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties $jsonProperties -ErrorAction Stop
+            $listWebpart = Add-PnPPageWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties $jsonProperties -ErrorAction Stop
             Write-Host "Webpart " $listWebpart.InstanceId " added successfully with properties " $listWebpart.PropertiesJson  -ForegroundColor Green
           }
                   
           if ($webpartSection.DefaultWebPartType -eq 'SiteActivity') {
-            Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title" = "Recent Activity"; maxItems = "9" } -ErrorAction Stop
+            Add-PnPPageWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -WebPartProperties @{"title" = "Recent Activity"; maxItems = "9" } -ErrorAction Stop
           }
 
           if ($webpartSection.DefaultWebPartType -eq 'QuickLinks') {
@@ -2053,11 +2056,11 @@ function New-WebPartToPage($url, $nodeLevel) {
             $jsonProps = '
 {"controlType":3,"id":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"layoutIndex":1},"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","webPartData":{"id":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","instanceId":"41d11bca-2e0b-47c8-a6e8-185a9d7c5dd9","title":"Quick links","description":"Add links to important documents and pages.","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick Links","items[0].title":"' + $item0Title + '","items[1].title":"' + $item1Title + '","items[2].title":"' + $item2Title + '","items[3].title":"' + $item3Title + '","items[4].title":"' + $item4Title + '","items[5].title":"' + $item5Title + '","items[6].title":"' + $item6Title + '","items[7].title":"' + $item7Title + '","items[8].title":"' + $item8Title + '","items[9].title":"' + $item9Title + '","items[10].title":"' + $item10Title + '"},"imageSources":{},"links":{"baseUrl":"' + $url + '","items[0].sourceItem.url":"' + $item0Url + '","items[1].sourceItem.url":"' + $item1Url + '","items[2].sourceItem.url":"' + $item2Url + '","items[3].sourceItem.url":"' + $item3Url + '","items[4].sourceItem.url":"' + $item4Url + '","items[5].sourceItem.url":"' + $item5Url + '","items[6].sourceItem.url":"' + $item6Url + '","items[7].sourceItem.url":"' + $item7Url + '","items[8].sourceItem.url":"' + $item8Url + '","items[9].sourceItem.url":"' + $item9Url + '","items[10].sourceItem.url":"' + $item10Url + '"},"componentDependencies":{"layoutComponentId":"706e33c8-af37-4e7b-9d22-6e5694d92a6f"}},"dataVersion":"2.2","properties":{"items":[{"sourceItem":{"itemType":5,"fileExtension":"","progId":""},"thumbnailType":3,"id":11,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":10,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":9,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":8,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":7,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":6,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":5,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":4,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":3,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":2,"description":"","altText":""},{"sourceItem":{"itemType":4,"fileExtension":"","progId":""},"thumbnailType":3,"id":1,"description":"","altText":""}],"isMigrated":true,"layoutId":"List","shouldShowThumbnail":true,"imageWidth":100,"buttonLayoutOptions":{"showDescription":false,"buttonTreatment":2,"iconPositionType":2,"textAlignmentVertical":2,"textAlignmentHorizontal":2,"linesOfText":2},"listLayoutOptions":{"showDescription":false,"showIcon":false},"waffleLayoutOptions":{"iconSize":1,"onlyShowThumbnail":false},"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","webId":"93012ab1-1675-4c10-a48d-9318b877ab5e","siteId":"8051fa3b-1aeb-4793-8354-d5c2eb571b6d"}},"emphasis":{},"reservedHeight":270,"reservedWidth":744,"addedFromPersistedData":true}
 '
-            Add-PnPClientSideWebPart -Page $page -DefaultWebPartType QuickLinks -WebPartProperties $jsonProps -Section $webpartSection.Section -Column $webpartSection.Column -Order 3
+            Add-PnPPageWebPart -Page $page -DefaultWebPartType QuickLinks -WebPartProperties $jsonProps -Section $webpartSection.Section -Column $webpartSection.Column -Order 3
           }
 
           if ($webpartSection.DefaultWebPartType -eq 'ContentRollup') {
-            Add-PnPClientSideWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -Order 2 -WebPartProperties @{"title" = "Recent documents"; "count" = 5 } -ErrorAction Stop
+            Add-PnPPageWebPart -Page $page -DefaultWebPartType $webpartSection.DefaultWebPartType -Section $webpartSection.Section -Column $webpartSection.Column -Order 2 -WebPartProperties @{"title" = "Recent documents"; "count" = 5 } -ErrorAction Stop
           }
         }
       }
@@ -2080,7 +2083,7 @@ function New-WebPartToPage($url, $nodeLevel) {
 
 function Edit-ListViewWebPartProperties($page, $webpartkeyHeight, $url, $tenantAdmin) {
   Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-  $wpList = Get-PnPClientSideComponent -Page $page
+  $wpList = Get-PnPPageComponent -Page $page
   foreach ($wp in $wpList) {
     try {
       if ($wp.Title -eq "List") {
@@ -2090,7 +2093,7 @@ function Edit-ListViewWebPartProperties($page, $webpartkeyHeight, $url, $tenantA
         $property.webpartHeightKey = $webpartkeyHeight
         $prop = $property | ConvertTo-Json
         Write-Host "Updated PropertiesJson is " $prop  -ForegroundColor Green
-        Set-PnPClientSideWebPart -Page $page -Identity $wp.InstanceId -PropertiesJson $prop
+        Set-PnPPageWebPart -Page $page -Identity $wp.InstanceId -PropertiesJson $prop
       }
     }
     catch {
@@ -2152,16 +2155,16 @@ function New-ModernPage($url, $nodeLevel) {
 
     foreach ($modernPage in $nodeLevel.page) {
       $modernPagename = $modernPage.name
-      $page = Get-PnPClientSidePage -Identity $modernPagename -ErrorAction SilentlyContinue           
+      $page = Get-PnPPage -Identity $modernPagename -ErrorAction SilentlyContinue           
       if ($null -ne $page) {    
-        Remove-PnPClientSidePage -Identity $modernPagename -Force        
+        Remove-PnPPage -Identity $modernPagename -Force        
         Write-Host $modernPagename 'found. Removing the page ' -ForegroundColor Yellow
       }
             
-      Add-PnPClientSidePage -Name $modernPagename -LayoutType Home -ErrorAction Stop
+      Add-PnPPage -Name $modernPagename -LayoutType Home -ErrorAction Stop
       $client.TrackEvent("Page created, $modernPage.name")
       Set-PnPHomePage -RootFolderRelativeUrl SitePages/$modernPagename.aspx
-      Set-PnPClientSidePage -Identity $modernPagename -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
+      Set-PnPPage -Identity $modernPagename -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
     }
   }
   catch {
@@ -2180,21 +2183,21 @@ function New-SitePage($url, $pageName, $tenantAdmin) {
   try {
     Connect-PnPOnline -Url $url -Credential $tenantAdmin
 
-    $page = Get-PnPClientSidePage -Identity $pageName -ErrorAction SilentlyContinue           
+    $page = Get-PnPPage -Identity $pageName -ErrorAction SilentlyContinue           
     if ($null -ne $page) {            
-      Remove-PnPClientSidePage -Identity $pageName -Force
+      Remove-PnPPage -Identity $pageName -Force
       Write-Host $pageName 'found. Removing the page ' -ForegroundColor Yellow
     } 
     else {
-      $page = Get-PnPClientSidePage -Identity 'My Tasks' -ErrorAction SilentlyContinue
+      $page = Get-PnPPage -Identity 'My Tasks' -ErrorAction SilentlyContinue
       if ($null -ne $page) {            
-        Remove-PnPClientSidePage -Identity 'My Tasks' -Force
+        Remove-PnPPage -Identity 'My Tasks' -Force
         Write-Host $pageName 'found. Removing the page ' -ForegroundColor Yellow
       } 
     }
 
-    Add-PnPClientSidePage -Name $pageName -LayoutType Home -ErrorAction Stop
-    Set-PnPClientSidePage -Identity $pageName -Title 'My Tasks' -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
+    Add-PnPPage -Name $pageName -LayoutType Home -ErrorAction Stop
+    Set-PnPPage -Identity $pageName -Title 'My Tasks' -CommentsEnabled:$false -LayoutType Home -ErrorAction Stop
 
     Write-Host $pageName' added successfully to the site collection '$url -ForegroundColor Green
   }
@@ -2253,10 +2256,10 @@ function Remove-PageOnFailure($pagename) {
     Connect-PnPOnline -Url $url -Credentials $tenantAdmin -ErrorAction Stop
 
     $pagename = $nodeLevel.webpartSection.pagename
-    $page = Get-PnPClientSidePage -Identity $pagename -ErrorAction SilentlyContinue           
+    $page = Get-PnPPage -Identity $pagename -ErrorAction SilentlyContinue           
         
     if ($null -ne $page) {
-      Remove-PnPClientSidePage $pagename -ErrorAction Stop
+      Remove-PnPPage $pagename -ErrorAction Stop
     }
 
     Write-Host "Clean up: Delete Page on failure completed for: $pagename"  -ForegroundColor Green
@@ -2874,14 +2877,14 @@ function Get-ListId($url, $tenantAdmin, $listTitle) {
 function Add-CustomWebPartToPage($url, $tenantAdmin, $pageName, $webPartProperties, $webPartName, $section, $column, $order) {
   try {
     Connect-PnPOnline -Url $url -Credentials $tenantAdmin
-    $page = Get-PnPClientSidePage -Identity $pageName -ErrorAction Stop 
+    $page = Get-PnPPage -Identity $pageName -ErrorAction Stop 
     if ($null -ne $page) {
       if (([bool]($section) -eq $true) -and ([bool]($column) -eq $true)) {
-        $newWebPart = Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -Section $section -Column $column -Order $order -WebPartProperties $webPartProperties
+        $newWebPart = Add-PnPPageWebPart -Page $pageName -Component $webPartName -Section $section -Column $column -Order $order -WebPartProperties $webPartProperties
         Write-Host 'Webpart ' $webPartName 'added & updated successfully to the page ' $pageName -ForegroundColor Green
       }
       else {
-        $newWebPart = Add-PnPClientSideWebPart -Page $pageName -Component $webPartName -WebPartProperties $webPartProperties
+        $newWebPart = Add-PnPPageWebPart -Page $pageName -Component $webPartName -WebPartProperties $webPartProperties
         Write-Host 'Webpart ' $webPartName 'added & updated successfully to the page ' $pageName -ForegroundColor Green
       }
     }
@@ -3165,7 +3168,7 @@ function AddEveryoneDefaultUserToVisitorGroup {
   try {
     Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
     $Group = Get-PnPGroup -AssociatedVisitorGroup
-    Add-PnPUserToGroup -Identity $Group -LoginName "everyone except external users"
+    Add-PnPGroupMember -Group $Group -LoginName "everyone except external users"
   }
   catch {
     $ErrorMessage = $_.Exception.Message
