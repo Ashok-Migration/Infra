@@ -722,6 +722,49 @@
         },
         "eventHubName": {
             "value": "evh-cpd-apps-mon-uat-we-01"
+        },
+        "customRules": {
+            "value": [
+                {
+                    "name": "CKANResourceCreate",
+                    "priority": 95,
+                    "ruleType": "MatchRule",
+                    "action": "Allow",
+                    "matchConditions": [
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestUri"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "/api/3/action/resource_create"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        },
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestHeaders",
+                                    "selector": "x-ckan-request"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "true"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     }
 }

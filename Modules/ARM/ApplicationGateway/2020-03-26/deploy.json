@@ -228,11 +228,24 @@
     },
     "wafPolicyName": {
       "type": "string",
-      "defaultValue": "WAF Policy Name"
+      "defaultValue": "WAF Policy Name",
+      "metadata": {
+        "description": "Name of the WAF Policy for WAF enabled application gateway"
+      }
     },
     "managedRuleSets": {
       "type": "array",
-      "defaultValue": []
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Managed Rules Sets"
+      }
+    },
+    "customRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Custom Rules"
+      }
     }
   },
   "variables": {
@@ -424,7 +437,7 @@
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
       "properties": {
-        "customRules": [],
+        "customRules": "[parameters('customRules')]",
         "policySettings": {
           "requestBodyCheck": "[parameters('requestBodyCheck')]",
           "maxRequestBodySizeInKb": 128,
