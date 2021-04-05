@@ -103,9 +103,33 @@
             ]
           }
         },
-        "Send_To_6DBilling_API": {
+        "Get_Client_Secret": {
           "runAfter": {
             "Initialize_message_to_be_sent": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['keyvault']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/secrets/@{encodeURIComponent('CPCoreApis-ClientSecret')}/value"
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          }
+        },
+        "Send_To_6DBilling_API": {
+          "runAfter": {
+            "Get_Client_Secret": [
               "Succeeded"
             ]
           },
@@ -116,6 +140,13 @@
               "Cache-Control": "no-cache",
               "Content-Type": "application/json",
               "event_type": "@{variables('EventMessage').eventType}"
+            },
+            "authentication": {
+              "audience": "https://management.azure.com/",
+              "clientId": "bc67474e-612b-4d7f-b75a-ac54d45f143a",
+              "secret": "@body('Get_Client_Secret')?['value']",
+              "tenant": "92603419-35d1-4eb0-8427-cac731071355",
+              "type": "ActiveDirectoryOAuth"
             },
             "method": "POST",
             "uri": "https://api.tra.sqcp.qa/eventmanagement/apiInterface/eventManagement/getEventDetails"
@@ -159,6 +190,11 @@
               "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-tra-we-01",
               "connectionName": "apicon-cpd-apps-integ-tra-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            },
+            "keyvault": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tra-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intkv-tra-we-01",
+              "connectionName": "apicon-cpd-apps-intkv-tra-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
             }
           }
         }
