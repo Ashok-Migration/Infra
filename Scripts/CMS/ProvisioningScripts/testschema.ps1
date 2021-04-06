@@ -40,6 +40,8 @@ param (
   $InstrumentationKey
 )
 
+Write-host 'Started the script' -ForegroundColor Green
+
 $filePath = $PSScriptRoot + '\resources\SchemaToTest.xml'
 [xml]$schemaFile = Get-Content -Path $filePath
 
@@ -79,9 +81,6 @@ function Get-Lists {
           $fieldIssue = [System.Collections.ArrayList]@()
           $field = Get-PnPField -List $listObj.Title -Identity $column.ColumnName
           if ($null -ne $field) {
-            if ($field.InternalName -eq 'cdnurl') {
-              Write-Host $field.InternalName
-            }
             $listDetails = ''
             $listDetails += "Column Title  : $($field.Title)`n"
             $listDetails += "Description   : $($field.Description)`n"
@@ -106,7 +105,7 @@ function Get-Lists {
                   foreach ($schemaChoiceValue in $schemaChoiceValues) {
                     if (!$choiceValues.Contains($schemaChoiceValue)) {
                       Write-Host "The Choice value "$schemaChoiceValue" is not available for the field " $field.InternalName " as per the schema"$column.Required" for the list" $list.ListName -ForegroundColor Red
-                      $fieldIssue.Add("The Choice value $($schemaChoiceValue) is not available for the field $($field.InternalName) as per the schema $($column.Required) for the list $($list.ListName)")
+                      $fieldIssue.Add("The Choice value $($schemaChoiceValue) is not available for the field $($field.InternalName) as per the schema $($column.Required) for the list $($list.ListName)`n")
                     }
                   }
                 }
@@ -131,7 +130,7 @@ function Get-Lists {
   
                   if ($manageMetaDataMappingExists -eq $false) {
                     Write-Host "The termset mapping is not available for the field " $field.InternalName " as per the schema for the list" $list.ListName -ForegroundColor Red
-                    $fieldIssue.Add("The termset mapping is not available for the field $($field.InternalName) as per the schema for the list $($list.ListName)")
+                    $fieldIssue.Add("The termset mapping is not available for the field $($field.InternalName) as per the schema for the list $($list.ListName)`n")
                   }
                 }
               }
@@ -186,7 +185,7 @@ function Get-Lists {
               if ($null -ne $column.EnforceUniqueValues) {
                 if (!$column.EnforceUniqueValues -eq $field.EnforceUniqueValues.ToString() ) {
                   Write-Host "The EnforceUniqueValues attribute" $field.EnforceUniqueValues" for the field " $field.InternalName "doesn't match as per the schema" $column.EnforceUniqueValues" for the list" $list.ListName -ForegroundColor Red
-                  $fieldIssue.Add("The EnforceUniqueValues attribute $($field.EnforceUniqueValues) for the field $($field.InternalName) doesn't match as per the schema $($column.EnforceUniqueValues) for the list $($list.ListName)")
+                  $fieldIssue.Add("The EnforceUniqueValues attribute $($field.EnforceUniqueValues) for the field $($field.InternalName) doesn't match as per the schema $($column.EnforceUniqueValues) for the list $($list.ListName)`n")
                 }
               }
             }
@@ -203,7 +202,7 @@ function Get-Lists {
                     $showInEditFormIssue = Get-ListFieldCTLevelHiddenValidation -siteUrl $siteUrl -issue $fieldIssue -fieldName $field.InternalName -listName $listObj.Title -tenantAdmin $tenantAdmin -isHidden $column.Hidden -contentTypeNames $contentTypeNames
                     if ($null -ne $showInEditFormIssue -and $showInEditFormIssue -gt 0) {
                       Write-Host "The ShowInEditForm attribute for the field" $field.InternalName "doesn't match as per the schema" $column.showInNewEditForm" for the list" $list.ListName -ForegroundColor Red
-                      $fieldIssue.Add("The ShowInEditForm attribute for the field $($field.InternalName) doesn't match as per the schema $($column.showInNewEditForm) for the list $($list.ListName)")
+                      $fieldIssue.Add("The ShowInEditForm attribute for the field $($field.InternalName) doesn't match as per the schema $($column.showInNewEditForm) for the list $($list.ListName)`n")
                     }
                   }
                 }
@@ -218,7 +217,7 @@ function Get-Lists {
               if ($null -ne $column.Validation) {
                 if ($null -eq $field.ValidationFormula) {
                   Write-Host "There is no validation formula set for the field" $field.InternalName " for the list" $list.ListName -ForegroundColor Red
-                  $fieldIssue.Add("There is no validation formula set for the field $($field.InternalName) for the list $($list.ListName)")
+                  $fieldIssue.Add("There is no validation formula set for the field $($field.InternalName) for the list $($list.ListName)`n")
                 }
               }
             }
@@ -233,7 +232,7 @@ function Get-Lists {
           }
 
           if ($null -ne $fieldIssue -and $fieldIssue.Count -gt 0) {
-            $listIssue.Add($fieldIssue -join '. ')
+            $listIssue.Add($fieldIssue -join ' ')
           }
         }
         
@@ -241,7 +240,7 @@ function Get-Lists {
       }
       else {
         Write-Host $list.ListName "doesn't exists at site" $siteUrl -ForegroundColor Red
-        $listIssue.Add("$($list.ListName) doesn't exists at site $($siteUrl)")
+        $listIssue.Add("$($list.ListName) doesn't exists at site $($siteUrl)`n")
       }
       Write-Host "Validation completed for the list $($listObj.Title) with URL $($rootSCUrl + $listObj.DefaultViewUrl)" -ForegroundColor Green
      
@@ -258,7 +257,7 @@ function Get-Lists {
       }
       else {
         $hash.Add("IssueWithList", "Yes")
-        $hash.Add("Issues", $listIssue -join ' .')
+        $hash.Add("Issues", $listIssue -join ' ')
       }
       Add-PnPListItem -List $schemaTestResultListName -Values $hash
       Disconnect-PnPOnline
@@ -293,7 +292,7 @@ function Get-ListFieldCTLevelRequireValidation {
         if ($null -ne $field) {
           if (!($field.Required.ToString() -eq $isRequired)) {
             Write-Host "The Required attribute"$field.Required" for the field " $field.InternalName "doesn't match as per the schema"$isRequired" for the list" $listName -ForegroundColor Red
-            $issue.Add("The Required attribute $($field.Required) for the field $($field.InternalName) doesn't match as per the schema $($isRequired) for the list $($listName)")
+            $issue.Add("The Required attribute $($field.Required) for the field $($field.InternalName) doesn't match as per the schema $($isRequired) for the list $($listName)`n")
           }
         }
       }
@@ -330,7 +329,7 @@ function Get-ListFieldCTLevelHiddenValidation {
         if ($null -ne $field) {
           if (!($field.Hidden.ToString() -eq $isHidden)) {
             Write-Host "The Required attribute"$field.Hidden" for the field " $field.InternalName "doesn't match as per the schema"$isHidden" for the list" $listName -ForegroundColor Red
-            $issue.Add("The Required attribute $($field.Hidden) for the field $($field.InternalName) doesn't match as per the schema $($isHidden) for the list $($listName)")
+            $issue.Add("The Required attribute $($field.Hidden) for the field $($field.InternalName) doesn't match as per the schema $($isHidden) for the list $($listName)`n")
           }
         }
       }
@@ -524,13 +523,13 @@ function Get-ListContentTypes {
       $contentType = $ContentTypeCollection | Where-Object { $_.Name -eq $contentTypeName }
       if ($null -eq $contentType) {
         Write-Host "Content Type $($contentTypeName) is not associated with the list $($listName) & $($rootSCUrl + $list.DefaultViewUrl)" -ForegroundColor Red
-        $issues.Add("Content Type $($contentTypeName) is not associated with the list $($listName) & $($rootSCUrl + $list.DefaultViewUrl)")
+        $issues.Add("Content Type $($contentTypeName) is not associated with the list $($listName) & $($rootSCUrl + $list.DefaultViewUrl)`n")
       }
     }
   }
   catch {
     Write-Host "Error occurred while validating Content Types for the list $($listName) at site $($siteUrl) Error : $($_.Exception.Message)" -ForegroundColor Red
-    $issues.Add("Error occurred while validating Content Types for the list $($listName) at site $($siteUrl)")
+    $issues.Add("Error occurred while validating Content Types for the list $($listName) at site $($siteUrl)`n")
   }
   
   Write-Host "Validation completed for content types for the list $($listName) at the site $($siteUrl)" -ForegroundColor Green
