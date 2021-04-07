@@ -624,6 +624,28 @@
           "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-data-landingzone-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-crmzone-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-dlscrmuatwe01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-data-crmzone-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
   "outputs": {
