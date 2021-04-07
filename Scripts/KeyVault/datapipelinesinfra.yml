@@ -43,21 +43,3 @@ stages:
             deploy:
               steps:
                 - template: data-secrets-infra.yml
-
-
-  - stage: tra
-    displayName: Add TRA Secrets
-    dependsOn: PublishArtifacts
-    variables:
-      - group: "tra"
-      - name: keyVaultName
-        value: kv-cpd-data-tra-we-01
-    jobs:
-      - deployment: Deploy
-        displayName: Add tra Key Vault Secrets
-        environment: data-tra
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: data-secrets-infra.yml
