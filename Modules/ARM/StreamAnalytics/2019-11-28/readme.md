@@ -1,14 +1,11 @@
-# StreamAnalytics
+# StreamAnalytics Cluster
 
 This template deploys a Stream Analytics Job, with optional configuration of inputs, outputs, and functions, and a default transformation.
 
 ## Resources
 
-- Microsoft.StreamAnalytics/streamingjobs
-- Microsoft.StreamAnalytics/streamingjobs/transformations
-- Microsoft.StreamAnalytics/streamingjobs/inputs
-- Microsoft.StreamAnalytics/streamingjobs/outputs
-- Microsoft.StreamAnalytics/streamingjobs/functions
+- Microsoft.StreamAnalytics/clusters
+- Microsoft.StreamAnalytics/clusters/privateendpoints
 
 
 ## Parameters

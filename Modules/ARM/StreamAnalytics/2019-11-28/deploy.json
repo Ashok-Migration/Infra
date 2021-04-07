@@ -123,42 +123,38 @@
   "variables": {},
   "resources": [
     {
-      "type": "Microsoft.StreamAnalytics/StreamingJobs",
-      "apiVersion": "2019-06-01",
-      "name": "[parameters('name')]",
-      "location": "[parameters('location')]",
-      "tags": "[parameters('tags')]",
+      "name": "string",
+      "type": "Microsoft.StreamAnalytics/clusters",
+      "apiVersion": "2020-03-01-preview",
+      "tags": {},
+      "location": "string",
+      "sku": {
+        "name": "Default",
+        "capacity": "integer"
+      },
       "properties": {
-        "sku": {
-          "name": "Standard"
-        },
-        "outputErrorPolicy": "[parameters('outputErrorPolicy')]",
-        "eventsOutOfOrderPolicy": "[parameters('eventsOutOfOrderPolicy')]",
-        "eventsOutOfOrderMaxDelayInSeconds": "[parameters('eventsOutOfOrderMaxDelayInSeconds')]",
-        "eventsLateArrivalMaxDelayInSeconds": "[parameters('eventsLateArrivalMaxDelayInSeconds')]",
-        "dataLocale": "[parameters('dataLocale')]",
-        "compatibilityLevel": "[parameters('compatibilityLevel')]",
-        "inputs": "[parameters('inputs')]",
-        "outputs": "[parameters('outputs')]",
-        "functions": "[parameters('functions')]",
-        "transformation": {
-          "name": "Transformation",
-          "properties": {
-            "streamingUnits": "[parameters('streamingUnits')]",
-            "query": "[parameters('query')]"
+      }
+    },
+    {
+      "name": "string",
+      "type": "Microsoft.StreamAnalytics/clusters/privateEndpoints",
+      "apiVersion": "2020-03-01-preview",
+      "properties": {
+        "manualPrivateLinkServiceConnections": [
+          {
+            "properties": {
+              "privateLinkServiceId": "string",
+              "groupIds": [
+                "string"
+              ],
+              "requestMessage": "string",
+              "privateLinkServiceConnectionState": {}
+            }
           }
-        }
+        ]
       }
     }
   ],
-  "outputs": {
-    "streamAnalyticsName": {
-      "type": "string",
-      "value": "[parameters('name')]",
-      "metadata": {
-        "description": "The Name of the Stream Analytics Job"
-      }
-    }
-  },
+  "outputs": {},
   "functions": []
 }
