@@ -1,6 +1,6 @@
 # FunctionApp
 
-This module (2018-11-01) is used to deploy Function App QnA without Virtual Network Integration and Access Restrictions, to deploy with these 2 components use 2020-09-01 module.
+This module (2020-09-01) is used to deploy Function App QnA with Virtual Network Integration and Access Restrictions, to deploy without these 2 components use 2018-11-01 module.
 
 ## Resources
 
@@ -25,6 +25,14 @@ This module (2018-11-01) is used to deploy Function App QnA without Virtual Netw
 | `eventHubName` | string | null |  | Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category.
 | `appConfigEndpoint` | string | | | App configuration endpoint.
 | `serviceBusSecretUri` | string | | | Key vault URI for service bus connection string.
+| `vnetName` | string | null | | The name of the virtual network to be created.
+| `ipSecurityRestrictions` | array | [] |  |IP based access restrictions.
+| `subnetResourceId` | string | null | | ResourceId of subnet.
+| `blobAccountConnectionString` | securestring | null | | KeyVault reference for Connection String of blob account.
+| `http20Enabled` | bool | false | | Configures a web site to allow clients to connect over http2.0.
+| `ftpsState` | string | null | | State of FTP / FTPS service.
+| `healthCheckPath` | string | `/` | | Health check path.
+
 
 ### Parameter Usage: `tags`
 
