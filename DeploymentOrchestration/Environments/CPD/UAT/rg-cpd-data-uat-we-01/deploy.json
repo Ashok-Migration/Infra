@@ -456,7 +456,8 @@
       "name": "DEP-vmdgatuatwe01",
       "resourceGroup": "rg-cpd-data-uat-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-uat-we-01"
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-stcpddatauatwe01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -477,7 +478,8 @@
       "name": "DEP-vmdgatuatwe02",
       "resourceGroup": "rg-cpd-data-uat-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-uat-we-01"
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-stcpddatauatwe01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -498,7 +500,8 @@
       "name": "DEP-vmdgatuatwe03",
       "resourceGroup": "rg-cpd-data-uat-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-uat-we-01"
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-stcpddatauatwe01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -519,7 +522,8 @@
       "name": "DEP-vmdgatuatwe04",
       "resourceGroup": "rg-cpd-data-uat-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-uat-we-01"
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-stcpddatauatwe01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -552,6 +556,72 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'Powerbi/2018-05-01/Parameters/pbicpddatauatwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-goldzone-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-dlsgoldzoneuatwe01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-data-goldzone-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-rawdzone-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-dlsrawzoneuatwe01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-data-rawzone-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-landingdzone-uat-we-01",
+      "resourceGroup": "rg-cpd-data-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-01",
+        "DEP-dlslandingzoneuatwe01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-data-landingzone-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }

@@ -35,37 +35,3 @@ jobs:
         inputs:
           testResultsFormat: NUnit
           testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
-
-      - task: AzurePowerShell@4
-        displayName: "Validate $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)"
-        inputs:
-          azureSubscription: $(serviceConnectionPrd)
-          ScriptType: InlineScript
-          inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
-            {
-              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location "$(location)"
-            }
-
-            $ValidationErrors = $null
-
-            $DeploymentInputs = @{
-              ResourceGroupName     = "$(resourceGroupNamePrd)"
-              TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
-              TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
-              Mode                  = "Incremental"
-              Verbose               = $true
-              OutVariable           = "ValidationErrors"
-            }
-
-            Test-AzResourceGroupDeployment @DeploymentInputs
-
-            if ($ValidationErrors)
-            {
-                foreach ($message in $ValidationErrors.Details)
-                {
-                    Write-Error $message.Message
-                }
-                Write-Error "Template is not valid."
-            }
-          azurePowerShellVersion: LatestVersion
