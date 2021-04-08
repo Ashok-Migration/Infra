@@ -57,6 +57,8 @@ stages:
         value: "func-cpp-apps-intntf-pre-we-01"
       - name: ptFuncName
         value: "func-cpp-apps-pt-pre-we-01"
+      - name: ckanFuncName
+        value: "func-cpp-apps-ckan-pre-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for pre
@@ -68,3 +70,9 @@ stages:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
                 - template: restart-appservice.yml
+                - task: AzureAppServiceManage@0
+                  displayName: Restart function app ckan
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    action: "Restart Azure App Service"
+                    webAppName: $(ckanFuncName)

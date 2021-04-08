@@ -200,6 +200,8 @@ stages:
         value: "func-cpd-apps-intntf-uat-we-01"
       - name: ptFuncName
         value: "func-cpd-apps-pt-uat-we-01"
+      - name: ckanFuncName
+        value: "func-cpd-apps-ckan-uat-we-01"
     jobs:
       - deployment: Deploy
         displayName: Update App Configurations for uat
@@ -211,3 +213,9 @@ stages:
                 - template: update-app-config.yml
                 - template: restart-pods.yml
                 - template: restart-appservice.yml
+                - task: AzureAppServiceManage@0
+                  displayName: Restart function app ckan
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    action: "Restart Azure App Service"
+                    webAppName: $(ckanFuncName)
