@@ -92,7 +92,7 @@
             "uri": "@{concat(variables('ckanbaseurlwithversion'),'/organization_list')}"
           },
           "runAfter": {
-            "purview-acquire-access-token-req-body": [
+            "ckan-resource-creation-function-url": [
               "Succeeded"
             ]
           },
@@ -534,32 +534,22 @@
                                         },
                                         "Ckan_resource_create_http_for_csv_type": {
                                           "inputs": {
-                                            "body": "@outputs('Execute_JavaScript_code_to_form_object_for_resource_create__for_csv_type')?['body']",
                                             "headers": {
                                               "Authorization": "@body('get-ckan-authorization-token')?['value']",
                                               "Content-Type": "application/json",
-                                              "x-ckan-request": "true"
+                                              "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                              "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                              "x-ckan-packageId": "@body('Ckan_package_create_response_json_parse_for_csv_type')?['result']?['id']"
                                             },
                                             "method": "POST",
-                                            "uri": "@{concat(variables('ckanbaseurlwithversion'),'/resource_create')}"
-                                          },
-                                          "runAfter": {
-                                            "Execute_JavaScript_code_to_form_object_for_resource_create__for_csv_type": [
-                                              "Succeeded"
-                                            ]
-                                          },
-                                          "type": "Http"
-                                        },
-                                        "Execute_JavaScript_code_to_form_object_for_resource_create__for_csv_type": {
-                                          "inputs": {
-                                            "code": "let packageId = workflowContext.actions.Ckan_package_create_response_json_parse_for_csv_type.outputs.body.result.id;\r\nlet blobFullPath = workflowContext.actions.Json_parse_on_compose.outputs.body.blobfullpath;\r\nlet blobFileNameOnly = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\n\r\nlet ckanResourceObject={\r\n    package_id:packageId,\r\n    url: blobFullPath,\r\n    format:'csv',\r\n    mimetype:'text/csv',\r\n    name: blobFileNameOnly,\r\n    title: blobFileNameOnly,\r\n    description: blobFileNameOnly\r\n};\r\n\r\nreturn ckanResourceObject;"
+                                            "uri": "@body('ckan-resource-creation-function-url')?['value']"
                                           },
                                           "runAfter": {
                                             "Ckan_package_create_response_json_parse_for_csv_type": [
                                               "Succeeded"
                                             ]
                                           },
-                                          "type": "JavaScriptCode"
+                                          "type": "Http"
                                         }
                                       },
                                       "expression": {
@@ -996,32 +986,22 @@
                                         },
                                         "Ckan_resource_create_http_for_json_type": {
                                           "inputs": {
-                                            "body": "@outputs('Execute_JavaScript_code_to_form_object_for_resource_create__for_json_type')?['body']",
                                             "headers": {
                                               "Authorization": "@body('get-ckan-authorization-token')?['value']",
                                               "Content-Type": "application/json",
-                                              "x-ckan-request": "true"
+                                              "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                              "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                              "x-ckan-packageId": "@body('Ckan_package_create_response_json_parse_for_json_type')?['result']?['id']"
                                             },
                                             "method": "POST",
-                                            "uri": "@{concat(variables('ckanbaseurlwithversion'),'/resource_create')}"
-                                          },
-                                          "runAfter": {
-                                            "Execute_JavaScript_code_to_form_object_for_resource_create__for_json_type": [
-                                              "Succeeded"
-                                            ]
-                                          },
-                                          "type": "Http"
-                                        },
-                                        "Execute_JavaScript_code_to_form_object_for_resource_create__for_json_type": {
-                                          "inputs": {
-                                            "code": "let packageId = workflowContext.actions.Ckan_package_create_response_json_parse_for_json_type.outputs.body.result.id;\r\nlet blobFullPath = workflowContext.actions.Json_parse_on_compose.outputs.body.blobfullpath;\r\nlet blobFileNameOnly = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\n\r\nlet ckanResourceObject={\r\n    package_id:packageId,\r\n    url: blobFullPath,\r\n    format:'json',\r\n    mimetype:'application/json',\r\n    name: blobFileNameOnly,\r\n    title: blobFileNameOnly,\r\n    description: blobFileNameOnly\r\n};\r\n\r\nreturn ckanResourceObject;"
+                                            "uri": "@body('ckan-resource-creation-function-url')?['value']"
                                           },
                                           "runAfter": {
                                             "Ckan_package_create_response_json_parse_for_json_type": [
                                               "Succeeded"
                                             ]
                                           },
-                                          "type": "JavaScriptCode"
+                                          "type": "Http"
                                         }
                                       },
                                       "expression": {
@@ -1451,30 +1431,20 @@
                                 "runAfter": {},
                                 "type": "ParseJson"
                               },
-                              "Execute_JavaScript_code_to_form_object_for_resource_create_for_other_type": {
-                                "inputs": {
-                                  "code": "let packageId = workflowContext.actions.Ckan_package_create_response_json_parse_for_other_type.outputs.body.result.id;\r\nlet contentType = workflowContext.actions.Purview_unique_attribute_parse_result_json_for_other_type.outputs.body.entity.attributes.contentType;\r\nlet blobFullPath = workflowContext.actions.Json_parse_on_compose.outputs.body.blobfullpath;\r\nlet blobFileNameOnly = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\n\r\nlet ckanResourceObject={\r\n    package_id:packageId,\r\n    url: blobFullPath,\r\n    format:blobFileNameOnly.split('.').pop(),\r\n    mimetype: contentType,\r\n    name: blobFileNameOnly,\r\n    title: blobFileNameOnly,\r\n    description: blobFileNameOnly\r\n};\r\n\r\nreturn ckanResourceObject;"
-                                },
-                                "runAfter": {
-                                  "Ckan_package_create_response_json_parse_for_other_type": [
-                                    "Succeeded"
-                                  ]
-                                },
-                                "type": "JavaScriptCode"
-                              },
                               "HTTP": {
                                 "inputs": {
-                                  "body": "@outputs('Execute_JavaScript_code_to_form_object_for_resource_create_for_other_type')?['body']",
                                   "headers": {
                                     "Authorization": "@body('get-ckan-authorization-token')?['value']",
                                     "Content-Type": "application/json",
-                                    "x-ckan-request": "true"
+                                    "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                    "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                    "x-ckan-packageId": "@body('Ckan_package_create_response_json_parse_for_other_type')?['result']?['id']"
                                   },
                                   "method": "POST",
-                                  "uri": "@{concat(variables('ckanbaseurlwithversion'),'/resource_create')}"
+                                  "uri": "@body('ckan-resource-creation-function-url')?['value']"
                                 },
                                 "runAfter": {
-                                  "Execute_JavaScript_code_to_form_object_for_resource_create_for_other_type": [
+                                  "Ckan_package_create_response_json_parse_for_other_type": [
                                     "Succeeded"
                                   ]
                                 },
@@ -1956,6 +1926,30 @@
             ]
           },
           "type": "InitializeVariable"
+        },
+        "ckan-resource-creation-function-url": {
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['keyvault']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/secrets/@{encodeURIComponent('Ckan-ResourceCreationFunctionURL')}/value"
+          },
+          "runAfter": {
+            "purview-acquire-access-token-req-body": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          },
+          "type": "ApiConnection"
         },
         "get-ckan-authorization-token": {
           "inputs": {
