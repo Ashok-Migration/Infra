@@ -31,6 +31,7 @@ This module is used to deploy Bitnami CKAN instance.
 | `customData` | string | # blank |  | customData
 | `BitnamiTags` | object |  |  | Optional. Bitnami Tags.
 | `ckanCount` | int | 2 |  | CKAN nodes count
+| `databaseUsername` | string | citus |  | Database username
 | `databasePassword` | securestring |  |  | Database password
 | `databaseWorkersVCores` | int | 4 | 4, 8, 16, 32, 64 | Number of VCores of the worker node
 | `databaseWorkersStorageSizeMB` | int | 524288 | 524288, 1048576, 2097152 | Disk storage for the worker node.
@@ -45,6 +46,18 @@ This module is used to deploy Bitnami CKAN instance.
 | `storageAccountSKU` | string | Standard_LRS |  | Storage Account SKU
 | `serverGroupName` | string | citus |  | Server Group Name
 | `postgreSQLServerNames` | array |  |  | PostgreSQL Server v2 Names
+| `singlePostgreSQLServerName` | string | |  | Single PostgreSQL Server Name
+| `singlePostgreSQLServerUsername` | string | |  | Single PostgreSQL Server Username
+| `singlePostgreSQLServerSKU` | string | GP_Gen5_4 |  | Single PostgreSQL Server SKU
+| `singlePostgreSQLServerTier` | string | GeneralPurpose |  | Single PostgreSQL Server Tier
+| `singlePostgreSQLServerFamily` | string | Gen5 |  | Single PostgreSQL Server Family
+| `singlePostgreSQLServerCapacity` | int | 4 |  | Single PostgreSQL Server Capacity
+| `singlePostgreSQLServerStorageProfile` | object | |  | Single PostgreSQL Server Profile
+| `singlePostgreSQLServerVersion` | string | 11 |  | Single PostgreSQL Server Version
+| `singlePostgreSQLServerSSL` | string | Enabled |  | Single PostgreSQL Server SSL Enforcement
+| `singlePostgreSQLServerTLSVersion` | string | TLSEnforcementDisabled |  | Single PostgreSQL Server TLS Version
+| `singlePostgreSQLServerInfrastructureEncryption` | string | Disabled |  | Single PostgreSQL Infrastructure Encryption
+| `singlePostgreSQLServerPublicAccess` | string | Enabled |  | Single PostgreSQL Server Public Access
 | `redisName` | string |  |  | Redis Instance Name
 | `frontendVirtualMachineNames` | array |  |  | Frontend VM Names
 | `solrVirtualMachineName` | string |  |  | Solr VM Name

@@ -105,6 +105,13 @@
                 "description": "CKAN nodes count"
             }
         },
+        "databaseUsername": {
+            "type": "string",
+            "defaultValue": "citus",
+            "metadata": {
+                "description": "Database Username"
+            }
+        },
         "databasePassword": {
             "type": "securestring",
             "maxLength": 128,
@@ -235,6 +242,95 @@
             "type": "array",
             "metadata": {
                 "description": "PostgreSQL Server v2 Names"
+            }
+        },
+        "singlePostgreSQLServerName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Single PostgreSQL Server Name"
+            }
+        },
+        "singlePostgreSQLServerUsername": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Single PostgreSQL Server Username"
+            }
+        },
+        "singlePostgreSQLServerSKU": {
+            "type": "string",
+            "defaultValue": "GP_Gen5_4",
+            "metadata": {
+                "description": "Single PostgreSQL Server SKU"
+            }
+        },
+        "singlePostgreSQLServerTier": {
+            "type": "string",
+            "defaultValue": "GeneralPurpose",
+            "metadata": {
+                "description": "Single PostgreSQL Server Tier"
+            }
+        },
+        "singlePostgreSQLServerFamily": {
+            "type": "string",
+            "defaultValue": "Gen5",
+            "metadata": {
+                "description": "Single PostgreSQL Server Family"
+            }
+        },
+        "singlePostgreSQLServerCapacity": {
+            "type": "int",
+            "defaultValue": 4,
+            "metadata": {
+                "description": "Single PostgreSQL Server Capacity"
+            }
+        },
+        "singlePostgreSQLServerStorageProfile": {
+            "type": "object",
+            "defaultValue": {
+                "storageMB": 102400,
+                "backupRetentionDays": 7,
+                "geoRedundantBackup": "Disabled",
+                "storageAutogrow": "Enabled"
+            },
+            "metadata": {
+                "description": "Single PostgreSQL Storage Profile"
+            }
+        },
+        "singlePostgreSQLServerVersion": {
+            "type": "string",
+            "defaultValue": "11",
+            "metadata": {
+                "description": "Single PostgreSQL Server Version"
+            }
+        },
+        "singlePostgreSQLServerSSL": {
+            "type": "string",
+            "defaultValue": "Enabled",
+            "metadata": {
+                "description": "Single PostgreSQL SSL Enforcement"
+            }
+        },
+        "singlePostgreSQLServerTLSVersion": {
+            "type": "string",
+            "defaultValue": "TLSEnforcementDisabled",
+            "metadata": {
+                "description": "Single PostgreSQL Server TLS Version"
+            }
+        },
+        "singlePostgreSQLServerInfrastructureEncryption": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "Single PostgreSQL Infrastructure Encryption"
+            }
+        },
+        "singlePostgreSQLServerPublicAccess": {
+            "type": "string",
+            "defaultValue": "Enabled",
+            "metadata": {
+                "description": "Single PostgreSQL Server Public Access"
             }
         },
         "redisName": {
@@ -507,7 +603,8 @@
             "dns": "[concat(variables('dnsPrefix'), 'dns-ckan')]"
         },
         "databasePassword": "[parameters('databasePassword')]",
-        "databaseAdministratorLogin": "citus",
+        "databaseAdministratorLogin": "[parameters('databaseUsername')]",
+        "singlePostgreSQLServerAdministratorLogin": "[parameters('singlePostgreSQLServerUsername')]",
         "databaseSkuSizeMB": "[mul(parameters('databaseSkuSizeGB'), 1024)]",
         "redisCacheSkuName": "[split(parameters('redisCacheSku'), '_')[0]]",
         "redisCacheSkuFamily": "[split(parameters('redisCacheSku'), '_')[1]]",
@@ -756,6 +853,29 @@
             "properties": {
                 "StartIpAddress": "[parameters('azFirewallPublicIP')]",
                 "EndIpAddress": "[parameters('azFirewallPublicIP')]"
+            }
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('singlePostgreSQLServerName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('singlePostgreSQLServerSKU')]",
+                "tier": "[parameters('singlePostgreSQLServerTier')]",
+                "family": "[parameters('singlePostgreSQLServerFamily')]",
+                "capacity": "[parameters('singlePostgreSQLServerCapacity')]"
+            },
+            "properties": {
+                "createMode": "Default",
+                "administratorLogin": "[variables('singlePostgreSQLServerAdministratorLogin')]",
+                "administratorLoginPassword": "[variables('databasePassword')]",
+                "storageProfile": "[parameters('singlePostgreSQLServerStorageProfile')]",
+                "version": "[parameters('singlePostgreSQLServerVersion')]",
+                "sslEnforcement": "[parameters('singlePostgreSQLServerSSL')]",
+                "minimalTlsVersion": "[parameters('singlePostgreSQLServerTLSVersion')]",
+                "infrastructureEncryption": "[parameters('singlePostgreSQLServerInfrastructureEncryption')]",
+                "publicNetworkAccess": "[parameters('singlePostgreSQLServerPublicAccess')]"
             }
         },
         {
