@@ -1064,6 +1064,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpd-apps-6dhook-tst-we-02",
+			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-int-tst-we-01",
+				"DEP-apicon-cpd-apps-integ-tst-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-apps-6dhook-tst-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpd-apps-mpsidx-tst-we-01",
 			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
 			"dependsOn": [
