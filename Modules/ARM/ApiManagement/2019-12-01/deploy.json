@@ -335,7 +335,7 @@
       "condition": "[not(empty(parameters('apimCertificateName')))]",
       "type": "Microsoft.ApiManagement/service/certificates",
       "apiVersion": "2020-12-01",
-      "name": "[concat(parameters('apiManagementServiceName'), '/', parameters('apimCertificateName'))]",
+      "name": "[if(not(empty(parameters('apimCertificateName'))), concat(parameters('apiManagementServiceName'), '/', parameters('apimCertificateName')), concat(parameters('apiManagementServiceName'), '/apim-certificate'))]",
       "dependsOn": [
         "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementServiceName'))]"
       ],
