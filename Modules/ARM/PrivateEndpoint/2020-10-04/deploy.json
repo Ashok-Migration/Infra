@@ -30,6 +30,12 @@
 			"metadata": {
 				"description": "Private Endpoint Group Name"
 			}
+		},
+		"SubscriptionId": {
+			"type": "string"
+		},
+		"NetworkRG": {
+			"type": "string"
 		}
 	},
 	"resources": [
@@ -58,7 +64,7 @@
 		{
 			"type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
 			"apiVersion": "2020-03-01",
-			"name": "[concat(parameters('privateEndpointName'), '/', parameters('privateEndpointGroupName'), 'PrivateDnsZoneGroup')]",
+			"name": "[concat(parameters('privateEndpointName'), '/', 'default')]",
 			"location": "[parameters('location')]",
 			"dependsOn": [
 				"[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
@@ -66,7 +72,7 @@
 			"properties": {
 				"privateDnsZoneConfigs": [
 					{
-						"name": "dnsConfig",
+						"name": "[concat(parameters('privateEndpointName'),'-dns')]",
 						"properties": {
 							"privateDnsZoneId": "[parameters('privateDnsZoneId')]"
 						}

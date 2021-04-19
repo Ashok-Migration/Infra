@@ -95,10 +95,16 @@
       "type": "bool",
       "defaultValue": false
     },
-    "privateEndpointName": {
+    "privateEndpointNameSql": {
       "type": "String"
     },
-    "targetSubResource": {
+    "privateEndpointNameSqlonDemand": {
+      "type": "String"
+    },
+    "targetSubResourceSqlOnDemand": {
+      "type": "Array"
+    },
+    "targetSubResourceSql": {
       "type": "Array"
     },
     "subnetName": {
@@ -124,6 +130,7 @@
     "subnetId": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
     "privateLinkResource": "[concat('/subscriptions/',parameters('SubscriptionId'), '/resourceGroups/', parameters('RG'), '/providers/Microsoft.Synapse/workspaces/', parameters('name'))]",
     "privateDnsZoneId": "[concat('/subscriptions/',parameters('SubscriptionId'), '/resourceGroups/', parameters('networkRG'), '/providers/Microsoft.Network/privateDnsZones/privatelink.sql.azuresynapse.net')]"
+    
   },
   "resources": [
     {
@@ -285,7 +292,7 @@
     {
       "type": "Microsoft.Network/privateEndpoints",
       "apiVersion": "2020-03-01",
-      "name": "[parameters('privateEndpointName')]",
+      "name": "[parameters('privateEndpointNameSqlOnDemand')]",
       "dependsOn": [
         "[parameters('name')]"
       ],
@@ -297,10 +304,10 @@
         },
         "privateLinkServiceConnections": [
           {
-            "name": "[parameters('privateEndpointName')]",
+            "name": "[parameters('privateEndpointNameSqlOnDemand')]",
             "properties": {
               "privateLinkServiceId": "[variables('privateLinkResource')]",
-              "groupIds": "[parameters('targetSubResource')]"
+              "groupIds": "[parameters('targetSubResourceSqlOnDemand')]"
             }
           }
         ]
@@ -311,7 +318,7 @@
       "apiVersion": "2017-05-10",
       "name": "PrivateDnsZoneDeployment",
       "dependsOn": [
-        "[parameters('privateEndpointName')]"
+        "[parameters('privateEndpointNameSqlOnDemand')]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -397,7 +404,7 @@
       "apiVersion": "2017-05-10",
       "name": "DnsZoneGroupDeployment",
       "dependsOn": [
-        "[parameters('privateEndpointName')]",
+        "[parameters('privateEndpointNameSqlOnDemand')]",
         "PrivateDnsZoneDeployment"
       ],
       "properties": {
@@ -409,12 +416,12 @@
             {
               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
               "apiVersion": "2020-03-01",
-              "name": "[concat(parameters('privateEndpointName'), '/', 'default')]",
+              "name": "[concat(parameters('privateEndpointNameSqlOnDemand'), '/', 'default')]",
               "location": "[parameters('location')]",
               "properties": {
                 "privateDnsZoneConfigs": [
                   {
-                    "name": "privatelink-sql-azuresynapse-net",
+                    "name": "privatelink-sql-azuresynapse-ondemand-net",
                     "properties": {
                       "privateDnsZoneId": "[variables('privateDnsZoneId')]"
                     }
