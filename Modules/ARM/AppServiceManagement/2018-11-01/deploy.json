@@ -1,7 +1,35 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
+    "parameters": {   
+        "http20Enabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Configures a web site to allow clients to connect over http2.0."
+            }
+        },
+        "webSocketsEnabled": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Configures a web site to allow clients to connect over websocket"
+            }
+        },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "State of FTP / FTPS service."
+            }
+        },
+        "healthCheckPath": {
+            "type": "string",
+            "defaultValue": "/",
+            "metadata": {
+                "description": "Health check path."
+            }
+        },
         "webAppName": {
             "type": "String"
         },
@@ -239,6 +267,10 @@
                 "serverFarmId": "[parameters('hostingPlanId')]",
                 "httpsOnly": true,
                 "siteConfig": {
+                    "http20Enabled": "[parameters('http20Enabled')]",
+                    "ftpsState": "[parameters('ftpsState')]",
+                    "webSocketsEnabled": "[parameters('webSocketsEnabled')]",
+                    "healthCheckPath": "[parameters('healthCheckPath')]",
                     "AlwaysOn": true,
                     "detailedErrorLoggingEnabled": true,
                     "httpLoggingEnabled": true,
