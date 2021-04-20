@@ -347,6 +347,20 @@
                 "description": "Availability zones"
             }
         },
+        "redisEnableNonSslPort": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Enable/Disable Non SSL Ports"
+            }
+        },
+        "redisMinimumTlsVersion": {
+            "type": "string",
+            "defaultValue": "1.2",
+            "metadata": {
+                "description": "Minimum TLS Version for Redis Instance"
+            }
+        },
         "redisVersion": {
             "type": "string",
             "defaultValue": "4",
@@ -493,6 +507,20 @@
                 "description": "Application Gateway SSL Certificates"
             }
         },
+        "sslPolicyType": {
+            "type": "string",
+            "defaultValue": "Predefined",
+            "metadata": {
+                "description": "Type of the SSL policy"
+            }
+        },
+        "sslPolicyName": {
+            "type": "string",
+            "defaultValue": "AppGwSslPolicy20170401S",
+            "metadata": {
+                "description": "Name of the SSL policy"
+            }
+        },
         "managedIdentityId": {
             "type": "string",
             "defaultValue": "",
@@ -535,6 +563,82 @@
             "defaultValue": "",
             "metadata": {
                 "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+            }
+        },
+        "utcYear": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyyy')]",
+            "metadata": {
+                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+            }
+        },
+        "accountSasProperties": {
+            "type": "object",
+            "defaultValue": {
+                "signedServices": "b",
+                "signedPermission": "rl",
+                "signedResourceTypes": "sco",
+                "keyToSign": "key2",
+                "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 100)), '-12-31T23:59:59Z')]"
+            },
+            "metadata": {
+                "description": "SAS account properties"
+            }
+        },
+        "storageMinimumTlsVersion": {
+            "type": "string",
+            "defaultValue": "TLS1_2",
+            "metadata": {
+                "description": "Minimum TLS Version for Storage Account"
+            }
+        },
+        "vNetId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Virtual Network Identifier used to create a service endpoint."
+            }
+        },
+        "networkAcls": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Networks ACLs, this value contains IPs to whitelist and/or Subnet information."
+            }
+        },
+        "vmDiagnosticsEventVolume": {
+            "type": "string",
+            "defaultValue": "Medium",
+            "metadata": {
+                "description": "VM Diagnostics Event Volume"
+            }
+        },
+        "vmDiagnosticsMetricAggregation": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "VM Diagnostics Metric Aggregation"
+            }
+        },
+        "vmDiagnosticsPerformanceCounters": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "VM Diagnostics Performance Counters"
+            }
+        },
+        "vmDiagnosticsSyslogEvents": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "VM Diagnostics Sys Log Events"
+            }
+        },
+        "vmDiagnosticsSampleRate": {
+            "type": "int",
+            "defaultValue": 15,
+            "metadata": {
+                "description": "VM Diagnostics Sample Rate in Seconds"
             }
         }
     },
@@ -598,10 +702,6 @@
                 "[parameters('managedIdentityId')]": {}
             }
         },
-        "ckanPublicIPs": {
-            "name": "[concat(parameters('stackId'), 'ip-ckan')]",
-            "dns": "[concat(variables('dnsPrefix'), 'dns-ckan')]"
-        },
         "databasePassword": "[parameters('databasePassword')]",
         "databaseAdministratorLogin": "[parameters('databaseUsername')]",
         "singlePostgreSQLServerAdministratorLogin": "[parameters('singlePostgreSQLServerUsername')]",
@@ -662,7 +762,24 @@
                     "enabled": true
                 }
             }
-        ]
+        ],
+        "virtualNetworkRules": {
+            "copy": [
+                {
+                    "name": "virtualNetworkRules",
+                    "count": "[if(empty(parameters('networkAcls')), 0, length(parameters('networkAcls').virtualNetworkRules))]",
+                    "input": {
+                        "id": "[concat(parameters('vNetId'), '/subnets/', parameters('networkAcls').virtualNetworkRules[copyIndex('virtualNetworkRules')].subnet)]"
+                    }
+                }
+            ]
+        },
+        "networkAcls": {
+            "bypass": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').bypass)]",
+            "defaultAction": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').defaultAction)]",
+            "virtualNetworkRules": "[if(empty(parameters('networkAcls')), json('null'), variables('virtualNetworkRules').virtualNetworkRules)]",
+            "ipRules": "[if(empty(parameters('networkAcls')), json('null'), if(equals(length(parameters('networkAcls').ipRules), 0), json('null'), parameters('networkAcls').ipRules))]"
+        }
     },
     "resources": [
         {
@@ -678,7 +795,10 @@
             "tags": {
                 "provider": "[toUpper(parameters('BitnamiTags').provider)]"
             },
-            "properties": null
+            "properties": {
+                "minimumTlsVersion": "[parameters('storageMinimumTlsVersion')]",
+                "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]"
+            }
         },
         {
             "apiVersion": "2018-03-29-privatepreview",
@@ -876,7 +996,20 @@
                 "minimalTlsVersion": "[parameters('singlePostgreSQLServerTLSVersion')]",
                 "infrastructureEncryption": "[parameters('singlePostgreSQLServerInfrastructureEncryption')]",
                 "publicNetworkAccess": "[parameters('singlePostgreSQLServerPublicAccess')]"
-            }
+            },
+            "resources": [
+                {
+                    "name": "AllowCkanVnetRule",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('singlePostgreSQLServerName'))]"
+                    ],
+                    "type": "virtualNetworkRules",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "virtualNetworkSubnetId": "[parameters('defaultSubnet')]"
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2020-06-01",
@@ -885,7 +1018,8 @@
             "name": "[parameters('redisName')]",
             "zones": "[parameters('redisZones')]",
             "properties": {
-                "enableNonSslPort": true,
+                "enableNonSslPort": "[parameters('redisEnableNonSslPort')]",
+                "minimumTlsVersion": "[parameters('redisMinimumTlsVersion')]",
                 "redisVersion": "[parameters('redisVersion')]",
                 "redisConfiguration": "[parameters('redisConfiguration')]",
                 "replicasPerMaster": "[parameters('redisReplicasPerMaster')]",
@@ -1064,7 +1198,47 @@
                 "publisher": "bitnami",
                 "product": "ckan-ckan-topology-multitier-image",
                 "name": "default"
-            }
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('frontendVirtualMachineNames')[copyIndex('vmCopy')])]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('frontendVirtualMachineNames')[copyIndex('vmCopy')])]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2019-12-01",
@@ -1155,7 +1329,47 @@
                 "publisher": "bitnami",
                 "product": "ckan-ckan-topology-multitier-image",
                 "name": "default"
-            }
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('solrVirtualMachineName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('solrVirtualMachineName'))]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2019-12-01",
@@ -1234,7 +1448,47 @@
                 "publisher": "bitnami",
                 "product": "ckan-ckan-topology-multitier-image",
                 "name": "default"
-            }
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('cacheVirtualMachineName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('cacheVirtualMachineName'))]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2019-12-01",
@@ -1332,6 +1586,10 @@
                 "httpListeners": "[parameters('httpListeners')]",
                 "requestRoutingRules": "[if(empty(parameters('requestRoutingRules')), variables('defaultRequestRoutingRules'), parameters('requestRoutingRules'))]",
                 "sslCertificates": "[parameters('sslCertificates')]",
+                "sslPolicy": {
+                    "policyType": "[parameters('sslPolicyType')]",
+                    "policyName": "[parameters('sslPolicyName')]"
+                },
                 "probes": "[parameters('probes')]"
             },
             "resources": [

@@ -388,8 +388,8 @@
           "maxCapacity": "[parameters('autoScaleMaxCapacity')]"
         },
         "sslPolicy": {
-          "policyType": "Predefined",
-          "policyName": "AppGwSslPolicy20170401S"
+          "policyType": "[parameters('sslPolicyType')]",
+          "policyName": "[parameters('sslPolicyName')]"
         },
         "webApplicationFirewallConfiguration": "[if(parameters('firewallEnabled'), variables('webApplicationFirewallConfiguration'), json('null'))]",
         "firewallPolicy": "[if(parameters('firewallEnabled'), variables('wafPolicyId'), json('null'))]"
