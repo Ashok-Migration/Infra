@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "integrationServiceEnvironmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Name of the workflow."
+      }
+    },
+    "integrationServiceEnvironmentLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Optional. Location for all resources."
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required."
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Required."
+      }
+    },
+    "subnetResourceIds": {
+      "type": "array",
+      "metadata": {
+        "description": "Required."
+      }
+    },
+    "accessEndpoint": {
+      "type": "object",
+      "metadata": {
+        "description": "Required."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Tags of the Logic App resource."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Logic/integrationServiceEnvironments",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('integrationServiceEnvironmentName')]",
+      "location": "[parameters('integrationServiceEnvironmentLocation')]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/updateVirtualNetworkSubnetWithDelegation"
+      ],
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "properties": {
+        "networkConfiguration": {
+          "subnets": "[parameters('subnetResourceIds')]",
+          "accessEndpoint": "[parameters('accessEndpoint')]"
+        }
+      }
+    }
+  ],
+  "outputs": {},
+  "functions": []
+}
