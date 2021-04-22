@@ -30,7 +30,7 @@
             "value": true
         },
         "kubernetesVersion": {
-            "value": "1.18.10"
+            "value": "1.18.17"
         },
         "location": {
             "value": "westeurope"
@@ -54,9 +54,6 @@
         },
         "virtualNetworkName": {
             "value": "vnet-cpp-pltf-prd-we-01"
-        },
-        "vmssNodePool": {
-            "value": true
         },
         "vnetResourceGroup": {
             "value": "rg-cpp-pltf-net-prd-we-01"
@@ -85,25 +82,6 @@
         "nodeResourceGroup": {
             "value": "rg-cpp-apps-aksnode-prd-we-01"
         },
-        "zones": {
-            "value": [
-                "1",
-                "2",
-                "3"
-            ]
-        },
-        "agentVMSize": {
-            "value": "Standard_DS2_v2"
-        },
-        "agentCount": {
-            "value": 3
-        },
-        "agentPoolMaxCount": {
-            "value": 10
-        },
-        "agentPoolMinCount": {
-            "value": 3
-        },
         "diagnosticLogsRetentionInDays": {
             "value": 365
         },
@@ -118,6 +96,50 @@
         },
         "eventHubName": {
             "value": "evh-cpp-apps-mon-prd-we-01"
+        },
+        "agentPoolProfiles": {
+            "value": [
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 20,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "apps",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_D4s_v3",
+                    "vnetSubnetID": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-prd-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-prd-we-01/subnets/snet-cpp-apps-aks-prd-we-01"
+                },
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 20,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "jobs",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_D4s_v3",
+                    "vnetSubnetID": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-prd-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-prd-we-01/subnets/snet-cpp-apps-aks-prd-we-01"
+                }
+            ]
         }
     }
 }
