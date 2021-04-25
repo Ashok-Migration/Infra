@@ -3,8 +3,6 @@ name: $(resourceGroupName)
 variables:
   - name: PoolName
     value: "tasmumsiprdagents"
-  # - name: vmImage
-  # value: windows-latest
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPP/PRD/rg-cpp-apps-aks-prd-we-01/deploy.json
   - name: parameterFilePath
@@ -43,7 +41,6 @@ stages:
         displayName: Validate Template
         pool:
           name: $(PoolName)
-          # vmImage: $(vmImage)
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
@@ -96,6 +93,24 @@ stages:
                 else echo "version update not required"
 
                 fi
+                
+          - task: AzureCLI@2
+            displayName: "Remove AgentPool2 Nodepool"
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                agentPool2=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='agentpool2'].name" -o tsv)
+
+                if [[ "$agentPool2" == agentpool2 ]]
+
+                then az aks nodepool delete --cluster-name $(clusterName) --name agentpool2 -g $(resourceGroupName)
+
+                else echo "agentPool2 doesn't exist"
+
+                fi
+
           
           - task: AzureCLI@2
             displayName: "Add Apps nodepool"
@@ -155,7 +170,6 @@ stages:
         timeoutInMinutes: 90
         pool:
           name: $(PoolName)
-          # vmImage: $(vmImage)
         steps:
           - task: AzurePowerShell@4
             displayName: Deploy template on $(resourceGroupName)
