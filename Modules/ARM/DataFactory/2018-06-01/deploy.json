@@ -96,6 +96,18 @@
         "type": "[parameters('identity')]"
       },
       "properties": "[if(parameters('gitEnabled'), variables('gitConfiguration'), '')]"
+    },
+    {
+      "name": "[concat(parameters('name'), '/adf-integration-runtime')]",
+      "type": "Microsoft.DataFactory/factories/integrationRuntimes",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "type": "SelfHosted",
+        "typeProperties": {}
+      },
+      "dependsOn": [
+        "[concat('Microsoft.DataFactory/factories/',parameters('name'))]"
+      ]
     }
   ],
   "functions": [],
