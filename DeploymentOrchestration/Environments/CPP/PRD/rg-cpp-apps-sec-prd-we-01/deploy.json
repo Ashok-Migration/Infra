@@ -234,6 +234,69 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cpp-apps-ckndflt-prd-we-01",
+            "resourceGroup": "rg-cpp-apps-sec-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-apps-sec-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-apps-ckndflt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cpp-apps-cknagw-prd-we-01",
+            "resourceGroup": "rg-cpp-apps-sec-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-apps-sec-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-apps-cknagw-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cpp-apps-cknredis-prd-we-01",
+            "resourceGroup": "rg-cpp-apps-sec-prd-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-apps-sec-prd-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-apps-cknredis-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "DEP-kv-cpp-apps-prd-we-01",
             "resourceGroup": "rg-cpp-apps-sec-prd-we-01",
