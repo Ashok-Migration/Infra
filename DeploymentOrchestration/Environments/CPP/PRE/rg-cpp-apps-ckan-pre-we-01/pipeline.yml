@@ -3,16 +3,14 @@ name: $(resourceGroupName)
 variables:
   - name: PoolName
     value: "tasmumsiagents"
-  #- name: vmImage
-  #  value: windows-latest
   - name: templateFilePath
-    value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-apps-waf-pre-we-01/deploy.json
+    value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-apps-ckan-pre-we-01/deploy.json
   - name: parameterFilePath
     value:
   - name: location
     value: westeurope
   - name: resourceGroupName
-    value: rg-cpp-apps-waf-pre-we-01
+    value: rg-cpp-apps-ckan-pre-we-01
   - name: serviceConnection
     value: sqcp-ado-spn-pre
   - name: subscriptionId
@@ -27,7 +25,6 @@ stages:
         displayName: Validate Template
         pool:
           name: $(PoolName)
-          #vmImage: $(vmImage)
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
@@ -62,7 +59,6 @@ stages:
         timeoutInMinutes: 90
         pool:
           name: $(PoolName)
-          #vmImage: $(vmImage)
         steps:
           - task: AzurePowerShell@4
             displayName: Deploy template on $(resourceGroupName)

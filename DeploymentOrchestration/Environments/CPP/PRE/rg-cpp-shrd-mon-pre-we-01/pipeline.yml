@@ -1,11 +1,10 @@
 name: $(resourceGroupName)
 
 variables:
-  #- name: PoolName
-  #  value: "Azure Pipelines"
-
-  - name: vmImage
-    value: windows-latest
+  - name: PoolName
+    value: "tasmumsiagents"
+  #- name: vmImage
+  #  value: windows-latest
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-shrd-mon-pre-we-01/deploy.json
   - name: parameterFilePath
@@ -35,8 +34,8 @@ stages:
       - job: ValidateTemplate
         displayName: Validate Template
         pool:
-         # name: $(PoolName)
-           vmImage: $(vmImage) 
+          name: $(PoolName)
+          #vmImage: $(vmImage) 
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
@@ -69,8 +68,8 @@ stages:
       - job: DeployTemplate
         displayName: Deploy Template
         pool:
-         # name: $(PoolName)
-           vmImage: $(vmImage)
+          name: $(PoolName)
+          #vmImage: $(vmImage)
         steps:
           - task: AzurePowerShell@4
             displayName: Deploy template on $(resourceGroupName)

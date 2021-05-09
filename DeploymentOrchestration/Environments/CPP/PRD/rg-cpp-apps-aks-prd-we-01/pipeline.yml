@@ -22,7 +22,7 @@ variables:
   - name: nodeCount
     value: 3
   - name: minCount
-    value: 3
+    value: 10
   - name: maxCount
     value: 20
   - name: maxPods
@@ -67,6 +67,48 @@ stages:
                   Write-Error "Template is not valid."
                 }
               azurePowerShellVersion: LatestVersion
+
+  - stage: DeployManagedCluster
+    jobs:
+      - job: DeployManagedCluster
+        displayName: Update Node Pools
+        timeoutInMinutes: 120
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzureCLI@2
+            displayName: "Upgrade to $(kubernetesVersion)"
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                currentVersion=$(az aks get-upgrades -g $(resourceGroupName) -n $(clusterName) --query "controlPlaneProfile.kubernetesVersion" -o tsv)
+
+                if [[ "$currentVersion" != $(kubernetesVersion) ]]
+
+                then az aks upgrade --resource-group $(resourceGroupName) --name $(clusterName) --kubernetes-version $(kubernetesVersion) --yes
+
+                else echo "version update not required"
+
+                fi
+
+          - task: AzureCLI@2
+            displayName: "Add portal nodepool"
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                portalPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='portal'].name" -o tsv)
+
+                if [[ "$portalPool" != portal ]]
+
+                then az aks nodepool add --cluster-name $(clusterName) --name portal -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
+
+                else echo "portal node pool already exists"
+
+                fi
 
   - stage: DeployTemplate
     jobs:

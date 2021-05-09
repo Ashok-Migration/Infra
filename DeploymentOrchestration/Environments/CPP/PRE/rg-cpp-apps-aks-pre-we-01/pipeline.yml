@@ -1,10 +1,8 @@
 name: $(resourceGroupName)
 
 variables:
-  #- name: PoolName
-  #  value: "tasmumsagents"
-  - name: vmImage
-    value: windows-latest
+  - name: PoolName
+    value: "tasmumsiagents"
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-apps-aks-pre-we-01/deploy.json
   - name: parameterFilePath
@@ -22,9 +20,9 @@ variables:
   - name: kubernetesVersion
     value: 1.18.17
   - name: nodeCount
-    value: 3
+    value: 10
   - name: minCount
-    value: 3
+    value: 10
   - name: maxCount
     value: 20
   - name: maxPods
@@ -42,8 +40,7 @@ stages:
       - job: ValidateTemplate
         displayName: Validate Template
         pool:
-          # name: $(PoolName)
-          vmImage: $(vmImage)
+          name: $(PoolName)
         steps:
           - task: AzurePowerShell@4
             displayName: Validate template on $(resourceGroupName)
@@ -79,7 +76,6 @@ stages:
         pool:
           name: $(PoolName)
         steps:
-
           - task: AzureCLI@2
             displayName: "Upgrade to $(kubernetesVersion)"
             inputs:
@@ -88,7 +84,7 @@ stages:
               scriptLocation: "inlineScript"
               inlineScript: |
                 currentVersion=$(az aks get-upgrades -g $(resourceGroupName) -n $(clusterName) --query "controlPlaneProfile.kubernetesVersion" -o tsv)
-                
+
                 if [[ "$currentVersion" != $(kubernetesVersion) ]]
 
                 then az aks upgrade --resource-group $(resourceGroupName) --name $(clusterName) --kubernetes-version $(kubernetesVersion) --yes
@@ -96,73 +92,21 @@ stages:
                 else echo "version update not required"
 
                 fi
-                
+
           - task: AzureCLI@2
-            displayName: "Remove AgentPool2 Nodepool"
+            displayName: "Add portal nodepool"
             inputs:
               azureSubscription: "$(serviceConnection)"
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                agentPool2=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='agentpool2'].name" -o tsv)
+                portalPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='portal'].name" -o tsv)
 
-                if [[ "$agentPool2" == agentpool2 ]]
+                if [[ "$portalPool" != portal ]]
 
-                then az aks nodepool delete --cluster-name $(clusterName) --name agentpool2 -g $(resourceGroupName)
+                then az aks nodepool add --cluster-name $(clusterName) --name portal -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
 
-                else echo "agentPool2 doesn't exist"
-
-                fi
-
-          
-          - task: AzureCLI@2
-            displayName: "Add Apps nodepool"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                appsPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='apps'].name" -o tsv)
-                
-                if [[ "$appsPool" != apps ]]
-
-                then az aks nodepool add --cluster-name $(clusterName) --name apps -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
-
-                else echo "apps node pool already exists"
-
-                fi
-
-          - task: AzureCLI@2
-            displayName: "Remove AgentPool Nodepool"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                agentPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='agentpool'].name" -o tsv)
-
-                if [[ "$agentPool" == agentpool ]]
-
-                then az aks nodepool delete --cluster-name $(clusterName) --name agentpool -g $(resourceGroupName)
-
-                else echo "agentPool doesn't exist"
-
-                fi
-
-          - task: AzureCLI@2
-            displayName: "Add Jobs Nodepool"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                jobsPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='jobs'].name" -o tsv)
-
-                if [[ "$jobsPool" != jobs ]]
-
-                then az aks nodepool add --cluster-name $(clusterName) --name jobs -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
-
-                else echo "jobs node pool already exists"
+                else echo "portal node pool already exists"
 
                 fi
 
@@ -172,8 +116,7 @@ stages:
         displayName: Deploy Template
         timeoutInMinutes: 90
         pool:
-          #  name: $(PoolName)
-          vmImage: $(vmImage)
+          name: $(PoolName)
         steps:
           - task: AzurePowerShell@4
             displayName: Deploy template on $(resourceGroupName)

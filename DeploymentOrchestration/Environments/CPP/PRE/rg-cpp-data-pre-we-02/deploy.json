@@ -13,6 +13,7 @@
   "variables": {
     "lockForDeletion": false,
     "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+
     "accountSasProperties": {
       "signedServices": "bt",
       "signedPermission": "racuw",
@@ -26,14 +27,16 @@
     "containerName": "components",
     "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
     "location": "[deployment().location]"
+
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-rg-cpp-shrd-mon-pre-we-01",
+      "name": "DEP-rg-cpp-data-pre-we-02",
       "location": "[variables('location')]",
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "properties": {
         "mode": "Incremental",
         "debugSetting": {
@@ -43,7 +46,7 @@
           "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-shrd-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-data-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
@@ -51,9 +54,9 @@
       "apiVersion": "2019-08-01",
       "name": "[variables('CUA')]",
       "type": "Microsoft.Resources/deployments",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
+      "resourceGroup": "rg-cpp-data-pre-we-02",
       "dependsOn": [
-        "DEP-rg-cpp-shrd-mon-pre-we-01"
+        "DEP-rg-cpp-data-pre-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -67,52 +70,10 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-aut-cpp-shrd-mon-pre-we-01",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
+      "name": "DEP-stcppdataprewe05",
+      "resourceGroup": "rg-cpp-data-pre-we-02",
       "dependsOn": [
-        "DEP-rg-cpp-shrd-mon-pre-we-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/Parameters/aut-cpp-shrd-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-log-cpp-shrd-mon-pre-we-01",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
-      "dependsOn": [
-        "DEP-aut-cpp-shrd-mon-pre-we-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'LogAnalytics/2019-11-28/Parameters/log-cpp-shrd-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-stcppshrddiagprewe01",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
-      "dependsOn": [
-        "DEP-rg-cpp-shrd-mon-pre-we-01"
+        "DEP-rg-cpp-data-pre-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -123,17 +84,38 @@
           "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppshrddiagprewe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcppdataprewe05-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-kv-cpp-data-pre-we-02",
+      "resourceGroup": "rg-cpp-data-pre-we-02",
+      "dependsOn": [
+        "DEP-rg-cpp-data-pre-we-02"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpp-data-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "DEP-appi-cpp-shrd-mon-pre-we-01",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
+      "name": "DEP-appi-cpp-data-pre-we-04",
+      "resourceGroup": "rg-cpp-data-pre-we-02",
       "dependsOn": [
-        "DEP-rg-cpp-shrd-mon-pre-we-01"
+        "DEP-rg-cpp-data-pre-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -144,19 +126,17 @@
           "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpp-shrd-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ApplicationInsights/2015-05-01/Parameters/appi-cpp-data-pre-we-04-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "name": "DEP-evhns-cpp-shrd-mon-pre-we-01",
-      "resourceGroup": "rg-cpp-shrd-mon-pre-we-01",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-mls-cpp-data-pre-we-01",
+      "resourceGroup": "rg-cpp-data-pre-we-02",
       "dependsOn": [
-        "DEP-rg-cpp-shrd-mon-pre-we-01",
-        "DEP-stcppshrddiagprewe01",
-        "DEP-log-cpp-shrd-mon-pre-we-01"
+        "DEP-rg-cpp-data-pre-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -164,13 +144,14 @@
           "detailLevel": "requestContent,responseContent"
         },
         "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'AzureMachineLearning/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'EventHubNamespaces/2019-11-28/Parameters/evhns-cpp-shrd-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'AzureMachineLearning/2019-04-01/Parameters/mls-cpp-data-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+  }
 }
