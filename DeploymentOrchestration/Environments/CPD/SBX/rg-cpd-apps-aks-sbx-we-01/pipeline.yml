@@ -17,14 +17,6 @@ variables:
     value: d0694def-b27e-4bb7-900d-437fbeb802da
 
 trigger: none
-#trigger:
-#  batch: true
-#  branches:
-#    include:
-#      - master
-#  paths:
-#    include:
-#    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
 
 stages:
   - stage: Validate
@@ -99,7 +91,7 @@ stages:
             displayName: Scan $(resourceGroupName)
             continueOnError: true
             inputs:
-              ConnectedServiceNameARM: '$(serviceConnection)'
-              GenerateMethodParameterSetSelection: 'ResourceGroupName'
-              ResourceGroupName: '$(resourceGroupName)'
-              SubscriptionId: '$(subscriptionId)'
+              ConnectedServiceNameARM: "$(serviceConnection)"
+              GenerateMethodParameterSetSelection: "ResourceGroupName"
+              ResourceGroupName: "$(resourceGroupName)"
+              SubscriptionId: "$(subscriptionId)"
