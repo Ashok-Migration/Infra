@@ -30,13 +30,15 @@
         "description": "The container partition key"
       }
     },
-    "throughput": {
-      "type": "int",
-      "defaultValue": 400,
-      "minValue": 400,
-      "maxValue": 1000000,
+    "options": {
+      "type": "object",
+      "defaultValue": {
+        "throughput": {
+          "value": 400
+        }
+      },
       "metadata": {
-        "description": "The throughput for the container"
+        "description": "The throughput options"
       }
     },
     "includedPaths": {
@@ -44,7 +46,7 @@
       "defaultValue": [
         {
           "path": "/*"
-        }       
+        }
       ]
     },
     "uniqueKeys": {
@@ -65,7 +67,7 @@
     {
       "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
       "name": "[concat(variables('accountName'), '/', parameters('databaseName'), '/', parameters('containerName'))]",
-      "apiVersion": "2020-04-01",
+      "apiVersion": "2021-01-15",
       "properties": {
         "resource": {
           "id": "[parameters('containerName')]",
@@ -85,9 +87,7 @@
             "uniqueKeys": "[parameters('uniqueKeys')]"
           }
         },
-        "options": {
-          "throughput": "[parameters('throughput')]"
-        }
+        "options": "[parameters('options')]"
       }
     }
   ],
