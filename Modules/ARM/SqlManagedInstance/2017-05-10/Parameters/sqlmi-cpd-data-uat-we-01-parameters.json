@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "administratorLogin": {
+      "value": "adminsa"
+    },
+    "administratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-sec-uat-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-data-uat-we-01"
+        },
+        "secretName": "sqlmiadmin"
+      }
+    },
+    "managedInstanceName": {
+      "value": "sqlmi-cpd-data-uat-we-01"
+    },
+    "skuName": {
+      "value": "GP_Gen5"
+    },
+    "skuEdition": {
+      "value": "GeneralPurpose"
+    },
+    "storageSizeInGB": {
+      "value": 1024
+    },
+    "vCores": {
+      "value": 32
+    },
+    "hardwareFamily": {
+      "value": "Gen5"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "rg-cpd-pltf-net-uat-we-01"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cpd-pltf-uat-we-01"
+    },
+    "subnetName": {
+      "value": "snet-cpd-pltf-sqlmi-uat-we-01"
+    },
+    "createNSG": {
+      "value": false
+    },
+    "createRT": {
+      "value": false
+    },
+    "removedNSG": {
+      "value": false
+    },
+    "nsgForPublicEndpoint": {
+      "value": "allowFromAzureCloudTo3342NSGUAT"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development"
+      }
+    }
+  }
+}

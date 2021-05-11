@@ -70,7 +70,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-snp-cpd-data-we-04",
+      "name": "DEP-sqlmi-cpd-data-we-03",
       "resourceGroup": "rg-cpd-data-uat-we-03",
       "dependsOn": [
         "DEP-rg-cpd-data-uat-we-03"
@@ -81,15 +81,40 @@
           "detailLevel": "requestContent,responseContent"
         },
         "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'AzureSynapseAnalytics/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'SQLManagedInstance/2017-05-10/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'AzureSynapseAnalytics/2019-04-01/Parameters/snp-cpd-data-uat-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'SQLManagedInstance/2017-05-10/Parameters/sqlmi-cpd-data-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vm-cpd-data-we-03",
+      "resourceGroup": "rg-cpd-data-uat-we-03",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-03"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualMachineSQL/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualMachineSQL/2020-01-23/Parameters/vmsqldatauatwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }
-    
+
   ],
   "outputs": {
   }
 }
+
+
+
+
