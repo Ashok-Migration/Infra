@@ -9,10 +9,14 @@
             }
         },
         "administratorLoginPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Required. Administrator account login password."
-            }
+          "type": "securestring",
+          "metadata": {
+            "description": "Required. Administrator account login password."
+          }
+        },
+        "subscriptionId": {
+          "type": "string",
+          "defaultValue": "d0694def-b27e-4bb7-900d-437fbeb802da"
         },
         "location": {
             "type": "string",
@@ -3122,19 +3126,19 @@
                 "tier": "[parameters('skuEdition')]"
             },
             "tags": "[parameters('tags')]",
-            "properties": {
-                "administratorLogin": "[parameters('administratorLogin')]",
-                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-                "subnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')),'/subnets/', parameters('subnetName'))]",
-                "storageSizeInGB": "[parameters('storageSizeInGB')]",
-                "vCores": "[parameters('vCores')]",
-                "licenseType": "[parameters('licenseType')]",
-                "hardwareFamily": "[parameters('hardwareFamily')]",
-                "collation": "[parameters('collation')]",
-                "proxyOverride": "[parameters('proxyOverride')]",
-                "publicDataEndpointEnabled": "[parameters('publicDataEndpointEnabled')]",
-                "timezoneId": "[parameters('timezoneId')]"
-            },
+          "properties": {
+            "administratorLogin": "[parameters('administratorLogin')]",
+            "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+            "subnetId": "[concat(resourceId(parameters('subscriptionId'), parameters('virtualNetworkResourceGroupName'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')),'/subnets/', parameters('subnetName'))]",
+            "storageSizeInGB": "[parameters('storageSizeInGB')]",
+            "vCores": "[parameters('vCores')]",
+            "licenseType": "[parameters('licenseType')]",
+            "hardwareFamily": "[parameters('hardwareFamily')]",
+            "collation": "[parameters('collation')]",
+            "proxyOverride": "[parameters('proxyOverride')]",
+            "publicDataEndpointEnabled": "[parameters('publicDataEndpointEnabled')]",
+            "timezoneId": "[parameters('timezoneId')]"
+          },
             "dependsOn": [
                 "updateSubnetTemplate"
             ]
@@ -3148,13 +3152,13 @@
                 "description": "The name of the managed instance created."
             }
         },
-        "subnetId": {
-            "type": "string",
-            "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')),'/subnets/', parameters('subnetName'))]",
-            "metadata": {
-                "description": "The subnet where the managed instance created."
-            }
+      "subnetId": {
+        "type": "string",
+        "value": "[concat(resourceId(parameters('subscriptionId'), parameters('virtualNetworkResourceGroupName'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')),'/subnets/', parameters('subnetName'))]",
+        "metadata": {
+          "description": "The subnet where the managed instance created."
         }
+      }
     },
     "functions": []
 }

@@ -33,7 +33,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-rg-cpd-data-dev-we-02",
+      "name": "DEP-rg-cpd-data-dev-we-03",
       "location": "[variables('location')]",
       "dependsOn": [
       ],
@@ -46,7 +46,7 @@
           "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-data-dev-we-04-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpd-data-dev-we-03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
@@ -54,9 +54,9 @@
       "apiVersion": "2019-08-01",
       "name": "[variables('CUA')]",
       "type": "Microsoft.Resources/deployments",
-      "resourceGroup": "rg-cpd-data-dev-we-02",
+      "resourceGroup": "rg-cpd-data-dev-we-03",
       "dependsOn": [
-        "DEP-rg-cpd-data-dev-we-02"
+        "DEP-rg-cpd-data-dev-we-03"
       ],
       "properties": {
         "mode": "Incremental",
@@ -70,10 +70,10 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-dlsgoldzonedevwe02",
-      "resourceGroup": "rg-cpd-data-dev-we-02",
+      "name": "DEP-vmsqldatadev01",
+      "resourceGroup": "rg-cpd-data-dev-we-03",
       "dependsOn": [
-        "DEP-rg-cpd-data-dev-we-02"
+        "DEP-rg-cpd-data-dev-we-03"
       ],
       "properties": {
         "mode": "Incremental",
@@ -81,10 +81,31 @@
           "detailLevel": "requestContent,responseContent"
         },
         "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachinesSQL/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), ''VirtualMachinesSQL/2020-01-23/Parameters/vmsqldatadevwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmsqldatadev01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqlmi-cpd-data-dev-we-01", 
+      "resourceGroup": "rg-cpd-data-dev-we-03",
+      "dependsOn": [
+        "DEP-rg-cpd-data-dev-we-03" 
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SqlManagedInstance/2017-05-10/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SqlManagedInstance/2017-05-10/Parameters/sqlmi-cpd-data-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }
