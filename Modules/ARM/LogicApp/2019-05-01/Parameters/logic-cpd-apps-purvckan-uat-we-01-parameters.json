@@ -373,7 +373,34 @@
                                       },
                                       "type": "Http"
                                     },
-                                    "Ckan_package_if_created_for_csv_type": {
+                                    "Execute_JavaScript_Code_remove_special_characters_for_csv_type": {
+                                      "inputs": {
+                                        "code": "let acceptedChars = /^[\\u0621-\\u064A0-9a-zA-Z-_ ]+$/;\r\nlet packageCreateObject = workflowContext.actions.JavaScript_code_result_for_csv_type.outputs;\r\n\r\npackageCreateObject.tags = packageCreateObject.tags.filter(function(column) { \r\n  return (column.name.length >1 && column.name.match(acceptedChars)) ;\r\n});\r\n\r\nreturn packageCreateObject;"
+                                      },
+                                      "runAfter": {
+                                        "JavaScript_code_result_for_csv_type": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "type": "JavaScriptCode"
+                                    },
+                                    "Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type": {
+                                      "inputs": {
+                                        "code": "let jsonObjectRepresentation= workflowContext.actions.Purview_entity_http_call_with_guid_for_csv_type.outputs.body;\r\nlet blobFileName = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobNotes = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobTitle = blobNotes;\r\nlet ownerOrg = workflowContext.actions.Json_parse_on_compose.outputs.body.org;\r\nblobFileName = blobFileName.replace(/[^a-zA-Z0-9]/g,'_').replace(/__/g,'_').toLowerCase();\r\n\r\nlet jsonObject = JSON.parse(JSON.stringify(jsonObjectRepresentation));\r\nlet columnAsTags = jsonObject.entity.relationshipAttributes.columns;\r\ncolumnAsTags = columnAsTags.map(u=>({name:u.displayText}));\r\ncolumnAsTags.shift();\r\n\r\nlet ckanObject={\r\n    owner_org:ownerOrg.toLowerCase(),\r\n    notes:blobNotes,\r\n    name:blobFileName,\r\n    title:blobTitle,\r\n    tags:columnAsTags,\r\n    private:true\r\n};\r\n\r\nreturn ckanObject;"
+                                      },
+                                      "runAfter": {},
+                                      "type": "JavaScriptCode"
+                                    },
+                                    "JavaScript_code_result_for_csv_type": {
+                                      "inputs": "@outputs('Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type')?['body']",
+                                      "runAfter": {
+                                        "Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "type": "Compose"
+                                    },
+                                    "Package_update_check_for_csv_type": {
                                       "actions": {
                                         "Ckan_package_create_response_json_parse_for_csv_type": {
                                           "inputs": {
@@ -552,6 +579,203 @@
                                           "type": "Http"
                                         }
                                       },
+                                      "else": {
+                                        "actions": {
+                                          "Ckan_package_update_http_for_csv_type": {
+                                            "inputs": {
+                                              "body": "@outputs('Execute_JavaScript_Code_remove_special_characters_for_csv_type')?['body']",
+                                              "headers": {
+                                                "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                                "Content-Type": "application/json"
+                                              },
+                                              "method": "POST",
+                                              "uri": "@{concat(variables('ckanbaseurlwithversion'),'/package_update')}"
+                                            },
+                                            "runAfter": {},
+                                            "type": "Http"
+                                          },
+                                          "Ckan_package_update_response_json_parse_for_csv_type": {
+                                            "inputs": {
+                                              "content": "@body('Ckan_package_update_http_for_csv_type')",
+                                              "schema": {
+                                                "properties": {
+                                                  "help": {
+                                                    "type": "string"
+                                                  },
+                                                  "result": {
+                                                    "properties": {
+                                                      "author": {},
+                                                      "author_email": {},
+                                                      "creator_user_id": {
+                                                        "type": "string"
+                                                      },
+                                                      "extras": {
+                                                        "type": "array"
+                                                      },
+                                                      "groups": {
+                                                        "type": "array"
+                                                      },
+                                                      "id": {
+                                                        "type": "string"
+                                                      },
+                                                      "isopen": {
+                                                        "type": "boolean"
+                                                      },
+                                                      "license_id": {},
+                                                      "license_title": {},
+                                                      "maintainer": {},
+                                                      "maintainer_email": {},
+                                                      "metadata_created": {
+                                                        "type": "string"
+                                                      },
+                                                      "metadata_modified": {
+                                                        "type": "string"
+                                                      },
+                                                      "name": {
+                                                        "type": "string"
+                                                      },
+                                                      "notes": {
+                                                        "type": "string"
+                                                      },
+                                                      "num_resources": {
+                                                        "type": "integer"
+                                                      },
+                                                      "num_tags": {
+                                                        "type": "integer"
+                                                      },
+                                                      "organization": {
+                                                        "properties": {
+                                                          "approval_status": {
+                                                            "type": "string"
+                                                          },
+                                                          "created": {
+                                                            "type": "string"
+                                                          },
+                                                          "description": {
+                                                            "type": "string"
+                                                          },
+                                                          "id": {
+                                                            "type": "string"
+                                                          },
+                                                          "image_url": {
+                                                            "type": "string"
+                                                          },
+                                                          "is_organization": {
+                                                            "type": "boolean"
+                                                          },
+                                                          "name": {
+                                                            "type": "string"
+                                                          },
+                                                          "revision_id": {
+                                                            "type": "string"
+                                                          },
+                                                          "state": {
+                                                            "type": "string"
+                                                          },
+                                                          "title": {
+                                                            "type": "string"
+                                                          },
+                                                          "type": {
+                                                            "type": "string"
+                                                          }
+                                                        },
+                                                        "type": "object"
+                                                      },
+                                                      "owner_org": {
+                                                        "type": "string"
+                                                      },
+                                                      "private": {
+                                                        "type": "boolean"
+                                                      },
+                                                      "relationships_as_object": {
+                                                        "type": "array"
+                                                      },
+                                                      "relationships_as_subject": {
+                                                        "type": "array"
+                                                      },
+                                                      "resources": {
+                                                        "type": "array"
+                                                      },
+                                                      "revision_id": {
+                                                        "type": "string"
+                                                      },
+                                                      "state": {
+                                                        "type": "string"
+                                                      },
+                                                      "tags": {
+                                                        "items": {
+                                                          "properties": {
+                                                            "display_name": {
+                                                              "type": "string"
+                                                            },
+                                                            "id": {
+                                                              "type": "string"
+                                                            },
+                                                            "name": {
+                                                              "type": "string"
+                                                            },
+                                                            "state": {
+                                                              "type": "string"
+                                                            },
+                                                            "vocabulary_id": {}
+                                                          },
+                                                          "required": [
+                                                            "vocabulary_id",
+                                                            "state",
+                                                            "display_name",
+                                                            "id",
+                                                            "name"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        "type": "array"
+                                                      },
+                                                      "title": {
+                                                        "type": "string"
+                                                      },
+                                                      "type": {
+                                                        "type": "string"
+                                                      },
+                                                      "url": {},
+                                                      "version": {}
+                                                    },
+                                                    "type": "object"
+                                                  },
+                                                  "success": {
+                                                    "type": "boolean"
+                                                  }
+                                                },
+                                                "type": "object"
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Ckan_package_update_http_for_csv_type": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "ParseJson"
+                                          },
+                                          "Ckan_resource_override_http_for_csv_type": {
+                                            "inputs": {
+                                              "headers": {
+                                                "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                                "Content-Type": "application/json",
+                                                "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                                "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                                "x-ckan-packageId": "@body('Ckan_package_update_response_json_parse_for_csv_type')?['result']?['id']"
+                                              },
+                                              "method": "POST",
+                                              "uri": "@body('ckan-resource-creation-function-url')?['value']"
+                                            },
+                                            "runAfter": {
+                                              "Ckan_package_update_response_json_parse_for_csv_type": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "Http"
+                                          }
+                                        }
+                                      },
                                       "expression": {
                                         "and": [
                                           {
@@ -564,37 +788,11 @@
                                       },
                                       "runAfter": {
                                         "Ckan_package_create_http_for_csv_type": [
-                                          "Succeeded"
+                                          "Succeeded",
+                                          "Failed"
                                         ]
                                       },
                                       "type": "If"
-                                    },
-                                    "Execute_JavaScript_Code_remove_special_characters_for_csv_type": {
-                                      "inputs": {
-                                        "code": "let acceptedChars = /^[\\u0621-\\u064A0-9a-zA-Z-_ ]+$/;\r\nlet packageCreateObject = workflowContext.actions.JavaScript_code_result_for_csv_type.outputs;\r\n\r\npackageCreateObject.tags = packageCreateObject.tags.filter(function(column) { \r\n  return (column.name.length >1 && column.name.match(acceptedChars)) ;\r\n});\r\n\r\nreturn packageCreateObject;"
-                                      },
-                                      "runAfter": {
-                                        "JavaScript_code_result_for_csv_type": [
-                                          "Succeeded"
-                                        ]
-                                      },
-                                      "type": "JavaScriptCode"
-                                    },
-                                    "Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type": {
-                                      "inputs": {
-                                        "code": "let jsonObjectRepresentation= workflowContext.actions.Purview_entity_http_call_with_guid_for_csv_type.outputs.body;\r\nlet blobFileName = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobNotes = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobTitle = blobNotes;\r\nlet ownerOrg = workflowContext.actions.Json_parse_on_compose.outputs.body.org;\r\nblobFileName = blobFileName.replace(/[^a-zA-Z0-9]/g,'_').replace(/__/g,'_').toLowerCase();\r\n\r\nlet jsonObject = JSON.parse(JSON.stringify(jsonObjectRepresentation));\r\nlet columnAsTags = jsonObject.entity.relationshipAttributes.columns;\r\ncolumnAsTags = columnAsTags.map(u=>({name:u.displayText}));\r\ncolumnAsTags.shift();\r\n\r\nlet ckanObject={\r\n    owner_org:ownerOrg.toLowerCase(),\r\n    notes:blobNotes,\r\n    name:blobFileName,\r\n    title:blobTitle,\r\n    tags:columnAsTags,\r\n    private:true\r\n};\r\n\r\nreturn ckanObject;"
-                                      },
-                                      "runAfter": {},
-                                      "type": "JavaScriptCode"
-                                    },
-                                    "JavaScript_code_result_for_csv_type": {
-                                      "inputs": "@outputs('Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type')?['body']",
-                                      "runAfter": {
-                                        "Execute_JavaScript_code_to_form_object_for_package_create__for_csv_type": [
-                                          "Succeeded"
-                                        ]
-                                      },
-                                      "type": "Compose"
                                     }
                                   },
                                   "expression": {
@@ -825,7 +1023,7 @@
                                       },
                                       "type": "Http"
                                     },
-                                    "Ckan_package_if_created_for_json_type": {
+                                    "Condition": {
                                       "actions": {
                                         "Ckan_package_create_response_json_parse_for_json_type": {
                                           "inputs": {
@@ -1004,6 +1202,203 @@
                                           "type": "Http"
                                         }
                                       },
+                                      "else": {
+                                        "actions": {
+                                          "Ckan_package_update_http_for_json_type": {
+                                            "inputs": {
+                                              "body": "@outputs('Execute_JavaScript_Code_remove_special_characters_for_json_type')?['body']",
+                                              "headers": {
+                                                "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                                "Content-Type": "application/json"
+                                              },
+                                              "method": "POST",
+                                              "uri": "@{concat(variables('ckanbaseurlwithversion'),'/package_update')}"
+                                            },
+                                            "runAfter": {},
+                                            "type": "Http"
+                                          },
+                                          "Ckan_package_update_response_json_parse_for_json_type": {
+                                            "inputs": {
+                                              "content": "@body('Ckan_package_update_http_for_json_type')",
+                                              "schema": {
+                                                "properties": {
+                                                  "help": {
+                                                    "type": "string"
+                                                  },
+                                                  "result": {
+                                                    "properties": {
+                                                      "author": {},
+                                                      "author_email": {},
+                                                      "creator_user_id": {
+                                                        "type": "string"
+                                                      },
+                                                      "extras": {
+                                                        "type": "array"
+                                                      },
+                                                      "groups": {
+                                                        "type": "array"
+                                                      },
+                                                      "id": {
+                                                        "type": "string"
+                                                      },
+                                                      "isopen": {
+                                                        "type": "boolean"
+                                                      },
+                                                      "license_id": {},
+                                                      "license_title": {},
+                                                      "maintainer": {},
+                                                      "maintainer_email": {},
+                                                      "metadata_created": {
+                                                        "type": "string"
+                                                      },
+                                                      "metadata_modified": {
+                                                        "type": "string"
+                                                      },
+                                                      "name": {
+                                                        "type": "string"
+                                                      },
+                                                      "notes": {
+                                                        "type": "string"
+                                                      },
+                                                      "num_resources": {
+                                                        "type": "integer"
+                                                      },
+                                                      "num_tags": {
+                                                        "type": "integer"
+                                                      },
+                                                      "organization": {
+                                                        "properties": {
+                                                          "approval_status": {
+                                                            "type": "string"
+                                                          },
+                                                          "created": {
+                                                            "type": "string"
+                                                          },
+                                                          "description": {
+                                                            "type": "string"
+                                                          },
+                                                          "id": {
+                                                            "type": "string"
+                                                          },
+                                                          "image_url": {
+                                                            "type": "string"
+                                                          },
+                                                          "is_organization": {
+                                                            "type": "boolean"
+                                                          },
+                                                          "name": {
+                                                            "type": "string"
+                                                          },
+                                                          "revision_id": {
+                                                            "type": "string"
+                                                          },
+                                                          "state": {
+                                                            "type": "string"
+                                                          },
+                                                          "title": {
+                                                            "type": "string"
+                                                          },
+                                                          "type": {
+                                                            "type": "string"
+                                                          }
+                                                        },
+                                                        "type": "object"
+                                                      },
+                                                      "owner_org": {
+                                                        "type": "string"
+                                                      },
+                                                      "private": {
+                                                        "type": "boolean"
+                                                      },
+                                                      "relationships_as_object": {
+                                                        "type": "array"
+                                                      },
+                                                      "relationships_as_subject": {
+                                                        "type": "array"
+                                                      },
+                                                      "resources": {
+                                                        "type": "array"
+                                                      },
+                                                      "revision_id": {
+                                                        "type": "string"
+                                                      },
+                                                      "state": {
+                                                        "type": "string"
+                                                      },
+                                                      "tags": {
+                                                        "items": {
+                                                          "properties": {
+                                                            "display_name": {
+                                                              "type": "string"
+                                                            },
+                                                            "id": {
+                                                              "type": "string"
+                                                            },
+                                                            "name": {
+                                                              "type": "string"
+                                                            },
+                                                            "state": {
+                                                              "type": "string"
+                                                            },
+                                                            "vocabulary_id": {}
+                                                          },
+                                                          "required": [
+                                                            "vocabulary_id",
+                                                            "state",
+                                                            "display_name",
+                                                            "id",
+                                                            "name"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        "type": "array"
+                                                      },
+                                                      "title": {
+                                                        "type": "string"
+                                                      },
+                                                      "type": {
+                                                        "type": "string"
+                                                      },
+                                                      "url": {},
+                                                      "version": {}
+                                                    },
+                                                    "type": "object"
+                                                  },
+                                                  "success": {
+                                                    "type": "boolean"
+                                                  }
+                                                },
+                                                "type": "object"
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Ckan_package_update_http_for_json_type": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "ParseJson"
+                                          },
+                                          "Ckan_resource_override_http_for_json_type": {
+                                            "inputs": {
+                                              "headers": {
+                                                "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                                "Content-Type": "application/json",
+                                                "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                                "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                                "x-ckan-packageId": "@body('Ckan_package_update_response_json_parse_for_json_type')?['result']?['id']"
+                                              },
+                                              "method": "POST",
+                                              "uri": "@body('ckan-resource-creation-function-url')?['value']"
+                                            },
+                                            "runAfter": {
+                                              "Ckan_package_update_response_json_parse_for_json_type": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "Http"
+                                          }
+                                        }
+                                      },
                                       "expression": {
                                         "and": [
                                           {
@@ -1016,7 +1411,8 @@
                                       },
                                       "runAfter": {
                                         "Ckan_package_create_http_for_json_type": [
-                                          "Succeeded"
+                                          "Succeeded",
+                                          "Failed"
                                         ]
                                       },
                                       "type": "If"
@@ -1272,7 +1668,18 @@
                             },
                             "type": "Http"
                           },
-                          "Ckan_package_if_created_for_other_type": {
+                          "Execute_JavaScript_code_to_form_object_for_package_create_for_other_type": {
+                            "inputs": {
+                              "code": "let blobFileName = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobNotes = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobTitle = blobNotes;\r\nlet ownerOrg = workflowContext.actions.Json_parse_on_compose.outputs.body.org;\r\nblobFileName = blobFileName.replace(/[^a-zA-Z0-9]/g,'_').replace(/__/g,'_').toLowerCase();\r\n\r\nlet ckanObject={\r\n    owner_org:ownerOrg.toLowerCase(),\r\n    notes:blobNotes,\r\n    name:blobFileName,\r\n    title:blobTitle,\r\n    private:true\r\n};\r\n\r\nreturn ckanObject;"
+                            },
+                            "runAfter": {
+                              "Purview_unique_attribute_parse_result_json_for_other_type": [
+                                "Succeeded"
+                              ]
+                            },
+                            "type": "JavaScriptCode"
+                          },
+                          "Package_update_check_for_other_type": {
                             "actions": {
                               "Ckan_package_create_response_json_parse_for_other_type": {
                                 "inputs": {
@@ -1431,7 +1838,7 @@
                                 "runAfter": {},
                                 "type": "ParseJson"
                               },
-                              "HTTP": {
+                              "Ckan_resource_create_http_for_other_type": {
                                 "inputs": {
                                   "headers": {
                                     "Authorization": "@body('get-ckan-authorization-token')?['value']",
@@ -1451,6 +1858,203 @@
                                 "type": "Http"
                               }
                             },
+                            "else": {
+                              "actions": {
+                                "Ckan_package_update_http_for_other_type": {
+                                  "inputs": {
+                                    "body": "@outputs('Execute_JavaScript_code_to_form_object_for_package_create_for_other_type')?['body']",
+                                    "headers": {
+                                      "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                      "Content-Type": "application/json"
+                                    },
+                                    "method": "POST",
+                                    "uri": "@{concat(variables('ckanbaseurlwithversion'),'/package_update')}"
+                                  },
+                                  "runAfter": {},
+                                  "type": "Http"
+                                },
+                                "Ckan_package_update_response_json_parse_for_other_type": {
+                                  "inputs": {
+                                    "content": "@body('Ckan_package_update_http_for_other_type')",
+                                    "schema": {
+                                      "properties": {
+                                        "help": {
+                                          "type": "string"
+                                        },
+                                        "result": {
+                                          "properties": {
+                                            "author": {},
+                                            "author_email": {},
+                                            "creator_user_id": {
+                                              "type": "string"
+                                            },
+                                            "extras": {
+                                              "type": "array"
+                                            },
+                                            "groups": {
+                                              "type": "array"
+                                            },
+                                            "id": {
+                                              "type": "string"
+                                            },
+                                            "isopen": {
+                                              "type": "boolean"
+                                            },
+                                            "license_id": {},
+                                            "license_title": {},
+                                            "maintainer": {},
+                                            "maintainer_email": {},
+                                            "metadata_created": {
+                                              "type": "string"
+                                            },
+                                            "metadata_modified": {
+                                              "type": "string"
+                                            },
+                                            "name": {
+                                              "type": "string"
+                                            },
+                                            "notes": {
+                                              "type": "string"
+                                            },
+                                            "num_resources": {
+                                              "type": "integer"
+                                            },
+                                            "num_tags": {
+                                              "type": "integer"
+                                            },
+                                            "organization": {
+                                              "properties": {
+                                                "approval_status": {
+                                                  "type": "string"
+                                                },
+                                                "created": {
+                                                  "type": "string"
+                                                },
+                                                "description": {
+                                                  "type": "string"
+                                                },
+                                                "id": {
+                                                  "type": "string"
+                                                },
+                                                "image_url": {
+                                                  "type": "string"
+                                                },
+                                                "is_organization": {
+                                                  "type": "boolean"
+                                                },
+                                                "name": {
+                                                  "type": "string"
+                                                },
+                                                "revision_id": {
+                                                  "type": "string"
+                                                },
+                                                "state": {
+                                                  "type": "string"
+                                                },
+                                                "title": {
+                                                  "type": "string"
+                                                },
+                                                "type": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "type": "object"
+                                            },
+                                            "owner_org": {
+                                              "type": "string"
+                                            },
+                                            "private": {
+                                              "type": "boolean"
+                                            },
+                                            "relationships_as_object": {
+                                              "type": "array"
+                                            },
+                                            "relationships_as_subject": {
+                                              "type": "array"
+                                            },
+                                            "resources": {
+                                              "type": "array"
+                                            },
+                                            "revision_id": {
+                                              "type": "string"
+                                            },
+                                            "state": {
+                                              "type": "string"
+                                            },
+                                            "tags": {
+                                              "items": {
+                                                "properties": {
+                                                  "display_name": {
+                                                    "type": "string"
+                                                  },
+                                                  "id": {
+                                                    "type": "string"
+                                                  },
+                                                  "name": {
+                                                    "type": "string"
+                                                  },
+                                                  "state": {
+                                                    "type": "string"
+                                                  },
+                                                  "vocabulary_id": {}
+                                                },
+                                                "required": [
+                                                  "vocabulary_id",
+                                                  "state",
+                                                  "display_name",
+                                                  "id",
+                                                  "name"
+                                                ],
+                                                "type": "object"
+                                              },
+                                              "type": "array"
+                                            },
+                                            "title": {
+                                              "type": "string"
+                                            },
+                                            "type": {
+                                              "type": "string"
+                                            },
+                                            "url": {},
+                                            "version": {}
+                                          },
+                                          "type": "object"
+                                        },
+                                        "success": {
+                                          "type": "boolean"
+                                        }
+                                      },
+                                      "type": "object"
+                                    }
+                                  },
+                                  "runAfter": {
+                                    "Ckan_package_update_http_for_other_type": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "type": "ParseJson"
+                                },
+                                "Ckan_resource_override_http_for_other_type": {
+                                  "inputs": {
+                                    "headers": {
+                                      "Authorization": "@body('get-ckan-authorization-token')?['value']",
+                                      "Content-Type": "application/json",
+                                      "x-blob-filename": "@body('Json_parse_on_compose')?['filename']",
+                                      "x-blob-filepath": "@body('Json_parse_on_compose')?['blobfullpath']",
+                                      "x-ckan-packageId": "@body('Ckan_package_update_response_json_parse_for_other_type')?['result']?['id']"
+                                    },
+                                    "method": "POST",
+                                    "uri": "@body('ckan-resource-creation-function-url')?['value']"
+                                  },
+                                  "runAfter": {
+                                    "Ckan_package_update_response_json_parse_for_other_type": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "type": "Http"
+                                }
+                              }
+                            },
                             "expression": {
                               "and": [
                                 {
@@ -1463,21 +2067,11 @@
                             },
                             "runAfter": {
                               "Ckan_package_create_http_for_other_type": [
-                                "Succeeded"
+                                "Succeeded",
+                                "Failed"
                               ]
                             },
                             "type": "If"
-                          },
-                          "Execute_JavaScript_code_to_form_object_for_package_create_for_other_type": {
-                            "inputs": {
-                              "code": "let blobFileName = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobNotes = workflowContext.actions.Json_parse_on_compose.outputs.body.filename;\r\nlet blobTitle = blobNotes;\r\nlet ownerOrg = workflowContext.actions.Json_parse_on_compose.outputs.body.org;\r\nblobFileName = blobFileName.replace(/[^a-zA-Z0-9]/g,'_').replace(/__/g,'_').toLowerCase();\r\n\r\nlet ckanObject={\r\n    owner_org:ownerOrg.toLowerCase(),\r\n    notes:blobNotes,\r\n    name:blobFileName,\r\n    title:blobTitle,\r\n    private:true\r\n};\r\n\r\nreturn ckanObject;"
-                            },
-                            "runAfter": {
-                              "Purview_unique_attribute_parse_result_json_for_other_type": [
-                                "Succeeded"
-                              ]
-                            },
-                            "type": "JavaScriptCode"
                           },
                           "Purview_unique_attribute_parse_result_json_for_other_type": {
                             "inputs": {
