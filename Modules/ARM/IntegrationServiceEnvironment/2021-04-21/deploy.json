@@ -28,6 +28,34 @@
         "description": "Required."
       }
     },
+    "iseDelegatedSubnetName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required"
+      }
+    },
+    "iseDelegatedSubnetId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required"
+      }
+    },
+    "iseDelegatedSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required"
+      }
+    },
+    "subnetResourceGroup": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Subnet's Resource Group"
+      }
+    },
     "subnetResourceIds": {
       "type": "array",
       "metadata": {
@@ -48,8 +76,48 @@
       }
     }
   },
-  "variables": {},
+  "variables": {
+    "integrationServiceEnvironmentDelegatedSubnet": {
+      "name": "[concat('vnet/', parameters('iseDelegatedSubnetName'))]",
+      "id": "[parameters('iseDelegatedSubnetId')]",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "addressPrefix": "[parameters('iseDelegatedSubnetAddressPrefix')]",
+        "serviceEndpoints": [],
+        "delegations": [
+          {
+            "name": "integrationServiceEnvironments",
+            "properties": {
+              "serviceName": "Microsoft.Logic/integrationServiceEnvironments",
+              "actions": []
+            }
+          }
+        ]
+      },
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2018-08-01"
+    }
+  },
   "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "updateVirtualNetworkSubnetWithDelegation",
+      "properties": {
+        "mode": "Incremental",
+        "parameters": {},
+        "template": {
+          "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            "[variables('integrationServiceEnvironmentDelegatedSubnet')]"
+          ]
+        }
+      },
+      "resourceGroup": "[parameters('subnetResourceGroup')]"
+    },
     {
       "type": "Microsoft.Logic/integrationServiceEnvironments",
       "apiVersion": "2018-07-01-preview",
