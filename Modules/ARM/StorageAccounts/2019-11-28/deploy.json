@@ -97,6 +97,10 @@
             "type": "array",
             "defaultValue":[]
         },
+        "allowBlobPublicAccess": {
+            "type": "bool",
+            "defaultValue": true
+        },
         "tags": {
             "type": "object",
             "defaultValue": {},
@@ -153,7 +157,8 @@
                 },
                 "accessTier": "[parameters('storageAccountAccessTier')]",
                 "supportsHttpsTrafficOnly": true,
-                "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]"
+                "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]",
+                "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"
             },
             "resources": [
                 {
