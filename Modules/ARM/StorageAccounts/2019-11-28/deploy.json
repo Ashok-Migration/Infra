@@ -97,6 +97,10 @@
             "type": "array",
             "defaultValue":[]
         },
+        "minimumTlsVersion": {
+            "type": "string",
+            "defaultValue": "TLS1_0"
+        },
         "allowBlobPublicAccess": {
             "type": "bool",
             "defaultValue": true
@@ -158,6 +162,7 @@
                 "accessTier": "[parameters('storageAccountAccessTier')]",
                 "supportsHttpsTrafficOnly": true,
                 "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]",
+                "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
                 "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"
             },
             "resources": [
