@@ -124,6 +124,10 @@
       "type": "array",
       "defaultValue": []
     },
+    "enableHttp2": {
+      "type": "bool",
+      "defaultValue": false
+    },
     "firewallMode": {
       "type": "string",
       "defaultValue": "Prevention",
@@ -379,7 +383,7 @@
         "backendHttpSettingsCollection": "[parameters('backendHttpSettingsCollection')]",
         "httpListeners": "[parameters('httpListeners')]",
         "requestRoutingRules": "[if(empty(parameters('requestRoutingRules')), variables('defaultRequestRoutingRules'), parameters('requestRoutingRules'))]",
-        "enableHttp2": false,
+        "enableHttp2": "[parameters('enableHttp2')]",
         "sslCertificates": "[parameters('sslCertificates')]",
         "probes": "[parameters('probes')]",
         "redirectConfigurations": "[parameters('redirectConfigurations')]",
