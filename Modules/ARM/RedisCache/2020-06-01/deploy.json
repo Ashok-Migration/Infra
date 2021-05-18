@@ -24,11 +24,11 @@
       }
     },
     "redisVersion": {
-     "type": "string",
-     "defaultValue": "4",
-     "metadata": {
-       "description": "Redis version"
-     } 
+      "type": "string",
+      "defaultValue": "4",
+      "metadata": {
+        "description": "Redis version"
+      }
     },
     "replicasPerMaster": {
       "type": "int",
@@ -62,6 +62,13 @@
         "description": "Optional. Redis Configuration."
       },
       "type": "object"
+    },
+    "minimumTlsVersion": {
+      "type": "string",
+      "defaultValue": "1.2",
+      "metadata": {
+        "description": "Minimum TLS Version for Redis Instance"
+      }
     },
     "diagnosticLogsRetentionInDays": {
       "type": "int",
@@ -131,6 +138,7 @@
       "tags": "[parameters('tags')]",
       "properties": {
         "enableNonSslPort": "[parameters('enableNonSslPort')]",
+        "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
         "redisVersion": "[parameters('redisVersion')]",
         "redisConfiguration": "[parameters('redisConfiguration')]",
         "replicasPerMaster": "[parameters('replicasPerMaster')]",
