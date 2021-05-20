@@ -592,6 +592,10 @@
                 "description": "Minimum TLS Version for Storage Account"
             }
         },
+        "allowBlobPublicAccess": {
+            "type": "bool",
+            "defaultValue": false
+        },
         "vNetId": {
             "type": "string",
             "defaultValue": "",
@@ -717,6 +721,42 @@
         "solrNicName": "[concat(parameters('solrVirtualMachineName'), '-0nic')]",
         "memcachedNicName": "[concat(parameters('cacheVirtualMachineName'), '-0nic')]",
         "backendAddressPoolId": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), parameters('backendAddressPoolName'))]",
+        "storageDiagnosticsMetrics": [
+            {
+                "category": "Transaction",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "storageDiagnosticsLogs": [
+            {
+                "category": "StorageRead",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageWrite",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageDelete",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
         "diagnosticsMetricsAll": [
             {
                 "category": "AllMetrics",
@@ -797,7 +837,39 @@
             },
             "properties": {
                 "minimumTlsVersion": "[parameters('storageMinimumTlsVersion')]",
+                "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]",
                 "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]"
+            }
+        },
+        {
+            "name": "[concat(parameters('storageAccountName'), '/ckanfiles')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2018-07-01",
+            "properties": {
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 30
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticsettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(parameters('storageAccountName'),'/default/Microsoft.Insights/', 'service')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/', parameters('storageAccountName'), 'default')]"
+            ],
+            "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+            "properties": {
+                "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('storageDiagnosticsMetrics'))]",
+                "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('storageDiagnosticsLogs'))]"
             }
         },
         {
