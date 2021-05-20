@@ -644,6 +644,13 @@
             "metadata": {
                 "description": "VM Diagnostics Sample Rate in Seconds"
             }
+        },
+        "vmImageReferenceVersion": {
+            "type": "string",
+            "defaultValue": "2.9.2104080024",
+            "metadata": {
+                "description": "VM Reference Image Version. Pass Latest value as Default Value and Deployed VM Image version in parameter file."
+            }
         }
     },
     "variables": {
@@ -1244,7 +1251,7 @@
                         "publisher": "bitnami",
                         "offer": "ckan-ckan-topology-multitier-image",
                         "sku": "default",
-                        "version": "2.9.2104080024"
+                        "version": "[parameters('vmImageReferenceVersion')]"
                     },
                     "osDisk": {
                         "name": "[concat(parameters('frontendVirtualMachineNames')[copyIndex('vmcopy')], '-disk-os-01')]",
@@ -1367,7 +1374,7 @@
                         "publisher": "bitnami",
                         "offer": "ckan-ckan-topology-multitier-image",
                         "sku": "default",
-                        "version": "2.9.2104080024"
+                        "version": "[parameters('vmImageReferenceVersion')]"
                     },
                     "osDisk": {
                         "name": "[concat(parameters('solrVirtualMachineName'),'-disk-os-01')]",
@@ -1494,7 +1501,7 @@
                         "publisher": "bitnami",
                         "offer": "ckan-ckan-topology-multitier-image",
                         "sku": "default",
-                        "version": "2.9.2104080024"
+                        "version": "[parameters('vmImageReferenceVersion')]"
                     },
                     "osDisk": {
                         "name": "[concat(parameters('cacheVirtualMachineName'), '-disk-os-01')]",
