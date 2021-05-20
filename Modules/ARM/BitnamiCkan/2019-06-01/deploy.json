@@ -849,7 +849,7 @@
             }
         },
         {
-            "name": "[concat(parameters('storageAccountName'), '/ckanfiles')]",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2018-07-01",
             "properties": {
@@ -867,7 +867,7 @@
             "apiVersion": "2017-05-01-preview",
             "name": "[concat(parameters('storageAccountName'),'/default/Microsoft.Insights/', 'service')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/', parameters('storageAccountName'), 'ckanfiles')]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/', parameters('storageAccountName'), 'default')]"
             ],
             "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
             "properties": {
