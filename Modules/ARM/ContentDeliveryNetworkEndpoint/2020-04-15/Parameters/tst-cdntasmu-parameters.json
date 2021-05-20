@@ -30,7 +30,27 @@
                             "httpsPort": 443
                         }
                     }
-                ]
+                ],
+                "deliveryPolicy": {
+                    "rules": [
+                      {
+                        "order": 0,
+                        "conditions": [],
+                        "actions": [
+                          {
+                            "name": "CacheExpiration",
+                            "parameters": {
+                              "cacheBehavior": "Override",
+                              "cacheType": "All",
+                              "cacheDuration": "7.00:00:00",
+                              "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleCacheExpirationActionParameters"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "queryStringCachingBehavior": "IgnoreQueryString"
             }
         },
         "location": {
