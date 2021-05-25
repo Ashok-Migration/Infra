@@ -162,9 +162,26 @@
             ]
           }
         },
-        "Response": {
+        "Initialize_Log_Name_for_Log_Analytics": {
           "runAfter": {
             "Create_blob": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "LogName",
+                "type": "string",
+                "value": "@{concat(toLower(variables('InsertedMessage').topic),'-',utcNow(),'.json')}"
+              }
+            ]
+          }
+        },
+        "Response": {
+          "runAfter": {
+            "Create_Log": [
               "Succeeded"
             ]
           },
@@ -174,6 +191,27 @@
             "body": "Message has been inserted in to the @{variables('Route')} queue",
             "statusCode": 200
           }
+        },
+        "Create_Log": {
+            "runAfter": {
+                "Initialize_Log_Name_for_Log_Analytics": [
+                    "Succeeded"
+                ]
+            },
+            "type": "ApiConnection",
+            "inputs": {
+                "body": "@{binary(variables('InsertedMessage'))}",
+                "headers": {
+                    "Log-Type": "@variables('LogName')"
+                },
+                "host": {
+                    "connection": {
+                        "name": "@parameters('$connections')['azureloganalyticsdatacollector']['connectionId']"
+                    }
+                },
+                "method": "post",
+                "path": "/api/logs"
+            }
         },
         "Send_Message_To_Queue": {
           "runAfter": {
@@ -261,6 +299,11 @@
               "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intst-dev-we-01",
               "connectionName": "apicon-cpd-apps-intst-dev-we-01",
               "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+            },
+            "apicon-cpd-apps-log-dev-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-log-dev-we-01",
+              "connectionName": "apicon-cpd-apps-log-dev-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/loganalytics"
             }
           }
         }
