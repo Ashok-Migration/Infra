@@ -39,7 +39,7 @@
   "resources": [
     {
       "type": "Microsoft.Web/connections",
-      "apiVersion": "2016-06-01",
+      "apiVersion": "2018-07-01-preview",
       "name": "[parameters('connectionName')]",
       "location": "[parameters('location')]",
       "tags": "[parameters('tags')]",
@@ -47,8 +47,8 @@
         "displayName": "[parameters('displayName')]",
         "customParameterValues": {},
         "parameterValues": {
-          "workspaceId": "[variables('authRuleResourceId')]",
-          "workspaceKey": "[listKeys(variables('authRuleResourceId'), parameters('logAnalyticsAPIVersion')).primarySharedKey]"
+          "username": "[reference(variables('authRuleResourceId'), parameters('logAnalyticsAPIVersion')).customerId]",
+          "password": "[listKeys(variables('authRuleResourceId'), parameters('logAnalyticsAPIVersion')).primarySharedKey]"
         },
         "api": {
           "id": "[parameters('apiId')]"
