@@ -28,6 +28,13 @@
         "description": "Required."
       }
     },
+    "iseDelegatedVnetName": {
+      "type": "string",
+      "defaultValue": "vnet",
+      "metadata": {
+        "description": "Required."
+      }
+    },
     "iseDelegatedSubnetName": {
       "type": "string",
       "defaultValue": "subnet",
@@ -68,6 +75,18 @@
         "description": "Required."
       }
     },
+    "networkSecurityGroupId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "routeTableId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "serviceEndpoints": {
+      "type": "array",
+      "defaultValue": []
+    },
     "tags": {
       "type": "object",
       "defaultValue": {},
@@ -78,12 +97,18 @@
   },
   "variables": {
     "integrationServiceEnvironmentDelegatedSubnet": {
-      "name": "[concat('vnet/', parameters('iseDelegatedSubnetName'))]",
+      "name": "[concat(parameters('iseDelegatedVnetName'), '/', parameters('iseDelegatedSubnetName'))]",
       "id": "[parameters('iseDelegatedSubnetId')]",
       "properties": {
         "provisioningState": "Succeeded",
         "addressPrefix": "[parameters('iseDelegatedSubnetAddressPrefix')]",
-        "serviceEndpoints": [],
+        "serviceEndpoints": "[parameters('serviceEndpoints')]",
+        "networkSecurityGroup": {
+          "id": "[parameters('networkSecurityGroupId')]"
+        },
+        "routeTable": {
+          "id": "[parameters('routeTableId')]"
+        },
         "delegations": [
           {
             "name": "integrationServiceEnvironments",

@@ -7,6 +7,335 @@
     },
     "networkSecurityGroupSecurityRules": {
       "value": [
+        {
+          "name": "IntersubnetCommunication",
+          "properties": {
+            "description": "Intersubnet communication within virtual network",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "172.20.54.0/25",
+            "destinationAddressPrefix": "172.20.54.0/25",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "LogicAppCommunication",
+          "properties": {
+            "description": "Communication to the logic app & Runs history for logic app",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 200,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "LogicAppDesigner",
+          "properties": {
+            "description": "Requests come from the Logic Apps access endpoint's inbound IP addresses for that region",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "454",
+            "sourceAddressPrefix": "LogicAppsManagement",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 300,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "NetworkHealthCheck",
+          "properties": {
+            "description": "Requests come from the Logic Apps access endpoint's inbound IP addresses and outbound IP addresses for that region.",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "454",
+            "sourceAddressPrefix": "LogicApps",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 400,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Inbound-Azure-Connectors",
+          "properties": {
+            "description": "Azure Connectors",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "454",
+            "sourceAddressPrefix": "AzureConnectors",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 500,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Inbound-AppServiceManagement",
+          "properties": {
+            "description": "Azure Connectors",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "",
+            "sourceAddressPrefix": "AppServiceManagement",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 600,
+            "direction": "Inbound",
+            "destinationPortRanges": [
+              "454",
+              "455"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Inbound-APIManagement",
+          "properties": {
+            "description": "Azure Connectors",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "3443",
+            "sourceAddressPrefix": "APIManagement",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 700,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "Inbound-AzureTrafficManager",
+          "properties": {
+            "description": "Azure Connectors",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "454",
+            "sourceAddressPrefix": "AzureTrafficManager",
+            "destinationAddressPrefix": "VirtualNetwork",
+            "access": "Allow",
+            "priority": 800,
+            "direction": "Inbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "IntersubnetCommunicationOutbound",
+          "properties": {
+            "description": "Intersubnet communication within virtual network",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "172.20.54.0/25",
+            "destinationAddressPrefix": "172.20.54.0/25",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "CommunicationFromLogicApp",
+          "properties": {
+            "description": "Destination ports vary based on the endpoints for the external services",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 200,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureActiveDirectory",
+          "properties": {
+            "description": "Azure Active Directory",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "AzureActiveDirectory",
+            "access": "Allow",
+            "priority": 300,
+            "direction": "Outbound",
+            "destinationPortRanges": [
+              "80",
+              "443"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureStorageDependency",
+          "properties": {
+            "description": "Azure Storage dependency",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "Storage",
+            "access": "Allow",
+            "priority": 400,
+            "direction": "Outbound",
+            "destinationPortRanges": [
+              "80",
+              "443"
+            ],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "PublishDiagnostics",
+          "properties": {
+            "description": "Publish diagnostic logs & metrics",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "443",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "AzureMonitor",
+            "access": "Allow",
+            "priority": 500,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureSQLDependency",
+          "properties": {
+            "description": "Azure SQL dependency",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "1433",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "SQL",
+            "access": "Allow",
+            "priority": 600,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "AzureResourceHealth",
+          "properties": {
+            "description": "Azure Resource Health",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "1886",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "AzureMonitor",
+            "access": "Allow",
+            "priority": 700,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        },
+        {
+          "name": "LogToEventHubPolicy",
+          "properties": {
+            "description": "Dependency from Log to Event Hub policy and monitoring agent",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "5672",
+            "sourceAddressPrefix": "VirtualNetwork",
+            "destinationAddressPrefix": "EventHub",
+            "access": "Allow",
+            "priority": 800,
+            "direction": "Outbound",
+            "destinationPortRanges": [],
+            "destinationApplicationSecurityGroups": [],
+            "sourceApplicationSecurityGroups": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": [],
+            "sourcePortRanges": []
+          }
+        }
       ]
     },
     "flowLogsDeloy": {
