@@ -15,22 +15,6 @@ variables:
     value: sqcp-ado-spn-pre
   - name: subscriptionId
     value: 8964f3c1-44f5-4094-80eb-4334845bdfb1
-  - name: clusterName
-    value: aks-cpp-apps-pre-we-01
-  - name: kubernetesVersion
-    value: 1.18.17
-  - name: nodeCount
-    value: 10
-  - name: minCount
-    value: 10
-  - name: maxCount
-    value: 20
-  - name: maxPods
-    value: 30
-  - name: nodeVMSize
-    value: Standard_D4s_v3
-  - name: zones
-    value: 1 2 3
 
 trigger: none
 
@@ -67,48 +51,6 @@ stages:
                   Write-Error "Template is not valid."
                 }
               azurePowerShellVersion: LatestVersion
-
-  - stage: DeployManagedCluster
-    jobs:
-      - job: DeployManagedCluster
-        displayName: Update Node Pools
-        timeoutInMinutes: 120
-        pool:
-          name: $(PoolName)
-        steps:
-          - task: AzureCLI@2
-            displayName: "Upgrade to $(kubernetesVersion)"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                currentVersion=$(az aks get-upgrades -g $(resourceGroupName) -n $(clusterName) --query "controlPlaneProfile.kubernetesVersion" -o tsv)
-
-                if [[ "$currentVersion" != $(kubernetesVersion) ]]
-
-                then az aks upgrade --resource-group $(resourceGroupName) --name $(clusterName) --kubernetes-version $(kubernetesVersion) --yes
-
-                else echo "version update not required"
-
-                fi
-
-          - task: AzureCLI@2
-            displayName: "Add portal nodepool"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                portalPool=$(az aks nodepool list --cluster-name $(clusterName) -g $(resourceGroupName) --query "[?name=='portal'].name" -o tsv)
-
-                if [[ "$portalPool" != portal ]]
-
-                then az aks nodepool add --cluster-name $(clusterName) --name portal -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
-
-                else echo "portal node pool already exists"
-
-                fi
 
   - stage: DeployTemplate
     jobs:
