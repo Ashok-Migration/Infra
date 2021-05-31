@@ -437,6 +437,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpd-apps-prflint-tst-we-01",
+			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-int-tst-we-01",
+				"DEP-plan-cpd-apps-int-tst-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/Parameters/func-cpd-apps-prflint-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-func-cpd-apps-intntf-tst-we-01",
 			"resourceGroup": "rg-cpd-apps-int-tst-we-01",
 			"dependsOn": [

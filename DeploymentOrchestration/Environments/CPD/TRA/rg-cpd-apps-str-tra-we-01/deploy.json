@@ -197,6 +197,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpd-apps-str-prf-tra-we-01",
+			"resourceGroup": "rg-cpd-apps-str-tra-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-str-tra-we-01",
+				"DEP-cosmos-cpd-apps-str-tra-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpd-apps-str-prf-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-sqlc-cosmos-cpd-apps-str-botfb-tra-we-01",
 			"resourceGroup": "rg-cpd-apps-str-tra-we-01",
 			"dependsOn": [
@@ -260,6 +282,29 @@
 				},
 				"parametersLink": {
 					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpd-apps-str-botst-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpd-apps-str-prf-tra-we-01",
+			"resourceGroup": "rg-cpd-apps-str-tra-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-str-tra-we-01",
+				"DEP-cosmos-cpd-apps-str-tra-we-01",
+				"DEP-sql-cosmos-cpd-apps-str-prf-tra-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpd-apps-str-prf-tra-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		},
@@ -641,27 +686,27 @@
 				}
 			}
 		},
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "name": "DEP-stcpdappsapimttrawe01",
-            "resourceGroup": "rg-cpd-apps-str-tra-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-apps-str-tra-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsapimttrawe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        }
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-stcpdappsapimttrawe01",
+			"resourceGroup": "rg-cpd-apps-str-tra-we-01",
+			"dependsOn": [
+				"DEP-rg-cpd-apps-str-tra-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcpdappsapimttrawe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		}
 	],
 	"outputs": {}
 }
