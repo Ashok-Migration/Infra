@@ -54,62 +54,280 @@
           "actions": {
             "Checking_Event_Type": {
               "actions": {
-                "Create_Marketplace_Product_Subscription": {
-                  "inputs": {
-                    "body": {
-                      "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],null)}",
-                      "_cpm_organisation_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],null)}",
-                      "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
-                      "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
-                      "cpm_description": "@body('Parse_JSON')?['value']?['description']",
-                      "cpm_externalreferencenumber": "@{body('Parse_JSON')?['value']?['id']}",
-                      "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
-                      "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                "Condition": {
+                  "actions": {
+                    "Check_if_Profile_exists_with_Alternate_key": {
+                      "actions": {
+                        "For_each_Profile": {
+                          "actions": {
+                            "Create_Marketplace_Product_Subscription_with_Profile": {
+                              "inputs": {
+                                "body": {
+                                  "_cpm_contact_value": "@items('For_each_Profile')?['contactid']",
+                                  "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                                  "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
+                                  "cpm_description": "@body('Parse_JSON')?['value']?['description']",
+                                  "cpm_externalreferencenumber": "@{body('Parse_JSON')?['value']?['id']}",
+                                  "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                                  "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                                },
+                                "host": {
+                                  "connection": {
+                                    "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                                  }
+                                },
+                                "method": "post",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items"
+                              },
+                              "runAfter": {},
+                              "type": "ApiConnection"
+                            }
+                          },
+                          "foreach": "@body('Get_Profile_Record_based_on_Alternate_Key')?['value']",
+                          "runAfter": {},
+                          "type": "Foreach"
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "Profile_does_not_exist": {
+                            "inputs": {
+                              "runError": {
+                                "code": "400",
+                                "message": "Profile does not exist for customerId passed."
+                              },
+                              "runStatus": "Failed"
+                            },
+                            "runAfter": {},
+                            "type": "Terminate"
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "greater": [
+                              "@length(body('Get_Profile_Record_based_on_Alternate_Key')?['value'])",
+                              0
+                            ]
+                          }
+                        ]
+                      },
+                      "runAfter": {
+                        "Get_Profile_Record_based_on_Alternate_Key": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "If"
                     },
-                    "host": {
-                      "connection": {
-                        "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                    "Get_Profile_Record_based_on_Alternate_Key": {
+                      "inputs": {
+                        "host": {
+                          "connection": {
+                            "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                          }
+                        },
+                        "method": "get",
+                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('contacts'))}/items",
+                        "queries": {
+                          "$filter": "cpm_alternatekey eq '@{body('Parse_JSON')?['value']?['customerId']}' ",
+                          "$top": 1
+                        }
+                      },
+                      "runAfter": {},
+                      "type": "ApiConnection"
+                    }
+                  },
+                  "else": {
+                    "actions": {
+                      "Create_Marketplace_Product_Subscription_with_Organisation": {
+                        "inputs": {
+                          "body": {
+                            "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                            "_cpm_organisation_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],null)}",
+                            "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                            "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
+                            "cpm_description": "@body('Parse_JSON')?['value']?['description']",
+                            "cpm_externalreferencenumber": "@{body('Parse_JSON')?['value']?['id']}",
+                            "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                            "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                          },
+                          "host": {
+                            "connection": {
+                              "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                            }
+                          },
+                          "method": "post",
+                          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items"
+                        },
+                        "runAfter": {},
+                        "type": "ApiConnection"
                       }
-                    },
-                    "method": "post",
-                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items"
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@body('Parse_JSON')?['value']?['customerTypeId']",
+                          "@string(0)"
+                        ]
+                      }
+                    ]
                   },
                   "runAfter": {},
-                  "type": "ApiConnection"
+                  "type": "If"
                 }
               },
               "else": {
                 "actions": {
                   "Checking_if_subscription_record_doesnt_contain_data_or_not": {
                     "actions": {
-                      "For_each": {
+                      "Update_option_check_customer_type_Id": {
                         "actions": {
-                          "_Update_Marketplace_Product_Subscription": {
+                          "Update_option_Get_Profile_Record_based_on_Alternate_Key": {
                             "inputs": {
-                              "body": {
-                                "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_contact_value'])}",
-                                "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
-                                "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
-                                "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
-                                "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
-                                "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
-                                "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
-                              },
                               "host": {
                                 "connection": {
                                   "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
                                 }
                               },
-                              "method": "patch",
-                              "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_servicesubscriptionid']))}"
+                              "method": "get",
+                              "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('contacts'))}/items",
+                              "queries": {
+                                "$filter": "cpm_alternatekey eq '@{body('Parse_JSON')?['value']?['customerId']}' ",
+                                "$top": 1
+                              }
                             },
                             "runAfter": {},
                             "type": "ApiConnection"
+                          },
+                          "Update_option_check_profile_exist_with_Alternate_Key": {
+                            "actions": {
+                              "Profile_Foreach": {
+                                "actions": {
+                                  "Marketplace_subscription_Foreach": {
+                                    "actions": {
+                                      "_Update_Marketplace_Product_Subscription1": {
+                                        "inputs": {
+                                          "body": {
+                                            "_cpm_contact_value": "@{outputs('ProfileId')}",
+                                            "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('Marketplace_subscription_Foreach')?['_cpm_organisation_value'])}",
+                                            "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                                            "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
+                                            "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
+                                            "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                                            "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                                          },
+                                          "host": {
+                                            "connection": {
+                                              "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                                            }
+                                          },
+                                          "method": "patch",
+                                          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items/@{encodeURIComponent(encodeURIComponent(items('Marketplace_subscription_Foreach')?['cpm_servicesubscriptionid']))}"
+                                        },
+                                        "runAfter": {},
+                                        "type": "ApiConnection"
+                                      }
+                                    },
+                                    "foreach": "@body('Get_Marketplace_Product_Subscriptions_Records')?['value']",
+                                    "runAfter": {
+                                      "ProfileId": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "type": "Foreach"
+                                  },
+                                  "ProfileId": {
+                                    "inputs": "@items('Profile_Foreach')?['contactid']",
+                                    "runAfter": {},
+                                    "type": "Compose"
+                                  }
+                                },
+                                "foreach": "@body('Update_option_Get_Profile_Record_based_on_Alternate_Key')?['value']",
+                                "runAfter": {},
+                                "type": "Foreach"
+                              }
+                            },
+                            "else": {
+                              "actions": {
+                                "Update_option_Profile_does_not_Exist": {
+                                  "inputs": {
+                                    "runError": {
+                                      "code": "400",
+                                      "message": "Profile does not exist for customerId passed."
+                                    },
+                                    "runStatus": "Failed"
+                                  },
+                                  "runAfter": {},
+                                  "type": "Terminate"
+                                }
+                              }
+                            },
+                            "expression": {
+                              "and": [
+                                {
+                                  "greater": [
+                                    "@length(body('Update_option_Get_Profile_Record_based_on_Alternate_Key')?['value'])",
+                                    0
+                                  ]
+                                }
+                              ]
+                            },
+                            "runAfter": {
+                              "Update_option_Get_Profile_Record_based_on_Alternate_Key": [
+                                "Succeeded"
+                              ]
+                            },
+                            "type": "If"
                           }
                         },
-                        "foreach": "@body('Get_Marketplace_Product_Subscriptions_Records')?['value']",
+                        "else": {
+                          "actions": {
+                            "For_each": {
+                              "actions": {
+                                "_Update_Marketplace_Product_Subscription": {
+                                  "inputs": {
+                                    "body": {
+                                      "_cpm_contact_value": "@{if(equals(body('Parse_JSON')?['value']?['customerTypeId'],'0'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_contact_value'])}",
+                                      "_cpm_organisation_value": "@{\r\nif(equals(body('Parse_JSON')?['value']?['customerTypeId'],'1'),body('Parse_JSON')?['value']?['customerId'],items('For_each')?['_cpm_organisation_value'])}",
+                                      "_cpm_service_value": "@body('Parse_JSON')?['value']?['productId']",
+                                      "cpm_billingaccountid": "@body('Parse_JSON')?['value']?['accountId']",
+                                      "cpm_description": "@{body('Parse_JSON')?['value']?['description']}",
+                                      "cpm_status": "@body('Parse_JSON')?['value']?['statusId']",
+                                      "cpm_statusreason": "@body('Parse_JSON')?['value']?['statusReasonId']"
+                                    },
+                                    "host": {
+                                      "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-prdcds-dev-we-01']['connectionId']"
+                                      }
+                                    },
+                                    "method": "patch",
+                                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('tasmu-dev21.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cpm_servicesubscriptions'))}/items/@{encodeURIComponent(encodeURIComponent(items('For_each')?['cpm_servicesubscriptionid']))}"
+                                  },
+                                  "runAfter": {},
+                                  "type": "ApiConnection"
+                                }
+                              },
+                              "foreach": "@body('Get_Marketplace_Product_Subscriptions_Records')?['value']",
+                              "runAfter": {},
+                              "type": "Foreach"
+                            }
+                          }
+                        },
+                        "expression": {
+                          "and": [
+                            {
+                              "equals": [
+                                "@body('Parse_JSON')?['value']?['customerTypeId']",
+                                "@string(0)"
+                              ]
+                            }
+                          ]
+                        },
                         "runAfter": {},
-                        "type": "Foreach"
+                        "type": "If"
                       }
                     },
                     "else": {
@@ -290,51 +508,51 @@
         }
       }
     },
-    "workflowParameters": {
-      "value": {
-        "$connections": {
-          "defaultValue": {},
-          "type": "Object"
+      "workflowParameters": {
+        "value": {
+          "$connections": {
+            "defaultValue": {},
+            "type": "Object"
+          }
         }
-      }
-    },
-    "diagnosticLogsRetentionInDays": {
-      "value": 365
-    },
-    "diagnosticStorageAccountId": {
-      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagdevwe01"
-    },
-    "workspaceId": {
-      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-dev-we-01"
-    },
-    "eventHubAuthorizationRuleId": {
-      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
-    },
-    "eventHubName": {
-      "value": "evh-cpd-apps-mon-dev-we-01"
-    },
-    "tags": {
-      "value": {
-        "Environment": "Development"
-      }
-    },
-    "connectionParameters": {
-      "value": {
-        "$connections": {
-          "value": {
-            "apicon-cpd-apps-integ-dev-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-dev-we-01",
-              "connectionName": "apicon-cpd-apps-integ-dev-we-01",
-              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
-            },
-            "apicon-cpd-apps-prdcds-dev-we-01": {
-              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-prdcds-dev-we-01",
-              "connectionName": "apicon-cpd-apps-prdcds-dev-we-01",
-              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+      },
+      "diagnosticLogsRetentionInDays": {
+        "value": 365
+      },
+      "diagnosticStorageAccountId": {
+        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagdevwe01"
+      },
+      "workspaceId": {
+        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-dev-we-01"
+      },
+      "eventHubAuthorizationRuleId": {
+        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
+      },
+      "eventHubName": {
+        "value": "evh-cpd-apps-mon-dev-we-01"
+      },
+      "tags": {
+        "value": {
+          "Environment": "Development"
+        }
+      },
+      "connectionParameters": {
+        "value": {
+          "$connections": {
+            "value": {
+              "apicon-cpd-apps-integ-dev-we-01": {
+                "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-dev-we-01",
+                "connectionName": "apicon-cpd-apps-integ-dev-we-01",
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+              },
+              "apicon-cpd-apps-prdcds-dev-we-01": {
+                "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-dev-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-prdcds-dev-we-01",
+                "connectionName": "apicon-cpd-apps-prdcds-dev-we-01",
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/commondataservice"
+              }
             }
           }
         }
       }
     }
-  }
 }
