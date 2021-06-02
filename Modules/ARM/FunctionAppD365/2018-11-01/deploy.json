@@ -79,6 +79,27 @@
         "description": "Optional. Resource tags."
       },
       "type": "object"
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of the virtual network to be created."
+      }
+    },
+    "ipSecurityRestrictions": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "IP based access restrictions."
+      }
+    },
+    "subnetResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "ResourceId of subnet."
+      }
     }
   },
   "variables": {
@@ -149,31 +170,47 @@
                   "value": "[variables('cosmosConnectionString')]"
                 }
               ],
-              "alwaysOn": "[parameters('alwaysOn')]"
+              "alwaysOn": "[parameters('alwaysOn')]",
+              "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]",
+              "vnetName": "[parameters('vnetName')]"
             },
             "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
             "clientAffinityEnabled": true,
             "httpsOnly": true
           },
-            "resources": [
-                {
-                    "type": "Microsoft.Web/sites/providers/diagnosticsettings",
-                    "apiVersion": "2017-05-01-preview",
-                    "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/service')]",
-                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', parameters('functionAppName'))]"
-                    ],
-                    "properties": {
-                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
-                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
-                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
-                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
-                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
-                    }
-                }
-            ]
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites/providers/diagnosticsettings",
+              "apiVersion": "2017-05-01-preview",
+              "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/service')]",
+              "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+              "dependsOn": [
+                "[concat('Microsoft.Web/sites/', parameters('functionAppName'))]"
+              ],
+              "properties": {
+                "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+              }
+            },
+            {
+              "name": "[concat(parameters('functionAppName'), '/virtualNetwork')]",
+              "type": "Microsoft.Web/sites/networkConfig",
+              "apiVersion": "2020-09-01",
+              "condition": "[not(empty(parameters('vnetName')))]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+              ],
+              "properties": {
+                "subnetResourceId": "[parameters('subnetResourceId')]",
+                "swiftSupported": true
+              }
+            }
+          ]
         }
     ],
     "functions": [],
