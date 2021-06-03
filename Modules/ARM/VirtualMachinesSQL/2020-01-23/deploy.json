@@ -161,6 +161,19 @@
       }
     },
     {
+      "name": "[parameters('availabilitySetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformFaultDomainCount": "[parameters('availabilitySetPlatformFaultDomainCount')]",
+        "platformUpdateDomainCount": "[parameters('availabilitySetPlatformUpdateDomainCount')]"
+      },
+      "sku": {
+        "name": "Aligned"
+      }
+    },
+    {
       "name": "[parameters('virtualMachineName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2021-03-01",
@@ -233,19 +246,6 @@
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
         }
-      }
-    },
-    {
-      "name": "[parameters('availabilitySetName')]",
-      "type": "Microsoft.Compute/availabilitySets",
-      "apiVersion": "2019-07-01",
-      "location": "[parameters('location')]",
-      "properties": {
-        "platformFaultDomainCount": "[parameters('availabilitySetPlatformFaultDomainCount')]",
-        "platformUpdateDomainCount": "[parameters('availabilitySetPlatformUpdateDomainCount')]"
-      },
-      "sku": {
-        "name": "Aligned"
       }
     },
     {
