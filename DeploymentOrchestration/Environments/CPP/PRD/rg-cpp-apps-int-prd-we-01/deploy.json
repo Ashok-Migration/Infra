@@ -481,6 +481,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-prflint-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-prd-we-01",
+				"DEP-plan-cpp-apps-int-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/Parameters/func-cpp-apps-prflint-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-stcppappsintprdwe01",
 			"resourceGroup": "rg-cpp-apps-int-prd-we-01",
 			"dependsOn": [
