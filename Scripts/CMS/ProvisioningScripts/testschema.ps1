@@ -244,29 +244,14 @@ function Get-Lists {
       }
       Write-Host "Validation completed for the list $($listObj.Title) with URL $($rootSCUrl + $listObj.DefaultViewUrl)" -ForegroundColor Green
      
-      Connect-PnPOnline -Url $globalConfigSCUrl -Credentials $tenantAdmin
-      $hash = $null
-      $hash = @{}
-      $hash.Add("SiteUrl", $siteUrl)
-      $hash.Add("ListName", "$($listFullUrl), $($listObj.Title)")
-      $hash.Add("Title", $web.Title)
-      Write-Host "ListIssue count is $($listIssue.Count)" -ForegroundColor Green
-      if ($null -eq $listIssue -or $listIssue.Count -eq 0) {
-        $hash.Add("IssueWithList", "No")
-        $hash.Add("Issues", "No Issues")
-      }
-      else {
-        $hash.Add("IssueWithList", "Yes")
-        $hash.Add("Issues", $listIssue -join ' ')
-      }
-      Add-PnPListItem -List $schemaTestResultListName -Values $hash
-      Disconnect-PnPOnline
+      Update-SchemaList -globalConfigSCUrl $globalConfigSCUrl -tenantAdmin $tenantAdmin -siteUrl $siteUrl -listFullUrl $listFullUrl -listTitle $listObj.Title -webTitle $web.Title -listIssue $listIssue -schemaTestResultListName $schemaTestResultListName
     }
   }
   catch {
     $ErrorMessage = $_.Exception.Message
     Write-Host $ErrorMessage -foreground Red
   }
+
 }
 
 function Get-ListFieldCTLevelRequireValidation {
@@ -536,6 +521,234 @@ function Get-ListContentTypes {
   return $issues
 }
 
+
+function Get-Theme {
+  param (
+    $globalConfigSCUrl,
+    $siteUrl,
+    $tenantAdmin,
+    $themeName,
+    $schemaTestResultListName
+  )
+
+  try {
+    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    $web = Get-PnPWeb
+    $issues = $null
+    $issues = [System.Collections.ArrayList]@()
+    $theme = Get-PnPTenantTheme | Where-Object { $_.Name -eq $themeName }
+    if ($null -eq $theme) {
+      Write-Host "$($themeName) is not available for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("$($themeName) is not available for the site $($siteUrl)`n")
+    }
+    Disconnect-PnPOnline
+  }
+  catch {
+    Write-Host "Error occurred while getting theme name$($themeName) for site $($siteUrl) Error : $($_.Exception.Message)" -ForegroundColor Red
+    $issues.Add("Error occurred while getting theme name$($themeName) for site $($siteUrl) Error : $($_.Exception.Message)`n")
+  }
+  
+  Update-SchemaList -globalConfigSCUrl $globalConfigSCUrl -tenantAdmin $tenantAdmin -siteUrl $siteUrl -webTitle $web.Title -listIssue $issues -siteProperty "Custom Theme" -schemaTestResultListName $schemaTestResultListName
+}
+
+function Get-Apps {
+  param (
+    $globalConfigSCUrl,
+    $siteUrl,
+    $tenantAdmin,
+    $appNameCollection,
+    $schemaTestResultListName
+  )
+  try {
+    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    $web = Get-PnPWeb
+    $issues = $null
+    $issues = [System.Collections.ArrayList]@()
+    foreach ($appName in $appNameCollection.App.Name) {
+      $tenantApps = Get-PnPApp -Scope Tenant
+      if ($null -ne $tenantApps) {
+        foreach ($tenantApp in $tenantApps) {
+          if ($tenantApp.Title -eq $appName) {
+            try {
+              $installedApp = Get-PnPApp -Identity $tenantApp.Id
+              if ([bool]($installedApp) -eq $false) {
+                Write-Host "$($appName) is not available for the site $($siteUrl)" -ForegroundColor Red
+                $issues.Add("$($appName) is not available for the site $($siteUrl)`n")
+              }
+            }
+            catch {
+              Write-Host "Error occurred while getting app : $($appName) for site $($siteUrl) Error : $($_.Exception.Message)" -ForegroundColor Red
+              $issues.Add("Error occurred while getting app : $($appName) for site $($siteUrl) Error : $($_.Exception.Message)`n")
+            }
+          }
+        }
+      }
+    }
+    Disconnect-PnPOnline
+  }
+  catch {
+    Write-Host "Error occurred in Get-App method Error : $($_.Exception.Message)" -ForegroundColor Red
+  }
+
+  Update-SchemaList -globalConfigSCUrl $globalConfigSCUrl -tenantAdmin $tenantAdmin -siteUrl $siteUrl -webTitle $web.Title -listIssue $issues -siteProperty "Custom Apps" -schemaTestResultListName $schemaTestResultListName
+}
+
+function Get-SiteAdmins {
+  param (
+    $globalConfigSCUrl,
+    $siteUrl,
+    $tenantAdmin,
+    $siteCollectionAdmins,
+    $schemaTestResultListName
+  )
+  
+  try {
+    Connect-PnPOnline -Url $siteUrl -Credentials $tenantAdmin
+    $web = Get-PnPWeb
+    $issues = $null
+    $issues = [System.Collections.ArrayList]@()
+    $siteColAdmins = Get-PnPSiteCollectionAdmin 
+    if ($null -eq $siteColAdmins) {
+      Write-Host "No site collection administrator exists for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("No site collection administrator exists for the site $($siteUrl)`n")
+    }
+    else {
+      foreach ($siteCollectionAdmin in $siteCollectionAdmins) {
+        $isSiteCollectionAdminExists = $siteColAdmins | Where-Object { $_.Email -eq $siteCollectionAdmin }
+        if ($null -eq $isSiteCollectionAdminExists) {
+          Write-Host "$($siteCollectionAdmin) doesn't exists at the site $(SiteUrl)" -ForegroundColor Red
+          $issues.Add("$($siteCollectionAdmin) doesn't exists at the site $(SiteUrl)`n")
+        }
+      }
+    }
+    Disconnect-PnPOnline
+  }
+  catch {
+    Write-Host "Error occured while getting site collection admins for the site $($siteUrl) $($_.Exception.Message)" -ForegroundColor Red
+    $issues.Add("Error occured while getting site collection admins for the site $($siteUrl) $($_.Exception.Message)`n")
+  }
+
+  Update-SchemaList -globalConfigSCUrl $globalConfigSCUrl -tenantAdmin $tenantAdmin -siteUrl $siteUrl -webTitle $web.Title -listIssue $listIssue -siteProperty "Site Collection Admins" -schemaTestResultListName $schemaTestResultListName
+}
+
+function Get-RegionalSettings {
+  param (
+    $globalConfigSCUrl,
+    $siteUrl,
+    $tenantAdmin,
+    $regionalSetting,
+    $schemaTestResultListName
+  )
+  
+  try {
+
+    $time24 = $true
+    if ($regionalSetting.Time24 -eq "FALSE") {
+      $time24 = $false
+    }
+    
+    #Load SharePoint CSOM Assemblies
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.dll')
+    Add-Type -Path (Resolve-Path $PSScriptRoot'\Assemblies\Microsoft.SharePoint.Client.Runtime.dll')
+  
+    $issues = $null
+    $issues = [System.Collections.ArrayList]@()
+    #Config parameters for SharePoint Online Site URL and Timezone description
+    $Ctx = New-Object Microsoft.SharePoint.Client.ClientContext($siteUrl)
+    $admin = $tenantAdmin.UserName
+    $password = $tenantAdmin.Password
+    $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($admin, $password)
+    $Ctx.Credentials = $credentials
+    $Web = $Ctx.Web
+    $regionalSettings = $Web.RegionalSettings
+    $timezones = $Web.RegionalSettings.TimeZones
+    $Ctx.Load($Web)
+    $Ctx.Load($regionalSettings)
+    $Ctx.Load($timezones)
+    $Ctx.ExecuteQuery()
+    if ($Web.RegionalSettings.LocaleId -ne $regionalSetting.LocaleId) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.WorkDayStartHour -ne $regionalSetting.WorkDayStartHour) {
+      Write-Host "Regional Settings : Work Day Start Hour is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Regional Settings : Work Day Start Hour is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.WorkDayEndHour -ne $regionalSetting.WorkDayEndHour) {
+      Write-Host "Regional Settings : Work Day End Hour  is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Regional Settings : Work Day End HOur is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.FirstDayOfWeek -ne $regionalSetting.FirstDayOfWeek) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.Time24 -ne $time24) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.CalendarType -ne $regionalSetting.CalendarType) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.AlternateCalendarType -ne $regionalSetting.AlternateCalendarType) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    if ($Web.RegionalSettings.WorkDays -ne $regionalSetting.WorkDays ) {
+      Write-Host "Locale Id is not correct for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("Locale Id is not correct for the site $($siteUrl)`n")
+    }
+    $timeZoneName = $Timezones | Where-Object { $_.Description -eq $regionalSetting.TimezoneName }
+    if ($null -eq $timeZoneName) {
+      Write-Host "$($regionalSetting.TimezoneName) timezone is not applied for the site $($siteUrl)" -ForegroundColor Red
+      $issues.Add("$($regionalSetting.TimezoneName) timezone is not applied for the site $($siteUrl)`n")
+    }
+  }
+  catch {
+    Write-Host "Error occurred in Get-RegionalSettings method Error : $($_.Exception.Message)" -ForegroundColor Red
+  }
+
+  Update-SchemaList -globalConfigSCUrl $globalConfigSCUrl -tenantAdmin $tenantAdmin -siteUrl $siteUrl -webTitle $Web.Title -listIssue $issues -siteProperty "Regional Settings" -schemaTestResultListName $schemaTestResultListName
+}
+
+function Update-SchemaList {
+  param (
+    $globalConfigSCUrl,
+    $tenantAdmin,
+    $siteUrl,
+    $listFullUrl,
+    $listTitle,
+    $webTitle,
+    $siteProperty,
+    $issue,
+    $schemaTestResultListName
+  )
+  
+  try {
+    Connect-PnPOnline -Url $globalConfigSCUrl -Credentials $tenantAdmin
+    $hash = $null
+    $hash = @{}
+    $hash.Add("SiteUrl", $siteUrl)
+    $hash.Add("ListName", "$($listFullUrl), $($listTitle)")
+    $hash.Add("Title", $webTitle)
+    $hash.Add("SiteProperty", $siteProperty)
+    Write-Host "ListIssue count is $($issue.Count)" -ForegroundColor Green
+    if ($null -eq $issue -or $issue.Count -eq 0) {
+      $hash.Add("IssueWithList", "No")
+      $hash.Add("Issues", "No Issues")
+    }
+    else {
+      $hash.Add("IssueWithList", "Yes")
+      $hash.Add("Issues", $issue -join ' ')
+    }
+    Add-PnPListItem -List $schemaTestResultListName -Values $hash
+    Disconnect-PnPOnline
+  }
+  catch {
+    Write-Host -f Red "Error !" $_.Exception.Message
+  }
+}
+
 function Get-SCReport {
   param (
     $schemaFile
@@ -561,6 +774,7 @@ function Get-SCReport {
           New-PnPList -Title $schemaTestResultListName -Template GenericList 
           Add-PnPField -List $schemaTestResultListName -DisplayName 'Site Url' -InternalName 'SiteUrl' -Type 'Text' -Required -AddToDefaultView -ErrorAction Stop
           Add-PnPField -List $schemaTestResultListName -DisplayName 'List Name' -InternalName 'ListName' -Type URL -AddToDefaultView -ErrorAction Stop
+          Add-PnPField -List $schemaTestResultListName -DisplayName 'Site Property' -InternalName 'SiteProperty' -Type 'Text' -AddToDefaultView -ErrorAction Stop
           Add-PnPField -List $schemaTestResultListName -DisplayName 'Issues' -InternalName 'Issues' -Type 'Note' -AddToDefaultView -ErrorAction Stop
           Add-PnPField -List $schemaTestResultListName -DisplayName 'Issue with List/Library?' -InternalName 'IssueWithList' -Type 'Text' -AddToDefaultView -ErrorAction Stop
           Add-PnPField -List $schemaTestResultListName -DisplayName 'Comments(If Any)' -InternalName 'Comments' -Type 'Note' -AddToDefaultView -ErrorAction Stop
@@ -570,6 +784,7 @@ function Get-SCReport {
           Remove-ListItems -siteUrl $globalconfigSiteUrl -listName $schemaTestResultListName -tenantAdmin $tenantAdmin
         }
         Get-Lists -siteUrl $globalconfigSiteUrl -tenantAdmin $tenantAdmin -lists $schemaFile.schema.global.ListAndContentTypes
+        
       }
     }
       
@@ -582,6 +797,10 @@ function Get-SCReport {
         $Web = Get-PnPWeb
         Write-host "Starting validation for the lists/libraries of $($Web.Title) - $($globalhubSiteUrl)" -ForegroundColor Green
         Get-Lists -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -lists $schemaFile.schema.marketplace.ListAndContentTypes
+        Get-Theme -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -themeName $schemaFile.schema.marketplace.Theme.ThemeName -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+        Get-Apps -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -appName $schemaFile.schema.marketplace.Apps -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+        Get-SiteAdmins -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -siteCollectionAdmins $schemaFile.schema.marketplace.users.user -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+        Get-RegionalSettings -siteUrl $globalhubSiteUrl -tenantAdmin $tenantAdmin -regionalSetting $schemaFile.schema.marketplace.RegionalSettings -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
       }
                    
       foreach ($sectorhubsite in $globalhubsite.sectorhubsite.site) {
@@ -593,6 +812,10 @@ function Get-SCReport {
           $Web = Get-PnPWeb
           Write-host "Starting validation for the lists/libraries of $($Web.Title) - $($sectorhubSiteUrl)" -ForegroundColor Green
           Get-Lists -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -lists $schemaFile.schema.sector.ListAndContentTypes
+          Get-Theme -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -themeName $schemaFile.schema.sector.Theme.ThemeName -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+          Get-Apps -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -appName $schemaFile.schema.sector.Apps -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+          Get-SiteAdmins -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -siteCollectionAdmins $schemaFile.schema.sector.users.user -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+          Get-RegionalSettings -siteUrl $sectorhubSiteUrl -tenantAdmin $tenantAdmin -regionalSetting $schemaFile.schema.sector.RegionalSettings -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
         } 
 
         foreach ($entitySite in $globalhubsite.sectorhubsite.site.orgassociatedsite) {
@@ -604,13 +827,17 @@ function Get-SCReport {
             $Web = Get-PnPWeb
             Write-host "Starting validation for the lists/libraries of $($Web.Title) - $($entitySiteUrl)" -ForegroundColor Green
             Get-Lists -siteUrl $entitySiteUrl -tenantAdmin $tenantAdmin -lists $schemaFile.schema.entity.ListAndContentTypes
+            Get-Theme -siteUrl $entitySiteUrl -tenantAdmin $tenantAdmin -themeName $schemaFile.schema.entity.Theme.ThemeName -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+            Get-Apps -siteUrl $entitySiteUrl -tenantAdmin $tenantAdmin -appName $schemaFile.schema.entity.Apps -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+            Get-SiteAdmins -siteUrl $entitySiteUrl -tenantAdmin $tenantAdmin -siteCollectionAdmins $schemaFile.schema.entity.users.user -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
+            Get-RegionalSettings -siteUrl $entitySiteUrl -tenantAdmin $tenantAdmin -regionalSetting $schemaFile.schema.entity.RegionalSettings -globalConfigSCUrl $globalConfigSCUrl -schemaTestResultListName $schemaTestResultListName
           } 
         }
       }
     }
   }
   catch {
-    write-host -f Red "Error !" $_.Exception.Message
+    Write-Host -f Red "Error !" $_.Exception.Message
   }
 
   Write-Host 'Schema validation script ended' -ForegroundColor Green

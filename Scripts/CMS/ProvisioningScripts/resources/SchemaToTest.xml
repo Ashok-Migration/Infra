@@ -1,6 +1,6 @@
 <schema>
   <termsets>
-    <termset Name="Channel">   
+    <termset Name="Channel">
     </termset>
     <termset Name="Enterprise Keywords">
     </termset>
@@ -33,12 +33,19 @@
       </sectorhubsite>
     </site>
   </globalhubsite>
-
   <Configsite>
     <site Title="Global" Alias="cms-global"></site>
   </Configsite>
-
   <global>
+    <Apps>
+      <App Name="mcs-tasmu-navigation-content-client-side-solution"></App>
+    </Apps>
+    <configSPAdmin>
+      <users>
+        <user email="cms.admin@tasmusqcp.onmicrosoft.com"></user>
+        <user email="cms.automation@tasmusqcp.onmicrosoft.com"></user>
+      </users>
+    </configSPAdmin>
     <ListAndContentTypes ListName="Configuration" ContentTypeName="TASMU Configuration" ListTemplate="GenericList" ParentCTName="Item" GroupName="TASMU" customView="">
 
       <columnItem ContentTypeName="TASMU Configuration" ColumnName="SiteURL" Required="True"></columnItem>
@@ -96,11 +103,32 @@
       <defaultviewfields name="Created"></defaultviewfields>
       <defaultviewfields name="Modified"></defaultviewfields>
     </ListAndContentTypes>
+
   </global>
   <marketplace>
+    <Theme ThemeName="TASMUGlobal"></Theme>
+    <Apps>
+      <App Name="tasmu-spfx-sector-client-side-solution"></App>
+      <App Name="mcs-tasmu-my-tasks-client-side-solution"></App>
+    </Apps>
+    <SiteCollectionAdmins>
+      <users>
+        <user email="cms.admin@tasmusqcp.onmicrosoft.com"></user>
+        <user email="cms.automation@tasmusqcp.onmicrosoft.com"></user>
+      </users>
+    </SiteCollectionAdmins>
+    <CustomGroup>
+      <group Name="Approvers">
+      </group>
+      <group Name="Critical Content Approvers">
+      </group>
+      <group Name="Translators">
+      </group>
+    </CustomGroup>
+    <RegionalSettings LocaleId="16385" WorkDayStartHour="480" WorkDayEndHour="1020" FirstDayOfWeek="0" Time24="FALSE" CalendarType="10" AlternateCalendarType="0" WorkDays="124" TimeZoneName="(UTC) Coordinated Universal Time"></RegionalSettings>
     <ListAndContentTypes ListName="Generic Master" ContentTypeName="TASMU Generic Master" ListTemplate="GenericList" ParentCTName="Item" GroupName="TASMU" customView="">
       <columnItem ContentTypeName="TASMU Generic Master" ColumnName="Title" EnforceUniqueValues="True" Required="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="Created"></defaultviewfields>
       <defaultviewfields name="Modified"></defaultviewfields>
@@ -118,7 +146,7 @@
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="arPreviewUrl" showInNewEditForm="FALSE" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="cmsactionby" showInNewEditForm="FALSE" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="ListName" showInNewEditForm="FALSE" Required="False"></columnItem>
-      
+
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="Title" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="Translation" choicevalue="Start Translation,Finish Translation" Required="True"></columnItem>
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="cmsAssignedToUser" Required="False"></columnItem>
@@ -131,7 +159,7 @@
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="arPreviewUrl" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="cmsactionby" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Translation Tasks" ColumnName="ListName" Required="False"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="PreviewUrl"></defaultviewfields>
       <defaultviewfields name="arPreviewUrl"></defaultviewfields>
@@ -187,7 +215,7 @@
       <columnItem ContentTypeName="TASMU Events" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Events" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Events" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -229,7 +257,7 @@
       <columnItem ContentTypeName="TASMU Announcements" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Announcements" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Announcements" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -271,7 +299,7 @@
       <columnItem ContentTypeName="TASMU Sponsors" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Sponsors" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Sponsors" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arSponsorName"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -294,7 +322,7 @@
       <columnItem ContentTypeName="TASMU Media Assets" ColumnName="Title" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Media Assets" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
       <columnItem ContentTypeName="TASMU Media Assets" ColumnName="cdnurl" Hidden="True" Required="False"></columnItem>
-      
+
       <defaultviewfields name="DocIcon"></defaultviewfields>
       <defaultviewfields name="LinkFilenameNoMenu"></defaultviewfields>
       <defaultviewfields name="cdnurl"></defaultviewfields>
@@ -331,7 +359,7 @@
       <columnItem ContentTypeName="TASMU Projects" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Projects" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Projects" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -372,7 +400,7 @@
       <columnItem ContentTypeName="TASMU Videos" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Videos" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Videos" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -425,7 +453,7 @@
       <columnItem ContentTypeName="TASMU Contacts" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Contacts" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Contacts" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="LastName"></defaultviewfields>
       <defaultviewfields name="arLastName"></defaultviewfields>
       <defaultviewfields name="cmsFirstName"></defaultviewfields>
@@ -469,7 +497,7 @@
       <columnItem ContentTypeName="TASMU Campaigns" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Campaigns" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Campaigns" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="ShortDescription"></defaultviewfields>
@@ -521,7 +549,7 @@
       <columnItem ContentTypeName="TASMU News Articles" ColumnName="SectorID" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU News Articles" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU News Articles" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
-      
+
       <defaultviewfields name="Title"></defaultviewfields>
       <defaultviewfields name="arTitle"></defaultviewfields>
       <defaultviewfields name="PreviewUrl"></defaultviewfields>
@@ -645,7 +673,7 @@
       <customViewfields name="ContentStatus"></customViewfields>
     </ListAndContentTypes>
     <ListAndContentTypes ListName="Hero Web" ContentTypeName="TASMU Hero Web" ListTemplate="PictureLibrary" customView="Home">
-      
+
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="Title" Required="True"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="arTitle" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="ShortDescription" Required="True"></columnItem>
@@ -662,7 +690,7 @@
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Web" ColumnName="cdnurl" showInNewEditForm="FALSE" Hidden="True" Required="False"></columnItem>
-      
+
       <defaultviewfields name="DocIcon"></defaultviewfields>
       <defaultviewfields name="LinkFilenameNoMenu"></defaultviewfields>
       <defaultviewfields name="Title"></defaultviewfields>
@@ -701,7 +729,7 @@
       <columnItem ContentTypeName="TASMU Hero Mobile" ColumnName="RequiresTranslation" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Mobile" ColumnName="cmsversion" showInNewEditForm="FALSE" Required="False" Hidden="True"></columnItem>
       <columnItem ContentTypeName="TASMU Hero Mobile" ColumnName="cdnurl" showInNewEditForm="FALSE" Hidden="True" Required="False"></columnItem>
-      
+
       <defaultviewfields name="DocIcon"></defaultviewfields>
       <defaultviewfields name="LinkFilenameNoMenu"></defaultviewfields>
       <defaultviewfields name="Title"></defaultviewfields>
@@ -794,6 +822,24 @@
     </ListAndContentTypes>
   </marketplace>
   <sector>
+    <Theme ThemeName="TASMUSector"></Theme>
+    <Apps>
+      <App Name="tasmu-spfx-sector-client-side-solution"></App>
+      <App Name="mcs-tasmu-my-tasks-client-side-solution"></App>
+    </Apps>
+    <SiteCollectionAdmins>
+      <users>
+        <user email="cms.admin@tasmusqcp.onmicrosoft.com"></user>
+        <user email="cms.automation@tasmusqcp.onmicrosoft.com"></user>
+      </users>
+    </SiteCollectionAdmins>
+    <CustomGroup>
+      <group Name="Approvers">
+      </group>
+      <group Name="Translators">
+      </group>
+    </CustomGroup>
+    <RegionalSettings LocaleId="16385" WorkDayStartHour="480" WorkDayEndHour="1020" FirstDayOfWeek="0" Time24="FALSE" CalendarType="10" AlternateCalendarType="0" WorkDays="124" TimeZoneName="(UTC) Coordinated Universal Time"></RegionalSettings>
     <ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="Title" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="TASMUTaskStatus" choicevalue="Approved,Rejected" Required="True"></columnItem>
@@ -1226,6 +1272,24 @@
     </ListAndContentTypes>
   </sector>
   <entity>
+    <Theme ThemeName="TASMUSector"></Theme>
+    <Apps>
+      <App Name="tasmu-spfx-sector-client-side-solution"></App>
+      <App Name="mcs-tasmu-my-tasks-client-side-solution"></App>
+    </Apps>
+    <SiteCollectionAdmins>
+      <users>
+        <user email="svc.cms.admin@tasmusqcpprod.onmicrosoft.com"></user>
+        <user email="svc.cms.automation@tasmusqcpprod.onmicrosoft.com"></user>
+      </users>
+    </SiteCollectionAdmins>
+    <CustomGroup>
+      <group Name="Approvers">
+      </group>
+      <group Name="Translators">
+      </group>
+    </CustomGroup>
+    <RegionalSettings LocaleId="16385" WorkDayStartHour="480" WorkDayEndHour="1020" FirstDayOfWeek="0" Time24="FALSE" CalendarType="10" AlternateCalendarType="0" WorkDays="124" TimeZoneName="(UTC) Coordinated Universal Time"></RegionalSettings>
     <ListAndContentTypes ListName="My Tasks" ContentTypeName="TASMU Approval Tasks" ListTemplate="GenericList" customView="Home">
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="Title" Required="False"></columnItem>
       <columnItem ContentTypeName="TASMU Approval Tasks" ColumnName="TASMUTaskStatus" choicevalue="Approved,Rejected" Required="True"></columnItem>
