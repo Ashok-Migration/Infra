@@ -1,63 +1,83 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-  "parameters": {
-    "endpointName": {
-      "value": "pre-cdntasmu"
-    },
-    "endpointProperties": {
-      "value": {
-        "contentTypesToCompress": [
-          "text/plain",
-          "text/html",
-          "text/css",
-          "text/javascript",
-          "application/x-javascript",
-          "application/javascript",
-          "application/json",
-          "application/xml"
-        ],
-        "isCompressionEnabled": true,
-        "isHttpAllowed": true,
-        "isHttpsAllowed": true,
-        "originHostHeader": "stcppshrdprewe01.blob.core.windows.net",
-        "origins": [
-          {
-            "name": "stcppshrdprewe01-blob-core-windows-net",
-            "properties": {
-              "hostName": "stcppshrdprewe01.blob.core.windows.net",
-              "httpPort": 80,
-              "httpsPort": 443
+    "parameters": {
+        "endpointName": {
+            "value": "pre-cdntasmu"
+        },
+        "endpointProperties": {
+            "value": {
+                "contentTypesToCompress": [
+                    "text/plain",
+                    "text/html",
+                    "text/css",
+                    "text/javascript",
+                    "application/x-javascript",
+                    "application/javascript",
+                    "application/json",
+                    "application/xml"
+                ],
+                "isCompressionEnabled": true,
+                "isHttpAllowed": true,
+                "isHttpsAllowed": true,
+                "originHostHeader": "stcppshrdprewe01.blob.core.windows.net",
+                "origins": [
+                    {
+                        "name": "stcppshrdprewe01-blob-core-windows-net",
+                        "properties": {
+                            "hostName": "stcppshrdprewe01.blob.core.windows.net",
+                            "httpPort": 80,
+                            "httpsPort": 443
+                        }
+                    }
+                ],
+                "deliveryPolicy": {
+                    "rules": [
+                        {
+                            "order": 0,
+                            "conditions": [],
+                            "actions": [
+                                {
+                                    "name": "CacheExpiration",
+                                    "parameters": {
+                                        "cacheBehavior": "Override",
+                                        "cacheType": "All",
+                                        "cacheDuration": "7.00:00:00",
+                                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleCacheExpirationActionParameters"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "queryStringCachingBehavior": "IgnoreQueryString"
             }
-          }
-        ]
-      }
-    },
-    "location": {
-      "value": "Global"
-    },
-    "profileName": {
-      "value": "cdn-cpp-shrd-pre-we-01"
-    },
-    "diagnosticLogsRetentionInDays": {
-      "value": 365
-    },
-    "diagnosticStorageAccountId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppshrddiagprewe01"
-    },
-    "workspaceId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-shrd-mon-pre-we-01"
-    },
-    "eventHubAuthorizationRuleId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-shrd-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
-    },
-    "eventHubName": {
-      "value": "evh-cpp-shrd-mon-pre-we-01"
-    },
-    "tags": {
-      "value": {
-        "Environment": "Pre-Production"
-      }
+        },
+        "location": {
+            "value": "Global"
+        },
+        "profileName": {
+            "value": "cdn-cpp-shrd-pre-we-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppshrddiagprewe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-shrd-mon-pre-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-shrd-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-shrd-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpp-shrd-mon-pre-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Pre-Production"
+            }
+        }
     }
-  }
 }

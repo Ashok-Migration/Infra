@@ -437,6 +437,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-func-cpp-apps-prflint-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-plan-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'FunctionAppD365/2018-11-01/Parameters/func-cpp-apps-prflint-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-func-cpp-apps-intntf-pre-we-01",
 			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
 			"dependsOn": [
@@ -804,6 +826,27 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-apps-log-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionLogAnalytics/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionLogAnalytics/2019-04-01/Parameters/apicon-cpp-apps-log-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-qnacopy-pre-we-01",
 			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
 			"dependsOn": [
@@ -1003,7 +1046,8 @@
 			"dependsOn": [
 				"DEP-rg-cpp-apps-int-pre-we-01",
 				"DEP-apicon-cpp-apps-intsb-pre-we-01",
-				"DEP-apicon-cpp-apps-intst-pre-we-01"
+				"DEP-apicon-cpp-apps-intst-pre-we-01",
+				"DEP-apicon-cpp-apps-log-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",

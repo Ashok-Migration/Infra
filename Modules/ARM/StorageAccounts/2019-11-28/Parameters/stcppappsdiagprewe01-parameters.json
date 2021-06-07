@@ -1,40 +1,61 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "storageAccountName": {
-        "value": "stcppappsdiagprewe01"
-      },
-      "storageAccountKind": {
-        "value": "StorageV2"
-      },
-      "storageAccountSku": {
-        "value": "Standard_LRS"
-      },
-      "storageAccountAccessTier": {
-        "value": "Hot"
-      },
-      "vNetId": {
-        "value": ""
-      },
-      "networkAcls": {
-        "value": {}
-      },
-      "blobContainers": {
-        "value": [
-          {
-            "name": "diagnostics",
-            "publicAccess": "None"
-          }
-        ]
-      },
-      "lockForDeletion": {
-        "value": true
-      },
-      "tags": {
-        "value": {
-          "Environment": "Pre-Production"
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "stcppappsdiagprewe01"
+    },
+    "storageAccountKind": {
+      "value": "StorageV2"
+    },
+    "storageAccountSku": {
+      "value": "Standard_ZRS"
+    },
+    "storageAccountAccessTier": {
+      "value": "Hot"
+    },
+    "vNetId": {
+      "value": ""
+    },
+    "networkAcls": {
+      "value": {
+        "resourceAccessRules": [],
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Deny"
+      }
+    },
+    "blobContainers": {
+      "value": [
+        {
+          "name": "diagnostics",
+          "publicAccess": "None"
         }
+      ]
+    },
+    "lockForDeletion": {
+      "value": true
+    },
+    "minimumTlsVersion": {
+      "value": "TLS1_2"
+    },
+    "allowBlobPublicAccess": {
+      "value": false
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
       }
     }
   }
+}

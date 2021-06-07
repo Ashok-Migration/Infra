@@ -10,23 +10,23 @@
             }
         }
     },
-  "variables": {
-    "lockForDeletion": false,
-    "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
-    "accountSasProperties": {
-      "signedServices": "bt",
-      "signedPermission": "racuw",
-      "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
-      "signedResourceTypes": "co",
-      "signedProtocol": "https"
+    "variables": {
+        "lockForDeletion": false,
+        "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+        "accountSasProperties": {
+            "signedServices": "bt",
+            "signedPermission": "racuw",
+            "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+            "signedResourceTypes": "co",
+            "signedProtocol": "https"
+        },
+        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprewe01",
+        "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+        "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+        "containerName": "components",
+        "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+        "location": "[deployment().location]"
     },
-    "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprewe01",
-    "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
-    "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
-    "containerName": "components",
-    "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]"
-    "location": "[deployment().location]"
-  },
     "resources": [
         {
             "type": "Microsoft.Resources/deployments",

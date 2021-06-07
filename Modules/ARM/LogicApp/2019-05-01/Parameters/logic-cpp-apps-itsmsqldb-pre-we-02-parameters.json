@@ -1,0 +1,395 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-apps-itsmsqldb-pre-we-02"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "manual": {
+          "inputs": {
+            "schema": {
+              "properties": {
+                "$content": {
+                  "type": "string"
+                },
+                "$content-type": {
+                  "type": "string"
+                },
+                "$formdata": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "kind": "Http",
+          "type": "Request"
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Delay": {
+          "inputs": {
+            "interval": {
+              "count": 15,
+              "unit": "Second"
+            }
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "Wait"
+        },
+        "For_each": {
+          "actions": {
+            "Condition_2": {
+              "actions": {
+                "For_each_3": {
+                  "actions": {
+                    "Condition": {
+                      "actions": {
+                        "For_each_2": {
+                          "actions": {
+                            "Add_comment_to_incident_(V3)": {
+                              "inputs": {
+                                "body": {
+                                  "incidentArmId": "@items('For_each_2')?['ArmID']",
+                                  "message": "<p>The latest ITSM Ticket details are:<br>\n<br>\nStatus : @{items('For_each_2')?['Status']}<br>\nAssigned Workgroup : @{items('For_each_2')?['Workgroup']}<br>\nAssigned at : @{items('For_each_2')?['WorkGroup_Assigned_Time']}<br>\nPrimary Engineer : @{items('For_each_2')?['Engineer']}<br>\nAssigned at : @{items('For_each_2')?['Analyst_Assigned_Time']}<br>\nSecondary Engineer : @{items('For_each_2')?['Secondary_Engineer']}<br>\n<br>\nThank you,<br>\nTASMU</p>"
+                                },
+                                "host": {
+                                  "connection": {
+                                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                  }
+                                },
+                                "method": "post",
+                                "path": "/Incidents/Comment"
+                              },
+                              "runAfter": {},
+                              "type": "ApiConnection"
+                            },
+                            "Send_an_email_(V2)": {
+                              "inputs": {
+                                "body": {
+                                  "Body": "<p>The latest ITSM Ticket details are:<br>\n<br>\n<strong>Status</strong> : @{items('For_each_2')?['Status']}<br>\n<strong>Assigned Workgroup</strong> : @{items('For_each_2')?['Workgroup']}<br>\n<strong>Assigned at</strong> : @{items('For_each_2')?['WorkGroup_Assigned_Time']}<br>\n<strong>Primary Engineer </strong>: @{items('For_each_2')?['Engineer']}<br>\n<strong>Assigned at</strong> : @{items('For_each_2')?['Analyst_Assigned_Time']}<br>\n<strong>Secondary Engineer </strong>: @{items('For_each_2')?['Secondary_Engineer']}<br>\n<br>\n<br>\nThank you,<br>\nTASMU<br>\n</p>",
+                                  "Subject": "####   A new comment has been posted on Incident# @{items('For_each_2')?['SentinelID']} on Workspace :  @{items('For_each_2')?['Workspace']}    ####",
+                                  "To": "@items('For_each_2')?['CallerEmail']"
+                                },
+                                "host": {
+                                  "connection": {
+                                    "name": "@parameters('$connections')['office365']['connectionId']"
+                                  }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                              },
+                              "runAfter": {
+                                "Add_comment_to_incident_(V3)": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "type": "ApiConnection"
+                            }
+                          },
+                          "foreach": "@body('Parse_JSON_2')?['ResultSets']?['Table1']",
+                          "runAfter": {},
+                          "type": "Foreach"
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "Add_comment_to_incident_(V3)_2": {
+                            "inputs": {
+                              "body": {
+                                "incidentArmId": "@items('For_each_3')?['ArmID']",
+                                "message": "<p>A new comment is added in the incident log:<br>\n<br>\n@{items('For_each_3')?['log']}<br>\n<br>\nThank you,<br>\nTASMU</p>"
+                              },
+                              "host": {
+                                "connection": {
+                                  "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                }
+                              },
+                              "method": "post",
+                              "path": "/Incidents/Comment"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                          },
+                          "Send_an_email_(V2)_2": {
+                            "inputs": {
+                              "body": {
+                                "Body": "<p>A new comment is added in the incident log:<br>\n<br>\n@{items('For_each_3')?['log']}<br>\n<br>\nThank you,<br>\nTASMU</p>",
+                                "Subject": "####   A new comment has been posted on Incident# @{items('For_each_3')?['SentinelID']} on Workspace :  @{items('For_each_3')?['Workspace']}    ####",
+                                "To": "@items('For_each_3')?['CallerEmail']"
+                              },
+                              "host": {
+                                "connection": {
+                                  "name": "@parameters('$connections')['office365']['connectionId']"
+                                }
+                              },
+                              "method": "post",
+                              "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                              "Add_comment_to_incident_(V3)_2": [
+                                "Succeeded"
+                              ]
+                            },
+                            "type": "ApiConnection"
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@items('For_each_3')?['log']",
+                              "@null"
+                            ]
+                          }
+                        ]
+                      },
+                      "runAfter": {},
+                      "type": "If"
+                    }
+                  },
+                  "foreach": "@body('Parse_JSON_2')?['ResultSets']?['Table1']",
+                  "runAfter": {},
+                  "type": "Foreach"
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@body('Parse_JSON_2')?['ResultSets']?['Table1']",
+                        "@null"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "runAfter": {
+                "Parse_JSON_2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "If"
+            },
+            "Execute_a_SQL_query_(V2)": {
+              "inputs": {
+                "body": {
+                  "query": "Select IMC3.AttributeValue as SentinelID, IMC.AttributeValue as ArmID, IMC2.AttributeValue as Workspace, IM.Status, WG.wg_Name as Workgroup,WGL.Assigned_Engineer_Comments as log,\nFORMAT(IM.WorkGroup_Assigned_Time, 'hh:mm:ss MM-dd-yy') as WorkGroup_Assigned_Time, UMC.EmailID as CallerEmail,\nUM.UserName as Engineer,FORMAT(IM.Analyst_Assigned_Time, 'hh:mm:ss MM-dd-yy') as Analyst_Assigned_Time, \nUMS.UserName as Secondary_Engineer from IM_TicketMaster IM \ninner join IM_CustomAttributes_Details IMC \non IM.Ticket_ID=IMC.Ticket_ID \nand IMC.AttributeID=22\ninner join IM_CustomAttributes_Details IMC2 \non IM.Ticket_ID=IMC2.Ticket_ID \nand IMC2.AttributeID=21\ninner join IM_CustomAttributes_Details IMC3 \non IM.Ticket_ID=IMC3.Ticket_ID \nand IMC3.AttributeID=20\ninner join IM_WorkGroup_Master WG\non IM.Assigned_Workgroup= WG.wg_Id\ninner join User_Master UM\non IM.Assigned_Engineer = UM.UserID\nleft join User_Master UMS\non IM.Assigned_Engineer_Secondary = UMS.UserID\nleft join IM_Total_EffortBy_Workgroup WGL\non IM.Ticket_ID=WGL.Ticket_ID and IM.Updated_Time<=WGL.Reg_Time\nleft join User_Master UMC\non IM.Caller = UMC.UserID\nwhere IM.Ticket_No=@{items('For_each')['value']} and IM.Updated_Time>=DATEADD(SECOND, -25, GETDATE());"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['sql']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/query/sql"
+              },
+              "runAfter": {},
+              "type": "ApiConnection"
+            },
+            "Parse_JSON_2": {
+              "inputs": {
+                "content": "@body('Execute_a_SQL_query_(V2)')",
+                "schema": {
+                  "properties": {
+                    "OutputParameters": {
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "ResultSets": {
+                      "properties": {
+                        "Table1": {
+                          "items": {
+                            "properties": {
+                              "Analyst_Assigned_Time": {
+                                "type": "string"
+                              },
+                              "ArmID": {
+                                "type": "string"
+                              },
+                              "CallerEmail": {
+                                "type": "string"
+                              },
+                              "Engineer": {
+                                "type": "string"
+                              },
+                              "Secondary_Engineer": {},
+                              "SentinelID": {
+                                "type": "string"
+                              },
+                              "Status": {
+                                "type": "string"
+                              },
+                              "WorkGroup_Assigned_Time": {
+                                "type": "string"
+                              },
+                              "Workgroup": {
+                                "type": "string"
+                              },
+                              "Workspace": {
+                                "type": "string"
+                              },
+                              "log": {}
+                            },
+                            "required": [
+                              "SentinelID",
+                              "ArmID",
+                              "Workspace",
+                              "Status",
+                              "Workgroup",
+                              "log",
+                              "WorkGroup_Assigned_Time",
+                              "CallerEmail",
+                              "Engineer",
+                              "Analyst_Assigned_Time",
+                              "Secondary_Engineer"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "runAfter": {
+                "Execute_a_SQL_query_(V2)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson"
+            }
+          },
+          "foreach": "@body('Parse_JSON')",
+          "runAfter": {
+            "Delay": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "Parse_JSON": {
+          "inputs": {
+            "content": "@triggerBody()?['$formdata']",
+            "schema": {
+              "items": {
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        },
+        "Terminate": {
+          "inputs": {
+            "runStatus": "Succeeded"
+          },
+          "runAfter": {
+            "For_each": [
+              "Succeeded"
+            ]
+          },
+          "type": "Terminate"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprewe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-pre-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpp-apps-sentl-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-itsm-int-pre-we-02/providers/Microsoft.Web/connections/apicon-cpp-apps-sentl-pre-we-01",
+              "connectionName": "apicon-cpp-apps-sentl-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel"
+            },
+            "apicon-cpp-apps-into365-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-into365-pre-we-01",
+              "connectionName": "apicon-cpp-apps-into365-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
+            },
+            "apicon-cpp-data-sql-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-itsm-int-pre-we-02/providers/Microsoft.Web/connections/apicon-cpp-data-sql-pre-we-01",
+              "connectionName": "apicon-cpp-data-sql-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/sql"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -311,6 +311,51 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-prf-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-str-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-pre-we-01",
+				"DEP-cosmos-cpp-apps-str-pre-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-prf-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-prf-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpp-apps-str-prf-pre-we-01",
+			"resourceGroup": "rg-cpp-apps-str-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-pre-we-01",
+				"DEP-cosmos-cpp-apps-str-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpp-apps-str-prf-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-redis-cpp-apps-str-pre-we-01",
 			"resourceGroup": "rg-cpp-apps-str-pre-we-01",
 			"dependsOn": [
@@ -322,10 +367,10 @@
 					"detailLevel": "requestContent,responseContent"
 				},
 				"templateLink": {
-					"uri": "[concat(variables('modulesPath'), 'RedisCache/2019-07-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+					"uri": "[concat(variables('modulesPath'), 'RedisCache/2020-06-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				},
 				"parametersLink": {
-					"uri": "[concat(variables('modulesPath'), 'RedisCache/2019-07-01/Parameters/redis-cpp-apps-str-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+					"uri": "[concat(variables('modulesPath'), 'RedisCache/2020-06-01/Parameters/redis-cpp-apps-str-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		},
