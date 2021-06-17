@@ -5,6 +5,13 @@
         "alwaysOn": {
             "type": "bool"
         },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "State of FTP / FTPS service."
+            }
+        },
         "appConfigEndpoint": {
             "type": "string"
         },
@@ -165,7 +172,8 @@
                   "value": "[toLower(parameters('functionAppName'))]"
                 }
               ],
-              "alwaysOn": "[parameters('alwaysOn')]"
+              "alwaysOn": "[parameters('alwaysOn')]",
+              "ftpsState": "[parameters('ftpsState')]"
             },
             "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
             "clientAffinityEnabled": true
