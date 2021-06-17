@@ -78,13 +78,12 @@
         "backendHttpSettingsCollection": {
             "value": [
                 {
-                    "name": "marketplace-prd-sqcp-https",
+                    "name": "marketplace-prd-sqcp-http",
                     "properties": {
-                        "port": 443,
-                        "protocol": "Https",
+                        "port": 80,
+                        "protocol": "Http",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
-                        "affinityCookieName": "ApplicationGatewayAffinity",
                         "requestTimeout": 120,
                         "probe": {
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/probes/marketplace-portal-probe"
@@ -92,13 +91,12 @@
                     }
                 },
                 {
-                    "name": "mytasmu-prd-sqcp-https",
+                    "name": "mytasmu-prd-sqcp-http",
                     "properties": {
-                        "port": 443,
-                        "protocol": "Https",
+                        "port": 80,
+                        "protocol": "Http",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
-                        "affinityCookieName": "ApplicationGatewayAffinity",
                         "path": "/eservices/",
                         "requestTimeout": 120,
                         "probe": {
@@ -107,13 +105,12 @@
                     }
                 },
                 {
-                    "name": "cpadmin-prd-sqcp-https",
+                    "name": "cpadmin-prd-sqcp-http",
                     "properties": {
-                        "port": 443,
-                        "protocol": "Https",
+                        "port": 80,
+                        "protocol": "Http",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
-                        "affinityCookieName": "ApplicationGatewayAffinity",
                         "path": "/adminportal/",
                         "requestTimeout": 120,
                         "probe": {
@@ -122,10 +119,10 @@
                     }
                 },
                 {
-                    "name": "account-prd-sqcp-https",
+                    "name": "account-prd-sqcp-http",
                     "properties": {
-                        "port": 443,
-                        "protocol": "Https",
+                        "port": 80,
+                        "protocol": "Http",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
                         "path": "/account/",
@@ -136,10 +133,10 @@
                     }
                 },
                 {
-                    "name": "opendata-prd-sqcp-https",
+                    "name": "opendata-prd-sqcp-http",
                     "properties": {
-                        "port": 443,
-                        "protocol": "Https",
+                        "port": 80,
+                        "protocol": "Http",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
                         "requestTimeout": 120,
@@ -322,7 +319,7 @@
         "requestRoutingRules": {
             "value": [
                 {
-                    "name": "prd-marketplace-sqcp-443",
+                    "name": "prd-marketplace-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
@@ -332,12 +329,12 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-apps-aks-prd-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/marketplace-prd-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/marketplace-prd-sqcp-http"
                         }
                     }
                 },
                 {
-                    "name": "prd-cpadmin-sqcp-443",
+                    "name": "prd-cpadmin-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
@@ -347,12 +344,12 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-apps-aks-prd-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/cpadmin-prd-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/cpadmin-prd-sqcp-http"
                         }
                     }
                 },
                 {
-                    "name": "prd-mytasmu-sqcp-443",
+                    "name": "prd-mytasmu-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
@@ -362,12 +359,12 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-apps-aks-prd-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/mytasmu-prd-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/mytasmu-prd-sqcp-http"
                         }
                     }
                 },
                 {
-                    "name": "prd-accounts-sqcp-443",
+                    "name": "prd-accounts-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
@@ -377,22 +374,22 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-apps-aks-prd-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/account-prd-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/account-prd-sqcp-http"
                         }
                     }
                 },
                 {
-                    "name": "prd-opendata-sqcp-443",
+                    "name": "prd-opendata-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
                         "httpListener": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/httpListeners/prd-opendata-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/httpListeners/prd-opendata-sqcp-http"
                         },
                         "backendAddressPool": {
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-apps-ckan-prd-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/opendata-prd-sqcp-https"
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/opendata-prd-sqcp-http"
                         }
                     }
                 },
@@ -463,8 +460,8 @@
                 {
                     "name": "mytasmu-portal-probe",
                     "properties": {
-                        "protocol": "Https",
-                        "host": "mytasmu.tasmu.gov.qa",
+                        "protocol": "Http",
+                        "host": "172.20.116.4",
                         "path": "/eservices/",
                         "interval": 30,
                         "timeout": 120,
@@ -481,8 +478,8 @@
                 {
                     "name": "account-portal-probe",
                     "properties": {
-                        "protocol": "Https",
-                        "host": "account.tasmu.gov.qa",
+                        "protocol": "Http",
+                        "host": "172.20.116.4",
                         "path": "/account/",
                         "interval": 30,
                         "timeout": 120,
@@ -499,8 +496,8 @@
                 {
                     "name": "cpadmin-portal-probe",
                     "properties": {
-                        "protocol": "Https",
-                        "host": "cpadmin.tasmu.gov.qa",
+                        "protocol": "Http",
+                        "host": "172.20.116.4",
                         "path": "/*",
                         "interval": 30,
                         "timeout": 120,
@@ -517,8 +514,8 @@
                 {
                     "name": "marketplace-portal-probe",
                     "properties": {
-                        "protocol": "Https",
-                        "host": "platform.tasmu.gov.qa",
+                        "protocol": "Http",
+                        "host": "172.20.116.4",
                         "path": "/",
                         "interval": 30,
                         "timeout": 120,
@@ -535,8 +532,8 @@
                 {
                     "name": "opendata-portal-probe",
                     "properties": {
-                        "protocol": "Https",
-                        "host": "opendata.tasmu.gov.qa",
+                        "protocol": "Http",
+                        "host": "172.20.117.70",
                         "path": "/",
                         "interval": 30,
                         "timeout": 120,
