@@ -22,7 +22,7 @@
             "type": "string",
             "defaultValue": "[resourceGroup().name]"
         },
-        "keyVaultName":{
+        "keyVaultName": {
             "type": "string"
         },
         "location": {
@@ -76,6 +76,13 @@
                 "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
             }
         },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "State of FTP / FTPS service."
+            }
+        },
         "tags": {
             "defaultValue": {
             },
@@ -92,8 +99,8 @@
                 "category": "AllMetrics",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             }
         ],
@@ -102,8 +109,8 @@
                 "category": "FunctionAppLogs",
                 "enabled": true,
                 "retentionPolicy": {
-                "days": "[parameters('diagnosticLogsRetentionInDays')]",
-                "enabled": true
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
                 }
             }
         ]
@@ -154,7 +161,8 @@
                 },
                 "serverFarmId": "[resourceId(subscription().subscriptionId, parameters('hostingPlanRG'), 'Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
                 "clientAffinityEnabled": true,
-                "httpsOnly": true
+                "httpsOnly": true,
+                "ftpsState": "[parameters('ftpsState')]"
             },
             "resources": [
                 {
