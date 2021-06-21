@@ -67,7 +67,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
-			"name": "DEP-apicon-cpp-apps-sql-prd-we-01",
+			"name": "DEP-apicon-cpp-apps-itsmkv-prd-we-01",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/Parameters/apicon-cpp-apps-itsmkv-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-data-sql-prd-we-01",
 			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
 			"dependsOn": [
 				"DEP-rg-cpp-itsm-int-prd-we-01"
@@ -81,7 +102,7 @@
 					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				},
 				"parametersLink": {
-					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/apicon-cpp-apps-sql-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+					"uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/apicon-cpp-data-sql-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		},
@@ -113,7 +134,7 @@
 			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
 			"dependsOn": [
 				"DEP-rg-cpp-itsm-int-prd-we-01",
-				"DEP-apicon-cpp-apps-sql-prd-we-01",
+				"DEP-apicon-cpp-data-sql-prd-we-01",
 				"DEP-apicon-cpp-apps-sentl-prd-we-01"
 			],
 			"properties": {
@@ -126,6 +147,135 @@
 				},
 				"parametersLink": {
 					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsmsqldb-prd-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-01",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-03",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-04",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-04-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-05",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-05-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-itsm-prd-we-06",
+			"resourceGroup": "rg-cpp-itsm-int-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-prd-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2019-05-01/Parameters/logic-cpp-apps-itsm-prd-we-06-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		}

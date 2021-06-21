@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflowName": {
-      "value": "logic-cpp-apps-itsm-pre-we-05"
+      "value": "logic-cpp-apps-itsm-prd-we-06"
     },
     "workflowLocation": {
       "value": "westeurope"
@@ -25,23 +25,23 @@
                 },
                 "filter": {
                   "includedEventTypes": [
-                    "servicerequest-internalnote-created",
-                    "supportrequest-internalnote-created",
-                    "servicerequest-internalnote-updated",
-                    "supportrequest-internalnote-updated"
+                    "servicerequest-file-created",
+                    "supportrequest-file-created",
+                    "servicerequest-file-updated",
+                    "supportrequest-file-updated"
                   ]
                 },
-                "topic": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.EventGrid/domains/egd-cpp-apps-int-pre-we-01/topics/d365"
+                "topic": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.EventGrid/domains/egd-cpp-apps-int-prd-we-01/topics/d365"
               }
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['apicon-cpp-apps-integ-pre-we-01']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpp-apps-integ-prd-we-01']['connectionId']"
               }
             },
             "path": "/subscriptions/@{encodeURIComponent('8964f3c1-44f5-4094-80eb-4334845bdfb1')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
             "queries": {
-              "subscriptionName": "logic-cpp-apps-itsm-pre-we-05-sub",
+              "subscriptionName": "logic-cpp-apps-itsm-prd-we-06-sub",
               "x-ms-api-version": "2017-09-15-preview"
             }
           },
@@ -56,22 +56,16 @@
           "actions": {
             "Compose": {
               "inputs": {
-                "ServiceName": "SR_UpdateServiceRequest",
-                "objCommonParameters": {
-                  "_ProxyDetails": {
-                    "APIKey": "eYnZ/sF5c/VqGukkenfBPa8mZA3adAsYkoY26WotTes=",
-                    "AuthType": "APIKEY",
-                    "ProxyID": 0,
-                    "ReturnType": "JSON"
-                  },
-                  "objSRServiceTicket": {
-                    "IncidentTicketID": "@body('Parse_JSON')?['value']?['regardingExtRefNumber']",
-                    "InternalLog": "@body('Parse_JSON')?['value']?['description']",
-                    "Org_ID": "1",
-                    "Status": null,
-                    "SupportFunction": "IT"
-                  }
-                }
+                "AttachmentFileName": "@body('Parse_JSON')?['value']?['fileName']",
+                "TicketID": "@body('Parse_JSON')?['value']?['regardingExtRefNumber']",
+                "_ProxyDetails": {
+                  "APIKey": "eYnZ/sF5c/VqGukkenfBPa8mZA3adAsYkoY26WotTes=",
+                  "AuthType": "APIKEY",
+                  "ProxyID": 0,
+                  "ReturnType": "JSON"
+                },
+                "base64EncodedData": "@base64(body('HTTP_5'))",
+                "eModule": "ServiceRequest"
               },
               "runAfter": {},
               "type": "Compose"
@@ -83,7 +77,7 @@
                   "Content-Type": "application/json"
                 },
                 "method": "POST",
-                "uri": "https://itsm.pre.sqcp.qa/SummitProxyService/REST/Summit_RESTWCF.svc/RESTService/CommonWS_JsonObjCall"
+                "uri": "https://itsm.tasmuplatform.qa/SummitProxyService/REST/Summit_RESTWCF.svc/RESTService/Summit_UploadAttachmentBase64Encoded"
               },
               "runAfter": {
                 "Compose": [
@@ -100,21 +94,7 @@
                     "Errors": {
                       "type": "string"
                     },
-                    "Input": {},
                     "Message": {
-                      "type": "string"
-                    },
-                    "OrgID": {
-                      "type": "integer"
-                    },
-                    "Output": {
-                      "type": "string"
-                    },
-                    "OutputID": {
-                      "type": "integer"
-                    },
-                    "OutputObject": {},
-                    "TokenID": {
                       "type": "string"
                     }
                   },
@@ -142,11 +122,54 @@
             ]
           },
           "runAfter": {
-            "Parse_JSON": [
+            "HTTP_5": [
               "Succeeded"
             ]
           },
           "type": "If"
+        },
+        "Get_Client_Secret": {
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['keyvault']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/secrets/@{encodeURIComponent('itsm-spn-secret')}/value"
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          }
+        },
+        "HTTP_5": {
+          "inputs": {
+            "authentication": {
+              "audience": "5b71785c-a9a9-4ab1-9acd-fc95f7e2f580",
+              "clientId": "908901be-5c84-4c23-9215-f0178ec27c60",
+              "secret": "@body('Get_Client_Secret')?['value']",
+              "tenant": "26aa757b-a20c-4270-bc1c-d946b1f3e4a2",
+              "type": "ActiveDirectoryOAuth"
+            },
+            "method": "GET",
+            "uri": "https://api.tasmu.gov.qa/Config/api/File/0/@{body('Parse_JSON')?['value']?['fileName']}?api-version=1.0"
+          },
+          "runAfter": {
+            "Get_Client_Secret": [
+              "Succeeded"
+            ]
+          },
+          "type": "Http"
         },
         "Parse_JSON": {
           "inputs": {
@@ -158,14 +181,15 @@
                 },
                 "value": {
                   "properties": {
-                    "description": {
+                    "createdOn": {
+                      "type": "string"
+                    },
+                    "fileName": {
                       "type": "string"
                     },
                     "id": {
                       "type": "string"
                     },
-                    "isNotifyCustomer": {},
-                    "profileId": {},
                     "regardingExtRefNumber": {
                       "type": [
                         "string",
@@ -198,30 +222,35 @@
       "value": 365
     },
     "diagnosticStorageAccountId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprewe01"
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcppappsdiagprdwe01"
     },
     "workspaceId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-pre-we-01"
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpp-apps-mon-prd-we-01"
     },
     "eventHubAuthorizationRuleId": {
-      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
     },
     "eventHubName": {
-      "value": "evh-cpp-apps-mon-pre-we-01"
+      "value": "evh-cpp-apps-mon-prd-we-01"
     },
     "tags": {
       "value": {
-        "Environment": "Pre-Production"
+        "Environment": "Production"
       }
     },
     "connectionParameters": {
       "value": {
         "$connections": {
           "value": {
-              "apicon-cpp-apps-integ-pre-we-01": {
-                  "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integ-pre-we-01",
-                  "connectionName": "apicon-cpp-apps-integ-pre-we-01",
+              "apicon-cpp-apps-integ-prd-we-01": {
+                  "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integ-prd-we-01",
+                  "connectionName": "apicon-cpp-apps-integ-prd-we-01",
                   "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+              },
+              "keyvault": {
+                "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-itsm-int-prd-we-02/providers/Microsoft.Web/connections/apicon-cpp-apps-itsmkv-prd-we-01",
+                "connectionName": "apicon-cpp-apps-itsmkv-prd-we-01",
+                "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
               }
           }
         }

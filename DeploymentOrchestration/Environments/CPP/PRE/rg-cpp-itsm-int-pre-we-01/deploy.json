@@ -31,7 +31,7 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
-			"name": "DEP-rg-cpp-itsm-int-pre-we-02",
+			"name": "DEP-rg-cpp-itsm-int-pre-we-01",
 			"location": "[variables('location')]",
 			"dependsOn": [],
 			"properties": {
@@ -43,7 +43,7 @@
 					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				},
 				"parametersLink": {
-					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-itsm-int-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-itsm-int-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		},
@@ -51,9 +51,9 @@
 			"apiVersion": "2019-10-01",
 			"name": "[variables('CUA')]",
 			"type": "Microsoft.Resources/deployments",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -67,10 +67,31 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
-			"name": "DEP-apicon-cpp-data-sql-pre-we-01",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"name": "DEP-apicon-cpp-apps-itsmkv-pre-we-01",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/Parameters/apicon-cpp-apps-itsmkv-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-data-sql-pre-we-01",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -89,9 +110,9 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-apicon-cpp-apps-sentl-pre-we-01",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -110,9 +131,9 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsmsqldb-pre-we-02",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02",
+				"DEP-rg-cpp-itsm-int-pre-we-01",
 				"DEP-apicon-cpp-data-sql-pre-we-01",
 				"DEP-apicon-cpp-apps-sentl-pre-we-01"
 			],
@@ -133,9 +154,10 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-01",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -154,9 +176,10 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-02",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -175,9 +198,9 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-03",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -196,9 +219,9 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-04",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -217,9 +240,9 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-05",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -238,9 +261,10 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
 			"name": "DEP-logic-cpp-apps-itsm-pre-we-06",
-			"resourceGroup": "rg-cpp-itsm-int-pre-we-02",
+			"resourceGroup": "rg-cpp-itsm-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-itsm-int-pre-we-02"
+				"DEP-rg-cpp-itsm-int-pre-we-01",
+				"DEP-apicon-cpp-apps-itsmkv-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",

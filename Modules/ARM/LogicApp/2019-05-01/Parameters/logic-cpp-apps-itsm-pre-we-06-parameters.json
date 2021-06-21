@@ -36,7 +36,7 @@
             },
             "host": {
               "connection": {
-                "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+                "name": "@parameters('$connections')['apicon-cpp-apps-integ-pre-we-01']['connectionId']"
               }
             },
             "path": "/subscriptions/@{encodeURIComponent('8964f3c1-44f5-4094-80eb-4334845bdfb1')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
@@ -128,20 +128,44 @@
           },
           "type": "If"
         },
+        "Get_Client_Secret": {
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['keyvault']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/secrets/@{encodeURIComponent('itsm-spn-secret')}/value"
+          },
+          "runtimeConfiguration": {
+            "secureData": {
+              "properties": [
+                "outputs"
+              ]
+            }
+          }
+        },
         "HTTP_5": {
           "inputs": {
             "authentication": {
-              "audience": "bc67474e-612b-4d7f-b75a-ac54d45f143a",
-              "clientId": "ce633c1d-d8b4-4381-b68a-1f7d0851250f",
-              "secret": "WnIaXQ~IT~P.O3CyjZNmwnj42vC2FoK_B7",
-              "tenant": "24f9d756-bf0c-43e9-ad5e-2073ae2d6698",
+              "audience": "5b71785c-a9a9-4ab1-9acd-fc95f7e2f580",
+              "clientId": "908901be-5c84-4c23-9215-f0178ec27c60",
+              "secret": "@body('Get_Client_Secret')?['value']",
+              "tenant": "26aa757b-a20c-4270-bc1c-d946b1f3e4a2",
               "type": "ActiveDirectoryOAuth"
             },
             "method": "GET",
             "uri": "https://api.pre.sqcp.qa/Config/api/File/0/@{body('Parse_JSON')?['value']?['fileName']}?api-version=1.0"
           },
           "runAfter": {
-            "Parse_JSON": [
+            "Get_Client_Secret": [
               "Succeeded"
             ]
           },
@@ -218,11 +242,16 @@
       "value": {
         "$connections": {
           "value": {
-            "azureeventgrid": {
-              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integd-pre-we-01",
-              "connectionName": "apicon-cpp-apps-integd-pre-we-01",
-              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
-            }
+              "apicon-cpp-apps-integ-pre-we-01": {
+                  "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integ-pre-we-01",
+                  "connectionName": "apicon-cpp-apps-integ-pre-we-01",
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+              },
+              "keyvault": {
+                "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-itsm-int-pre-we-02/providers/Microsoft.Web/connections/apicon-cpp-apps-itsmkv-pre-we-01",
+                "connectionName": "apicon-cpp-apps-itsmkv-pre-we-01",
+                "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
+              }
           }
         }
       }
