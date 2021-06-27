@@ -112,6 +112,27 @@
         "metadata": {
           "description": "Optional. Tags of the Logic App resource."
         }
+      },
+      "logAnalytics": {
+        "type": "string",
+        "defaultValue": {},
+        "metadata": {
+          "description": "Required. Log Analytics Workspace Name."
+        }
+      },
+      "logAnalyticsRG": {
+        "type": "string",
+        "defaultValue": {},
+        "metadata": {
+          "description": "Optional. Log Analytics Resource Group."
+        }
+      },
+      "subscriptionId": {
+        "type": "string",
+        "defaultValue": {},
+        "metadata": {
+          "description": "Optional. Log Analytics Subscription Id."
+        }
       }
     },
     "variables": {
@@ -232,7 +253,7 @@
                             "body": "@outputs('Compose')",
                             "host": {
                                 "connection": {
-                                    "name": "@parameters('$connections')['apimApiConnection']['connectionId']"
+                                    "name": "@parameters('$connections')['apicon-cpp-prdt-ipam-pre-we-01']['connectionId']"
                                 }
                             },
                             "method": "post",
@@ -309,7 +330,7 @@
                             ],
                             "host": {
                                 "connection": {
-                                    "name": "@parameters('$connections')['eventGridApiConnection']['connectionId']"
+                                    "name": "@parameters('$connections')['apicon-cpp-apps-integd-pre-we-01']['connectionId']"
                                 }
                             },
                             "method": "post",
@@ -327,16 +348,16 @@
                             "body": "let TempLastMonthEndDate = (startofmonth(now()) - 1h);\nlet LastMonthStartDate = startofmonth(TempLastMonthEndDate);\nlet LastMonthEndDate = TempLastMonthEndDate+59m+59s;\n AuditLogs\n| where LoggedByService == \"B2C\"\n    and Result == \"success\"\n    and Category == \"Authentication\"\n    and OperationName in (\"Issue an id_token to the application\", \"Exchange token\", \"Issue an authorization code to the application\", \"Issue an access token to the //application\")\n    and tostring(AdditionalDetails[1][\"value\"]) has \"signup_signin\"\n  and TimeGenerated between(LastMonthStartDate .. LastMonthEndDate)\n| extend UserId = extractjson(\"$.[0].id\", tostring(TargetResources))\n| extend application_id = tostring(AdditionalDetails[1][\"value\"])\n| extend unit_type = \"count\"\n| order by TimeGenerated desc\n| summarize TotalAuth = count() by UserId , application_id, unit_type\n| summarize number_of_active_users = count() by application_id, unit_type\n| order by application_id desc\n",
                             "host": {
                                 "connection": {
-                                    "name": "@parameters('$connections')['azuremonitorlogs']['connectionId']"
+                                    "name": "@parameters('$connections')['apicon-cpp-apps-monitor-pre-we-01']['connectionId']"
                                 }
                             },
                             "method": "post",
                             "path": "/queryData",
                             "queries": {
-                                "resourcegroups": "rg-cpd-b2c-mon-npd-we-01",
-                                "resourcename": "log-cpd-b2c-npd-we-01",
+                                "resourcegroups": "[parameters('logAnalyticsRG')]",
+                                "resourcename": "[parameters('logAnalytics')]",
                                 "resourcetype": "Log Analytics Workspace",
-                                "subscriptions": "d0694def-b27e-4bb7-900d-437fbeb802da",
+                                "subscriptions": "[parameters('subscriptionId')]",
                                 "timerange": "Set in query"
                             }
                         },
