@@ -103,7 +103,7 @@
                         "body": "@outputs('Compose')",
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpp-prdt-ipam-prd-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['azureblob']['connectionId']"
                             }
                         },
                         "method": "post",
@@ -180,7 +180,7 @@
                         ],
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpp-apps-integd-prd-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
                             }
                         },
                         "method": "post",
@@ -194,7 +194,7 @@
                         "body": "let TempLastMonthEndDate = (startofmonth(now()) - 1h);\nlet LastMonthStartDate = startofmonth(TempLastMonthEndDate);\nlet LastMonthEndDate = TempLastMonthEndDate+59m+59s;\n AuditLogs\n| where LoggedByService == \"B2C\"\n    and Result == \"success\"\n    and Category == \"Authentication\"\n    and OperationName in (\"Issue an id_token to the application\", \"Exchange token\", \"Issue an authorization code to the application\", \"Issue an access token to the //application\")\n  and TimeGenerated between(LastMonthStartDate .. LastMonthEndDate)\n| extend UserId = extractjson(\"$.[0].id\", tostring(TargetResources))\n| extend application_id = tostring(AdditionalDetails[2][\"value\"])\n| extend unit_type = \"count\"\n| order by TimeGenerated desc\n| summarize TotalAuth = count() by UserId , application_id, unit_type\n| summarize number_of_active_users = count() by application_id, unit_type\n| order by application_id desc\n",
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpp-apps-monitor-prd-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['azuremonitor']['connectionId']"
                             }
                         },
                         "method": "post",
@@ -242,17 +242,17 @@
             "value": {
                 "$connections": {
                     "value": {
-                        "apicon-cpp-prdt-ipam-prd-we-01": {
+                        "azureblob": {
                             "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-prdt-ipam-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-prdt-ipam-prd-we-01",
                             "connectionName": "apicon-cpp-prdt-ipam-prd-we-01",
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
                         },
-                        "apicon-cpp-apps-integd-prd-we-01": {
+                        "azureeventgrid": {
                             "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integd-prd-we-01",
                             "connectionName": "apicon-cpp-apps-integd-prd-we-01",
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
                         },
-                        "apicon-cpp-apps-monitor-prd-we-01": {
+                        "azuremonitor": {
                           "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-prdt-ipam-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-monitor-prd-we-01",
                           "connectionName": "apicon-cpp-apps-monitor-prd-we-01",
                           "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs"
