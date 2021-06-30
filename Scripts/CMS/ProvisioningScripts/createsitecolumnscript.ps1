@@ -239,11 +239,10 @@ function Add-Field($tenantAdmin, $contenttypehub, $ColumnTitle, $ColumnName, $Gr
       } 
       elseif ($columnType -eq "Number") {
         $Id = [GUID]::NewGuid() 
-        #$fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName'></Field>"
         if ($null -ne $validation) {
           $validation = $validation.Replace('>', '&gt;').Replace('<', '&lt;')
         }
-        $fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName' Description='$description'><Validation Message='$message'>$validation</Validation></Field>"
+        $fieldXml = "<Field Type='$ColumnType' DisplayName='$ColumnTitle' Name='$ColumnName' ID='{$Id}' Decimals='0' Min='0' Required='$Required' ShowInEditForm='$showInNewEditForm' ShowInNewForm='$showInNewEditForm' EnforceUniqueValues='$enforceUniqueValues' Indexed='$indexed' Group='$GroupName' Description='$description'><Validation Message='$message'>$validation</Validation></Field>"
 
         $addNewField = Add-PnPFieldFromXml -Connection $connection $fieldXml
       }
