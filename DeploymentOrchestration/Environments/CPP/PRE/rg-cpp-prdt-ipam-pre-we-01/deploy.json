@@ -88,6 +88,28 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-prdt-ipam-pre-we-01",
+			"resourceGroup": "rg-cpp-prdt-ipam-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-prdt-ipam-pre-we-01",
+        "DEP-stcppprdtipamprewe01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionAzureBlob/2019-04-01/Parameters/apicon-cpp-prdt-ipam-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
 			"name": "DEP-apicon-cpp-apps-monitor-pre-we-01",
 			"resourceGroup": "rg-cpp-prdt-ipam-pre-we-01",
 			"dependsOn": [
@@ -106,6 +128,27 @@
 				}
 			}
 		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-apicon-cpp-prdt-ipam-log-pre-we-01",
+			"resourceGroup": "rg-cpp-prdt-ipam-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-prdt-ipam-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionLogAnalytics/2021-06-25/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ApiConnectionLogAnalytics/2021-06-25/Parameters/apicon-cpp-prdt-ipam-log-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
@@ -113,8 +156,10 @@
       "resourceGroup": "rg-cpp-prdt-ipam-pre-we-01",
       "dependsOn": [
         "DEP-rg-cpp-prdt-ipam-pre-we-01",
-        "DEP-apicon-cpp-apps-monitor-pre-we-01",
-        "DEP-stcppprdtipamprewe01"
+        "DEP-apicon-cpp-prdt-ipam-pre-we-01",
+        "DEP-stcppprdtipamprewe01",
+        "DEP-apicon-cpp-prdt-ipam-log-pre-we-01",
+        "DEP-apicon-cpp-apps-monitor-pre-we-01"
       ],
       "properties": {
         "mode": "Incremental",

@@ -373,27 +373,6 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2019-10-01",
-			"name": "DEP-cog-cpp-apps-cmstrsl-pre-we-01",
-			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
-			"dependsOn": [
-				"DEP-rg-cpp-apps-int-pre-we-01"
-			],
-			"properties": {
-				"mode": "Incremental",
-				"debugSetting": {
-					"detailLevel": "requestContent,responseContent"
-				},
-				"templateLink": {
-					"uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-				},
-				"parametersLink": {
-					"uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpp-apps-cmstrsl-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2019-10-01",
 			"name": "DEP-plan-cpp-apps-int-pre-we-01",
 			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
 			"dependsOn": [
@@ -723,8 +702,7 @@
 			"name": "DEP-apicon-cpp-apps-intcog-pre-we-01",
 			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
 			"dependsOn": [
-				"DEP-rg-cpp-apps-int-pre-we-01",
-				"DEP-cog-cpp-apps-cmstrsl-pre-we-01"
+				"DEP-rg-cpp-apps-int-pre-we-01"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -949,7 +927,6 @@
 				"DEP-apicon-cpp-apps-intsb-pre-we-01",
 				"DEP-apicon-cpp-apps-into365-pre-we-01",
 				"DEP-apicon-cpp-apps-intcog-pre-we-01",
-				"DEP-cog-cpp-apps-cmstrsl-pre-we-01",
 				"DEP-apicon-cpp-apps-intkv-pre-we-01"
 			],
 			"properties": {
@@ -1104,6 +1081,28 @@
 				},
 				"parametersLink": {
 					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-6dhook-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-logic-cpp-apps-6dhook-pre-we-02",
+			"resourceGroup": "rg-cpp-apps-int-pre-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-int-pre-we-01",
+				"DEP-apicon-cpp-apps-integ-pre-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-apps-6dhook-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
 				}
 			}
 		},

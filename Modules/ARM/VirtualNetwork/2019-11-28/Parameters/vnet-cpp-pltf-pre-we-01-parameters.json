@@ -1,9 +1,14 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
   "parameters": {
     "vnetName": {
       "value": "vnet-cpp-pltf-pre-we-01"
+    },
+    "dnsServers": {
+      "value": [
+        "172.20.33.170"
+      ]
     },
     "vnetAddressPrefixes": {
       "value": [
@@ -179,7 +184,14 @@
           "addressPrefix": "172.20.96.0/25",
           "networkSecurityGroupName": "nsg-cpp-data-dbrpub-pre-we-01",
           "routeTableName": "route-cpp-data-dbrpub-pre-we-01",
-          "serviceEndpoints": [],
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westeurope"
+              ]
+            }
+          ],
           "delegations": [
             {
               "name": "Microsoft.Databricks/workspaces",
@@ -196,7 +208,14 @@
           "addressPrefix": "172.20.96.128/25",
           "networkSecurityGroupName": "nsg-cpp-data-dbrpri-pre-we-01",
           "routeTableName": "route-cpp-data-dbrpri-pre-we-01",
-          "serviceEndpoints": [],
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westeurope"
+              ]
+            }
+          ],
           "delegations": [
             {
               "name": "Microsoft.Databricks/workspaces",
@@ -285,7 +304,14 @@
           "addressPrefix": "172.20.100.0/25",
           "networkSecurityGroupName": "nsg-cpp-6d-app-pre-we-01",
           "routeTableName": "route-cpp-6d-app-pre-we-01",
-          "serviceEndpoints": [],
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westeurope"
+              ]
+            }
+          ],
           "delegations": [],
           "nsgsRGName": "rg-cpp-6d-sec-pre-we-01",
           "routesRGName": "rg-cpp-6d-net-pre-we-01"
