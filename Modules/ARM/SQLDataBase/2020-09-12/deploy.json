@@ -176,24 +176,24 @@
             "type": "string",
             "defaultValue": ""
         },
-      
-		"enableTED": {
+
+        "enableTED": {
             "type": "string",
             "defaultValue": "Enabled"
         },
-		"storageEndPoint": {
+        "storageEndPoint": {
             "type": "string",
             "defaultValue": ""
         },
-		"storageKey": {
+        "storageKey": {
             "type": "string",
             "defaultValue": ""
         },
-		"storageContainer": {
+        "storageContainer": {
             "type": "string",
             "defaultValue": ""
         },
-		
+
         "omsWorkspaceName": {
             "type": "string",
             "defaultValue": "[concat('omsworkspace', uniqueString(resourceGroup().id))]",
@@ -201,10 +201,10 @@
                 "description": "Log Analytics workspace name"
             }
         }
-      
+
     },
     "resources": [
-        
+
         {
             "apiVersion": "2019-06-01-preview",
             "type": "Microsoft.Sql/servers",
@@ -258,30 +258,30 @@
                             ]
                         },
                         {
-					  "name": "default",
-					  "type": "backupShortTermRetentionPolicies",
-					  "apiVersion": "2017-10-01-preview",
-					  "properties": {
-						"retentionDays": 21
-					  },
-                       "dependsOn": [
+                            "name": "default",
+                            "type": "backupShortTermRetentionPolicies",
+                            "apiVersion": "2017-10-01-preview",
+                            "properties": {
+                                "retentionDays": 21
+                            },
+                            "dependsOn": [
                                 "[parameters('databaseName')]"
                             ]
-				},
-				{
-				  "name": "default",
-				  "type": "backupLongTermRetentionPolicies",
-				  "apiVersion": "2017-03-01-preview",
-				  "properties": {
-					
-					"monthlyRetention": "P12M",
-					
-					"weekOfYear": 1
-				  },
-                   "dependsOn": [
+                        },
+                        {
+                            "name": "default",
+                            "type": "backupLongTermRetentionPolicies",
+                            "apiVersion": "2017-03-01-preview",
+                            "properties": {
+
+                                "monthlyRetention": "P12M",
+
+                                "weekOfYear": 1
+                            },
+                            "dependsOn": [
                                 "[parameters('databaseName')]"
                             ]
-				}
+                        }
                     ]
                 },
                 {
@@ -297,12 +297,12 @@
                         "isAzureMonitorTargetEnabled": true
                     }
                 },
-				{
+                {
                     "type": "databases/providers/diagnosticSettings",
                     "name": "[concat('master/microsoft.insights/',variables('diagnosticSettingsName'))]",
                     "dependsOn": [
                         "[parameters('serverName')]",
-                        
+
                         "[concat('Microsoft.Sql/servers/', parameters('serverName'), '/databases/', parameters('databaseName'))]"
                     ],
                     "apiVersion": "2017-05-01-preview",
@@ -321,9 +321,9 @@
                         ]
                     }
                 },
-				
- 
-				
+
+
+
                 {
                     "condition": "[parameters('enableADS')]",
                     "apiVersion": "2017-03-01-preview",
@@ -341,11 +341,11 @@
                         ],
                         "emailAccountAdmins": true,
                         "storageEndpoint": "[parameters('storageEndPoint')]",
-						"storageAccountAccessKey": "[parameters('storageKey')]",
-						"retentionDays": 180
+                        "storageAccountAccessKey": "[parameters('storageKey')]",
+                        "retentionDays": 180
                     }
                 },
-               
+
                 {
                     "type": "connectionPolicies",
                     "apiVersion": "2014-04-01",
@@ -357,7 +357,7 @@
                         "connectionType": "Redirect"
                     }
                 },
-                
+
                 {
                     "condition": "[parameters('enableVA')]",
                     "apiVersion": "2018-06-01-preview",
@@ -381,7 +381,7 @@
                 }
             ]
         },
-       
+
         {
             "condition": "[parameters('enablePrivateEndpoint')]",
             "type": "Microsoft.Resources/deployments",
@@ -522,8 +522,8 @@
         "privateEndpointVnetId": "[if(parameters('enablePrivateEndpoint'), resourceId(parameters('privateEndpointVnetSubscriptionId'), parameters('privateEndpointVnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('privateEndpointVnetName')), '')]",
         "privateEndpointSubnetResourceId": "[if(parameters('enablePrivateEndpoint'), resourceId(parameters('privateEndpointVnetSubscriptionId'), parameters('privateEndpointVnetResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('privateEndpointVnetName'), parameters('privateEndpointSubnetName')), '')]",
         "diagnosticSettingsName": "SQLSecurityAuditEvents_3d229c42-c7e7-4c97-9a99-ec0d0d8b86c1"
-        
+
     },
-    "outputs": { },
+    "outputs": {},
     "functions": []
 }
