@@ -128,6 +128,49 @@
           "uri": "[concat(variables('modulesPath'), 'FunctionAppPT/2021-04-05/Parameters/func-cpd-apps-pt-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-plan-cpd-apps-rrf-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-pt-sbx-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-pt-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'AppServicePlan/2019-08-01/Parameters/plan-cpd-apps-rrf-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-func-cpd-apps-rrf-sbx-we-01",
+      "resourceGroup": "rg-cpd-apps-pt-sbx-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-apps-pt-sbx-we-01",
+        "DEP-plan-cpd-apps-rrf-sbx-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'FunctionAppRRF/2021-04-05/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'FunctionAppRRF/2021-04-05/Parameters/func-cpd-apps-rrf-sbx-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
   "outputs": {}
