@@ -126,6 +126,48 @@
                     "uri": "[concat(variables('modulesPath'), 'ApplicationGateway/2020-03-26/Parameters/agw-cpd-apps-ntf-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-agw-cpd-apps-bot-tst-we-01",
+            "resourceGroup": "rg-cpd-apps-waf-tst-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-waf-tst-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApplicationGateway/2020-03-26/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApplicationGateway/2020-03-26/Parameters/agw-cpd-apps-bot-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-agw-cpd-apps-ckm-tst-we-01",
+            "resourceGroup": "rg-cpd-apps-waf-tst-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-waf-tst-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApplicationGateway/2020-03-26/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ApplicationGateway/2020-03-26/Parameters/agw-cpd-apps-ckm-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
     ],
     "outputs": {}

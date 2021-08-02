@@ -1,0 +1,235 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allocationMethod": {
+            "value": "Static"
+        },
+        "applicationGatewayName": {
+            "value": "agw-cpd-apps-bot-tra-we-01"
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        },
+        "capacity": {
+            "value": 2
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "privateIPAddress": {
+            "value": "172.20.87.5"
+        },
+        "publicIpAddressName": {
+            "value": "agw-cpd-apps-bot-tra-we-01-ip"
+        },
+        "publicIpZones": {
+            "value": []
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "WAF_v2"
+        },
+        "subnetName": {
+            "value": "snet-cpd-apps-agwbot-tra-we-01"
+        },
+        "frontendPorts": {
+            "value": [
+                {
+                    "name": "port_80",
+                    "properties": {
+                        "port": 80
+                    }
+                },
+                {
+                    "name": "port_443",
+                    "properties": {
+                        "port": 443
+                    }
+                }
+            ]
+        },
+        "backendAddressPools": {
+            "value": [
+                {
+                    "name": "apim-cpd-shrd-tra-we-01",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "172.20.82.77"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "backendHttpSettingsCollection": {
+            "value": [
+                {
+                    "name": "apim-tra-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "bot.trn.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "affinityCookieName": "ApplicationGatewayAffinity",
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/probes/apimprobe"
+                        }
+                    }
+                }
+            ]
+        },
+        "httpListeners": {
+            "value": [
+                {
+                    "name": "tra-bot-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/frontendIPConfigurations/agw-cpd-apps-bot-tra-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/sslCertificates/tra-bot-sqcp-httpsvaultCert"
+                        },
+                        "hostName": "bot.trn.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                }
+            ]
+        },
+        "requestRoutingRules": {
+            "value": [
+                {
+                    "name": "tra-bot-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/httpListeners/tra-bot-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/backendAddressPools/apim-cpd-shrd-tra-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tra-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-bot-tra-we-01/backendHttpSettingsCollection/apim-tra-sqcp-https"
+                        }
+                    }
+                }
+            ]
+        },
+        "probes": {
+            "value": [
+                {
+                    "name": "apimprobe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "bot.trn.sqcp.qa",
+                        "path": "/status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 60,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "firewallMode": {
+            "value": "Prevention"
+        },
+        "sslCertificates": {
+            "value": [
+                {
+                    "name": "tra-bot-sqcp-httpsvaultCert",
+                    "properties": {
+                        "keyVaultSecretId": "https://kv-cpd-pltf-tra-we-01.vault.azure.net/secrets/TRN-SQCP-Certificate/"
+                    }
+                }
+            ]
+        },
+        "managedIdentityId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-tra-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-tra-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Training"
+            }
+        },
+        "tier": {
+            "value": "WAF_v2"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpd-pltf-tra-we-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpd-pltf-net-tra-we-01"
+        },
+        "zones": {
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "wafPolicyName": {
+            "value": "waf-cpd-apps-bot-tra-we-01"
+        },
+        "managedRuleSets": {
+            "value": [
+                {
+                    "ruleSetType": "Microsoft_BotManagerRuleSet",
+                    "ruleSetVersion": "0.1",
+                    "ruleGroupOverrides": []
+                },
+                {
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.1",
+                    "ruleGroupOverrides": []
+                }
+            ]
+        },
+        "customRules": {
+            "value": []
+        },
+        "enableHttp2": {
+            "value": true
+        },
+        "firewallEnabled": {
+            "value": true
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.Storage/storageAccounts/stcpdappsdiagtrawe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-apps-mon-tra-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-tra-we-01"
+        }
+    }
+}
