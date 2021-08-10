@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "metadata": {
+                "description": "Required. Resource name."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westeurope",
+            "metadata": {
+                "description": "Required. Resource location."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "metadata": {
+                "description": "Required. Resource sku."
+            },
+            "allowedValues": [ "S0", "S1", "G2" ]
+        },
+        "kind": {
+            "type": "string",
+            "metadata": {
+                "description": "Required. Resource kind."
+            },
+            "allowedValues": [ "Gen1", "Gen2" ]
+        },
+        "disableLocalAuth": {
+            "type": "bool",
+            "metadata": {
+                "description": "Required. Allows toggle functionality on Azure Policy to disable Azure Maps local authentication support. This will disable Shared Keys authentication from any usage."
+            },
+            "defaultValue": false
+        },
+        "tags": {
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Maps/accounts",
+            "apiVersion": "2021-02-01",
+            "tags": "[parameters('tags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "kind": "[parameters('kind')]",
+            "properties": {
+                "disableLocalAuth": "[parameters('disableLocalAuth')]"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
