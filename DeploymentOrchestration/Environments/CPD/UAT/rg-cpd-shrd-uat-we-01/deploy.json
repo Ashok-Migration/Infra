@@ -238,6 +238,28 @@
           "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/Parameters/uat-cdntasmu-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimpgw-cpd-shrd-uat-we-01",
+      "resourceGroup": "rg-cpd-shrd-uat-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-shrd-uat-we-01",
+        "DEP-apim-cpd-shrd-uat-we-01"        
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementPGWAPI/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementPGWAPI/2019-01-01/Parameters/apimpgw-cpd-shrd-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
     "outputs": {}
