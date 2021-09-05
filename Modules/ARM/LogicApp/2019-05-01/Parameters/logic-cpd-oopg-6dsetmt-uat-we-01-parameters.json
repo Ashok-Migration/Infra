@@ -6,7 +6,7 @@
 			"value": "stcpdoopgmtuatwe01"
 		},
 		"workflowName": {
-			"value": "logic-cpd-oopg-6dmtr-uat-we-01"
+			"value": "logic-cpd-oopg-6dsetmt-uat-we-01"
 		},
 		"workflowLocation": {
 			"value": "westeurope"
@@ -28,9 +28,9 @@
 							}
 						},
 						"method": "post",
-						"path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('stcpdappsapimtuatwe01'))}/files",
+						"path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('storageAccountName'))}/files",
 						"queries": {
-							"folderPath": "/pgw-metering",
+							"folderPath": "/pgw-settlement",
 							"name": "@body('Parse_JSON')?['Name']",
 							"queryParametersSingleEncoded": true
 						}
@@ -51,7 +51,7 @@
 					"inputs": {
 						"host": {
 							"connection": {
-								"name": "@parameters('$connections')['azureblob']['connectionId']"
+								"name": "@parameters('$connections')['azureblob_2']['connectionId']"
 							}
 						},
 						"method": "get",
@@ -69,6 +69,23 @@
 					},
 					"type": "ApiConnection"
 				},
+				"Initialize_ContainerName": {
+					"inputs": {
+						"variables": [
+							{
+								"name": "ContainerName",
+								"type": "string",
+								"value": "pgw-settlement/"
+							}
+						]
+					},
+					"runAfter": {
+						"Initialize_StorageAccountName": [
+							"Succeeded"
+						]
+					},
+					"type": "InitializeVariable"
+				},
 				"Initialize_FilePath": {
 					"inputs": {
 						"variables": [
@@ -82,7 +99,7 @@
 						]
 					},
 					"runAfter": {
-						"Initialize_variable": [
+						"Initialize_ContainerName": [
 							"Succeeded"
 						]
 					},
@@ -100,23 +117,6 @@
 					},
 					"runAfter": {
 						"Create_blob_(V2)": [
-							"Succeeded"
-						]
-					},
-					"type": "InitializeVariable"
-				},
-				"Initialize_variable": {
-					"inputs": {
-						"variables": [
-							{
-								"name": "ContainerName",
-								"type": "string",
-								"value": "pgw-metering/"
-							}
-						]
-					},
-					"runAfter": {
-						"Initialize_StorageAccountName": [
 							"Succeeded"
 						]
 					},
@@ -171,7 +171,7 @@
 							{
 								"data": "@variables('FilePath')",
 								"eventTime": "@{utcNow('yyyy-MM-dd')}",
-								"eventType": "pgw-metering",
+								"eventType": "pgw-settlement",
 								"id": "@{guid()}",
 								"subject": "pgw",
 								"topic": "meteringdata"
@@ -200,14 +200,14 @@
 					"inputs": {
 						"host": {
 							"connection": {
-								"name": "@parameters('$connections')['azureblob']['connectionId']"
+								"name": "@parameters('$connections')['azureblob_2']['connectionId']"
 							}
 						},
 						"method": "get",
-						"path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('storageAccountName'))}/triggers/batch/onupdatedfile",
+						"path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('stcpdoopgwmtuatwe01'))}/triggers/batch/onupdatedfile",
 						"queries": {
 							"checkBothCreatedAndModifiedDateTime": false,
-							"folderId": "JTJmcGd3LW1ldGVyaW5n",
+							"folderId": "JTJmcGd3LXNldHRsZW1lbnQ=",
 							"maxFileCount": 1
 						}
 					},
