@@ -784,6 +784,32 @@
                 }
             }
         ],
+        "diagnosticsLogsGreSQLSingle": [
+            {
+                "category": "PostgreSQLLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "QueryStoreRuntimeStatistics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "QueryStoreWaitStatistics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
         "diagnosticsLogsAGW": [
             {
                 "category": "ApplicationGatewayAccessLog",
@@ -807,6 +833,32 @@
                 "retentionPolicy": {
                     "days": "[parameters('diagnosticLogsRetentionInDays')]",
                     "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogsPublicIP": [
+            {
+                "category": "DDoSProtectionNotifications",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
+                }
+            },
+            {
+                "category": "DDoSMitigationFlowLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
+                }
+            },
+            {
+                "category": "DDoSMitigationReports",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
                 }
             }
         ],
@@ -1086,6 +1138,23 @@
                     "apiVersion": "2017-12-01",
                     "properties": {
                         "virtualNetworkSubnetId": "[parameters('defaultSubnet')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('singlePostgreSQLServerName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('singlePostgreSQLServerName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsGreSQLSingle'))]"
                     }
                 }
             ]
@@ -1607,7 +1676,27 @@
                 "dnsSettings": {
                     "domainNameLabel": "[concat(variables('dnsPrefix'), 'agw-dns')]"
                 }
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/publicIPAddresses/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('appGw').frontends[0].publicIPAddress, '/Microsoft.Insights/service')]",
+                    "location": "[parameters('location')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/publicIPAddresses/', variables('appGw').frontends[0].publicIPAddress)]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsPublicIP'))]"
+                    }
+                }
+            ]
         },
         {
             "location": "[parameters('location')]",

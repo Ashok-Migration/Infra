@@ -18,6 +18,43 @@
       "defaultValue": "1234",
       "type": "String"
     },
+    "diagnosticLogsRetentionInDays": {
+      "type": "int",
+      "defaultValue": 365,
+      "minValue": 0,
+      "maxValue": 365,
+      "metadata": {
+        "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+      }
+    },
+    "diagnosticStorageAccountId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+      }
+    },
+    "workspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of Log Analytics."
+      }
+    },
+    "eventHubAuthorizationRuleId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+      }
+    },
+    "eventHubName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+      }
+    },
     "tags": {
       "defaultValue": {},
       "metadata": {
@@ -27,7 +64,27 @@
     }
   },
   "variables": {
-    "endpointvalue": "[resourceId(resourceGroup().name, 'Microsoft.Web/sites',parameters('botWebappName'))]"
+    "endpointvalue": "[resourceId(resourceGroup().name, 'Microsoft.Web/sites',parameters('botWebappName'))]",
+    "diagnosticsMetrics": [
+      {
+        "category": "AllMetrics",
+        "enabled": true,
+        "retentionPolicy": {
+          "days": "[parameters('diagnosticLogsRetentionInDays')]",
+          "enabled": true
+        }
+      }
+    ],
+    "diagnosticsLogs": [
+      {
+        "category": "BotRequest",
+        "enabled": true,
+        "retentionPolicy": {
+          "days": "[parameters('diagnosticLogsRetentionInDays')]",
+          "enabled": true
+        }
+      }
+    ]
   },
   "resources": [
     {
@@ -48,6 +105,25 @@
         "developerAppInsightKey": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
         "developerAppInsightsApplicationId": "[reference(parameters('appInsightsResourceId'), '2015-05-01').ApplicationId]"
       },
+      "resources": [
+        {
+          "type": "Microsoft.BotService/botServices/providers/diagnosticsettings",
+          "apiVersion": "2017-05-01-preview",
+          "name": "[concat(parameters('botId'), '/Microsoft.Insights/service')]",
+          "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+          "dependsOn": [
+            "[concat('Microsoft.BotService/botServices/', parameters('botId'))]"
+          ],
+          "properties": {
+            "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+            "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+            "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+            "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+            "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+            "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+          }
+        }
+      ],
       "tags": "[parameters('tags')]"
     }
   ],

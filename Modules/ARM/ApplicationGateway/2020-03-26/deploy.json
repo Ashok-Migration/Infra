@@ -313,6 +313,32 @@
         }
       }
     ],
+    "diagnosticsLogsPublicIP": [
+      {
+        "category": "DDoSProtectionNotifications",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "DDoSMitigationFlowLogs",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "DDoSMitigationReports",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      }
+    ],
     "identity": {
       "type": "UserAssigned",
       "userAssignedIdentities": {
@@ -431,7 +457,27 @@
       "zones": "[parameters('publicIpZones')]",
       "properties": {
         "publicIPAllocationMethod": "[parameters('allocationMethod')]"
-      }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Network/publicIPAddresses/providers/diagnosticsettings",
+          "apiVersion": "2017-05-01-preview",
+          "name": "[concat(parameters('publicIpAddressName'), '/Microsoft.Insights/service')]",
+          "location": "[parameters('location')]",
+          "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+          "dependsOn": [
+            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
+          ],
+          "properties": {
+            "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+            "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+            "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+            "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+            "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+            "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsPublicIP'))]"
+          }
+        }
+      ]
     },
     {
       "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
