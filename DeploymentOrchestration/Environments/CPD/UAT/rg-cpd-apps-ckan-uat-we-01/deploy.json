@@ -214,6 +214,28 @@
                     "uri": "[concat(variables('modulesPath'), 'FunctionAppCKAN/2021-04-05/Parameters/func-cpd-apps-ckan-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "DEP-prvep-cpd-apps-ckangre-uat-we-01",
+            "resourceGroup": "rg-cpd-apps-ckan-uat-we-01",
+            "dependsOn": [
+                "DEP-rg-cpd-apps-ckan-uat-we-01",
+                "DEP-ckan-cpd-uat-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2020-10-04/Parameters/prvep-cpd-apps-ckangre-uat-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
         }
     ],
     "outputs": {}

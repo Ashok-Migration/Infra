@@ -647,7 +647,7 @@
         },
         "vmImageReferenceVersion": {
             "type": "string",
-            "defaultValue": "2.9.2106231551",
+            "defaultValue": "2.9.2107271211",
             "metadata": {
                 "description": "VM Reference Image Version. Pass Latest value as Default Value and Deployed VM Image version in parameter file."
             }
@@ -1131,6 +1131,7 @@
             "resources": [
                 {
                     "name": "AllowCkanVnetRule",
+                    "condition": "[equals(parameters('singlePostgreSQLServerPublicAccess'),'Enabled')]",
                     "dependsOn": [
                         "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('singlePostgreSQLServerName'))]"
                     ],
