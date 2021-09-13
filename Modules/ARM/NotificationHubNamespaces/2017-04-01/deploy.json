@@ -104,22 +104,6 @@
 				"name": "[parameters('namespaceName')]",
 				"region": "[parameters('location')]",
 				"namespaceType": "NotificationHub"
-			}
-		},
-		{
-			"type": "Microsoft.NotificationHubs/namespaces/notificationHubs",
-			"apiVersion": "2017-04-01",
-			"name": "[concat(parameters('namespaceName'),'/',parameters('notificationHubName'))]",
-			"location": "[parameters('location')]",
-			"dependsOn": [
-				"[concat('Microsoft.NotificationHubs/namespaces/', parameters('namespaceName'))]"
-			],
-			"tags": "[parameters('tags')]",
-			"sku": {
-				"name": "[parameters('sku')]"
-			},
-			"properties": {
-				"name": "[parameters('notificationHubName')]"
 			},
 			"resources": [
 				{
@@ -140,6 +124,22 @@
 					}
 				}
 			]
+		},
+		{
+			"type": "Microsoft.NotificationHubs/namespaces/notificationHubs",
+			"apiVersion": "2017-04-01",
+			"name": "[concat(parameters('namespaceName'),'/',parameters('notificationHubName'))]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[concat('Microsoft.NotificationHubs/namespaces/', parameters('namespaceName'))]"
+			],
+			"tags": "[parameters('tags')]",
+			"sku": {
+				"name": "[parameters('sku')]"
+			},
+			"properties": {
+				"name": "[parameters('notificationHubName')]"
+			}
 		},
 		{
 			"type": "Microsoft.NotificationHubs/namespaces/AuthorizationRules",
