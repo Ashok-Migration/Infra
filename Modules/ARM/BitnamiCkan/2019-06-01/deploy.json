@@ -1233,7 +1233,26 @@
                         }
                     }
                 ]
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('stackId'), '-ckan', copyIndex() ,'nic', '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', parameters('stackId'), '-ckan', copyIndex() ,'nic')]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
         },
         {
             "location": "[parameters('location')]",
@@ -1256,7 +1275,26 @@
                         }
                     }
                 ]
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('solrNicName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', variables('solrNicName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
         },
         {
             "location": "[parameters('location')]",
@@ -1279,7 +1317,26 @@
                         }
                     }
                 ]
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('memcachedNicName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', variables('memcachedNicName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2019-12-01",
