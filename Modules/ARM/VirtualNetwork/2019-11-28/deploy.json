@@ -92,6 +92,10 @@
             "metadata": {
                 "description": "Optional. Tags of the Virtual Network resource."
             }
+        },
+        "diagnosticSettingsName": {
+            "type": "string",
+            "defaultValue": "service"
         }
     },
     "variables": {
@@ -191,7 +195,7 @@
                 {
                     "type": "Microsoft.Network/virtualNetworks/providers/diagnosticsettings",
                     "apiVersion": "2017-05-01-preview",
-                    "name": "[concat(parameters('vNetName'), '/Microsoft.Insights/service')]",
+                    "name": "[concat(parameters('vNetName'), '/Microsoft.Insights/', parameters('diagnosticSettingsName'))]",
                     "location": "[parameters('location')]",
                     "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
                     "dependsOn": [
