@@ -86,29 +86,7 @@
     }
   },
   "variables": {
-    "basePolicy0": "<policies><inbound><base/><set-backend-service id=\"apim-generated-policy\" backend-id=\"<NAMEOFLOGICAPPBACKEND>\"/><set-method id=\"apim-generated-policy\">POST</set-method><set-variable name=\"requestPath\" value=\"@(context.Request.Url.Path)\"/><rewrite-uri id=\"apim-generated-policy\" template=\"/manual/paths/invoke/?api-version=2016-10-01&amp;sp=%2Ftriggers%2Fmanual%2Frun&amp;sv=1.0&amp;sig=<SIGNATUREOFLOGICAPP>\"/><validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized. Access token is missing or invalid.\"><openid-config url=\"<OPENIDCONFIGURL>\"/><audiences><audience><AUDIENCEGUID></audience></audiences><issuers><issuer><ISSUERURL></issuer></issuers></validate-jwt><set-header name=\"Authorization\" exists-action=\"override\"><value/></set-header><set-variable name=\"IAllowListNamdval\" value=\"{{PGWAPIAllowIPList}}\" />
-    <set-variable name=\"X-Forwarded-For-Value\" value=\"@{ string[] value1; 
-            if (context.Request.Headers.TryGetValue(\"X-Forwarded-For\", out value1))
-            {   if(value1 != null && value1.Length > 0)
-                {
-                    var forwardedForValue= value1[0]; 
-                    return forwardedForValue.Split(',')[0];
-                }
-            }
-            return null;
-        }\" />
-        <set-variable name=\"AlwdIpFor\" value=\"@{
-                    var jsonval = (string)context.Variables.GetValueOrDefault<string>(\"IAllowListNamdval\");
-                    var arr = jsonval.Contains((string)context.Variables.GetValueOrDefault<string>(\"X-Forwarded-For-Value\"));
-                    return arr; }\" />
-        <choose>
-            <when condition=\"@(!(bool)context.Variables.GetValueOrDefault<bool>(\"AlwdIpFor\"))\">
-                <ip-filter action=\"allow\">
-                    <address>@((string)context.Variables.GetValueOrDefault<string>(\"X-Forwarded-For-Value\"))</address>
-                </ip-filter>
-            </when>
-        </choose>
-    </inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>",
+    "basePolicy0": "<policies><inbound><base/><set-backend-service id=\"apim-generated-policy\" backend-id=\"<NAMEOFLOGICAPPBACKEND>\"/><set-method id=\"apim-generated-policy\">POST</set-method><set-variable name=\"requestPath\" value=\"@(context.Request.Url.Path)\"/><rewrite-uri id=\"apim-generated-policy\" template=\"/manual/paths/invoke/?api-version=2016-10-01&amp;sp=%2Ftriggers%2Fmanual%2Frun&amp;sv=1.0&amp;sig=<SIGNATUREOFLOGICAPP>\"/><validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized. Access token is missing or invalid.\"><openid-config url=\"<OPENIDCONFIGURL>\"/><audiences><audience><AUDIENCEGUID></audience></audiences><issuers><issuer><ISSUERURL></issuer></issuers></validate-jwt><set-header name=\"Authorization\" exists-action=\"override\"><value/></set-header></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>",
     "basePolicy1": "[replace(variables('basePolicy0'),'<NAMEOFLOGICAPPBACKEND>',parameters('apiPolicyLogicAppName'))]",
     "basePolicy2": "[replace(variables('basePolicy1'),'<OPENIDCONFIGURL>',parameters('openIdConfigUrl'))]",
     "basePolicy3": "[replace(variables('basePolicy2'),'<AUDIENCEGUID>',parameters('audienceId'))]",
