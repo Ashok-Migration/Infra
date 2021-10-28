@@ -161,9 +161,26 @@
       "type": "bool",
       "defaultValue": true
     },
+    "useAgwFirewallExclusions": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Use this switch to pass firewall exclusions for agw waf configuration (Note, it will always be overrided if WAF rule exists)"
+      }
+    },
+    "agwFirewallExclusions": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Use when you need to pass some firewall exclusions for agw waf configuration (Note, set parameter('useAgwFirewallExclusions') to true)"
+      }
+    },
     "firewallExclusions": {
       "type": "array",
-      "defaultValue": []
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Use when you need to pass some firewall exclusion rules for WAF"
+      }
     },
     "diagnosticLogsRetentionInDays": {
       "type": "int",
@@ -351,7 +368,11 @@
       "ruleSetType": "OWASP",
       "ruleSetVersion": "3.1",
       "disabledRuleGroups": [],
-      "exclusions": "[parameters('firewallExclusions')]",
+      "exclusions": "[if(and(empty(parameters('firewallExclusions')), equals(parameters('useAgwFirewallExclusions'), false())) ,
+                        json('null'), 
+                        if(equals(parameters('useAgwFirewallExclusions'), true()), 
+                          parameters('agwFirewallExclusions'), 
+                          parameters('firewallExclusions')))]",
       "requestBodyCheck": "[parameters('requestBodyCheck')]",
       "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]"
     }
