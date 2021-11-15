@@ -2,7 +2,7 @@ name: $(resourceGroupName)
 
 variables:
   - name: PoolName
-    value: "platformapispool"
+    value: "tasmumsiagents"
   - name: templateFilePath
     value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-apps-aks-pre-we-01/deploy.json
   - name: parameterFilePath
@@ -15,34 +15,6 @@ variables:
     value: sqcp-ado-spn-pre
   - name: subscriptionId
     value: 8964f3c1-44f5-4094-80eb-4334845bdfb1
-  - name: clusterName
-    value: aks-cpp-apps-pre-we-01
-  - name: clusterManagedIdentity
-    value: mi-cpp-apps-aks-pre-we-01
-  - name: kubernetesVersion
-    value: 1.20.7
-  - name: privateDNSZoneResourceId
-    value: /subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-pre-we-01/providers/Microsoft.Network/privateDnsZones/privatelink.westeurope.azmk8s.io
-  - name: subnetResourceId
-    value: /subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-pre-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-pre-we-01/subnets/snet-cpp-apps-aks-pre-we-01
-  - name: nodeResourceGroup
-    value: rg-cpp-apps-aksnode-pre-we-01
-  - name: nodeCount
-    value: 3
-  - name: minCount
-    value: 3
-  - name: maxCount
-    value: 10
-  - name: maxPods
-    value: 30
-  - name: nodeVMSize
-    value: Standard_D4s_v3
-  - name: zones
-    value: 1 2 3
-  - name: aksServicePrincipal
-    value: "e36847ba-e82d-4b38-a67a-ea45c5ab15b5"
-  # - name: aksServicePrincipalSecret
-  #   value: "added to pipeline variables"
 
 trigger: none
 
@@ -79,40 +51,6 @@ stages:
                   Write-Error "Template is not valid."
                 }
               azurePowerShellVersion: LatestVersion
-
-  - stage: DeployManagedCluster
-    jobs:
-      - job: DeployManagedCluster
-        displayName: Deploy Managed Cluster
-        pool:
-          name: $(PoolName)
-        steps:
-          - task: AzureCLI@2
-            displayName: "Create Managed Cluster"
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: pscore
-              scriptLocation: inlineScript
-              inlineScript: |
-                az extension add --name aks-preview --version 0.5.5
-                az aks create -n $(clusterName) -g $(resourceGroupName) --location $(location) --kubernetes-version $(kubernetesVersion) --generate-ssh-keys --enable-private-cluster --network-plugin azure --network-policy azure --load-balancer-sku standard --dns-name-prefix $(clusterName)-dns --vnet-subnet-id $(subnetResourceId) --docker-bridge-address 172.17.0.1/16 --dns-service-ip 10.0.0.10 --service-cidr 10.0.0.0/16 --private-dns-zone $(privateDNSZoneResourceId) --node-resource-group $(nodeResourceGroup) --nodepool-name apps --enable-cluster-autoscaler --node-count $(nodeCount) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux --max-pods $(maxPods) --max-count $(maxCount) --min-count $(minCount) --skip-subnet-role-assignment --service-principal $(aksServicePrincipal) --client-secret $(aksServicePrincipalSecret)
-
-          - task: AzureCLI@2
-            displayName: "Add Nodepool"
-            inputs:
-              azureSubscription: "$(serviceConnection)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                jobsPool=$(az aks nodepool show --cluster-name $(clusterName) --name jobs -g $(resourceGroupName) --query 'name' -o json)
-
-                if [[ "$jobsPool" != '"jobs"' ]]
-
-                then az aks nodepool add --cluster-name $(clusterName) --name jobs -g $(resourceGroupName) --enable-cluster-autoscaler --mode System --node-count $(nodeCount) --max-count $(maxCount) --min-count $(minCount) --max-pods $(maxPods) --node-osdisk-size 0 --node-vm-size $(nodeVMSize) --zones $(zones) --node-osdisk-type Linux
-
-                else echo "jobs node pool already exists"
-
-                fi
 
   - stage: DeployTemplate
     jobs:
