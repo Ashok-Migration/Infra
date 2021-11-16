@@ -1,6 +1,6 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "vnetName": {
       "value": "vnet-cpp-pltf-pre-we-01"
@@ -417,24 +417,61 @@
           "routesRGName": "rg-cpp-itsm-net-pre-we-01"
         },
         {
-            "name": "snet-cpp-apps-agwbot-pre-we-01",
-            "addressPrefix": "172.20.95.0/26",
-            "networkSecurityGroupName": "nsg-cpp-apps-agwbot-pre-we-01",
-            "routeTableName": "",
-            "serviceEndpoints": [],
-            "delegations": [],
-            "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
-            "routesRGName": ""
+          "name": "snet-cpp-apps-agwbot-pre-we-01",
+          "addressPrefix": "172.20.95.0/26",
+          "networkSecurityGroupName": "nsg-cpp-apps-agwbot-pre-we-01",
+          "routeTableName": "",
+          "serviceEndpoints": [],
+          "delegations": [],
+          "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
+          "routesRGName": ""
         },
         {
-            "name": "snet-cpp-apps-agwckm-pre-we-01",
-            "addressPrefix": "172.20.95.64/26",
-            "networkSecurityGroupName": "nsg-cpp-apps-agwckm-pre-we-01",
-            "routeTableName": "",
-            "serviceEndpoints": [],
-            "delegations": [],
-            "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
-            "routesRGName": ""
+          "name": "snet-cpp-apps-agwckm-pre-we-01",
+          "addressPrefix": "172.20.95.64/26",
+          "networkSecurityGroupName": "nsg-cpp-apps-agwckm-pre-we-01",
+          "routeTableName": "",
+          "serviceEndpoints": [],
+          "delegations": [],
+          "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
+          "routesRGName": ""
+        },
+        {
+          "name": "snet-cpp-tacc-db-pre-we-01",
+          "addressPrefix": "172.20.103.80/28",
+          "networkSecurityGroupName": "nsg-cpp-tacc-db-pre-we-01",
+          "routeTableName": "route-cpp-tacc-pre-we-01",
+          "serviceEndpoints": [],
+          "delegations": [],
+          "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
+          "routesRGName": "rg-cpp-tacc-net-pre-we-01"
+        },
+        {
+          "name": "snet-cpp-tacc-app-pre-we-01",
+          "addressPrefix": "172.20.103.64/28",
+          "networkSecurityGroupName": "nsg-cpp-tacc-app-pre-we-01",
+          "routeTableName": "route-cpp-tacc-pre-we-01",
+          "serviceEndpoints": [],
+          "delegations": [
+            {
+              "name": "Microsoft.Web.serverFarms",
+              "properties": {
+                "serviceName": "Microsoft.Web/serverFarms"
+              }
+            }
+          ],
+          "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
+          "routesRGName": "rg-cpp-tacc-net-pre-we-01"
+        },
+        {
+          "name": "snet-cpp-tacc-web-pre-we-01",
+          "addressPrefix": "172.20.103.96/28",
+          "networkSecurityGroupName": "nsg-cpp-tacc-web-pre-we-01",
+          "routeTableName": "route-cpp-tacc-pre-we-01",
+          "serviceEndpoints": [],
+          "delegations": [],
+          "nsgsRGName": "rg-cpp-apps-sec-pre-we-01",
+          "routesRGName": "rg-cpp-tacc-net-pre-we-01"
         }
       ]
     },
