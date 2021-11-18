@@ -87,6 +87,27 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cpp-pltf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-08-01",
+        "name": "DEP-cpp-privatelink.postgres.database.azure.com",
+        "resourceGroup": "rg-cpp-pltf-net-prd-we-01",
+        "dependsOn": [
+            "DEP-vnet-cpp-pltf-prd-we-01"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+                "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+                "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+                "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cpp-privatelink.postgres.database.azure.com-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+        }
     }
   ],
     "outputs": {
