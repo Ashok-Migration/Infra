@@ -227,11 +227,13 @@
                     "availabilityZones": "[json('null')]"
                 }
             ]
+        },
+        "omsSubscriptionId": {
+            "type": "string"
         }
     },
     "variables": {
         "vnetSubnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]",
-        "subscriptionId": "[subscription().subscriptionId]",
         "diagnosticsLogs": [
             {
                 "category": "kube-apiserver",
@@ -366,7 +368,7 @@
             "name": "[concat('DEP-', parameters('clusterName'), '-Solution')]",
             "apiVersion": "2017-05-10",
             "resourceGroup": "[if(empty(parameters('workspaceId')),resourceGroup().id,split(parameters('workspaceId'),'/')[4] )]",
-            "subscriptionId": "[variables('subscriptionId')]",
+            "subscriptionId": "[parameters('omsSubscriptionId')]",
             "condition": "[not(empty(parameters('workspaceId')))]",
             "properties": {
                 "mode": "Incremental",
