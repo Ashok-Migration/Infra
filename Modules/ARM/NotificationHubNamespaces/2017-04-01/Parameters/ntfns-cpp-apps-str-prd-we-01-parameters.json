@@ -1,46 +1,61 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "value": "westeurope"
-        },
-        "namespaceName": {
-            "value": "ntfns-cpp-apps-str-prd-we-01"
-        },
-        "notificationHubName": {
-            "value": "ntf-cpp-apps-str-prd-we-01"
-        },
-        "sku": {
-            "value": "Standard"
-        },
-        "tags": {
-            "value": {
-                "Environment": "Production"
-            }
-        },
-        "authorizationRules": {
-            "value": [
-                {
-                    "name": "RootManageSharedAccessKey",
-                    "properties": {
-                        "rights": [
-                            "Listen",
-                            "Manage",
-                            "Send"
-                        ]
-                    }
-                },
-                {
-                    "name": "SendListenAccess",
-                    "properties": {
-                        "rights": [
-                            "Listen",
-                            "Send"
-                        ]
-                    }
-                }
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "namespaceName": {
+      "value": "ntfns-cpp-apps-str-prd-we-01"
+    },
+    "notificationHubName": {
+      "value": "ntf-cpp-apps-str-prd-we-01"
+    },
+    "sku": {
+      "value": "Standard"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-prd-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    },
+    "authorizationRules": {
+      "value": [
+        {
+          "name": "RootManageSharedAccessKey",
+          "properties": {
+            "rights": [
+              "Listen",
+              "Manage",
+              "Send"
             ]
+          }
+        },
+        {
+          "name": "SendListenAccess",
+          "properties": {
+            "rights": [
+              "Listen",
+              "Send"
+            ]
+          }
         }
+      ]
     }
+  }
 }
