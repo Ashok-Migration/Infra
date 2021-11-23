@@ -54,11 +54,11 @@
         "backendAddressPools": {
             "value": [
                 {
-                    "name": "opendata-portal",
+                    "name": "agw-cpd-apps-ckan-tst-we-01",
                     "properties": {
                         "backendAddresses": [
                             {
-                                "ipAddress": "52.136.235.138"
+                                "ipAddress": "172.20.64.69"
                             }
                         ]
                     }
@@ -78,13 +78,13 @@
         "backendHttpSettingsCollection": {
             "value": [
                 {
-                    "name": "opendata-tst-sqcp-http",
+                    "name": "opendata-tst-sqcp-https",
                     "properties": {
-                        "port": 5000,
-                        "protocol": "Http",
+                        "port": 443,
+                        "protocol": "Https",
                         "cookieBasedAffinity": "Disabled",
                         "pickHostNameFromBackendAddress": false,
-                        "requestTimeout": 60,
+                        "requestTimeout": 120,
                         "probe": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/probes/opendata-portal-probe"
                         }
@@ -172,10 +172,10 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/httpListeners/tst-opendata-sqcp-https"
                         },
                         "backendAddressPool": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/backendAddressPools/opendata-portal"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/backendAddressPools/agw-cpd-apps-ckan-tst-we-01"
                         },
                         "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/backendHttpSettingsCollection/opendata-tst-sqcp-http"
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-tst-we-01/backendHttpSettingsCollection/opendata-tst-sqcp-https"
                         }
                     }
                 },
@@ -213,12 +213,11 @@
                 {
                     "name": "opendata-portal-probe",
                     "properties": {
-                        "protocol": "Http",
-                        "host": "52.136.235.138",
-                        "port": 5000,
+                        "protocol": "Https",
+                        "host": "opendata.tst.sqcp.qa",
                         "path": "/",
                         "interval": 30,
-                        "timeout": 60,
+                        "timeout": 120,
                         "unhealthyThreshold": 3,
                         "pickHostNameFromBackendHttpSettings": false,
                         "minServers": 0,
