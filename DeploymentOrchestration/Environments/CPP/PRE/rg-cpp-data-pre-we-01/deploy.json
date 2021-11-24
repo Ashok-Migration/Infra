@@ -279,27 +279,6 @@
       }
     },
     {
-         "type": "Microsoft.Resources/deployments",
-         "apiVersion": "2019-08-01",
-         "name": "DEP-cog-cpp-data-pre-we-01",
-         "resourceGroup": "rg-cpp-data-pre-we-01",
-         "dependsOn": [
-           "DEP-rg-cpp-data-pre-we-01"
-         ],
-         "properties": {
-          "mode": "Incremental",
-          "debugSetting": {
-            "detailLevel": "requestContent,responseContent"
-          },
-           "templateLink": {
-             "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-           },
-           "parametersLink": {
-             "uri": "[concat(variables('modulesPath'), 'CognitiveServices/2017-04-18/Parameters/cog-cpp-data-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-           }
-         }
-       },
-    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
       "name": "DEP-evh-cpp-data-pre-we-01",
@@ -429,28 +408,6 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-sqldw-smartcity-data-pre-we-02",
-      "resourceGroup": "rg-cpp-data-pre-we-01",
-      "dependsOn": [
-        "DEP-rg-cpp-data-pre-we-01",
-        "DEP-synapse-data-pre-we-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'SynapseAnalytics/2019-04-01/Parameters/sqldw-smartparking-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
       "name": "DEP-sqldb-cpp-dynamics-data-pre-we-01",
       "resourceGroup": "rg-cpp-data-pre-we-01",
       "dependsOn": [
@@ -489,6 +446,28 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/Parameters/sqldb-cpp-data-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-sqldb-cpp-data-pre-we-03",
+      "resourceGroup": "rg-cpp-data-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-data-pre-we-01",
+        "DEP-sql-cpp-data-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'SQLSingleDatabase/2017-10-01-preview/Parameters/sqldb-cpp-data-pre-we-03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
