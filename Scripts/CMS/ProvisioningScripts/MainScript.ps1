@@ -245,7 +245,7 @@ function Install-Modules{
     $pnpPowerShellModule = Get-InstalledModule -Name SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue
     if($null -eq $pnpPowerShellModule){
         Write-host "Installing SharePointPnPPowerShellOnline module not found. Installing ..." -ForegroundColor Green
-        Install-Module -Name SharePointPnPPowerShellOnline -Scope CurrentUser -Force
+        Install-Module -Name SharePointPnPPowerShellOnline -Force
     }
 }
 

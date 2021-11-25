@@ -39,7 +39,7 @@ function Install-Modules{
 
     if($null -ne $pnpPowerShellModule){
         Write-Host 'PnP.Powershell moudule found. Uninstalling ...' -ForegroundColor Green
-         Uninstall-Module -Name PnP.Powershell -AllVersions -ErrorAction Stop -Scope CurrentUser -Force
+         Uninstall-Module -Name PnP.Powershell -AllVersions -ErrorAction Stop -Force
     }
     else{
         Write-Host 'SharePointPnPPowerShellOnline moudule not found.' -ForegroundColor Yellow
@@ -49,8 +49,7 @@ function Install-Modules{
     $pnpPowerShellModule = Get-InstalledModule -Name SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue
     if($null -eq $pnpPowerShellModule){
         Write-host "Installing SharePointPnPPowerShellOnline module not found. Installing ..." -ForegroundColor Green
-        Install-Module -Name PnP.Powershell -Scope CurrentUser -AllowClobber -Force
-        Install-Module -Name SharePointPnPPowerShellOnline -Scope CurrentUser -AllowClobber -Force
+        Install-Module -Name SharePointPnPPowerShellOnline -AllowClobber -Force
     }
 }
 

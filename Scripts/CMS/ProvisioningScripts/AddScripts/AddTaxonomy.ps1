@@ -43,7 +43,7 @@ Write-host $TemplateParametersFile -ForegroundColor Yellow
 Write-host $tenant -ForegroundColor Yellow
 
 Import-PackageProvider -Name "NuGet" -RequiredVersion "3.0.0.1" -Force
-Install-Module SharePointPnPPowerShellOnline -Force -Verbose -Scope CurrentUser
+Install-Module SharePointPnPPowerShellOnline -Force -Verbose
 
 $parentDirectory = $PSScriptRoot.Substring(0, $PSScriptRoot.LastIndexOf('\'))
 $paramslogin = @{tenant = $tenant; sp_user = $sp_user; sp_password = $sp_password; }

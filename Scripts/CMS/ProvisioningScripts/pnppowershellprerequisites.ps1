@@ -47,7 +47,7 @@ Write-host "Installing PnP.PowerShell module" -ForegroundColor Green
 $pnpPowerShellModule = Get-InstalledModule -Name PnP.PowerShell -ErrorAction SilentlyContinue
 if($null -eq $pnpPowerShellModule){
     Write-host "Installing PnP.PowerShell module not found. Installing ..." -ForegroundColor Green
-    Install-Module -Name PnP.PowerShell -RequiredVersion 1.2.0 -Scope CurrentUser -Force
+    Install-Module -Name PnP.PowerShell -RequiredVersion 1.2.0 -Force
 }
 else{
     Write-host 'Current installed version module for PnP.PowerShell is ' $pnpPowerShellModule.Version -ForegroundColor Green
