@@ -317,6 +317,18 @@
         "wafPolicyName": {
             "value": "waf-cpd-apps-ckm-tst-we-01"
         },
+        "useAgwFirewallExclusions": {
+            "value": true
+        },
+        "firewallExclusions": {
+            "value": [
+                {
+                    "matchVariable": "RequestCookieNames",
+                    "selectorMatchOperator": "StartsWith",
+                    "selector": "auth_tkt"
+                }
+            ]
+        },
         "managedRuleSets": {
             "value": [
                 {
@@ -351,7 +363,70 @@
             ]
         },
         "customRules": {
-            "value": []
+            "value": [
+                {
+                    "name": "CKANResourceCreate",
+                    "priority": 95,
+                    "ruleType": "MatchRule",
+                    "action": "Allow",
+                    "matchConditions": [
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestUri"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "/api/3/action/resource_create"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        },
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestHeaders",
+                                    "selector": "x-ckan-request"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "true"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "CKANDatasetView",
+                    "priority": 100,
+                    "ruleType": "MatchRule",
+                    "action": "Allow",
+                    "matchConditions": [
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestUri"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "dataset"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         "firewallEnabled": {
             "value": true

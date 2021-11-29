@@ -402,7 +402,14 @@
                     "networkSecurityGroupName": "",
                     "routeTableName": "",
                     "serviceEndpoints": [],
-                    "delegations": [],
+                    "delegations": [
+                        {
+                            "name": "delegation",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverfarms"
+                            }
+                        }
+                    ],
                     "nsgsRGName": "",
                     "routesRGName": ""
                 },
@@ -418,7 +425,7 @@
                 },
                 {
                     "name": "snet-cpd-apps-cknagw-tst-we-01",
-                    "addressPrefix": "172.20.65.0/27",
+                    "addressPrefix": "172.20.64.64/27",
                     "networkSecurityGroupName": "nsg-cpd-apps-cknagw-tst-we-01",
                     "routeTableName": "",
                     "serviceEndpoints": [],
@@ -431,7 +438,20 @@
                     "addressPrefix": "172.20.65.32/27",
                     "networkSecurityGroupName": "nsg-cpd-apps-ckndflt-tst-we-01",
                     "routeTableName": "route-cpd-apps-ckndflt-tst-we-01",
-                    "serviceEndpoints": [],
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Sql",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
                     "delegations": [],
                     "nsgsRGName": "rg-cpd-apps-sec-tst-we-01",
                     "routesRGName": "rg-cpd-apps-net-tst-we-01"
@@ -448,7 +468,7 @@
                 }
             ]
         },
-        "dnsServers":{
+        "dnsServers": {
             "value": [
                 "172.20.33.170"
             ]
