@@ -130,10 +130,10 @@
             }
         },
         "singlePostgreSQLServerTLSVersion": {
-            "value": "TLS1_2"
+            "value": "TLS1_0"
         },
         "singlePostgreSQLServerPublicAccess": {
-            "value": "Disabled"
+            "value": "Enabled"
         },
         "redisName": {
             "value": "redis-cpd-apps-ckan-uat-we-01"
@@ -258,20 +258,48 @@
                 }
             ]
         },
+        "urlPathMaps": {
+            "value": [
+                {
+                    "name": "uat-opendata-sqcp-443",
+                    "properties": {
+                        "defaultBackendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendAddressPools/agw-cpd-apps-ckan-uat-we-01-backend-pool"
+                        },
+                        "defaultBackendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendHttpSettingsCollection/opendata-uat-sqcp-http"
+                        },
+                        "pathRules": [
+                            {
+                                "name": "dataset",
+                                "properties": {
+                                    "paths": [
+                                        "/dataset/*"
+                                    ],
+                                    "backendAddressPool": {
+                                        "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendAddressPools/dataset-backend-pool"
+                                    },
+                                    "backendHttpSettings": {
+                                        "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendHttpSettingsCollection/opendata-uat-sqcp-http"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "requestRoutingRules": {
             "value": [
                 {
                     "name": "uat-opendata-sqcp-443",
                     "properties": {
-                        "ruleType": "Basic",
+                        "ruleType": "PathBasedRouting",
                         "httpListener": {
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/httpListeners/uat-opendata-sqcp-https"
                         },
-                        "backendAddressPool": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendAddressPools/agw-cpd-apps-ckan-uat-we-01-backend-pool"
-                        },
-                        "backendHttpSettings": {
-                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/backendHttpSettingsCollection/opendata-uat-sqcp-http"
+                        "urlPathMap": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-ckan-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckan-uat-we-01/urlPathMaps/uat-opendata-sqcp-443"
                         }
                     }
                 }

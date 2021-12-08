@@ -492,6 +492,10 @@
                 }
             ]
         },
+        "urlPathMaps": {
+            "type": "array",
+            "defaultValue": []
+        },
         "requestRoutingRules": {
             "type": "array",
             "defaultValue": []
@@ -1760,7 +1764,7 @@
             "location": "[parameters('location')]",
             "type": "Microsoft.Network/applicationGateways",
             "name": "[variables('appGw').name]",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-11-01",
             "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('appGw').frontends[0].publicIPAddress)]"
@@ -1816,7 +1820,8 @@
                     "policyType": "[parameters('sslPolicyType')]",
                     "policyName": "[parameters('sslPolicyName')]"
                 },
-                "probes": "[parameters('probes')]"
+                "probes": "[parameters('probes')]",
+                "urlPathMaps": "[parameters('urlPathMaps')]"
             },
             "resources": [
                 {
