@@ -130,10 +130,10 @@
       }
     },
     "singlePostgreSQLServerTLSVersion": {
-      "value": "TLS1_2"
+      "value": "TLS1_0"
     },
     "singlePostgreSQLServerPublicAccess": {
-      "value": "Disabled"
+      "value": "Enabled"
     },
     "redisName": {
       "value": "redis-cpp-apps-ckan-pre-we-01"
@@ -215,6 +215,12 @@
           "properties": {
             "backendAddresses": []
           }
+        },
+        {
+            "name": "dataset-backend-pool",
+            "properties": {
+                "backendAddresses": []
+            }
         }
       ]
     },
@@ -258,6 +264,37 @@
         }
       ]
     },
+    "urlPathMaps": {
+        "value": [
+            {
+                "name": "pre-opendata-sqcp-443",
+                "properties": {
+                    "defaultBackendAddressPool": {
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendAddressPools/agw-cpp-apps-ckan-pre-we-01-backend-pool"
+                    },
+                    "defaultBackendHttpSettings": {
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendHttpSettingsCollection/opendata-pre-sqcp-http"
+                    },
+                    "pathRules": [
+                        {
+                            "name": "dataset",
+                            "properties": {
+                                "paths": [
+                                    "/dataset/*"
+                                ],
+                                "backendAddressPool": {
+                                    "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendAddressPools/dataset-backend-pool"
+                                },
+                                "backendHttpSettings": {
+                                    "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendHttpSettingsCollection/opendata-pre-sqcp-http"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
     "requestRoutingRules": {
       "value": [
         {
@@ -267,11 +304,8 @@
             "httpListener": {
               "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/httpListeners/pre-opendata-sqcp-https"
             },
-            "backendAddressPool": {
-              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendAddressPools/agw-cpp-apps-ckan-pre-we-01-backend-pool"
-            },
-            "backendHttpSettings": {
-              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/backendHttpSettingsCollection/opendata-pre-sqcp-http"
+            "urlPathMap": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-ckan-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-ckan-pre-we-01/urlPathMaps/pre-opendata-sqcp-443"
             }
           }
         }
