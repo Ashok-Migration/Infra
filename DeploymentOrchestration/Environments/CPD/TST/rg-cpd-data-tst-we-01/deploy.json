@@ -514,6 +514,28 @@
           "uri": "[concat(variables('modulesPath'), 'Powerbi/2018-05-01/Parameters/pbicpddatatstwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-sql-tst-we-01",
+      "resourceGroup": "rg-cpd-data-tst-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-data-tst-we-01",
+        "DEP-sql-cpd-data-tst-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cpd-data-sql-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
   ],
   "outputs": {
