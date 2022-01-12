@@ -82,6 +82,7 @@
         "StorageBlobContributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
         "vnetId": "[concat(subscription().id, '/resourceGroups/', parameters('networkRG'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
         "subnetId": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "privateDnsZoneId": "[concat(subscription().id, '/resourceGroups/', parameters('networkRG'), '/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net')]"
     },
     "resources": [
         {
@@ -294,6 +295,41 @@
             ]
             }
         }
+        },
+        {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2017-05-10",
+        "name": "DnsZoneGroupDeployment",
+        "dependsOn": [
+            "[parameters('privateEndpointNameSqlOnDemand')]",
+            "PrivateDnsZoneDeployment"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources": [
+                {
+                "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+                "apiVersion": "2020-03-01",
+                "name": "[concat(parameters('privateEndpointNameSqlOnDemand'), '/', 'default')]",
+                "location": "[parameters('location')]",
+                "properties": {
+                    "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-sql-azuresynapse-ondemand-net",
+                        "properties": {
+                        "privateDnsZoneId": "[variables('privateDnsZoneId')]"
+                        }
+                    }
+                    ]
+                }
+                }
+            ]
+            }
+        },
+        "resourceGroup": "[resourceGroup().name]"
         }
     ],
     "outputs": {
