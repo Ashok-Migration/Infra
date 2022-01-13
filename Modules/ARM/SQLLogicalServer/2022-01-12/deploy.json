@@ -64,6 +64,10 @@
         "targetSubResourceSqlOnDemand": {
             "type": "Array"
         },
+        "storageName": {
+            "type": "String",
+            "defaultValue": ""
+        },
         "tags": {
             "defaultValue": {
             },
@@ -77,7 +81,7 @@
         "serverResourceGroupName": "[resourceGroup().name]",
         "subscriptionId": "[subscription().subscriptionId]",
         "uniqueStorage": "[uniqueString(variables('subscriptionId'), variables('serverResourceGroupName'), parameters('location'))]",
-        "storageName": "stcpddatadevwe01",
+        "storageName": "[parameters('storageName')]",
         "uniqueRoleGuid": "[guid(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), variables('storageBlobContributor'), resourceId('Microsoft.Sql/servers', parameters('serverName')))]",
         "StorageBlobContributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
         "vnetId": "[concat(subscription().id, '/resourceGroups/', parameters('networkRG'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
@@ -318,7 +322,7 @@
                 "properties": {
                     "privateDnsZoneConfigs": [
                     {
-                        "name": "privatelink-sql-azuresynapse-ondemand-net",
+                        "name": "privatelink-database-windows-ondemand-net",
                         "properties": {
                         "privateDnsZoneId": "[variables('privateDnsZoneId')]"
                         }
