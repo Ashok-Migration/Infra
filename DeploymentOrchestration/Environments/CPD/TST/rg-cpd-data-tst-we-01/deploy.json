@@ -94,7 +94,8 @@
       "name": "DEP-synapse-data-tst-we-01",
       "resourceGroup": "rg-cpd-data-tst-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-tst-we-01"
+        "DEP-rg-cpd-data-tst-we-01",
+        "DEP-kv-cpd-data-tst-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -305,7 +306,8 @@
       "name": "DEP-sql-cpd-data-tst-we-01",
       "resourceGroup": "rg-cpd-data-tst-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-tst-we-01"
+        "DEP-rg-cpd-data-tst-we-01",
+        "DEP-kv-cpd-data-tst-we-02"
       ],
       "properties": {
         "mode": "Incremental",
@@ -413,6 +415,7 @@
       "resourceGroup": "rg-cpd-data-tst-we-01",
       "dependsOn": [
         "DEP-rg-cpd-data-tst-we-01",
+        "DEP-kv-cpd-data-tst-we-02",
         "DEP-stcpddatatstwe01"
       ],
       "properties": {
@@ -435,6 +438,7 @@
       "resourceGroup": "rg-cpd-data-tst-we-01",
       "dependsOn": [
         "DEP-rg-cpd-data-tst-we-01",
+        "DEP-kv-cpd-data-tst-we-02",
         "DEP-stcpddatatstwe01"
       ],
       "properties": {
@@ -447,50 +451,6 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdgattstwe02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vmdgattstwe03",
-      "resourceGroup": "rg-cpd-data-tst-we-01",
-      "dependsOn": [
-        "DEP-rg-cpd-data-tst-we-01",
-        "DEP-stcpddatatstwe01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdgattstwe03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vmdgattstwe04",
-      "resourceGroup": "rg-cpd-data-tst-we-01",
-      "dependsOn": [
-        "DEP-rg-cpd-data-tst-we-01",
-        "DEP-stcpddatatstwe01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdgattstwe04-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
@@ -518,11 +478,10 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-prvep-cpd-data-sql-tst-we-01",
+      "name": "DEP-kv-cpd-data-tst-we-02",
       "resourceGroup": "rg-cpd-data-tst-we-01",
       "dependsOn": [
-        "DEP-rg-cpd-data-tst-we-01",
-        "DEP-sql-cpd-data-tst-we-01"
+        "DEP-rg-cpd-data-tst-we-01"
       ],
       "properties": {
         "mode": "Incremental",
@@ -530,10 +489,10 @@
           "detailLevel": "requestContent,responseContent"
         },
         "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cpd-data-sql-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cpd-data-tst-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }

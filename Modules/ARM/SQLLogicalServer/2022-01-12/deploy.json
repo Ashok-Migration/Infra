@@ -81,7 +81,7 @@
         "serverResourceGroupName": "[resourceGroup().name]",
         "subscriptionId": "[subscription().subscriptionId]",
         "uniqueStorage": "[uniqueString(variables('subscriptionId'), variables('serverResourceGroupName'), parameters('location'))]",
-        "storageName": "[parameters('storageName')]",
+        "storageName": "[if(empty(parameters('storageName')), 'stcpddatadevwe01', parameters('storageName'))]",
         "uniqueRoleGuid": "[guid(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), variables('storageBlobContributor'), resourceId('Microsoft.Sql/servers', parameters('serverName')))]",
         "StorageBlobContributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
         "vnetId": "[concat(subscription().id, '/resourceGroups/', parameters('networkRG'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
