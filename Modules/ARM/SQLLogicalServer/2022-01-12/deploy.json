@@ -217,7 +217,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "name": "PrivateDnsZoneDeployment",
+            "name": "SQL-PrivateDnsZoneDeployment",
             "dependsOn": [
                 "[parameters('privateEndpointNameSqlOnDemand')]"
             ],
@@ -229,7 +229,7 @@
                 "resources": [
                     {
                     "apiVersion": "2017-05-10",
-                    "name": "PrivateDnsZone",
+                    "name": "SQL-PrivateDnsZone",
                     "type": "Microsoft.Resources/deployments",
                     "subscriptionId": "[variables('SubscriptionId')]",
                     "resourceGroup": "[parameters('networkRG')]",
@@ -258,9 +258,9 @@
         {
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2017-05-10",
-        "name": "VirtualNetworkLinkDeployment",
+        "name": "SQL-VirtualNetworkLinkDeployment",
         "dependsOn": [
-            "PrivateDnsZoneDeployment"
+            "SQL-PrivateDnsZoneDeployment"
         ],
         "properties": {
             "mode": "Incremental",
@@ -270,7 +270,7 @@
             "resources": [
                 {
                 "apiVersion": "2017-05-10",
-                "name": "VirtualNetworklink",
+                "name": "SQL-VirtualNetworklink",
                 "type": "Microsoft.Resources/deployments",
                 "subscriptionId": "[variables('SubscriptionId')]",
                 "resourceGroup": "[parameters('networkRG')]",
@@ -303,10 +303,10 @@
         {
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2017-05-10",
-        "name": "DnsZoneGroupDeployment",
+        "name": "SQL-DnsZoneGroupDeployment",
         "dependsOn": [
             "[parameters('privateEndpointNameSqlOnDemand')]",
-            "PrivateDnsZoneDeployment"
+            "SQL-PrivateDnsZoneDeployment"
         ],
         "properties": {
             "mode": "Incremental",
