@@ -62,6 +62,16 @@
                             }
                         ]
                     }
+                },
+                {
+                  "name": "agw-cpp-tacc-prd-we-01",
+                  "properties": {
+                    "backendAddresses": [
+                      {
+                        "fqdn": "app-cpp-tacc-prd-we-01.azurewebsites.net"
+                      }
+                    ]
+                  }
                 }
             ]
         },
@@ -121,6 +131,20 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/probes/account-portal-probe"
                         }
                     }
+                },
+                {
+                  "name": "tacc-prd-sqcp-https",
+                  "properties": {
+                    "port": 443,
+                    "protocol": "Https",
+                    "cookieBasedAffinity": "Disabled",
+                    "pickHostNameFromBackendAddress": false,
+                    "affinityCookieName": "ApplicationGatewayAffinity",
+                    "requestTimeout": 60,
+                    "probe": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/probes/tacc-portal-probe"
+                    }
+                  }
                 }
             ]
         },
@@ -257,6 +281,38 @@
                         "hostNames": [],
                         "requireServerNameIndication": false
                     }
+                },
+                {
+                  "name": "prd-tacc-sqcp-https",
+                  "properties": {
+                    "frontendIPConfiguration": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/frontendIPConfigurations/agw-cpp-apps-web-prd-we-01-privateip"
+                    },
+                    "frontendPort": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/frontendPorts/port_443"
+                    },
+                    "protocol": "Https",
+                    "sslCertificate": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/sslCertificates/prd-sqcp-qa-httpsvaultCert"
+                    },
+                    "hostName": "accelerator.tasmu.gov.qa",
+                    "hostNames": [],
+                    "requireServerNameIndication": true
+                  }
+                },
+                {
+                  "name": "prd-tacc-sqcp-http",
+                  "properties": {
+                    "frontendIPConfiguration": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/frontendIPConfigurations/agw-cpp-apps-web-prd-we-01-privateip"
+                    },
+                    "frontendPort": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/frontendPorts/port_80"
+                    },
+                    "protocol": "Http",
+                    "hostNames": [],
+                    "requireServerNameIndication": false
+                  }
                 }
             ]
         },
@@ -369,6 +425,33 @@
                             "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/redirectConfigurations/prd-cpadmin-redirect"
                         }
                     }
+                },
+                {
+                  "name": "prd-tacc-sqcp-443",
+                  "properties": {
+                    "ruleType": "Basic",
+                    "httpListener": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/httpListeners/prd-tacc-sqcp-https"
+                    },
+                    "backendAddressPool": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendAddressPools/agw-cpp-tacc-prd-we-01"
+                    },
+                    "backendHttpSettings": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/backendHttpSettingsCollection/tacc-prd-sqcp-https"
+                    }
+                  }
+                },
+                {
+                  "name": "prd-tacc-sqcp-redirect",
+                  "properties": {
+                    "ruleType": "Basic",
+                    "httpListener": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/httpListeners/prd-tacc-sqcp-http"
+                    },
+                    "redirectConfiguration": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/redirectConfigurations/prd-tacc-sqcp-redirect"
+                    }
+                  }
                 }
             ]
         },
@@ -445,6 +528,24 @@
                             ]
                         }
                     }
+                },
+                {
+                  "name": "tacc-portal-probe",
+                  "properties": {
+                    "protocol": "Https",
+                    "host": "accelerator.tasmu.gov.qa",
+                    "path": "/",
+                    "interval": 30,
+                    "timeout": 30,
+                    "unhealthyThreshold": 3,
+                    "pickHostNameFromBackendHttpSettings": false,
+                    "minServers": 0,
+                    "match": {
+                      "statusCodes": [
+                        "200-399"
+                      ]
+                    }
+                  }
                 }
             ]
         },
@@ -513,6 +614,22 @@
                             }
                         ]
                     }
+                },
+                {
+                  "name": "prd-tacc-sqcp-redirect",
+                  "properties": {
+                    "redirectType": "Permanent",
+                    "targetListener": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/httpListeners/prd-tacc-sqcp-https"
+                    },
+                    "includePath": true,
+                    "includeQueryString": true,
+                    "requestRoutingRules": [
+                      {
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-prd-we-01/requestRoutingRules/prd-tacc-sqcp-redirect"
+                      }
+                    ]
+                  }
                 }
             ]
         },
