@@ -11,7 +11,7 @@ param
 	[string]$url
 )
 
-$searchApiKey = Get-AzureRmSearchAdminKeyPair -ResourceGroupName $resourceGroupName -ServiceName $searchServiceName
+$searchApiKey = Get-AzSearchAdminKeyPair -ResourceGroupName $resourceGroupName -ServiceName $searchServiceName
 
 
 $headers = @{
