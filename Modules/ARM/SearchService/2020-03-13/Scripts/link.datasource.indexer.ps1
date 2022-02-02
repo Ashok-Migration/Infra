@@ -16,7 +16,7 @@ param
 )
 Import-Module Az.Search
 $storageAccount = Get-AzStorageAccount -Name $storageAccountName -ResourceGroupName $storageResourceGroup
-$storageAccountKey = (Get-AztorageAccountKey -ResourceGroupName $storageResourceGroup -Name $storageAccountName)[0].Value
+$storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $storageResourceGroup -Name $storageAccountName)[0].Value
 
 $searchApiKey = Get-AzSearchAdminKeyPair -ResourceGroupName $resourceGroupName -ServiceName $searchServiceName
 $body = $(get-content $schemaFile) | ConvertFrom-JSON
