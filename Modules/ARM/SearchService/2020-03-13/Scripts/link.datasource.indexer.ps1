@@ -14,11 +14,11 @@ param
 	[Parameter(Mandatory = $true)]
 	[string]$url
 )
+Import-Module Az.Search
+$storageAccount = Get-AzStorageAccount -Name $storageAccountName -ResourceGroupName $storageResourceGroup
+$storageAccountKey = (Get-AztorageAccountKey -ResourceGroupName $storageResourceGroup -Name $storageAccountName)[0].Value
 
-$storageAccount = Get-AzureRmStorageAccount -StorageAccountName $storageAccountName -ResourceGroupName $storageResourceGroup
-$storageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $storageResourceGroup -Name $storageAccountName)[0].Value
-
-$searchApiKey = Get-AzureRmSearchAdminKeyPair -ResourceGroupName $resourceGroupName -ServiceName $searchServiceName
+$searchApiKey = Get-AzSearchAdminKeyPair -ResourceGroupName $resourceGroupName -ServiceName $searchServiceName
 $body = $(get-content $schemaFile) | ConvertFrom-JSON
 $body.credentials.connectionString = 'DefaultEndpointsProtocol=https;AccountName=' + $storageAccountName + ';AccountKey=' + $storageAccountKey + ';EndpointSuffix=core.windows.net' 
 

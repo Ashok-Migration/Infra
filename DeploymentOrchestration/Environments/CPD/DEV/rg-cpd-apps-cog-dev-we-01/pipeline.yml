@@ -114,7 +114,7 @@ stages:
                 New-AzDeployment @DeploymentInputs
               azurePowerShellVersion: LatestVersion
 
-          - task: AzurePowerShell@3
+          - task: AzurePowerShell@5
             displayName: Create Index in Search
             inputs:
               azureSubscription: "$(serviceConnection)"
@@ -122,7 +122,7 @@ stages:
               ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(indexSchemaFile)" -url "$(indexUrl)"'
               azurePowerShellVersion: LatestVersion
 
-          - task: AzurePowerShell@3
+          - task: AzurePowerShell@5
             displayName: Link to blob datasource
             inputs:
               azureSubscription: "$(serviceConnection)"
@@ -130,7 +130,7 @@ stages:
               ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -storageResourceGroup "$(storageResourceGroup)" -storageAccountName "$(storageAccountName)" -schemaFile "$(Build.Repository.LocalPath)/$(dataSourceSchemaFile)" -url "$(dataSourceUrl)"'
               azurePowerShellVersion: LatestVersion
 
-          - task: AzurePowerShell@3
+          - task: AzurePowerShell@5
             displayName: Link to blob skillset
             inputs:
               azureSubscription: "$(serviceConnection)"
@@ -138,7 +138,7 @@ stages:
               ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(skillSetSchemaFile)" -url "$(skillSetUrl)"'
               azurePowerShellVersion: LatestVersion
 
-          - task: AzurePowerShell@3
+          - task: AzurePowerShell@5
             displayName: Create Indexer in Search
             inputs:
               azureSubscription: "$(serviceConnection)"
