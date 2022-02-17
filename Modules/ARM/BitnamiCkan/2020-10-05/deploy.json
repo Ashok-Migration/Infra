@@ -238,12 +238,6 @@
         "description": "Server Group Name"
       }
     },
-    "postgreSQLServerNames": {
-      "type": "array",
-      "metadata": {
-        "description": "PostgreSQL Server v2 Names"
-      }
-    },
     "singlePostgreSQLServerName": {
       "type": "string",
       "defaultValue": "",
@@ -662,6 +656,27 @@
       "metadata": {
         "description": "VM Reference Image Version. Pass Latest value as Default Value and Deployed VM Image version in parameter file."
       }
+    },
+    "enableHa": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable HA for Server Groups."
+      }
+    },
+    "coordinatorCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Coordinator Servers"
+      }
+    },
+    "workersCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of Worker Servers"
+      }
     }
   },
     "variables": {
@@ -671,6 +686,7 @@
         "cloudAccountId": "[uniqueString(subscription().subscriptionId)]",
         "stackUniqueId": "[concat(parameters('stackId'), uniquestring(resourceGroup().id))]",
         "dnsPrefix": "[concat(variables('stackUniqueId'), '-')]",
+        "coordinatorFqdn": "[concat('c.', toLower(parameters('serverGroupName')), '.postgres.database.azure.com')]",
         "linuxConfigurationSshPublicKey": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -947,174 +963,36 @@
             "location": "[parameters('location')]",
             "type": "Microsoft.DBforPostgreSQL/serverGroupsv2",
             "name": "[variables('citusServerGroupName')]",
-            "Properties": {
-                "Mode": "citus"
-            }
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "location": "[parameters('location')]",
-            "type": "Microsoft.DBforPostgreSQL/serversv2",
-            "name": "[parameters('postgreSQLServerNames')[0]]",
-            "sku": {
-                "name": "[parameters('databaseSkuName')]",
-                "size": "[variables('databaseSkuSizeMB')]"
-            },
             "properties": {
-                "version": "11",
-                "Role": "Coordinator",
-                "administratorLogin": "[variables('databaseAdministratorLogin')]",
+                "createMode": "Default",
+                "administratorLogin": "citus",
                 "administratorLoginPassword": "[variables('databasePassword')]",
-                "publicIpAddressRequested": "true",
-                "serverEdition": "GeneralPurpose",
-                "VCores": "[variables('coordinatorVcores')]",
-                "storageQuotaInMb": "[variables('coordinatorStorageSizeMB')]",
-                "serverGroupName": "[variables('citusServerGroupName')]",
-                "standbyCount": "[variables('citusStandbyCount')]"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.DBforPostgreSQL/serversv2/providers/diagnosticsettings",
-                    "apiVersion": "2017-05-01-preview",
-                    "name": "[concat(parameters('postgreSQLServerNames')[0], '/Microsoft.Insights/service')]",
-                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
-                    "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[0])]"
-                    ],
-                    "properties": {
-                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
-                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
-                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
-                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
-                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsGreSQL'))]"
+                "backupRetentionDays": 35,
+                "enableMx": false,
+                "enableZfs": false,
+                "previewFeatures": true,
+                "postgresqlVersion": "11",
+                "serverRoleGroups": [
+                    {
+                        "name": "",
+                        "role": "Coordinator",
+                        "serverCount": "[parameters('coordinatorCount')]",
+                        "serverEdition": "GeneralPurpose",
+                        "vCores": "[variables('coordinatorVcores')]",
+                        "storageQuotaInMb": "[variables('coordinatorStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]"
+                    },
+                    {
+                        "name": "",
+                        "role": "Worker",
+                        "serverCount": "[parameters('workersCount')]",
+                        "serverEdition": "MemoryOptimized",
+                        "vCores": "[parameters('databaseWorkersVCores')]",
+                        "storageQuotaInMb": "[parameters('databaseWorkersStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]",
+                        "enablePublicIpAccess": false
                     }
-                }
-            ],
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('citusServerGroupName'))]"
-            ]
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "type": "Microsoft.DBforPostgreSQL/serversv2/firewallRules",
-            "name": "[concat(parameters('postgreSQLServerNames')[0], '/access-ckan')]",
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[0])]"
-            ],
-            "properties": {
-                "StartIpAddress": "[parameters('azFirewallPublicIP')]",
-                "EndIpAddress": "[parameters('azFirewallPublicIP')]"
-            }
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "location": "[parameters('location')]",
-            "type": "Microsoft.DBforPostgreSQL/serversv2",
-            "name": "[parameters('postgreSQLServerNames')[1]]",
-            "sku": {
-                "name": "[parameters('databaseSkuName')]"
-            },
-            "properties": {
-                "version": "11",
-                "Role": "Worker",
-                "administratorLogin": "[variables('databaseAdministratorLogin')]",
-                "administratorLoginPassword": "[variables('databasePassword')]",
-                "publicIpAddressRequested": "false",
-                "serverEdition": "MemoryOptimized",
-                "VCores": "[parameters('databaseWorkersVCores')]",
-                "storageQuotaInMb": "[parameters('databaseWorkersStorageSizeMB')]",
-                "serverGroupName": "[variables('citusServerGroupName')]",
-                "standbyCount": "[variables('citusStandbyCount')]"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.DBforPostgreSQL/serversv2/providers/diagnosticsettings",
-                    "apiVersion": "2017-05-01-preview",
-                    "name": "[concat(parameters('postgreSQLServerNames')[1], '/Microsoft.Insights/service')]",
-                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
-                    "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[1])]"
-                    ],
-                    "properties": {
-                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
-                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
-                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
-                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
-                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsGreSQL'))]"
-                    }
-                }
-            ],
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('citusServerGroupName'))]"
-            ]
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "type": "Microsoft.DBforPostgreSQL/serversv2/firewallRules",
-            "name": "[concat(parameters('postgreSQLServerNames')[1], '/access-ckan')]",
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[1])]"
-            ],
-            "properties": {
-                "StartIpAddress": "[parameters('azFirewallPublicIP')]",
-                "EndIpAddress": "[parameters('azFirewallPublicIP')]"
-            }
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "location": "[parameters('location')]",
-            "type": "Microsoft.DBforPostgreSQL/serversv2",
-            "name": "[parameters('postgreSQLServerNames')[2]]",
-            "sku": {
-                "name": "[parameters('databaseSkuName')]"
-            },
-            "properties": {
-                "version": "11",
-                "Role": "Worker",
-                "administratorLogin": "[variables('databaseAdministratorLogin')]",
-                "administratorLoginPassword": "[variables('databasePassword')]",
-                "publicIpAddressRequested": "false",
-                "serverEdition": "MemoryOptimized",
-                "VCores": "[parameters('databaseWorkersVCores')]",
-                "storageQuotaInMb": "[parameters('databaseWorkersStorageSizeMB')]",
-                "serverGroupName": "[variables('citusServerGroupName')]",
-                "standbyCount": "[variables('citusStandbyCount')]"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.DBforPostgreSQL/serversv2/providers/diagnosticsettings",
-                    "apiVersion": "2017-05-01-preview",
-                    "name": "[concat(parameters('postgreSQLServerNames')[2], '/Microsoft.Insights/service')]",
-                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
-                    "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[2])]"
-                    ],
-                    "properties": {
-                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
-                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
-                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
-                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
-                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
-                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsGreSQL'))]"
-                    }
-                }
-            ],
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('citusServerGroupName'))]"
-            ]
-        },
-        {
-            "apiVersion": "2018-03-29-privatepreview",
-            "type": "Microsoft.DBforPostgreSQL/serversv2/firewallRules",
-            "name": "[concat(parameters('postgreSQLServerNames')[2], '/access-ckan')]",
-            "dependsOn": [
-                "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[2])]"
-            ],
-            "properties": {
-                "StartIpAddress": "[parameters('azFirewallPublicIP')]",
-                "EndIpAddress": "[parameters('azFirewallPublicIP')]"
+                ]
             }
         },
         {
@@ -1364,8 +1242,8 @@
                 "[concat('Microsoft.Network/networkInterfaces/', concat(concat(parameters('stackId'), '-ckan'), copyIndex(), 'nic'))]",
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('solrVirtualMachineName'), '/extensions/setupMachine')]",
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('cacheVirtualMachineName'), '/extensions/setupMachine')]",
-                "[concat('Microsoft.DBforPostgreSQL/serversv2/', parameters('postgreSQLServerNames')[copyIndex()])]",
-                "[concat('Microsoft.Cache/Redis/', parameters('redisName'))]"
+                "[concat('Microsoft.Cache/Redis/', parameters('redisName'))]",
+                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('citusServerGroupName'))]"
             ],
             "tags": {
                 "provider": "[toUpper(parameters('BitnamiTags').provider)]"
@@ -1381,7 +1259,7 @@
                     "computerName": "[parameters('frontendVirtualMachineNames')[copyIndex('vmcopy')]]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[if(equals(parameters('authenticationType'), 'password'), parameters('adminPassword'), '')]",
-                    "customData": "[base64(concat('\n', '# PROVISIONER_APP_PASSWORD=', parameters('appPassword'), '\n', '# PROVISIONER_PEER_NODES_COUNT=', variables('machineCount'), '\n', '# PROVISIONER_PEER_NODES_INDEX=', copyIndex(), '\n', '# PROVISIONER_PEER_NODES_PREFIX=', parameters('stackId'), '\n', '# PROVISIONER_PEER_PASSWORD_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_SHARED_UNIQUE_ID_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_CLOUD_ACCOUNT_ID=', variables('cloudAccountId'), '\n', '# PROVISIONER_TIER=', 'ckan', '\n', '# PROVISIONER_STORAGE_ACCOUNT_NAME=', parameters('storageAccountName'), '\n', '# PROVISIONER_STORAGE_ACCOUNT_KEY=', listKeys(parameters('storageAccountName'), '2019-06-01').keys[0].value, '\n', '# PROVISIONER_EXTRA_SERVICES=', base64(concat('[{\"name\":\"postgresql\",\"host\":\"', reference(resourceId('Microsoft.DBforPostgreSQL/serversv2', parameters('postgreSQLServerNames')[0])).fullyQualifiedDomainName, '\",\"port\":\"5432\",\"user\":\"', variables('databaseAdministratorLogin'), '\",\"password\":\"', variables('databasePassword'), '\",\"ssl\":\"yes\"},{\"name\":\"solr\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('solrNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"8983\"},{\"name\":\"memcached\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('memcachedNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"11211\"},{\"name\":\"redis\",\"host\":\"', reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).hostName, '\",\"port\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), '6379', '6380'), '\",\"password\":\"', listKeys(parameters('redisName'), '2019-07-01').primaryKey, '\",\"ssl\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), 'no', 'yes'), '\"}]')), '\n', '# PROVISIONER_PUBLIC_ENDPOINT=', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('appGw').frontends[0].publicIPAddress)).dnsSettings.fqdn, '\n', parameters('customData')))]",
+                    "customData": "[base64(concat('\n', '# PROVISIONER_APP_PASSWORD=', parameters('appPassword'), '\n', '# PROVISIONER_PEER_NODES_COUNT=', variables('machineCount'), '\n', '# PROVISIONER_PEER_NODES_INDEX=', copyIndex(), '\n', '# PROVISIONER_PEER_NODES_PREFIX=', parameters('stackId'), '\n', '# PROVISIONER_PEER_PASSWORD_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_SHARED_UNIQUE_ID_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_CLOUD_ACCOUNT_ID=', variables('cloudAccountId'), '\n', '# PROVISIONER_TIER=', 'ckan', '\n', '# PROVISIONER_STORAGE_ACCOUNT_NAME=', parameters('storageAccountName'), '\n', '# PROVISIONER_STORAGE_ACCOUNT_KEY=', listKeys(parameters('storageAccountName'), '2019-06-01').keys[0].value, '\n', '# PROVISIONER_EXTRA_SERVICES=', base64(concat('[{\"name\":\"postgresql\",\"host\":\"', variables('coordinatorFqdn'), '\",\"port\":\"5432\",\"user\":\"', variables('databaseAdministratorLogin'), '\",\"password\":\"', variables('databasePassword'), '\",\"ssl\":\"yes\"},{\"name\":\"solr\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('solrNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"8983\"},{\"name\":\"memcached\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('memcachedNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"11211\"},{\"name\":\"redis\",\"host\":\"', reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).hostName, '\",\"port\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), '6379', '6380'), '\",\"password\":\"', listKeys(parameters('redisName'), '2019-07-01').primaryKey, '\",\"ssl\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), 'no', 'yes'), '\"}]')), '\n', '# PROVISIONER_PUBLIC_ENDPOINT=', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('appGw').frontends[0].publicIPAddress)).dnsSettings.fqdn, '\n', parameters('customData')))]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), variables('linuxConfigurationPassword'), variables('linuxConfigurationSshPublicKey'))]"
                 },
                 "storageProfile": {
