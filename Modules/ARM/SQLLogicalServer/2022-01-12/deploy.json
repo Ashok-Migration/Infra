@@ -226,40 +226,6 @@
                     }
                 ]
             }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "SQL-DnsZoneGroupDeployment",
-            "dependsOn": [
-                "[parameters('privateEndpointNameSqlOnDemand')]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                "contentVersion": "1.0.0.0",
-                "resources": [
-                    {
-                    "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                    "apiVersion": "2020-03-01",
-                    "name": "[concat(parameters('privateEndpointNameSqlOnDemand'), '/', 'default')]",
-                    "location": "[parameters('location')]",
-                    "properties": {
-                        "privateDnsZoneConfigs": [
-                        {
-                            "name": "privatelink-database-windows-ondemand-net",
-                            "properties": {
-                            "privateDnsZoneId": "[variables('privateDnsZoneId')]"
-                            }
-                        }
-                        ]
-                    }
-                    }
-                ]
-                }
-            },
-            "resourceGroup": "[resourceGroup().name]"
         }
     ],
     "outputs": {
