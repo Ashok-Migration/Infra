@@ -6,7 +6,7 @@ steps:
       scriptType: "ps"
       scriptLocation: "inlineScript"
       inlineScript: |
-        az aks get-credentials -g $(aksResourceGroupName) -n $(aksClusterName) --overwrite-existing
+        az aks get-credentials -g $(aksResourceGroupName) -n $(aksClusterName)
         kubectl rollout restart deployment caseapi -n apiapps
         kubectl rollout restart deployment cmscontentapi -n apiapps
         kubectl rollout restart deployment cmsdocumentsapi -n apiapps
