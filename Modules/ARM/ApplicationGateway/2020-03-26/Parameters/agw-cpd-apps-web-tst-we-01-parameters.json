@@ -124,6 +124,20 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/probes/account-portal-probe"
                         }
                     }
+                },
+                {
+                    "name": "orderingtool-tst-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "pickHostNameFromBackendAddress": false,
+                        "affinityCookieName": "ApplicationGatewayAffinity",
+                        "requestTimeout": 120,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/probes/orderingtool-portal-probe"
+                        }
+                    }
                 }
             ]
         },
@@ -260,6 +274,39 @@
                         "hostNames": [],
                         "requireServerNameIndication": false
                     }
+                },
+                {
+                    "name": "tst-orderingtool-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/frontendIPConfigurations/agw-cpd-apps-web-tst-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/sslCertificates/tst-sqcp-qa-httpsvaultCert"
+                        },
+                        "hostName": "ordering-tool.tst.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
+                    "name": "tst-orderingtool-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/frontendIPConfigurations/agw-cpd-apps-web-tst-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "ordering-tool.tst.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
                 }
             ]
         },
@@ -372,6 +419,33 @@
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/redirectConfigurations/tst-cpadmin-redirect"
                         }
                     }
+                },
+                {
+                    "name": "tst-orderingtool-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/httpListeners/tst-orderingtool-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/backendAddressPools/agw-cpd-apps-aks-tst-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/backendHttpSettingsCollection/orderingtool-tst-sqcp-https"
+                        }
+                    }
+                },
+                {
+                    "name": "tst-orderingtool-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/httpListeners/tst-orderingtool-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/redirectConfigurations/tst-orderingtool-redirect"
+                        }
+                    }
                 }
             ]
         },
@@ -436,6 +510,24 @@
                     "properties": {
                         "protocol": "Https",
                         "host": "marketplace.tst.sqcp.qa",
+                        "path": "/",
+                        "interval": 30,
+                        "timeout": 120,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "orderingtool-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "ordering-tool.tst.sqcp.qa",
                         "path": "/",
                         "interval": 30,
                         "timeout": 120,
@@ -513,6 +605,22 @@
                         "requestRoutingRules": [
                             {
                                 "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/requestRoutingRules/tst-cpadmin-redirect"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "tst-orderingtool-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/httpListeners/tst-orderingtool-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-tst-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-tst-we-01/requestRoutingRules/tst-orderingtool-redirect"
                             }
                         ]
                     }
