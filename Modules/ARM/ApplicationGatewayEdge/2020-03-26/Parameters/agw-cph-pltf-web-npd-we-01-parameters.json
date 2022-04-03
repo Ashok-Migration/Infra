@@ -1702,6 +1702,18 @@
                     }
                   },
                   {
+                      "name": "dev-orderingtool-redirect",
+                      "properties": {
+                          "ruleType": "Basic",
+                          "httpListener": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/dev-orderingtool-sqcp-http"
+                          },
+                          "redirectConfiguration": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/redirectConfigurations/dev-orderingtool-redirect"
+                          }
+                      }
+                  },
+                  {
                     "name": "tst-orderingtool-sqcp-80",
                     "properties": {
                         "ruleType": "Basic",
@@ -2454,6 +2466,22 @@
                         }
                       ]
                     }
+                  },
+                  {
+                      "name": "dev-orderingtool-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/dev-orderingtool-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                  "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/requestRoutingRules/dev-orderingtool-redirect"
+                              }
+                          ]
+                      }
                   },
                   {
                       "name": "tst-orderingtool-redirect",
