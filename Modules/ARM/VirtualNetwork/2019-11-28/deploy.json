@@ -171,7 +171,7 @@
                                 "routeTable": "[if(empty(parameters('subnets')[copyIndex('subnets')].routeTableName), json('null'), json(concat('{\"id\": \"', resourceId(parameters('subnets')[copyIndex('subnets')].routesRGName,'Microsoft.Network/routeTables', parameters('subnets')[copyIndex('subnets')].routeTableName), '\"}')))]",
                                 "serviceEndpoints": "[if(empty(parameters('subnets')[copyIndex('subnets')].serviceEndpoints), json('null'), parameters('subnets')[copyIndex('subnets')].serviceEndpoints)]",
                                 "delegations": "[if(contains(parameters('subnets')[copyIndex('subnets')], 'delegations'), if(empty(parameters('subnets')[copyIndex('subnets')].delegations), json('null'), parameters('subnets')[copyIndex('subnets')].delegations), json('null'))]",
-                                "privateEndpointNetworkPolicies": "Disabled",
+                                "privateEndpointNetworkPolicies": "[if(contains(parameters('subnets')[copyIndex('subnets')], 'privateEndpointNetworkPolicies'), if(empty(parameters('subnets')[copyIndex('subnets')].privateEndpointNetworkPolicies), 'Disabled', parameters('subnets')[copyIndex('subnets')].privateEndpointNetworkPolicies), 'Disabled')]",
                                 "privateLinkServiceNetworkPolicies": "Enabled"
                             }
                         }
