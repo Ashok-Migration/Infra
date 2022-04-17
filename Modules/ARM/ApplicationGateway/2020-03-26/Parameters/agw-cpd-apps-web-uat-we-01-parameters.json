@@ -92,20 +92,6 @@
                     }
                 },
                 {
-                  "name": "orderingtool-uat-sqcp-https",
-                  "properties": {
-                      "port": 443,
-                      "protocol": "Https",
-                      "cookieBasedAffinity": "Disabled",
-                      "pickHostNameFromBackendAddress": false,
-                      "affinityCookieName": "ApplicationGatewayAffinity",
-                      "requestTimeout": 120,
-                      "probe": {
-                          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/orderingtool-portal-probe"
-                      }
-                  }
-              },
-                {
                     "name": "mytasmu-uat-sqcp-https",
                     "properties": {
                         "port": 443,
@@ -162,8 +148,22 @@
                     "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/tacc-portal-probe"
                   }
                 }
+              },
+              {
+                  "name": "orderingtool-uat-sqcp-https",
+                  "properties": {
+                      "port": 443,
+                      "protocol": "Https",
+                      "cookieBasedAffinity": "Disabled",
+                      "pickHostNameFromBackendAddress": false,
+                      "affinityCookieName": "ApplicationGatewayAffinity",
+                      "path": "/boadminportal/",
+                      "requestTimeout": 120,
+                      "probe": {
+                          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/orderingtool-portal-probe"
+                      }
+                  }
               }
-
             ]
         },
         "httpListeners": {
