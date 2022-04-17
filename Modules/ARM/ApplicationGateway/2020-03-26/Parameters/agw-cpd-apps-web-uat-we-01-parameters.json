@@ -92,6 +92,20 @@
                     }
                 },
                 {
+                  "name": "orderingtool-uat-sqcp-https",
+                  "properties": {
+                      "port": 443,
+                      "protocol": "Https",
+                      "cookieBasedAffinity": "Disabled",
+                      "pickHostNameFromBackendAddress": false,
+                      "affinityCookieName": "ApplicationGatewayAffinity",
+                      "requestTimeout": 120,
+                      "probe": {
+                          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/probes/orderingtool-portal-probe"
+                      }
+                  }
+              },
+                {
                     "name": "mytasmu-uat-sqcp-https",
                     "properties": {
                         "port": 443,
@@ -191,6 +205,24 @@
                     }
                 },
                 {
+                    "name": "uat-orderingtool-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendIPConfigurations/agw-cpd-apps-web-uat-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/sslCertificates/uat-sqcp-qa-httpsvaultCert"
+                        },
+                        "hostName": "ordering-tool.uat.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
                     "name": "uat-accounts-sqcp-https",
                     "properties": {
                         "frontendIPConfiguration": {
@@ -275,6 +307,21 @@
                     }
                 },
                 {
+                    "name": "uat-orderingtool-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendIPConfigurations/agw-cpd-apps-web-uat-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "ordering-tool.uat.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
+                },
+                {
                     "name": "uat-accounts-sqcp-http",
                     "properties": {
                         "frontendIPConfiguration": {
@@ -334,6 +381,21 @@
                 },
                 "backendHttpSettings": {
                   "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendHttpSettingsCollection/marketplace-uat-sqcp-https"
+                }
+              }
+            },
+            {
+              "name": "uat-orderingtool-sqcp-443",
+              "properties": {
+                "ruleType": "Basic",
+                "httpListener": {
+                  "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/httpListeners/uat-orderingtool-sqcp-https"
+                },
+                "backendAddressPool": {
+                  "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendAddressPools/agw-cpd-apps-aks-uat-we-01"
+                },
+                "backendHttpSettings": {
+                  "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/backendHttpSettingsCollection/orderingtool-uat-sqcp-https"
                 }
               }
             },
@@ -418,6 +480,18 @@
                 },
                 "redirectConfiguration": {
                   "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/redirectConfigurations/uat-marketplace-redirect"
+                }
+              }
+            },
+            {
+              "name": "uat-orderingtool-redirect",
+              "properties": {
+                "ruleType": "Basic",
+                "httpListener": {
+                  "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/httpListeners/uat-orderingtool-sqcp-http"
+                },
+                "redirectConfiguration": {
+                  "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/redirectConfigurations/uat-orderingtool-redirect"
                 }
               }
             },
@@ -534,6 +608,24 @@
                 }
               },
               {
+                "name": "orderingtool-portal-probe",
+                "properties": {
+                  "protocol": "Https",
+                  "host": "ordering-tool.uat.sqcp.qa",
+                  "path": "/boadminportal/",
+                  "interval": 30,
+                  "timeout": 120,
+                  "unhealthyThreshold": 3,
+                  "pickHostNameFromBackendHttpSettings": false,
+                  "minServers": 0,
+                  "match": {
+                    "statusCodes": [
+                      "200-399"
+                    ]
+                  }
+                }
+              },
+              {
                 "name": "tacc-portal-probe",
                 "properties": {
                   "protocol": "Https",
@@ -583,6 +675,22 @@
                         "requestRoutingRules": [
                             {
                                 "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/requestRoutingRules/uat-marketplace-redirect"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "uat-orderingtool-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/httpListeners/uat-orderingtool-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-web-uat-we-01/requestRoutingRules/uat-orderingtool-redirect"
                             }
                         ]
                     }

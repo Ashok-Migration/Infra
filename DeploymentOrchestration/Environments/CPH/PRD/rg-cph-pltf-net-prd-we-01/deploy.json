@@ -1753,6 +1753,27 @@
               "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
             }
           }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-uat-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-we-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-we-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
         }
   ],
 "outputs": {}
