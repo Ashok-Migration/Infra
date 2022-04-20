@@ -1185,6 +1185,51 @@
                           "hostNames": [],
                           "requireServerNameIndication": true
                       }
+                  },
+                  {
+                      "name": "dev-www-marketplace-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-npd-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "www.marketplace.dev.sqcp.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
+                  },
+                  {
+                      "name": "tst-www-marketplace-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-npd-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "www.marketplace.tst.sqcp.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
+                  },
+                  {
+                      "name": "uat-www-marketplace-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-npd-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "www.marketplace.uat.sqcp.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
                   }
             ]
         },
@@ -1879,6 +1924,42 @@
                               "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/redirectConfigurations/uat-orderingtool-redirect"
                           }
                       }
+                  },
+                  {
+                    "name": "dev-www-marketplace-redirect",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/dev-www-marketplace-sqcp-http"
+                      },
+                      "redirectConfiguration": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/redirectConfigurations/dev-www-marketplace-redirect"
+                      }
+                    }
+                  },
+                  {
+                    "name": "tst-www-marketplace-redirect",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/tst-www-marketplace-sqcp-http"
+                      },
+                      "redirectConfiguration": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/redirectConfigurations/tst-www-marketplace-redirect"
+                      }
+                    }
+                  },
+                  {
+                    "name": "uat-www-marketplace-redirect",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/uat-www-marketplace-sqcp-http"
+                      },
+                      "redirectConfiguration": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/redirectConfigurations/uat-www-marketplace-redirect"
+                      }
+                    }
                   }
             ]
         },
@@ -2666,6 +2747,54 @@
                           "requestRoutingRules": [
                               {
                                   "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/requestRoutingRules/uat-orderingtool-redirect"
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "name": "dev-www-marketplace-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/dev-marketplace-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/requestRoutingRules/dev-www-marketplace-redirect"
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "name": "tst-www-marketplace-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/tst-marketplace-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/requestRoutingRules/tst-www-marketplace-redirect"
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "name": "uat-www-marketplace-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/httpListeners/uat-marketplace-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-npd-we-01/requestRoutingRules/uat-www-marketplace-redirect"
                               }
                           ]
                       }
