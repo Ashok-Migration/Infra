@@ -154,7 +154,21 @@
                         "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/probes/pre-tacc-portal-probe"
                       }
                     }
-                  }
+                  },
+                  {
+                    "name": "orderingtool-pre-sqcp-https",
+                    "properties": {
+                        "port": 10044,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "ordering-tool.pre.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 30,
+                        "probe": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/probes/pre-orderingtool-portal-probe"
+                        }
+                    }
+                }
             ]
         },
         "httpListeners": {
@@ -356,6 +370,39 @@
                       "hostNames": [],
                       "requireServerNameIndication": false
                     }
+                  },
+                  {
+                      "name": "pre-orderingtool-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-pre-we-01"
+                          },
+                          "frontendPort": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "ordering-tool.pre.sqcp.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
+                  },
+                  {
+                      "name": "pre-orderingtool-sqcp-https",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-pre-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/frontendPorts/port_443"
+                          },
+                          "protocol": "Https",
+                          "sslCertificate": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/sslCertificates/Pre-SQCP-Certificate"
+                          },
+                          "hostName": "ordering-tool.pre.sqcp.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": true
+                      }
                   }
             ]
         },
@@ -540,6 +587,36 @@
                         "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/redirectConfigurations/pre-tacc-redirect"
                       }
                     }
+                  },
+                  {
+                    "name": "pre-orderingtool-sqcp-80",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+                        },
+                        "backendHttpSettings": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/backendHttpSettingsCollection/orderingtool-pre-sqcp-https"
+                        },
+                        "rewriteRuleSet": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/rewriteRuleSets/xff-orderingtool-pre-rewrite"
+                        }
+                    }
+                  },
+                  {
+                    "name": "pre-orderingtool-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/redirectConfigurations/pre-orderingtool-redirect"
+                        }
+                    }
                   }
             ]
         },
@@ -652,6 +729,24 @@
                         ]
                       }
                     }
+                  },
+                  {
+                    "name": "pre-orderingtool-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "ordering-tool.pre.sqcp.qa",
+                        "path": "/",
+                        "interval": 30,
+                        "timeout": 30,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
                   }
             ]
         },
@@ -752,6 +847,22 @@
                         }
                       ]
                     }
+                  },
+                  {
+                      "name": "pre-orderingtool-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-pre-we-01/requestRoutingRules/pre-orderingtool-redirect"
+                              }
+                          ]
+                      }
                   }
             ]
         },
@@ -864,6 +975,27 @@
             },
             {
               "name": "xff-tacc-pre-rewrite",
+              "properties": {
+                "rewriteRules": [
+                  {
+                    "ruleSequence": 100,
+                    "conditions": [],
+                    "name": "xff-header",
+                    "actionSet": {
+                      "requestHeaderConfigurations": [
+                        {
+                          "headerName": "X-Forwarded-For",
+                          "headerValue": "{var_add_x_forwarded_for_proxy}"
+                        }
+                      ],
+                      "responseHeaderConfigurations": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "xff-orderingtool-pre-rewrite",
               "properties": {
                 "rewriteRules": [
                   {

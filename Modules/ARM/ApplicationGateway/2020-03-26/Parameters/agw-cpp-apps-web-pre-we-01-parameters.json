@@ -148,6 +148,21 @@
                     "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/tacc-portal-probe"
                   }
                 }
+              },
+              {
+                  "name": "orderingtool-pre-sqcp-https",
+                  "properties": {
+                      "port": 443,
+                      "protocol": "Https",
+                      "cookieBasedAffinity": "Disabled",
+                      "pickHostNameFromBackendAddress": false,
+                      "affinityCookieName": "ApplicationGatewayAffinity",
+                      "path": "/boadminportal/",
+                      "requestTimeout": 120,
+                      "probe": {
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/orderingtool-portal-probe"
+                      }
+                  }
               }
             ]
         },
@@ -316,6 +331,39 @@
                 "hostNames": [],
                 "requireServerNameIndication": false
               }
+            },
+            {
+                "name": "pre-orderingtool-sqcp-http",
+                "properties": {
+                    "frontendIPConfiguration": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+                    },
+                    "frontendPort": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_80"
+                    },
+                    "protocol": "Http",
+                    "hostName": "ordering-tool.pre.sqcp.qa",
+                    "hostNames": [],
+                    "requireServerNameIndication": false
+                }
+            },
+            {
+                "name": "pre-orderingtool-sqcp-https",
+                "properties": {
+                    "frontendIPConfiguration": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+                    },
+                    "frontendPort": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+                    },
+                    "protocol": "Https",
+                    "sslCertificate": {
+                      "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+                    },
+                    "hostName": "ordering-tool.pre.sqcp.qa",
+                    "hostNames": [],
+                    "requireServerNameIndication": true
+                }
             }
           ]
         },
@@ -455,6 +503,33 @@
                   "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/redirectConfigurations/pre-tacc-sqcp-redirect"
                 }
               }
+            },
+            {
+              "name": "pre-orderingtool-sqcp-443",
+              "properties": {
+                "ruleType": "Basic",
+                "httpListener": {
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-https"
+                },
+                "backendAddressPool": {
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-apps-aks-pre-we-01"
+                },
+                "backendHttpSettings": {
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/orderingtool-pre-sqcp-https"
+                }
+              }
+            },
+            {
+              "name": "pre-orderingtool-redirect",
+              "properties": {
+                "ruleType": "Basic",
+                "httpListener": {
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-http"
+                },
+                "redirectConfiguration": {
+                  "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/redirectConfigurations/pre-orderingtool-redirect"
+                }
+              }
             }
           ]
         },
@@ -549,6 +624,24 @@
                     ]
                   }
                 }
+              },
+              {
+                "name": "orderingtool-portal-probe",
+                "properties": {
+                  "protocol": "Https",
+                  "host": "ordering-tool.pre.sqcp.qa",
+                  "path": "/boadminportal/",
+                  "interval": 30,
+                  "timeout": 120,
+                  "unhealthyThreshold": 3,
+                  "pickHostNameFromBackendHttpSettings": false,
+                  "minServers": 0,
+                  "match": {
+                    "statusCodes": [
+                      "200-399"
+                    ]
+                  }
+                }
               }
             ]
         },
@@ -633,6 +726,22 @@
                     }
                   ]
                 }
+              },
+              {
+                  "name": "pre-orderingtool-redirect",
+                  "properties": {
+                      "redirectType": "Permanent",
+                      "targetListener": {
+                        "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-orderingtool-sqcp-https"
+                      },
+                      "includePath": true,
+                      "includeQueryString": true,
+                      "requestRoutingRules": [
+                          {
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/requestRoutingRules/pre-orderingtool-redirect"
+                          }
+                      ]
+                  }
               }
             ]
         },
