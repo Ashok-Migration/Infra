@@ -154,6 +154,20 @@
                         "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/probes/prd-tacc-portal-probe"
                       }
                     }
+                  },
+                  {
+                    "name": "orderingtool-prd-sqcp-https",
+                    "properties": {
+                      "port": 10054,
+                      "protocol": "Https",
+                      "cookieBasedAffinity": "Disabled",
+                      "hostName": "ordering-tool.tasmu.gov.qa",
+                      "pickHostNameFromBackendAddress": false,
+                      "requestTimeout": 30,
+                      "probe": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/probes/prd-orderingtool-portal-probe"
+                      }
+                    }
                   }
             ]
         },
@@ -356,6 +370,54 @@
                       "hostNames": [],
                       "requireServerNameIndication": false
                     }
+                  },
+                  {
+                      "name": "prd-orderingtool-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-prd-we-01"
+                          },
+                          "frontendPort": {
+                              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "ordering-tool.tasmu.gov.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
+                  },
+                  {
+                      "name": "prd-orderingtool-sqcp-https",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-prd-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendPorts/port_443"
+                          },
+                          "protocol": "Https",
+                          "sslCertificate": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/sslCertificates/TASMU-Certificate"
+                          },
+                          "hostName": "ordering-tool.tasmu.gov.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": true
+                      }
+                  },
+                  {
+                      "name": "prd-www-marketplace-sqcp-http",
+                      "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-web-prd-we-01"
+                          },
+                          "frontendPort": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/frontendPorts/port_80"
+                          },
+                          "protocol": "Http",
+                          "hostName": "www.marketplace.tasmu.gov.qa",
+                          "hostNames": [],
+                          "requireServerNameIndication": false
+                      }
                   }
             ]
         },
@@ -540,6 +602,48 @@
                         "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/redirectConfigurations/prd-tacc-redirect"
                       }
                     }
+                  },
+                  {
+                    "name": "prd-orderingtool-sqcp-80",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/httpListeners/prd-orderingtool-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+                        },
+                        "backendHttpSettings": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/backendHttpSettingsCollection/orderingtool-prd-sqcp-https"
+                        },
+                        "rewriteRuleSet": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/rewriteRuleSets/xff-orderingtool-prd-rewrite"
+                        }
+                    }
+                  },
+                  {
+                    "name": "prd-orderingtool-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/httpListeners/prd-orderingtool-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                          "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/redirectConfigurations/prd-orderingtool-redirect"
+                        }
+                    }
+                  },
+                  {
+                    "name": "prd-www-marketplace-redirect",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/httpListeners/prd-www-marketplace-sqcp-http"
+                      },
+                      "redirectConfiguration": {
+                        "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/redirectConfigurations/prd-www-marketplace-redirect"
+                      }
+                    }
                   }
             ]
         },
@@ -652,6 +756,24 @@
                         ]
                       }
                     }
+                  },
+                  {
+                    "name": "prd-orderingtool-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "ordering-tool.tasmu.gov.qa",
+                        "path": "/",
+                        "interval": 30,
+                        "timeout": 30,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
                   }
             ]
         },
@@ -752,6 +874,38 @@
                         }
                       ]
                     }
+                  },
+                  {
+                      "name": "prd-orderingtool-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/httpListeners/prd-orderingtool-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/requestRoutingRules/prd-orderingtool-redirect"
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "name": "prd-www-marketplace-redirect",
+                      "properties": {
+                          "redirectType": "Permanent",
+                          "targetListener": {
+                            "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/httpListeners/prd-marketplace-sqcp-https"
+                          },
+                          "includePath": true,
+                          "includeQueryString": true,
+                          "requestRoutingRules": [
+                              {
+                                "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-web-prd-we-01/requestRoutingRules/prd-www-marketplace-redirect"
+                              }
+                          ]
+                      }
                   }
             ]
         },
@@ -864,6 +1018,27 @@
             },
             {
               "name": "xff-tacc-prd-rewrite",
+              "properties": {
+                "rewriteRules": [
+                  {
+                    "ruleSequence": 100,
+                    "conditions": [],
+                    "name": "xff-header",
+                    "actionSet": {
+                      "requestHeaderConfigurations": [
+                        {
+                          "headerName": "X-Forwarded-For",
+                          "headerValue": "{var_add_x_forwarded_for_proxy}"
+                        }
+                      ],
+                      "responseHeaderConfigurations": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "xff-orderingtool-prd-rewrite",
               "properties": {
                 "rewriteRules": [
                   {
