@@ -21,7 +21,7 @@
       "signedResourceTypes": "co",
       "signedProtocol": "https"
     },
-    "componentStorageAccountId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-iacstg-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgprewe01",
+    "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprewe01",
     "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
     "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
     "containerName": "components",
@@ -171,6 +171,27 @@
                 },
                 "parametersLink": {
                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-sqlmi-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-route-cpp-data-adx-pre-we-01",
+            "resourceGroup": "rg-cpp-data-net-pre-we-01",
+            "dependsOn": [
+                "DEP-rg-cpp-data-net-pre-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-adx-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
