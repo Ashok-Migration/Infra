@@ -66,69 +66,6 @@
                     "resources": []
                 }
             }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-nsg-cpd-cctr-web-tst-we-01",
-            "resourceGroup": "rg-cpd-cctr-sec-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-cctr-sec-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-cctr-web-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-nsg-cpd-cctr-app-tst-we-01",
-            "resourceGroup": "rg-cpd-cctr-sec-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-cctr-sec-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-cctr-app-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-nsg-cpd-cctr-db-tst-we-01",
-            "resourceGroup": "rg-cpd-cctr-sec-tst-we-01",
-            "dependsOn": [
-                "DEP-rg-cpd-cctr-sec-tst-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpd-cctr-db-tst-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
         }
 
     ],
