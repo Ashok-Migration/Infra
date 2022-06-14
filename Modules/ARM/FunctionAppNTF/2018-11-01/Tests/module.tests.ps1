@@ -31,14 +31,14 @@ param (
   [Parameter()][string]$script:TemplateFileName = 'deploy.json'
 )
 
-#endregion 
+#endregion
 
-#region Collect parameter files for TestCases 
+#region Collect parameter files for TestCases
 
 $Parameters = @()
 $ParameterFiles = (Get-ChildItem (Join-Path -Path $($(Get-Item $PSScriptRoot).Parent.FullName) -ChildPath $ParameterFilePath -AdditionalChildPath "*parameters.json") -Recurse).Name
 ForEach ($ParameterFile in $ParameterFiles) {
-	$Parameters += @{ 
+	$Parameters += @{
 		ParameterFileName = $ParameterFile
 	}
 }
@@ -125,7 +125,7 @@ Describe "Template: $(Split-Path $($(Get-Item $PSScriptRoot).Parent.FullName) -L
 				| Sort-Object -Property Name `
 				| ForEach-Object Name
 			$result = @($allParametersInParametersFile | Where-Object { $allParametersInTemplateFile -notcontains $_ })
-			if ($result) { 
+			if ($result) {
 				Write-Host "   [-] Following parameter does not exist: $result"
 			}
 			@($allParametersInParametersFile | Where-Object { $allParametersInTemplateFile -notcontains $_ }).Count | Should -Be 0
