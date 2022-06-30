@@ -40,7 +40,7 @@ jobs:
           azureSubscription: $(serviceConnectionPrd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)" --overwrite
 
   - job: PublishComponentPre
     displayName: Publish Component Pre
@@ -70,7 +70,7 @@ jobs:
           azureSubscription: $(serviceConnectionPrd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePre)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePre)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)" --overwrite
 
   - job: PublishComponentNpd
     displayName: Publish Component Npd
@@ -99,4 +99,4 @@ jobs:
           azureSubscription: $(serviceConnectionNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameNpd)" --subscription  "$(componentStorageAccountSubscriptionIdNpd)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameNpd)" --subscription  "$(componentStorageAccountSubscriptionIdNpd)" --overwrite
