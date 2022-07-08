@@ -1,0 +1,202 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alwaysOn": {
+            "type": "bool"
+        },
+        "appInsightsName": {
+            "type": "string"
+        },
+        "appInsightsRG": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]"
+        },
+        "functionAppName": {
+            "type": "string"
+        },
+        "hostingPlanName": {
+            "type": "string"
+        },
+        "hostingPlanRG": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]"
+        },
+        "appConfigEndpoint": {
+            "type": "string"
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            },
+            "type": "string"
+        },
+        "blobAccountConnectionString": {
+            "type": "securestring"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "type": "int",
+            "defaultValue": 365,
+            "minValue": 0,
+            "maxValue": 365,
+            "metadata": {
+                "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+            }
+        },
+        "diagnosticStorageAccountId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of Log Analytics."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+            }
+        },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "State of FTP / FTPS service."
+            }
+        },
+        "tags": {
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        }
+    },
+    "variables": {
+        "blobAccountConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=',parameters('blobAccountConnectionString'),')')]",
+        "appInsightsResourceId": "[resourceId(subscription().subscriptionId, parameters('appInsightsRG'), 'microsoft.insights/components',parameters('appInsightsName'))]",
+        "diagnosticsMetrics": [
+            {
+                "category": "AllMetrics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogs": [
+            {
+                "category": "FunctionAppLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ]
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-09-01",
+            "name": "[parameters('functionAppName')]",
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+            ],
+            "properties": {
+                "name": "[parameters('functionAppName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(variables('appInsightsResourceId'), '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[variables('blobAccountConnectionString')]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[variables('blobAccountConnectionString')]"
+                        },
+                        {
+                            "name": "ConnectionStrings__AzureWebJobsStorage",
+                            "value": "[variables('blobAccountConnectionString')]"
+                        },
+                        {
+                            "name": "ReconcileRefundScheduleTriggerTime",
+                            "value": "0 */30 * * * *"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "AppConfig",
+                            "connectionString": "[parameters('appConfigEndpoint')]"
+                        }
+                    ],
+                    "alwaysOn": "[parameters('alwaysOn')]",
+                    "ftpsState": "[parameters('ftpsState')]"
+                },
+                "serverFarmId": "[resourceId(subscription().subscriptionId, parameters('hostingPlanRG'), 'Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+                "clientAffinityEnabled": true,
+                "httpsOnly": true
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Web/sites/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Web/sites/', parameters('functionAppName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+                    }
+                }
+            ]
+        }
+    ],
+    "functions": [],
+    "outputs": {
+    }
+}

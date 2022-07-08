@@ -1,0 +1,129 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "agentPoolProfiles": {
+            "value": [
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 10,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "apps",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_DS2_v2",
+                    "vnetSubnetID": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-aks-dev-we-01"
+                },
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 10,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "jobs",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_DS2_v2",
+                    "vnetSubnetID": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-aks-dev-we-01"
+                }
+            ]
+        },
+        "clusterName": {
+            "value": "aks-cpd-apps-dev-we-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "dnsPrefix": {
+            "value": "aks-cpd-apps-dev-we-01-dns"
+        },
+        "dnsServiceIP": {
+            "value": "10.0.0.10"
+        },
+        "dockerBridgeCidr": {
+            "value": "172.17.0.1/16"
+        },
+        "enableHttpApplicationRouting": {
+            "value": false
+        },
+        "enablePrivateCluster": {
+            "value": true
+        },
+        "enableRBAC": {
+            "value": true
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-dev-we-01"
+        },
+        "kubernetesVersion": {
+            "value": "1.21.7"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "networkPlugin": {
+            "value": "azure"
+        },
+        "networkPolicy": {
+            "value": "azure"
+        },
+        "nodeResourceGroup": {
+            "value": "rg-cpd-apps-aksnode-dev-we-01"
+        },
+        "serviceCidr": {
+            "value": "10.0.0.0/16"
+        },
+        "servicePrincipalClientId": {
+            "value": "cb37a940-37f2-483f-abfd-8492eeaebc96"
+        },
+        "servicePrincipalClientSecret": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-dev-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-pltf-dev-we-01"
+                },
+                "secretName": "aks-spn-dev-secret"
+            }
+        },
+        "subnetName": {
+            "value": "snet-cpd-pltf-aks-dev-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpd-pltf-dev-we-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpd-pltf-net-dev-we-01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourcegroups/rg-cpd-pltf-mon-npd-we-01/providers/microsoft.operationalinsights/workspaces/log-cpd-pltf-npd-we-01"
+        }
+    }
+}

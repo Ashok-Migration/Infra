@@ -1,0 +1,86 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "networkSecurityGroupName": {
+        "value": "nsg-cpd-apps-testvms-tst-we-01"
+      },
+      "networkSecurityGroupSecurityRules": {
+        "value": [
+          {
+            "name": "Port_6901",
+            "properties": {
+              "description": "AllowPort6901",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "6901",
+              "sourceAddressPrefix": "172.20.64.0/27",
+              "destinationAddressPrefix": "172.20.64.0/27",
+              "access": "Allow",
+              "priority": 4096,
+              "direction": "Inbound",
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [],
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "Port_6910",
+            "properties": {
+              "description": "AllowPort6910",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "6910",
+              "sourceAddressPrefix": "172.20.64.0/27",
+              "destinationAddressPrefix": "172.20.64.0/27",
+              "access": "Allow",
+              "priority": 4095,
+              "direction": "Inbound",
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [],
+              "sourcePortRanges": []
+            }
+          }
+        ]
+      },
+      "flowLogsDeloy": {
+        "value": true
+      },
+      "flowLogsEnabled": {
+        "value": true
+      },
+      "flowLogStorageAccountRGName": {
+        "value": "rg-cpd-pltf-mon-npd-we-01"
+      },
+      "flowLogStorageAccountName": {
+        "value": "stcpdpltfnsgflnpdwe01"
+      },
+      "workspaceRGName":      {
+          "value": "rg-cpd-pltf-mon-npd-we-01"  
+      },
+      "workspaceName":      {
+          "value": "log-cpd-pltf-npd-we-01"
+      },
+      "NSGFlowsubscriptionid": {
+          "value": "d0694def-b27e-4bb7-900d-437fbeb802da"
+      },
+      "diagnosticLogsRetentionInDays": 
+      {
+        "value": 365
+      },
+      "lockForDeletion": {
+        "value": false
+      },
+      "tags": {
+        "value": {
+          "Environment": "Test"
+        }
+      }
+    }
+  }

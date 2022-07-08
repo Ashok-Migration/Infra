@@ -1,0 +1,43 @@
+name: $(moduleName)-$(moduleVersion)
+
+variables:
+- template: pipeline.variables.yml
+- template: /Modules/.global/global.variables.yml
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+    - Modules/ARM/AzureBastion/*
+    exclude:
+    - Modules/ARM/AzureBastion/*/readme.md
+    
+stages:  
+- stage: Scan
+  jobs:
+    - template: /Modules/.global/global.azsk.yml
+      parameters:
+        templateFile: $(modulePath)/deploy.json
+        parametersFile: $(modulePath)/Parameters/parameters.json
+          
+- stage: Validate
+  jobs:
+  - template: pipeline.jobs.validate.yml
+    parameters:
+      templateFile: $(modulePath)/deploy.json
+      parametersFile: $(modulePath)/Parameters/parameters.json
+
+- stage: Deploy
+  jobs:
+  - template: pipeline.jobs.deploy.yml
+    parameters:
+      templateFile: $(modulePath)/deploy.json
+      parametersFile: $(modulePath)/Parameters/parameters.json
+
+- stage: PublishArtifact
+  displayName: 'Publish Artifact'
+  jobs:
+  - template: pipeline.jobs.publish.yml

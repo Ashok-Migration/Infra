@@ -1,0 +1,270 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-apps-route-prd-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": {
+            "method": "POST",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "dataVersion": {
+                  "type": "string"
+                },
+                "eventTime": {
+                  "type": "string"
+                },
+                "eventType": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "metadataVersion": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "topic": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "topic",
+                "subject",
+                "id",
+                "eventType",
+                "eventTime",
+                "data"
+              ],
+              "type": "object"
+            }
+          },
+          "operationOptions": "EnableSchemaValidation"
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Convert_Message_Into_JSON_Object": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "InsertedMessage",
+                "type": "object",
+                "value": "@triggerBody()"
+              }
+            ]
+          }
+        },
+        "Create_Queue_Route_From_Topic_": {
+          "runAfter": {
+            "Convert_Message_Into_JSON_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Route",
+                "type": "string",
+                "value": "@{concat('events.',toLower(variables('InsertedMessage').topic))}"
+              }
+            ]
+          }
+        },
+        "Create_blob": {
+          "runAfter": {
+            "Initialize_Folder_Path_for_Event_Archive": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@binary(variables('InsertedMessage'))",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-intst-prd-we-01']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/datasets/default/files",
+            "queries": {
+              "folderPath": "@variables('BlobFolderPath')",
+              "name": "@variables('BlobFileName')",
+              "queryParametersSingleEncoded": true
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Initialize_File_Name_for_Event_Archive": {
+          "runAfter": {
+            "Send_Message_To_Queue": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "BlobFileName",
+                "type": "string",
+                "value": "@{concat(toLower(variables('InsertedMessage').topic),'-',utcNow(), '.json')}"
+              }
+            ]
+          }
+        },
+        "Initialize_Folder_Path_for_Event_Archive": {
+          "runAfter": {
+            "Initialize_File_Name_for_Event_Archive": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "BlobFolderPath",
+                "type": "string",
+                "value": "@{toLower(variables('InsertedMessage').topic)}/@{formatDateTime(utcNow(), 'yyyy-MM-dd')}"
+              }
+            ]
+          }
+        },
+        "Response": {
+          "runAfter": {
+            "Create_blob": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "Http",
+          "inputs": {
+            "body": "Message has been inserted in to the @{variables('Route')} queue",
+            "statusCode": 200
+          }
+        },
+        "Send_Message_To_Queue": {
+          "runAfter": {
+            "Create_Queue_Route_From_Topic_": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": {
+              "ContentData": "@{base64(binary(variables('InsertedMessage')))}",
+              "ContentType": "application/json",
+              "SessionId": "guid()"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-intsb-prd-we-01']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/@{encodeURIComponent(encodeURIComponent(variables('Route')))}/messages",
+            "queries": {
+              "systemProperties": "None"
+            }
+          }
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "accessControl": {
+      "value": {
+        "triggers": {
+          "allowedCallerIpAddresses": [
+            {
+              "addressRange": "51.144.250.222/32"
+            }
+          ]
+        },
+        "actions": {
+          "allowedCallerIpAddresses": [
+            {
+              "addressRange": "51.144.250.222/32"
+            }
+          ]
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+        "value": 365
+    },
+    "diagnosticStorageAccountId": {
+        "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+        "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+        "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+        "value": "evh-cpp-apps-mon-prd-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpp-apps-intsb-prd-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intsb-prd-we-01",
+              "connectionName": "apicon-cpp-apps-intsb-prd-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+            },
+            "apicon-cpp-apps-intst-prd-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-intst-prd-we-01",
+              "connectionName": "apicon-cpp-apps-intst-prd-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+            }
+          }
+        }
+      }
+    }
+  }
+}

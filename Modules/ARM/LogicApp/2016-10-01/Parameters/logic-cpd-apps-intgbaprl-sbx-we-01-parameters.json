@@ -1,0 +1,2385 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpd-apps-intgbaprl-sbx-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "When_a_message_is_received_in_a_queue_(auto-complete)": {
+                    "recurrence": {
+                        "frequency": "Second",
+                        "interval": 10
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/@{encodeURIComponent(encodeURIComponent('approvalglobal'))}/messages/head",
+                        "queries": {
+                            "queueType": "Main"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Check_For_Sensitivity_Type": {
+                    "actions": {
+                        "Expand_critical_users_and_append": {
+                            "actions": {
+                                "Check_for_user": {
+                                    "actions": {
+                                        "Append_to_array_variable": {
+                                            "inputs": {
+                                                "name": "ApproverUserId",
+                                                "value": "@items('Expand_critical_users_and_append')?['Id']"
+                                            },
+                                            "runAfter": {
+                                                "Append_to_string_variable": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "AppendToArrayVariable"
+                                        },
+                                        "Append_to_string_variable": {
+                                            "inputs": {
+                                                "name": "ApproverEmail",
+                                                "value": "@{items('Expand_critical_users_and_append')?['Email']};"
+                                            },
+                                            "runAfter": {},
+                                            "type": "AppendToStringVariable"
+                                        }
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Check_for_AAD_or_M365_Group": {
+                                                "actions": {
+                                                    "For_each_critical_group_member": {
+                                                        "actions": {
+                                                            "Check_for_null_value_in_mail": {
+                                                                "actions": {
+                                                                    "Add_UserId_to_ApproverUserId": {
+                                                                        "actions": {
+                                                                            "Append_to_ApproverUserId_-_Critical": {
+                                                                                "inputs": {
+                                                                                    "name": "ApproverUserId",
+                                                                                    "value": "@items('Add_UserId_to_ApproverUserId')?['Id']"
+                                                                                },
+                                                                                "runAfter": {},
+                                                                                "type": "AppendToArrayVariable"
+                                                                            }
+                                                                        },
+                                                                        "foreach": "@body('Parse_Site_User_Response')?['value']",
+                                                                        "runAfter": {
+                                                                            "Append_to_ApproverEmail_-_Critical": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "Foreach"
+                                                                    },
+                                                                    "Append_to_ApproverEmail_-_Critical": {
+                                                                        "inputs": {
+                                                                            "name": "ApproverEmail",
+                                                                            "value": "@{items('For_each_critical_group_member')?['mail']};"
+                                                                        },
+                                                                        "runAfter": {
+                                                                            "Parse_Site_User_Response": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "AppendToStringVariable"
+                                                                    },
+                                                                    "Get_Site_User_Id": {
+                                                                        "inputs": {
+                                                                            "body": {
+                                                                                "headers": {
+                                                                                    "Accept": "application/json;odata=nometadata",
+                                                                                    "Content-Type": "application/json"
+                                                                                },
+                                                                                "method": "GET",
+                                                                                "uri": "/_api/web/siteusers?$filter=Email eq '@{items('For_each_critical_group_member')?['mail']}'"
+                                                                            },
+                                                                            "host": {
+                                                                                "connection": {
+                                                                                    "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                                                }
+                                                                            },
+                                                                            "method": "post",
+                                                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                                                        },
+                                                                        "runAfter": {},
+                                                                        "type": "ApiConnection"
+                                                                    },
+                                                                    "Parse_Site_User_Response": {
+                                                                        "inputs": {
+                                                                            "content": "@body('Get_Site_User_Id')",
+                                                                            "schema": {
+                                                                                "properties": {
+                                                                                    "value": {
+                                                                                        "items": {
+                                                                                            "properties": {
+                                                                                                "Email": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "Expiration": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "Id": {
+                                                                                                    "type": "integer"
+                                                                                                },
+                                                                                                "IsEmailAuthenticationGuestUser": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsHiddenInUI": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsShareByEmailGuestUser": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "IsSiteAdmin": {
+                                                                                                    "type": "boolean"
+                                                                                                },
+                                                                                                "LoginName": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "PrincipalType": {
+                                                                                                    "type": "integer"
+                                                                                                },
+                                                                                                "Title": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "UserId": {
+                                                                                                    "properties": {
+                                                                                                        "NameId": {
+                                                                                                            "type": "string"
+                                                                                                        },
+                                                                                                        "NameIdIssuer": {
+                                                                                                            "type": "string"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "type": "object"
+                                                                                                },
+                                                                                                "UserPrincipalName": {
+                                                                                                    "type": "string"
+                                                                                                }
+                                                                                            },
+                                                                                            "required": [
+                                                                                                "Id",
+                                                                                                "IsHiddenInUI",
+                                                                                                "LoginName",
+                                                                                                "Title",
+                                                                                                "PrincipalType",
+                                                                                                "Email",
+                                                                                                "Expiration",
+                                                                                                "IsEmailAuthenticationGuestUser",
+                                                                                                "IsShareByEmailGuestUser",
+                                                                                                "IsSiteAdmin",
+                                                                                                "UserId",
+                                                                                                "UserPrincipalName"
+                                                                                            ],
+                                                                                            "type": "object"
+                                                                                        },
+                                                                                        "type": "array"
+                                                                                    }
+                                                                                },
+                                                                                "type": "object"
+                                                                            }
+                                                                        },
+                                                                        "runAfter": {
+                                                                            "Get_Site_User_Id": [
+                                                                                "Succeeded"
+                                                                            ]
+                                                                        },
+                                                                        "type": "ParseJson"
+                                                                    }
+                                                                },
+                                                                "expression": {
+                                                                    "and": [
+                                                                        {
+                                                                            "not": {
+                                                                                "equals": [
+                                                                                    "@items('For_each_critical_group_member')?['mail']",
+                                                                                    null
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "runAfter": {},
+                                                                "type": "If"
+                                                            }
+                                                        },
+                                                        "foreach": "@body('Parse_Critical_Group_Member_JSON')?['value']",
+                                                        "runAfter": {
+                                                            "Parse_Critical_Group_Member_JSON": [
+                                                                "Succeeded"
+                                                            ]
+                                                        },
+                                                        "type": "Foreach"
+                                                    },
+                                                    "Get_Critical_Group_Members": {
+                                                        "inputs": {
+                                                            "authentication": {
+                                                                "audience": "https://graph.microsoft.com",
+                                                                "authority": "https://login.microsoft.com",
+                                                                "clientId": "@body('Get_ClientId')?['value']",
+                                                                "password": "@body('Get_CertificatePassword')?['value']",
+                                                                "pfx": "@body('Get_CertificatePfxKey')?['value']",
+                                                                "tenant": "@body('Get_TenantId')?['value']",
+                                                                "type": "ActiveDirectoryOAuth"
+                                                            },
+                                                            "method": "GET",
+                                                            "uri": "https://graph.microsoft.com/v1.0/groups/@{last(split(items('Expand_critical_users_and_append')?['LoginName'],'|'))}/members"
+                                                        },
+                                                        "runAfter": {},
+                                                        "type": "Http"
+                                                    },
+                                                    "Parse_Critical_Group_Member_JSON": {
+                                                        "inputs": {
+                                                            "content": "@body('Get_Critical_Group_Members')",
+                                                            "schema": {
+                                                                "properties": {
+                                                                    "@@odata.context": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "@@odata.type": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "businessPhones": {
+                                                                                    "items": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "type": "array"
+                                                                                },
+                                                                                "displayName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "givenName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "id": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "jobTitle": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "mail": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "mobilePhone": {},
+                                                                                "officeLocation": {},
+                                                                                "preferredLanguage": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "surname": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                },
+                                                                                "userPrincipalName": {
+                                                                                    "type": [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "@@odata.type",
+                                                                                "id",
+                                                                                "businessPhones",
+                                                                                "displayName",
+                                                                                "givenName",
+                                                                                "jobTitle",
+                                                                                "mail",
+                                                                                "mobilePhone",
+                                                                                "officeLocation",
+                                                                                "preferredLanguage",
+                                                                                "surname",
+                                                                                "userPrincipalName"
+                                                                            ],
+                                                                            "type": "object"
+                                                                        },
+                                                                        "type": "array"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "runAfter": {
+                                                            "Get_Critical_Group_Members": [
+                                                                "Succeeded"
+                                                            ]
+                                                        },
+                                                        "type": "ParseJson"
+                                                    }
+                                                },
+                                                "expression": {
+                                                    "or": [
+                                                        {
+                                                            "equals": [
+                                                                "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                                3
+                                                            ]
+                                                        },
+                                                        {
+                                                            "equals": [
+                                                                "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                                4
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "runAfter": {},
+                                                "type": "If"
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@items('Expand_critical_users_and_append')?['PrincipalType']",
+                                                    1
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "runAfter": {},
+                                    "type": "If"
+                                }
+                            },
+                            "foreach": "@body('Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON')?['value']",
+                            "runAfter": {
+                                "Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Get_Users_from_SharePoint_Critical_Approvers_Group": {
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata",
+                                        "Content-Type": "application/json"
+                                    },
+                                    "method": "GET",
+                                    "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['CriticalApprovers']}')/users?$select=Email,Id,PrincipalType,LoginName"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        },
+                        "Parse_Users_From_SharePoint_Critical_Approvers_Group_JSON": {
+                            "inputs": {
+                                "content": "@body('Get_Users_from_SharePoint_Critical_Approvers_Group')",
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "items": {
+                                                "properties": {
+                                                    "Email": {
+                                                        "type": "string"
+                                                    },
+                                                    "Id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "LoginName": {
+                                                        "type": "string"
+                                                    },
+                                                    "PrincipalType": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "Id",
+                                                    "Email",
+                                                    "PrincipalType",
+                                                    "LoginName"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "runAfter": {
+                                "Get_Users_from_SharePoint_Critical_Approvers_Group": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson"
+                        },
+                        "Set_ApproverTitle_Critical": {
+                            "inputs": {
+                                "name": "ApproverTitle",
+                                "value": "Global Critical"
+                            },
+                            "runAfter": {
+                                "Expand_critical_users_and_append": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Expand_users_and_append": {
+                                "actions": {
+                                    "Check_for_user_2": {
+                                        "actions": {
+                                            "Append_to_array_variable_2": {
+                                                "inputs": {
+                                                    "name": "ApproverUserId",
+                                                    "value": "@items('Expand_users_and_append')?['Id']"
+                                                },
+                                                "runAfter": {
+                                                    "Append_to_string_variable_2": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "AppendToArrayVariable"
+                                            },
+                                            "Append_to_string_variable_2": {
+                                                "inputs": {
+                                                    "name": "ApproverEmail",
+                                                    "value": "@{items('Expand_users_and_append')?['Email']};"
+                                                },
+                                                "runAfter": {},
+                                                "type": "AppendToStringVariable"
+                                            }
+                                        },
+                                        "else": {
+                                            "actions": {
+                                                "Check_for_AAD_or_M365_Group_2": {
+                                                    "actions": {
+                                                        "For_each_group_member": {
+                                                            "actions": {
+                                                                "Check_for_null_value_in_mail_2": {
+                                                                    "actions": {
+                                                                        "Add_UserId_to_ApproverUserId_2": {
+                                                                            "actions": {
+                                                                                "Append_to_ApproverUserId": {
+                                                                                    "inputs": {
+                                                                                        "name": "ApproverUserId",
+                                                                                        "value": "@items('Add_UserId_to_ApproverUserId_2')?['Id']"
+                                                                                    },
+                                                                                    "runAfter": {},
+                                                                                    "type": "AppendToArrayVariable"
+                                                                                }
+                                                                            },
+                                                                            "foreach": "@body('Parse_Site_User_Response_2')?['value']",
+                                                                            "runAfter": {
+                                                                                "Append_to_ApproverEmail": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "Foreach"
+                                                                        },
+                                                                        "Append_to_ApproverEmail": {
+                                                                            "inputs": {
+                                                                                "name": "ApproverEmail",
+                                                                                "value": "@{items('For_each_group_member')?['mail']};"
+                                                                            },
+                                                                            "runAfter": {
+                                                                                "Parse_Site_User_Response_2": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "AppendToStringVariable"
+                                                                        },
+                                                                        "Get_Site_User_Id_2": {
+                                                                            "inputs": {
+                                                                                "body": {
+                                                                                    "headers": {
+                                                                                        "Accept": "application/json;odata=nometadata",
+                                                                                        "Content-Type": "application/json"
+                                                                                    },
+                                                                                    "method": "GET",
+                                                                                    "uri": "/_api/web/siteusers?$filter=Email eq '@{items('For_each_group_member')?['mail']}'"
+                                                                                },
+                                                                                "host": {
+                                                                                    "connection": {
+                                                                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                                                    }
+                                                                                },
+                                                                                "method": "post",
+                                                                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                                                            },
+                                                                            "runAfter": {},
+                                                                            "type": "ApiConnection"
+                                                                        },
+                                                                        "Parse_Site_User_Response_2": {
+                                                                            "inputs": {
+                                                                                "content": "@body('Get_Site_User_Id_2')",
+                                                                                "schema": {
+                                                                                    "properties": {
+                                                                                        "value": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "Email": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "Expiration": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "Id": {
+                                                                                                        "type": "integer"
+                                                                                                    },
+                                                                                                    "IsEmailAuthenticationGuestUser": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsHiddenInUI": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsShareByEmailGuestUser": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "IsSiteAdmin": {
+                                                                                                        "type": "boolean"
+                                                                                                    },
+                                                                                                    "LoginName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "PrincipalType": {
+                                                                                                        "type": "integer"
+                                                                                                    },
+                                                                                                    "Title": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "UserId": {
+                                                                                                        "properties": {
+                                                                                                            "NameId": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "NameIdIssuer": {
+                                                                                                                "type": "string"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        "type": "object"
+                                                                                                    },
+                                                                                                    "UserPrincipalName": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "Id",
+                                                                                                    "IsHiddenInUI",
+                                                                                                    "LoginName",
+                                                                                                    "Title",
+                                                                                                    "PrincipalType",
+                                                                                                    "Email",
+                                                                                                    "Expiration",
+                                                                                                    "IsEmailAuthenticationGuestUser",
+                                                                                                    "IsShareByEmailGuestUser",
+                                                                                                    "IsSiteAdmin",
+                                                                                                    "UserId",
+                                                                                                    "UserPrincipalName"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array"
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                }
+                                                                            },
+                                                                            "runAfter": {
+                                                                                "Get_Site_User_Id_2": [
+                                                                                    "Succeeded"
+                                                                                ]
+                                                                            },
+                                                                            "type": "ParseJson"
+                                                                        }
+                                                                    },
+                                                                    "expression": {
+                                                                        "and": [
+                                                                            {
+                                                                                "not": {
+                                                                                    "equals": [
+                                                                                        "@items('For_each_group_member')?['mail']",
+                                                                                        null
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "runAfter": {},
+                                                                    "type": "If"
+                                                                }
+                                                            },
+                                                            "foreach": "@body('Parse_Group_Member_JSON')?['value']",
+                                                            "runAfter": {
+                                                                "Parse_Group_Member_JSON": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "Foreach"
+                                                        },
+                                                        "Get_Group_Members": {
+                                                            "inputs": {
+                                                                "authentication": {
+                                                                    "audience": "https://graph.microsoft.com",
+                                                                    "authority": "https://login.microsoft.com",
+                                                                    "clientId": "@body('Get_ClientId')?['value']",
+                                                                    "password": "@body('Get_CertificatePassword')?['value']",
+                                                                    "pfx": "@body('Get_CertificatePfxKey')?['value']",
+                                                                    "tenant": "@body('Get_TenantId')?['value']",
+                                                                    "type": "ActiveDirectoryOAuth"
+                                                                },
+                                                                "method": "GET",
+                                                                "uri": "https://graph.microsoft.com/v1.0/groups/@{last(split(items('Expand_users_and_append')?['LoginName'],'|'))}/members"
+                                                            },
+                                                            "runAfter": {},
+                                                            "type": "Http"
+                                                        },
+                                                        "Parse_Group_Member_JSON": {
+                                                            "inputs": {
+                                                                "content": "@body('Get_Group_Members')",
+                                                                "schema": {
+                                                                    "properties": {
+                                                                        "@@odata.context": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "value": {
+                                                                            "items": {
+                                                                                "properties": {
+                                                                                    "@@odata.type": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "businessPhones": {
+                                                                                        "items": {
+                                                                                            "type": [
+                                                                                                "string",
+                                                                                                "null"
+                                                                                            ]
+                                                                                        },
+                                                                                        "type": "array"
+                                                                                    },
+                                                                                    "displayName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "givenName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "id": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "jobTitle": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "mail": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "mobilePhone": {},
+                                                                                    "officeLocation": {},
+                                                                                    "preferredLanguage": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "surname": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    },
+                                                                                    "userPrincipalName": {
+                                                                                        "type": [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ]
+                                                                                    }
+                                                                                },
+                                                                                "required": [
+                                                                                    "@@odata.type",
+                                                                                    "id",
+                                                                                    "businessPhones",
+                                                                                    "displayName",
+                                                                                    "givenName",
+                                                                                    "jobTitle",
+                                                                                    "mail",
+                                                                                    "mobilePhone",
+                                                                                    "officeLocation",
+                                                                                    "preferredLanguage",
+                                                                                    "surname",
+                                                                                    "userPrincipalName"
+                                                                                ],
+                                                                                "type": "object"
+                                                                            },
+                                                                            "type": "array"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "runAfter": {
+                                                                "Get_Group_Members": [
+                                                                    "Succeeded"
+                                                                ]
+                                                            },
+                                                            "type": "ParseJson"
+                                                        }
+                                                    },
+                                                    "expression": {
+                                                        "or": [
+                                                            {
+                                                                "equals": [
+                                                                    "@items('Expand_users_and_append')?['PrincipalType']",
+                                                                    3
+                                                                ]
+                                                            },
+                                                            {
+                                                                "equals": [
+                                                                    "@items('Expand_users_and_append')?['PrincipalType']",
+                                                                    4
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "runAfter": {},
+                                                    "type": "If"
+                                                }
+                                            }
+                                        },
+                                        "expression": {
+                                            "and": [
+                                                {
+                                                    "equals": [
+                                                        "@items('Expand_users_and_append')?['PrincipalType']",
+                                                        1
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "runAfter": {},
+                                        "type": "If"
+                                    }
+                                },
+                                "foreach": "@body('Parse_Users_From_SharePoint_Approvers_Group_JSON')?['value']",
+                                "runAfter": {
+                                    "Parse_Users_From_SharePoint_Approvers_Group_JSON": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Foreach"
+                            },
+                            "Get_Users_From_SharePoint_Approvers_Group": {
+                                "inputs": {
+                                    "body": {
+                                        "headers": {
+                                            "Accept": "application/json;odata=nometadata",
+                                            "Content-Type": "application/json"
+                                        },
+                                        "method": "GET",
+                                        "uri": "/_api/web/SiteGroups/GetByName('@{first(body('Parse_Translators_Approvers_Group_From_Config_JSON')?['value'])?['Approvers']}')/users?$select=Email,Id,PrincipalType,LoginName"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                                },
+                                "runAfter": {},
+                                "type": "ApiConnection"
+                            },
+                            "Parse_Users_From_SharePoint_Approvers_Group_JSON": {
+                                "inputs": {
+                                    "content": "@body('Get_Users_From_SharePoint_Approvers_Group')",
+                                    "schema": {
+                                        "properties": {
+                                            "value": {
+                                                "items": {
+                                                    "properties": {
+                                                        "Email": {
+                                                            "type": "string"
+                                                        },
+                                                        "Id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "LoginName": {
+                                                            "type": "string"
+                                                        },
+                                                        "PrincipalType": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "Id",
+                                                        "Email",
+                                                        "PrincipalType",
+                                                        "LoginName"
+                                                    ],
+                                                    "type": "object"
+                                                },
+                                                "type": "array"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "runAfter": {
+                                    "Get_Users_From_SharePoint_Approvers_Group": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ParseJson"
+                            },
+                            "Set_ApproverTitle": {
+                                "inputs": {
+                                    "name": "ApproverTitle",
+                                    "value": "Global"
+                                },
+                                "runAfter": {
+                                    "Expand_users_and_append": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "or": [
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['Sensitivity']",
+                                    "Critical/Sensitive"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['SiteURL']",
+                                    "@body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Parse_Translators_Approvers_Group_From_Config_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Check_If_Document_Or_Picture_Library": {
+                    "actions": {
+                        "Set_ListName_Append_Forms": {
+                            "inputs": {
+                                "name": "ListName",
+                                "value": "@{concat(replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ',''),'/Forms')}"
+                            },
+                            "runAfter": {},
+                            "type": "SetVariable"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Set_ListName_Remove_Spaces": {
+                                "inputs": {
+                                    "name": "ListName",
+                                    "value": "@{concat('Lists/', replace(body('Parse_Service_Bus_Message_JSON')?['ListName'],' ',''))}"
+                                },
+                                "runAfter": {},
+                                "type": "SetVariable"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "or": [
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "@parameters('HeroWeb')"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "@parameters('HeroMobile')"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "@parameters('ProductAssets')"
+                                ]
+                            },
+                            {
+                                "equals": [
+                                    "@body('Parse_Service_Bus_Message_JSON')?['ListName']",
+                                    "@parameters('ProductMediaAssets')"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Check_For_Sensitivity_Type": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Check_Reminder": {
+                    "actions": {
+                        "Create_Task_in_MyTasks_for_Approval": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"Title\":\"@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\",\n\"cmsAssignedToUserId\":@{variables('ApproverUserId')},\n\"ParentSiteUrl\":\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}\",\n\"ParentItemId\":\"@{body('Parse_Service_Bus_Message_JSON')?['ItemGUID']}\",\n\"TASMUTaskStatusInternal\":\"Active\",\n\"TASMUTaskStatus\":\"Created\",\n\"ParentItemLink\": {'Description': '', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/DispForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}'},\n\"PreviewUrl\": {'Description':'', 'Url': '@{body('Parse_Service_Bus_Message_JSON')?['PreviewURL']}'},\n\"arPreviewUrl\": {'Description':'', 'Url':'@{body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL']}'},\n\"ListName\": \"@{body('Parse_Service_Bus_Message_JSON')?['ListName']}\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata",
+                                        "Content-Type": "application/json;odata=nometadata"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/items?$select=Id"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        },
+                        "Parse_Users_from_MyTasks_for_Approval": {
+                            "inputs": {
+                                "content": "@body('Create_Task_in_MyTasks_for_Approval')",
+                                "schema": {
+                                    "properties": {
+                                        "ID": {
+                                            "type": "integer"
+                                        },
+                                        "Id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "runAfter": {
+                                "Create_Task_in_MyTasks_for_Approval": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson"
+                        },
+                        "Send_an_email_(V2)_-_Approval_Request": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EmailBody')}</p>",
+                                    "Importance": "High",
+                                    "Subject": "@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@variables('ApproverEmail')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Set_EditorEmailBody_Approval_Request_Notification": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Send_an_email_(V2)_-_Approval_Request_Notification": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                    "Subject": "@{variables('ApproverTitle')} Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_-_Approval_Request": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Set_EditorEmailBody_Approval_Request_Notification": {
+                            "inputs": {
+                                "name": "EditorEmailBody",
+                                "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Set_EmailBody_Approval_Request": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_EmailBody_Approval_Request": {
+                            "inputs": {
+                                "name": "EmailBody",
+                                "value": "<p>Hello @{variables('ApproverTitle')} Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/SitePages/MyTasks.aspx?TaskId=@{variables('TaskID')}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Update_Item_Status_to_Pending_Approval": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_TaskID": {
+                            "inputs": {
+                                "name": "TaskID",
+                                "value": "@{body('Parse_Users_from_MyTasks_for_Approval')?['ID']}"
+                            },
+                            "runAfter": {
+                                "Parse_Users_from_MyTasks_for_Approval": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Update_Item_Status_to_Pending_Approval": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"ContentStatus\":\"Pending 2nd Level Approval\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {
+                                "Set_TaskID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Check_ReminderCount": {
+                                "actions": {
+                                    "Send_an_email_(V2)_Approval_Auto_Rejected": {
+                                        "inputs": {
+                                            "body": {
+                                                "Body": "<p>@{variables('EmailBody')}</p>",
+                                                "Subject": "@{variables('ApproverTitle')} Content Auto Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                                "To": "@variables('ApproverEmail')"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/v2/Mail"
+                                        },
+                                        "runAfter": {
+                                            "Set_EmailBody_Auto_Rejection": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "ApiConnection"
+                                    },
+                                    "Set_EmailBody_Auto_Rejection": {
+                                        "inputs": {
+                                            "name": "EmailBody",
+                                            "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been auto rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                        },
+                                        "runAfter": {
+                                            "Update_ItemStatus_to_Rejected": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "SetVariable"
+                                    },
+                                    "Terminate_After_Reminder_Limit": {
+                                        "inputs": {
+                                            "runStatus": "Succeeded"
+                                        },
+                                        "runAfter": {
+                                            "Send_an_email_(V2)_Approval_Auto_Rejected": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "Terminate"
+                                    },
+                                    "Update_ItemStatus_to_Rejected": {
+                                        "inputs": {
+                                            "body": {
+                                                "body": "{\n\"ContentStatus\":\"Rejected\"\n}",
+                                                "headers": {
+                                                    "Accept": "application/json;odata=verbose",
+                                                    "Content-Type": "application/json",
+                                                    "If-Match": "*",
+                                                    "X-HTTP-Method": "MERGE"
+                                                },
+                                                "method": "POST",
+                                                "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                        },
+                                        "runAfter": {
+                                            "Update_TaskStatus_to_Rejected": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "ApiConnection"
+                                    },
+                                    "Update_TaskStatus_to_Rejected": {
+                                        "inputs": {
+                                            "body": {
+                                                "body": "{\n\"TASMUTaskStatusInternal\":\"Rejected\",\n\"TASMUTaskStatus\":\"Rejected\"\n}",
+                                                "headers": {
+                                                    "Accept": "application/json;odata=verbose",
+                                                    "Content-Type": "application/json",
+                                                    "If-Match": "*",
+                                                    "X-HTTP-Method": "MERGE"
+                                                },
+                                                "method": "POST",
+                                                "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{variables('TaskID')})"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                                        },
+                                        "runAfter": {},
+                                        "type": "ApiConnection"
+                                    }
+                                },
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "equals": [
+                                                "@variables('ReminderCount')",
+                                                30
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "runAfter": {
+                                    "Set_EmailBody_Reminder": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "If"
+                            },
+                            "Set_EmailBody_Reminder": {
+                                "inputs": {
+                                    "name": "EmailBody",
+                                    "value": "<p>Hello @{variables('ApproverTitle')} Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been received for approval.\n<br>\nPlease visit Item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to review  the content.<br>\n<br>\nClick <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}/SitePages/MyTasks.aspx?TaskId=@{variables('TaskID')}\">here</a> to view the task and take neccessary action.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                },
+                                "runAfter": {
+                                    "Set_TaskID_Reminder": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            },
+                            "Set_TaskID_Reminder": {
+                                "inputs": {
+                                    "name": "TaskID",
+                                    "value": "@body('Parse_Service_Bus_Message_JSON')?['TaskId']"
+                                },
+                                "runAfter": {},
+                                "type": "SetVariable"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@variables('Reminder')",
+                                    "@false"
+                                ]
+                            },
+                            {
+                                "less": [
+                                    "@variables('ReminderCount')",
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Check_If_Document_Or_Picture_Library": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Delay_5_Seconds_After_Approved_Or_Rejected": {
+                    "inputs": {
+                        "interval": {
+                            "count": 5,
+                            "unit": "Second"
+                        }
+                    },
+                    "runAfter": {
+                        "Set_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Wait"
+                },
+                "Get_CertificatePassword": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intkv-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-CertificatePassword')}/value"
+                    },
+                    "runAfter": {
+                        "Get_TenantId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_CertificatePfxKey": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intkv-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-CertificatePfxKey')}/value"
+                    },
+                    "runAfter": {
+                        "Initialize_Terminate": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_ClientId": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intkv-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-ClientId')}/value"
+                    },
+                    "runAfter": {
+                        "Get_CertificatePfxKey": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_TenantId": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intkv-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('Cms-Function-TenantId')}/value"
+                    },
+                    "runAfter": {
+                        "Get_ClientId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "secureData": {
+                            "properties": [
+                                "inputs",
+                                "outputs"
+                            ]
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_Translators_Approvers_Group_From_Config": {
+                    "inputs": {
+                        "body": {
+                            "headers": {
+                                "Accept": "application/json;odata=nometadata",
+                                "Content-Type": "application/json"
+                            },
+                            "method": "GET",
+                            "uri": "/_api/web/lists/getByTitle('@{body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList']}')/items?$filter=SiteURL eq '@{body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']}'"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL']))}/httprequest"
+                    },
+                    "runAfter": {
+                        "Set_ReminderCount": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "If_Task_Status_Is_Approved_Or_Rejected": {
+                    "actions": {
+                        "Send_an_email_(V2)_Approved": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EmailBody')}</p>",
+                                    "Subject": "@{variables('ApproverTitle')} Content Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@variables('ApproverEmail')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Set_EditorEmailBody_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Send_an_email_(V2)_Approved_Notification": {
+                            "inputs": {
+                                "body": {
+                                    "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                    "Subject": "@{variables('ApproverTitle')} Content Approved - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                    "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/v2/Mail"
+                            },
+                            "runAfter": {
+                                "Send_an_email_(V2)_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Set_EditorEmailBody_Approved": {
+                            "inputs": {
+                                "name": "EditorEmailBody",
+                                "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Set_EmailBody_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_EmailBody_Approved": {
+                            "inputs": {
+                                "name": "EmailBody",
+                                "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been approved.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                            },
+                            "runAfter": {
+                                "Update_Internal_Task_Status_And_Comments_-_Approval_Task": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Update_Internal_Task_Status_And_Comments_-_Approval_Task": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"TASMUTaskStatusInternal\":\"Completed\",\n\"TASMUTaskStatus\":\"Approved\"\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{variables('TaskID')})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                            },
+                            "runAfter": {
+                                "Update_Item_Status_And_Comments_-_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Update_Item_Status_And_Comments_-_Approved": {
+                            "inputs": {
+                                "body": {
+                                    "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ApprovedDate\":\"@{convertFromUtc(utcNow(),'Arabian Standard Time')}\",\n\"ContentStatus\":\"Approved\",\n\"cmsversion\": @{if(equals(body('Parse_Service_Bus_Message_JSON')?['Version'], ''), 1, add(int(body('Parse_Service_Bus_Message_JSON')?['Version']), 1))}\n}",
+                                    "headers": {
+                                        "Accept": "application/json;odata=verbose",
+                                        "Content-Type": "application/json",
+                                        "If-Match": "*",
+                                        "X-HTTP-Method": "MERGE"
+                                    },
+                                    "method": "POST",
+                                    "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                            },
+                            "runAfter": {},
+                            "type": "ApiConnection"
+                        }
+                    },
+                    "else": {
+                        "actions": {
+                            "Send_an_email_(V2)_Rejected": {
+                                "inputs": {
+                                    "body": {
+                                        "Body": "<p>@{variables('EmailBody')}</p>",
+                                        "Subject": "@{variables('ApproverTitle')} Content Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "To": "@variables('ApproverEmail')"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/v2/Mail"
+                                },
+                                "runAfter": {
+                                    "Set_EditorEmailBody_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Send_an_email_(V2)_Rejected_Notification": {
+                                "inputs": {
+                                    "body": {
+                                        "Body": "<p>@{variables('EditorEmailBody')}</p>",
+                                        "Subject": "@{variables('ApproverTitle')} Content Rejected - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                        "To": "@body('Parse_Service_Bus_Message_JSON')?['EditorEmail']"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/v2/Mail"
+                                },
+                                "runAfter": {
+                                    "Send_an_email_(V2)_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Set_EditorEmailBody_Rejected": {
+                                "inputs": {
+                                    "name": "EditorEmailBody",
+                                    "value": "<p>Hello Editor,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                },
+                                "runAfter": {
+                                    "Set_EmailBody_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            },
+                            "Set_EmailBody_Rejected": {
+                                "inputs": {
+                                    "name": "EmailBody",
+                                    "value": "<p>Hello Approver,\n<br><br>\nPlease note , <b>\"@{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}\"</b> item has been rejected.\n<br>\nPlease visit item <a href=\"@{body('Parse_Service_Bus_Message_JSON')?['SiteURL']}/@{variables('ListName')}/EditForm.aspx?ID=@{body('Parse_Service_Bus_Message_JSON')?['ItemId']}\">Link</a> to view  the content.\n<br><br>\nRegards,<br>\nAdmin Team</p>"
+                                },
+                                "runAfter": {
+                                    "Update_Internal_Task_Status_Rejected_-_Approval_Task": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            },
+                            "Update_Internal_Task_Status_Rejected_-_Approval_Task": {
+                                "inputs": {
+                                    "body": {
+                                        "body": "{\n\"TASMUTaskStatusInternal\":\"Rejected\",\n\"TASMUTaskStatus\":\"Rejected\"\n}",
+                                        "headers": {
+                                            "Accept": "application/json;odata=verbose",
+                                            "Content-Type": "application/json",
+                                            "If-Match": "*",
+                                            "X-HTTP-Method": "MERGE"
+                                        },
+                                        "method": "POST",
+                                        "uri": "/_api/web/lists/GetByTitle('@{parameters('MyTasksList')}')/GetItemById(@{variables('TaskID')})"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                                },
+                                "runAfter": {
+                                    "Update_Item_Status_And_Comments_-_Rejected": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "Update_Item_Status_And_Comments_-_Rejected": {
+                                "inputs": {
+                                    "body": {
+                                        "body": "{\n\"ApproverComments\":\"@{variables('ApproverTaskComments')}\",\n\"ContentStatus\":\"Rejected\"\n}",
+                                        "headers": {
+                                            "Accept": "application/json;odata=verbose",
+                                            "Content-Type": "application/json",
+                                            "If-Match": "*",
+                                            "X-HTTP-Method": "MERGE"
+                                        },
+                                        "method": "POST",
+                                        "uri": "/_api/web/lists/GetByTitle('@{body('Parse_Service_Bus_Message_JSON')?['ListName']}')/GetItemById(@{body('Parse_Service_Bus_Message_JSON')?['ItemId']})"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['SiteURL']))}/httprequest"
+                                },
+                                "runAfter": {},
+                                "type": "ApiConnection"
+                            }
+                        }
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@variables('ApproverTaskStatus')",
+                                    "Approved"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "If_Teminate_is_True": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "If_Teminate_is_True": {
+                    "actions": {
+                        "Terminate_Current_Flow_and_Trigger_New": {
+                            "inputs": {
+                                "runStatus": "Succeeded"
+                            },
+                            "runAfter": {},
+                            "type": "Terminate"
+                        }
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@variables('Terminate')",
+                                    "@true"
+                                ]
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Delay_5_Seconds_After_Approved_Or_Rejected": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Initialize_ApprovalRejectionReminder": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApprovalRejectionReminder",
+                                "type": "boolean",
+                                "value": "@true"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_EditorEmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverEmail": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverEmail",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {},
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverTaskComments": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTaskComments",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTaskStatus": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverTaskStatus": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTaskStatus",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverUserId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverTitle": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverTitle",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ListName": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ApproverUserId": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApproverUserId",
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverEmail": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_EditorEmailBody": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EditorEmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_EmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_EmailBody": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTaskComments": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ListName": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ListName",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApprovalRejectionReminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_Reminder": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "Reminder",
+                                "type": "boolean",
+                                "value": "@false"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_TaskID": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_ReminderCount": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ReminderCount",
+                                "type": "integer",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_Reminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_TaskID": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TaskID",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ApproverTitle": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_Terminate": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "Terminate",
+                                "type": "boolean",
+                                "value": "@false"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_ReminderCount": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Parse_Service_Bus_Message_JSON": {
+                    "inputs": {
+                        "content": "@decodeBase64(triggerBody()?['ContentData'])",
+                        "schema": {
+                            "properties": {
+                                "ArabicPreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "EditorEmail": {
+                                    "type": "string"
+                                },
+                                "GlobalConfigList": {
+                                    "type": "string"
+                                },
+                                "GlobalSiteURL": {
+                                    "type": "string"
+                                },
+                                "ItemGUID": {
+                                    "type": "string"
+                                },
+                                "ItemId": {
+                                    "type": "string"
+                                },
+                                "ItemTitle": {
+                                    "type": "string"
+                                },
+                                "ListId": {
+                                    "type": "string"
+                                },
+                                "ListName": {
+                                    "type": "string"
+                                },
+                                "MarketplaceSiteURL": {
+                                    "type": "string"
+                                },
+                                "PreviewURL": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "Reminder": {
+                                    "type": [
+                                        "boolean",
+                                        "null"
+                                    ]
+                                },
+                                "ReminderCount": {
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "Sensitivity": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "SiteURL": {
+                                    "type": "string"
+                                },
+                                "TaskId": {
+                                    "type": "string"
+                                },
+                                "Version": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Get_CertificatePassword": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Parse_Translators_Approvers_Group_From_Config_JSON": {
+                    "inputs": {
+                        "content": "@body('Get_Translators_Approvers_Group_From_Config')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "Approvers": {
+                                                "type": "string"
+                                            },
+                                            "CriticalApprovers": {
+                                                "type": "string"
+                                            },
+                                            "Id": {
+                                                "type": "integer"
+                                            },
+                                            "SiteLevel": {
+                                                "type": "string"
+                                            },
+                                            "SiteURL": {
+                                                "type": "string"
+                                            },
+                                            "Translators": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "runAfter": {
+                        "Get_Translators_Approvers_Group_From_Config": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Set_ApprovalRejectionReminder": {
+                    "inputs": {
+                        "name": "ApprovalRejectionReminder",
+                        "value": "@false"
+                    },
+                    "runAfter": {
+                        "Until_Task_Is_Approved_Or_Rejected": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Set_Reminder": {
+                    "inputs": {
+                        "name": "Reminder",
+                        "value": "@if(equals(body('Parse_Service_Bus_Message_JSON')?['Reminder'], null), false, bool(body('Parse_Service_Bus_Message_JSON')?['Reminder']))"
+                    },
+                    "runAfter": {
+                        "Parse_Service_Bus_Message_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Set_ReminderCount": {
+                    "inputs": {
+                        "name": "ReminderCount",
+                        "value": "@if(equals(body('Parse_Service_Bus_Message_JSON')?['ReminderCount'], null), 0, body('Parse_Service_Bus_Message_JSON')?['ReminderCount'])"
+                    },
+                    "runAfter": {
+                        "Set_Reminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable"
+                },
+                "Until_Task_Is_Approved_Or_Rejected": {
+                    "actions": {
+                        "Delay_20_Seconds_Approved": {
+                            "inputs": {
+                                "interval": {
+                                    "count": 20,
+                                    "unit": "Second"
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Wait"
+                        },
+                        "Get_Task_Status": {
+                            "inputs": {
+                                "body": {
+                                    "headers": {
+                                        "Accept": "application/json;odata=nometadata"
+                                    },
+                                    "method": "GET",
+                                    "uri": "/_api/web/lists/getbytitle('@{parameters('MyTasksList')}')/items(@{variables('TaskID')})?$select=TASMUTaskStatusInternal,TaskComments,TASMUTaskStatus"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['apicon-cpd-apps-intspo-sbx-we-01']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/datasets/@{encodeURIComponent(encodeURIComponent(body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL']))}/httprequest"
+                            },
+                            "runAfter": {
+                                "Delay_20_Seconds_Approved": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Parse_Task_Status_JSON": {
+                            "inputs": {
+                                "content": "@body('Get_Task_Status')",
+                                "schema": {
+                                    "properties": {
+                                        "TASMUTaskStatus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "TASMUTaskStatusInternal": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "TaskComments": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "runAfter": {
+                                "Get_Task_Status": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson"
+                        },
+                        "Set_ApproverTaskComments": {
+                            "inputs": {
+                                "name": "ApproverTaskComments",
+                                "value": "@body('Parse_Task_Status_JSON')?['TaskComments']"
+                            },
+                            "runAfter": {
+                                "Set_ApproverTaskStatus": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        },
+                        "Set_ApproverTaskStatus": {
+                            "inputs": {
+                                "name": "ApproverTaskStatus",
+                                "value": "@body('Parse_Task_Status_JSON')?['TASMUTaskStatus']"
+                            },
+                            "runAfter": {
+                                "Parse_Task_Status_JSON": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        }
+                    },
+                    "expression": "@equals(or(or(equals(variables('ApproverTaskStatus'), 'Approved'), equals(variables('ApproverTaskStatus'), 'Rejected')), equals(variables('Terminate'), true)), true)",
+                    "limit": {
+                        "count": 5000,
+                        "timeout": "P1M"
+                    },
+                    "runAfter": {
+                        "Check_Reminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Until"
+                },
+                "Until_Task_Is_Approved_Or_Rejected_Reminder": {
+                    "actions": {
+                        "Delay_1_Day_Approval_Rejection_Reminder": {
+                            "inputs": {
+                                "interval": {
+                                    "count": 1,
+                                    "unit": "Day"
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Wait"
+                        },
+                        "If_Task_Status_Is_Approved_Or_Rejected_Reminder": {
+                            "actions": {
+                                "Send_an_email_(V2)_Approval_Rejection_Reminder": {
+                                    "inputs": {
+                                        "body": {
+                                            "Body": "<p>@{variables('EmailBody')}</p>",
+                                            "Subject": "Gentle Reminder- Global Approval Request - @{body('Parse_Service_Bus_Message_JSON')?['ItemTitle']}",
+                                            "To": "@variables('ApproverEmail')"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-into365-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v2/Mail"
+                                    },
+                                    "runAfter": {},
+                                    "type": "ApiConnection"
+                                },
+                                "Send_message_Global_Approval_Reminder": {
+                                    "inputs": {
+                                        "body": {
+                                            "ContentData": "@{base64(concat('{','\n','\"SiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['SiteURL'],'\",','\n','\"ItemTitle\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemTitle'],'\",','\n','\"ItemGUID\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemGUID'],'\",','\n','\"ItemId\": \"',body('Parse_Service_Bus_Message_JSON')?['ItemId'],'\",','\n','\"ListName\": \"',body('Parse_Service_Bus_Message_JSON')?['ListName'],'\",','\n','\"EditorEmail\": \"',body('Parse_Service_Bus_Message_JSON')?['EditorEmail'],'\",','\n','\"TranslatorId\": \"',body('Parse_Service_Bus_Message_JSON')?['TranslatorId'],'\",','\n','\"Sensitivity\": \"',body('Parse_Service_Bus_Message_JSON')?['Sensitivity'],'\",','\n','\"MarketplaceSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['MarketplaceSiteURL'],'\",','\n','\"GlobalSiteURL\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalSiteURL'],'\",','\n','\"GlobalConfigList\": \"',body('Parse_Service_Bus_Message_JSON')?['GlobalConfigList'],'\",','\n','\"PreviewURL\": \"',body('Parse_Service_Bus_Message_JSON')?['PreviewURL'],'\",','\n','\"ArabicPreviewURL\": \"',body('Parse_Service_Bus_Message_JSON')?['ArabicPreviewURL'],'\",','\n','\"Version\": \"',body('Parse_Service_Bus_Message_JSON')?['Version'],'\",','\n','\"TaskId\": \"',variables('TaskID'),'\",','\n','\"Reminder\": true,','\n','\"ReminderCount\": ',add(variables('ReminderCount'),1),'\n','}'))}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['apicon-cpd-apps-intsb-sbx-we-01']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/@{encodeURIComponent(encodeURIComponent('approvalglobal'))}/messages"
+                                    },
+                                    "runAfter": {
+                                        "Send_an_email_(V2)_Approval_Rejection_Reminder": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Set_Terminate": {
+                                    "inputs": {
+                                        "name": "Terminate",
+                                        "value": "@true"
+                                    },
+                                    "runAfter": {
+                                        "Send_message_Global_Approval_Reminder": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "SetVariable"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@variables('ApprovalRejectionReminder')",
+                                            "@true"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Delay_1_Day_Approval_Rejection_Reminder": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        }
+                    },
+                    "expression": "@equals(or(equals(variables('ApprovalRejectionReminder'), false), equals(variables('Terminate'), true)), true)",
+                    "limit": {
+                        "count": 100,
+                        "timeout": "P1M"
+                    },
+                    "runAfter": {
+                        "Check_Reminder": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Until"
+                }
+            }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                },
+                "HeroMobile": {
+                    "defaultValue": "Hero Mobile",
+                    "type": "String"
+                },
+                "HeroWeb": {
+                    "defaultValue": "Hero Web",
+                    "type": "String"
+                },
+                "MyTasksList": {
+                    "defaultValue": "My Tasks",
+                    "type": "String"
+                },
+                "ProductAssets": {
+                    "defaultValue": "Product Assets",
+                    "type": "String"
+                },
+                "ProductMediaAssets": {
+                    "defaultValue": "Product Media Assets",
+                    "type": "String"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-sbx-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-sbx-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-sbx-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Sandbox"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "apicon-cpd-apps-into365-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-into365-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-into365-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
+                        },
+                        "apicon-cpd-apps-intsb-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intsb-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+                        },
+                        "apicon-cpd-apps-intspo-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intspo-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intspo-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/sharepointonline"
+                        },
+                        "apicon-cpd-apps-intkv-sbx-we-01": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-sbx-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intkv-sbx-we-01",
+                            "connectionName": "apicon-cpd-apps-intkv-sbx-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

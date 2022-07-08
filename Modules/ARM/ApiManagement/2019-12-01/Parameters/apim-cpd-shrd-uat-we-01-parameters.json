@@ -1,0 +1,117 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiManagementServiceName": {
+            "value": "apim-cpd-shrd-uat-we-01"
+        },
+        "appInsightsId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-shrd-mon-uat-we-01/providers/Microsoft.Insights/components/appi-cpd-shrd-mon-uat-we-01"
+        },
+        "publisherEmail": {
+            "value": "noreply@noreply.com"
+        },
+        "publisherName": {
+            "value": "TASMU CPD UAT"
+        },
+        "sku": {
+            "value": "Developer"
+        },
+        "skuCount": {
+            "value": 1
+        },
+        "subnetName": {
+            "value": "snet-cpd-apps-apim-uat-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "UAT"
+            }
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpd-pltf-uat-we-01"
+        },
+        "virtualNetworkType": {
+            "value": "Internal"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpd-pltf-net-uat-we-01"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+      "diagnosticStorageAccountId": {
+        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+      },
+      "workspaceId": {
+        "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+      },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-shrd-mon-uat-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-shrd-mon-uat-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-shrd-mon-uat-we-01"
+        },
+        "lockForDeletion": {
+            "value": true
+        },
+        "hostnameConfigurations": {
+            "value": [
+                {
+                    "type": "DeveloperPortal",
+                    "hostName": "developer.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": false
+                },
+                {
+                    "type": "Proxy",
+                    "hostName": "api.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": true
+                },
+                {
+                    "type": "Proxy",
+                    "hostName": "notification.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": true
+                },
+                {
+                    "type": "Proxy",
+                    "hostName": "bot.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": true
+                },
+                {
+                    "type": "Proxy",
+                    "hostName": "upload.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": true
+                },
+                {
+                    "type": "Management",
+                    "hostName": "api-management.uat.sqcp.qa",
+                    "keyVaultId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate",
+                    "negotiateClientCertificate": false,
+                    "defaultSslBinding": false
+                }
+            ]
+        },
+        "requestsThreshold":{
+            "value": "1000"
+        },
+        "durationThreshold":{
+            "value": "10000"
+        },
+        "actionGroupId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.Insights/actionGroups/ag-cpd-apps-mon-uat-we-01"
+        }
+    }
+}

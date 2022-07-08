@@ -1,0 +1,373 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string",
+            "maxLength": 24,
+            "metadata": {
+                "description": "Required. Name of the Storage Account."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Optional. Location for all resources."
+            }
+        },
+        "storageAccountKind": {
+            "type": "string",
+            "defaultValue": "StorageV2",
+            "allowedValues": [
+                "Storage",
+                "StorageV2",
+                "BlobStorage",
+                "FileStorage",
+                "BlockBlobStorage"
+            ],
+            "metadata": {
+                "description": "Optional. Type of Storage Account to create."
+            }
+        },
+        "keyvaultproperties": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. KeyVault properties for customer managed key."
+            }
+        },
+        "storageAccountSku": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_RAGRS",
+                "Standard_ZRS",
+                "Premium_LRS",
+                "Premium_ZRS",
+                "Standard_GZRS",
+                "Standard_RAGZRS"
+            ],
+            "metadata": {
+                "description": "Optional. Storage Account Sku Name."
+            }
+        },
+        "storageAccountAccessTier": {
+            "type": "string",
+            "defaultValue": "Hot",
+            "allowedValues": [
+                "Hot",
+                "Cool"
+            ],
+            "metadata": {
+                "description": "Optional. Storage Account Access Tier."
+            }
+        },
+        "vNetId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Virtual Network Identifier used to create a service endpoint."
+            }
+        },
+        "networkAcls": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Networks ACLs, this value contains IPs to whitelist and/or Subnet information."
+            }
+        },
+        "blobContainers": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "Optional. Blob containers to create."
+            }
+        },
+        "utcYear": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyyy')]",
+            "metadata": {
+                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+            }
+        },
+        "lockForDeletion": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Optional. Switch to lock storage from deletion."
+            }
+        },
+        "blobCorsRules": {
+            "type": "array",
+            "defaultValue": []
+        },
+        "minimumTlsVersion": {
+            "type": "string",
+            "defaultValue": "TLS1_0"
+        },
+        "allowBlobPublicAccess": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "diagnosticLogsRetentionInDays": {
+            "type": "int",
+            "defaultValue": 365,
+            "minValue": 0,
+            "maxValue": 365,
+            "metadata": {
+                "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+            }
+        },
+        "diagnosticStorageAccountId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of Log Analytics."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Tags of the Storage Account resource."
+            }
+        }
+    },
+    "variables": {
+        "cleanStorageAccountName": "[replace(tolower(parameters('storageAccountName')), '-', '')]",
+        "accountSasProperties": {
+            "signedServices": "bt",
+            "signedPermission": "racuw",
+            "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 100)), '-12-31T23:59:59Z')]",
+            "signedResourceTypes": "co",
+            "signedProtocol": "https"
+        },
+        "virtualNetworkRules": {
+            "copy": [
+                {
+                    "name": "virtualNetworkRules",
+                    "count": "[if(empty(parameters('networkAcls')), 0, length(parameters('networkAcls').virtualNetworkRules))]",
+                    "input": {
+                        "id": "[concat(parameters('vNetId'), '/subnets/', parameters('networkAcls').virtualNetworkRules[copyIndex('virtualNetworkRules')].subnet)]"
+                    }
+                }
+            ]
+        },
+        "networkAcls": {
+            "bypass": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').bypass)]",
+            "defaultAction": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').defaultAction)]",
+            "virtualNetworkRules": "[if(empty(parameters('networkAcls')), json('null'), variables('virtualNetworkRules').virtualNetworkRules)]",
+            "ipRules": "[if(empty(parameters('networkAcls')), json('null'), if(equals(length(parameters('networkAcls').ipRules), 0), json('null'), parameters('networkAcls').ipRules))]"
+        },
+        "diagnosticsMetrics": [
+            {
+                "category": "Transaction",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogs": [
+            {
+                "category": "StorageRead",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageWrite",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageDelete",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('cleanStorageAccountName')]",
+            "apiVersion": "2021-04-01",
+            "location": "[parameters('location')]",
+            "kind": "[parameters('storageAccountKind')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "sku": {
+                "name": "[parameters('storageAccountSku')]"
+            },
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "encryption": {
+                    
+                    "keySource": "[if(empty(parameters('keyvaultproperties')),'Microsoft.Storage','Microsoft.Keyvault')]",
+                    "keyvaultproperties": "[parameters('keyvaultproperties')]",
+                    "services": {
+                        "blob": "[if(or(equals(parameters('storageAccountKind'), 'BlockBlobStorage'), equals(parameters('storageAccountKind'), 'BlobStorage'), equals(parameters('storageAccountKind'), 'StorageV2'), equals(parameters('storageAccountKind'), 'Storage')), json('{\"keyType\": \"Account\",\"enabled\": true}'), json('null'))]",
+                        "file": "[if(or(equals(parameters('storageAccountKind'), 'FileStorage'), equals(parameters('storageAccountKind'), 'StorageV2'), equals(parameters('storageAccountKind'), 'Storage')), json('{\"keyType\": \"Account\",\"enabled\": true}'), json('null'))]"
+                    }
+                },
+                "accessTier": "[parameters('storageAccountAccessTier')]",
+                "supportsHttpsTrafficOnly": true,
+                "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]",
+                "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
+                "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"
+            },
+            "resources": [
+                {
+                    "type": "providers/locks",
+                    "apiVersion": "2016-09-01",
+                    "condition": "[parameters('lockForDeletion')]",
+                    "name": "Microsoft.Authorization/storageDoNotDelete",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts/', variables('cleanStorageAccountName'))]"
+                    ],
+                    "comments": "Resource lock on the Storage Account",
+                    "properties": {
+                        "level": "CannotDelete"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2018-07-01",
+            "condition": "[not(empty(parameters('blobContainers')))]",
+            "properties": {
+                "cors": {
+                    "corsRules": "[parameters('blobCorsRules')]"
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 30
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('cleanStorageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticsettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(parameters('storageAccountName'),'/default/Microsoft.Insights/', 'service')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/', parameters('storageAccountName'), 'default')]"
+            ],
+            "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+            "properties": {
+                "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+            }
+        },
+        {
+            "name": "[if(empty(parameters('blobContainers')), concat(variables('cleanStorageAccountName'), '/', 'default/dummy'), concat(variables('cleanStorageAccountName'), '/default/', parameters('blobContainers')[copyIndex('blobContainersLoop')].name))]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2018-03-01-preview",
+            "condition": "[not(empty(parameters('blobContainers')))]",
+            "copy": {
+                "name": "blobContainersLoop",
+                "count": "[if(empty(parameters('blobContainers')) , 1, length(parameters('blobContainers')))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('cleanStorageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "[if(empty(parameters('blobContainers')), 'None', parameters('blobContainers')[copyIndex('blobContainersLoop')].publicAccess)]"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccountResourceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Storage/storageAccounts', variables('cleanStorageAccountName'))]",
+            "metadata": {
+                "description": "The Resource Id of the Storage Account."
+            }
+        },
+        "storageAccountRegion": {
+            "type": "string",
+            "value": "[parameters('location')]",
+            "metadata": {
+                "description": "The Region of the Storage Account."
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "value": "[variables('cleanStorageAccountName')]",
+            "metadata": {
+                "description": "The Name of the Storage Account."
+            }
+        },
+        "storageAccountResourceGroup": {
+            "type": "string",
+            "value": "[resourceGroup().name]",
+            "metadata": {
+                "description": "The name of the Resource Group the Storage Account was created in."
+            }
+        },
+        "storageAccountSasToken": {
+            "type": "securestring",
+            "value": "[listAccountSas(variables('cleanStorageAccountName'), '2019-04-01', variables('accountSasProperties')).accountSasToken]",
+            "metadata": {
+                "description": "The SAS Token for the Storage Account."
+            }
+        },
+        "storageAccountAccessKey": {
+            "type": "securestring",
+            "value": "[listKeys(variables('cleanStorageAccountName'), '2016-12-01').keys[0].value]",
+            "metadata": {
+                "description": "The Access Key for the Storage Account."
+            }
+        },
+        "storageAccountPrimaryBlobEndpoint": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('cleanStorageAccountName')), '2019-04-01').primaryEndpoints.blob]",
+            "metadata": {
+                "description": "The public endpoint of the Storage Account."
+            }
+        }
+    },
+    "functions": []
+}

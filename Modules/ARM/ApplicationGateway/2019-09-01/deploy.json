@@ -1,0 +1,528 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      },
+      "type": "string"
+    },
+    "applicationGatewayName": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string"
+    },
+    "skuSize": {
+      "type": "string"
+    },
+    "capacity": {
+      "type": "int",
+      "defaultValue": 2
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "zones": {
+      "type": "array"
+    },
+    "publicIpAddressName": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "allocationMethod": {
+      "type": "string"
+    },
+    "publicIpZones": {
+      "type": "array"
+    },
+    "autoScaleMaxCapacity": {
+      "type": "int"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "vnet-cpd-pltf-dev-we-01"
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "defaultValue": "rg-cpd-pltf-net-dev-we-01"
+    },
+    "httpListeners": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "httpListener",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), concat('/frontendIPConfigurations/', parameters('applicationGatewayName'), '-privateip'))]"
+            },
+            "frontendPort": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_80')]"
+            },
+            "sslCertificate": null,
+            "protocol": "Http",
+            "hostName": null,
+            "hostNames": [],
+            "requireServerNameIndication": false
+          }
+        }
+      ]
+    },
+    "frontendPorts": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "port_80",
+          "properties": {
+            "Port": 80
+          }
+        }
+      ]
+    },
+    "backendAddressPools": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "backendPool",
+          "properties": {
+            "backendAddresses": []
+          }
+        }
+      ]
+    },
+    "backendHttpSettingName": {
+      "type": "string",
+      "defaultValue": "backendHttpSetting"
+    },
+    "backendHttpSettingsCollection": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "[parameters('backendHttpSettingName')]",
+          "properties": {
+            "Port": 80,
+            "Protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "requestTimeout": 60
+          }
+        }
+      ]
+    },
+    "requestRoutingRules": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "redirectConfigurations": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "probes": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "enableHttp2": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "firewallMode": {
+      "type": "string",
+      "defaultValue": "Prevention",
+      "allowedValues": [
+        "Detection",
+        "Prevention"
+      ],
+      "metadata": {
+        "description": "Optionals. Specifies web application firewall mode (Detection/Prevention)."
+      }
+    },
+    "sslCertificates": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "managedIdentityId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    },
+    "privateIPAddress": {
+      "type": "string"
+    },
+    "requestBodyCheck": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "useAgwFirewallExclusions": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Use this switch to pass firewall exclusions for agw waf configuration (Note, it will always be overrided if WAF rule exists)"
+      }
+    },
+    "agwFirewallExclusions": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Use when you need to pass some firewall exclusions for agw waf configuration (Note, set parameter('useAgwFirewallExclusions') to true)"
+      }
+    },
+    "firewallExclusions": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Use when you need to pass some firewall exclusion rules for WAF"
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "type": "int",
+      "defaultValue": 365,
+      "minValue": 0,
+      "maxValue": 365,
+      "metadata": {
+        "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+      }
+    },
+    "diagnosticStorageAccountId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+      }
+    },
+    "workspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of Log Analytics."
+      }
+    },
+    "eventHubAuthorizationRuleId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+      }
+    },
+    "eventHubName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+      }
+    },
+    "fileUploadLimitInMb": {
+      "type": "int",
+      "defaultValue": 100,
+      "metadata": {
+        "description": "Optional. Web Application Firewall File Upload Limit."
+      }
+    },
+    "firewallEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Web Application Firewall Enable or Disable."
+      }
+    },
+    "sslPolicyType": {
+      "type": "string",
+      "defaultValue": "Predefined",
+      "metadata": {
+        "description": "Type of the SSL policy"
+      }
+    },
+    "sslPolicyName": {
+      "type": "string",
+      "defaultValue": "AppGwSslPolicy20170401S",
+      "metadata": {
+        "description": "Name of the SSL policy"
+      }
+    },
+    "wafPolicyName": {
+      "type": "string",
+      "defaultValue": "WAF Policy Name",
+      "metadata": {
+        "description": "Name of the WAF Policy for WAF enabled application gateway"
+      }
+    },
+    "managedRuleSets": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Managed Rules Sets"
+      }
+    },
+    "customRules": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Custom Rules"
+      }
+    }
+  },
+  "variables": {
+    "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
+    "vnetId": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "wafPolicyId": {
+      "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', parameters('wafPolicyName'))]"
+    },
+    "defaultRequestRoutingRules": [
+      {
+        "Name": "routingRule",
+        "properties": {
+          "RuleType": "Basic",
+          "httpListener": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/httpListeners/httpListener')]"
+          },
+          "backendAddressPool": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendAddressPools/backendPool')]"
+          },
+          "backendHttpSettings": {
+            "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendHttpSettingsCollection/backendHttpSetting')]"
+          }
+        }
+      }
+    ],
+    "diagnosticsMetrics": [
+      {
+        "category": "AllMetrics",
+        "timeGrain": null,
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      }
+    ],
+    "diagnosticsLogs": [
+      {
+        "category": "ApplicationGatewayAccessLog",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "ApplicationGatewayPerformanceLog",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "ApplicationGatewayFirewallLog",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      }
+    ],
+    "diagnosticsLogsPublicIP": [
+      {
+        "category": "DDoSProtectionNotifications",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "DDoSMitigationFlowLogs",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      },
+      {
+        "category": "DDoSMitigationReports",
+        "enabled": true,
+        "retentionPolicy": {
+          "enabled": true,
+          "days": "[parameters('diagnosticLogsRetentionInDays')]"
+        }
+      }
+    ],
+    "identity": {
+      "type": "UserAssigned",
+      "userAssignedIdentities": {
+        "[parameters('managedIdentityId')]": {}
+      }
+    },
+    "webApplicationFirewallConfiguration": {
+      "enabled": "[parameters('firewallEnabled')]",
+      "firewallMode": "[parameters('firewallMode')]",
+      "ruleSetType": "OWASP",
+      "ruleSetVersion": "3.1",
+      "disabledRuleGroups": [],
+      "exclusions": "[if(and(empty(parameters('firewallExclusions')), equals(parameters('useAgwFirewallExclusions'), false())) ,
+                        json('null'), 
+                        if(equals(parameters('useAgwFirewallExclusions'), true()), 
+                          parameters('agwFirewallExclusions'), 
+                          parameters('firewallExclusions')))]",
+      "requestBodyCheck": "[parameters('requestBodyCheck')]",
+      "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]"
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('applicationGatewayName')]",
+      "type": "Microsoft.Network/applicationGateways",
+      "apiVersion": "2020-07-01",
+      "location": "[parameters('location')]",
+      "zones": "[parameters('zones')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
+        "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', parameters('wafPolicyName'))]"
+      ],
+      "identity": "[if(empty(parameters('managedIdentityId')), json('null'), variables('identity'))]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('skuSize')]",
+          "tier": "[parameters('tier')]"
+        },
+        "gatewayIPConfigurations": [
+          {
+            "name": "appGatewayIpConfig",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "[concat(parameters('applicationGatewayName'), '-publicip')]",
+            "properties": {
+              "PublicIPAddress": {
+                "id": "[variables('publicIPRef')]"
+              }
+            }
+          },
+          {
+            "name": "[concat(parameters('applicationGatewayName'), '-privateip')]",
+            "properties": {
+              "privateIPAddress": "[parameters('privateIPAddress')]",
+              "privateIPAllocationMethod": "Static",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ],
+        "frontendPorts": "[parameters('frontendPorts')]",
+        "backendAddressPools": "[parameters('backendAddressPools')]",
+        "backendHttpSettingsCollection": "[parameters('backendHttpSettingsCollection')]",
+        "httpListeners": "[parameters('httpListeners')]",
+        "requestRoutingRules": "[if(empty(parameters('requestRoutingRules')), variables('defaultRequestRoutingRules'), parameters('requestRoutingRules'))]",
+        "enableHttp2": "[parameters('enableHttp2')]",
+        "sslCertificates": "[parameters('sslCertificates')]",
+        "probes": "[parameters('probes')]",
+        "redirectConfigurations": "[parameters('redirectConfigurations')]",
+        "autoscaleConfiguration": {
+          "minCapacity": "[parameters('capacity')]",
+          "maxCapacity": "[parameters('autoScaleMaxCapacity')]"
+        },
+        "sslPolicy": {
+          "policyType": "[parameters('sslPolicyType')]",
+          "policyName": "[parameters('sslPolicyName')]"
+        },
+        "webApplicationFirewallConfiguration": "[if(parameters('firewallEnabled'), variables('webApplicationFirewallConfiguration'), json('null'))]",
+        "firewallPolicy": "[if(parameters('firewallEnabled'), variables('wafPolicyId'), json('null'))]"
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Network/applicationGateways/providers/diagnosticsettings",
+          "apiVersion": "2017-05-01-preview",
+          "name": "[concat(parameters('applicationGatewayName'), '/Microsoft.Insights/service')]",
+          "location": "[parameters('location')]",
+          "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+          "dependsOn": [
+            "[concat('Microsoft.Network/applicationGateways/', parameters('applicationGatewayName'))]"
+          ],
+          "properties": {
+            "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+            "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+            "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+            "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+            "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+            "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2019-02-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIpAddressName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "tags": "[parameters('tags')]",
+      "zones": "[parameters('publicIpZones')]",
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('allocationMethod')]"
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Network/publicIPAddresses/providers/diagnosticsettings",
+          "apiVersion": "2017-05-01-preview",
+          "name": "[concat(parameters('publicIpAddressName'), '/Microsoft.Insights/service')]",
+          "location": "[parameters('location')]",
+          "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+          "dependsOn": [
+            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
+          ],
+          "properties": {
+            "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+            "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+            "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+            "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+            "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+            "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsPublicIP'))]"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+      "apiVersion": "2020-08-01",
+      "condition": "[parameters('firewallEnabled')]",
+      "name": "[parameters('wafPolicyName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "customRules": "[parameters('customRules')]",
+        "policySettings": {
+          "requestBodyCheck": "[parameters('requestBodyCheck')]",
+          "maxRequestBodySizeInKb": 128,
+          "fileUploadLimitInMb": "[parameters('fileUploadLimitInMb')]",
+          "state": "[if(parameters('firewallEnabled'), 'Enabled', 'Disabled')]",
+          "mode": "[parameters('firewallMode')]"
+        },
+        "managedRules": {
+          "managedRuleSets": "[parameters('managedRuleSets')]",
+          "exclusions": "[parameters('firewallExclusions')]"
+        }
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

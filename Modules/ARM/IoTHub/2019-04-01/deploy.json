@@ -1,0 +1,134 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hubname": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "sku_name": {
+      "type": "string"
+    },
+    "sku_units": {
+      "type": "string"
+    },
+    "d2c_partitions": {
+      "type": "string"
+    },
+    "features": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "cloudEnvironment": {
+      "type": "string",
+      "metadata": {
+        "description": "Cloud environment to deploy (i.e. usgov/china/ ...)"
+      },
+      "allowedValues": [
+        "public",
+        "china",
+        "usgov"
+      ],
+      "defaultValue": "public"
+    }
+  },
+  "variables": {
+    "cloudEnvironmentSettings": {
+      "public": {
+        "nonDefaultRegionList": "eastasia, southeastasia, centralus, eastus, eastus2, westus, northcentralus, southcentralus, japanwest, japaneast, brazilsouth, australiaeast, australiasoutheast, southindia, centralindia, westindia, canadacentral, canadaeast, westcentralus, westus2, koreacentral, koreasouth, australiacentral, australiacentral2, uaecentral, uaenorth, southafricanorth, southafricawest",
+        "nonDefaultFallbackRegion": "eastus",
+        "defaultFallbackRegion": "westeurope"
+      },
+      "china": {
+        "nonDefaultRegionList": "",
+        "nonDefaultFallbackRegion": "",
+        "defaultFallbackRegion": "chinaeast2"
+      },
+      "usgov": {
+        "nonDefaultRegionList": "",
+        "nonDefaultFallbackRegion": "",
+        "defaultFallbackRegion": "usgovvirginia"
+      }
+    },
+    "logAnalyticsLocationsArray": "[providers('Microsoft.OperationalInsights', 'workspaces').locations]",
+    "logAnalyticsLocationsString": "[toLower(replace(string(variables('logAnalyticsLocationsArray')), '\"', ''))]",
+    "cleanedLogAnalyticsLocationString": "[substring(variables('logAnalyticsLocationsString'), 1, sub(length(variables('logAnalyticsLocationsString')), 2))]",
+    "logAnalyticsNormalizedLocationsString": "[replace(variables('cleanedLogAnalyticsLocationString'), ' ', '')]",
+    "normalizedLocation": "[toLower(replace(parameters('location'), ' ', ''))]",
+    "nonDefaultFallbackRegion": "[variables('cloudEnvironmentSettings')[parameters('cloudEnvironment')].nonDefaultFallbackRegion]",
+    "defaultFallbackRegion": "[variables('cloudEnvironmentSettings')[parameters('cloudEnvironment')].defaultFallbackRegion]",
+    "nonDefaultRegionList": "[variables('cloudEnvironmentSettings')[parameters('cloudEnvironment')].nonDefaultRegionList]",
+    "workspaceRegion": "[if(contains(variables('logAnalyticsNormalizedLocationsString'), variables('normalizedLocation')), variables('normalizedLocation'), if(contains(variables('nonDefaultRegionList'), variables('normalizedLocation')), variables('nonDefaultFallbackRegion'), variables('defaultFallbackRegion')))]",
+    "consumerGroupName": "[concat(parameters('hubname'),'/events/smartparkingtelemetry')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2020-03-01",
+      "type": "Microsoft.Devices/IotHubs",
+      "name": "[parameters('hubname')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "eventHubEndpoints": {
+          "events": {
+            "retentionTimeInDays": 1,
+            "partitionCount": "[parameters('d2c_partitions')]"
+          }
+        },
+        "features": "[parameters('features')]"
+      },
+      "sku": {
+        "name": "[parameters('sku_name')]",
+        "capacity": "[parameters('sku_units')]"
+      },
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2017-03-15-preview",
+      "name": "[parameters('hubname')]",
+      "location": "[variables('workspaceRegion')]",
+      "properties": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Security/IoTSecuritySolutions",
+      "apiVersion": "2019-08-01",
+      "name": "[parameters('hubname')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "workspace": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('hubname'))]",
+        "status": "Enabled",
+        "export": [
+          "RawEvents"
+        ],
+        "disabledDataSources": [],
+        "displayName": "[parameters('hubname')]",
+        "iotHubs": [
+          "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+        ],
+        "recommendationsConfiguration": [],
+        "unmaskedIpLoggingStatus": "Enabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]",
+        "[resourceId('Microsoft.OperationalInsights/workspaces',  parameters('hubname'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Devices/iotHubs/eventhubEndpoints/ConsumerGroups",
+      "apiVersion": "2020-03-01",
+      "name": "[variables('consumerGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Devices/IotHubs', parameters('hubname'))]"
+      ]
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

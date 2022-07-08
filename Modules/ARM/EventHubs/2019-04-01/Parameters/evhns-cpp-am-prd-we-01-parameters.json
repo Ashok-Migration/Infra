@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "value": "evhns-cpp-am-prd-we-01"
+    },
+    "eventHubName": {
+      "value": [
+        { "name": "am-adfpipelinerun" },
+        { "name": "am-appservicehttplogs" },
+        { "name": "am-containerinventory" },
+        { "name": "am-failedingestion" },
+        { "name": "am-functionapplogs" }
+      ]
+    },
+    "consumerGroupName": {
+      "value": [
+        {
+          "eventHub": "am-adfpipelinerun",
+          "consumerGroup": "adx"
+        },
+        {
+          "eventHub": "am-appservicehttplogs",
+          "consumerGroup": "adx"
+        },
+        {
+          "eventHub": "am-containerinventory",
+          "consumerGroup": "adx"
+        },
+        {
+          "eventHub": "am-failedingestion",
+          "consumerGroup": "adx"
+        },
+        {
+          "eventHub": "am-functionapplogs",
+          "consumerGroup": "adx"
+        }
+      ]
+    },
+    "isCaptureEnabled": {
+      "value": true
+    },
+    "storageAccount_capture": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-prd-we-01/providers/Microsoft.Storage/storageAccounts/dlsrawzoneprdwe01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    }
+  }
+}

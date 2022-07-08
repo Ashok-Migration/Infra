@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "alwaysOn": {
+      "value": true
+    },
+    "appInsightsResourceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/microsoft.insights/components/appi-cpd-apps-mon-dev-we-01"
+    },
+    "functionAppName": {
+      "value": "func-cpd-apps-luistra-dev-we-01"
+    },
+    "hostingPlanName": {
+      "value": "plan-cpd-apps-cog-dev-we-01"
+    },
+    "location": {
+      "value": "West Europe"
+    },
+    "storageAccountName": {
+      "value": "stcpdappsstrdevwe01"
+    },
+    "storageResourceGroup": {
+      "value": "rg-cpd-apps-str-dev-we-01"
+    },
+    "runtimeValue": {
+      "value": "node"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourcegroups/rg-cpd-pltf-mon-npd-we-01/providers/microsoft.operationalinsights/workspaces/log-cpd-pltf-npd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpd-apps-mon-dev-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development"
+      }
+    },
+    "appConfigEndpoint": {
+      "value": "https://acst-cpd-apps-str-dev-we-01.azconfig.io"
+    },
+    "serviceBusSecretUri": {
+      "value": "https://kv-cpd-apps-dev-we-01.vault.azure.net/secrets/ConnectionStrings-IntegrationServiceBus"
+    },
+    "vnetName": {
+      "value": "vnet-cpd-pltf-dev-we-01"
+    },
+    "ipSecurityRestrictions": {
+      "value": [
+        {
+          "action": "Allow",
+          "description": "AllowSnetCog",
+          "name": "AllowSnetCog",
+          "priority": 100,
+          "tag": "Default",
+          "vnetSubnetResourceId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-plancog-dev-we-01"
+        },
+        {
+          "action": "Allow",
+          "description": "AllowSnetAPIM",
+          "name": "AllowSnetAPIM",
+          "priority": 200,
+          "tag": "Default",
+          "vnetSubnetResourceId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-apim-dev-we-01"
+        },
+        {
+          "ipAddress": "20.71.67.37/32",
+          "action": "Allow",
+          "tag": "Default",
+          "priority": 150,
+          "name": "AllowPlatformApisAgentPool",
+          "description": "AllowPlatformApisAgentPool"
+        },
+        {
+          "action": "Deny",
+          "description": "Deny all access",
+          "ipAddress": "Any",
+          "name": "Deny all",
+          "priority": 2147483647
+        }
+      ]
+    },
+    "subnetResourceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-plancog-dev-we-01"
+    },
+    "blobAccountConnectionString": {
+      "value": "https://kv-cpd-apps-dev-we-01.vault.azure.net/secrets/ConnectionStrings-StorageAccount"
+    },
+    "http20Enabled": {
+      "value": true
+    },
+    "ftpsState": {
+      "value": "Disabled"
+    },
+    "healthCheckPath": {
+      "value": "/"
+    }
+  }
+}

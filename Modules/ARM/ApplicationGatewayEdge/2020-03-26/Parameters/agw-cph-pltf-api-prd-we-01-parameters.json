@@ -1,0 +1,609 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "allocationMethod": {
+      "value": "Static"
+    },
+    "applicationGatewayName": {
+      "value": "agw-cph-pltf-api-prd-we-01"
+    },
+    "autoScaleMaxCapacity": {
+      "value": 30
+    },
+    "capacity": {
+      "value": 10
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "publicIpAddressName": {
+      "value": "pipagw-cph-pltf-api-prd-we-01"
+    },
+    "publicIpZones": {
+      "value": [
+        "3",
+        "2",
+        "1"
+      ]
+    },
+    "sku": {
+      "value": "Standard"
+    },
+    "skuSize": {
+      "value": "Standard_v2"
+    },
+    "subnetName": {
+      "value": "snet-cph-pltf-api-prd-we-01"
+    },
+    "frontendPorts": {
+      "value": [
+        {
+          "name": "port_443",
+          "properties": {
+            "port": 443
+          }
+        }
+      ]
+    },
+    "backendAddressPools": {
+      "value": [
+        {
+          "name": "pafw-cph-pltf-fwin-prd-we-01",
+          "properties": {
+            "backendAddresses": [
+              {
+                "ipAddress": "172.20.34.85"
+              },
+              {
+                "ipAddress": "172.20.34.86"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "backendHttpSettingsCollection": {
+      "value": [
+        {
+          "name": "api-prd-sqcp-https",
+          "properties": {
+            "port": 10050,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api.tasmu.gov.qa",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/probes/prd-api-probe"
+            }
+          }
+        },
+        {
+          "name": "developer-prd-sqcp-https",
+          "properties": {
+            "port": 10050,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "developer.tasmu.gov.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/probes/prd-developer-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "api-management-prd-sqcp-https",
+          "properties": {
+            "port": 10050,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api-management.tasmu.gov.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/probes/prd-api-management-probe"
+            }
+          }
+        },
+        {
+          "name": "bot-prd-sqcp-https",
+          "properties": {
+            "port": 10051,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "bot.tasmu.gov.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/probes/prd-bot-probe"
+            }
+          }
+        },
+        {
+          "name": "upload-prd-sqcp-https",
+          "properties": {
+            "port": 10052,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "upload.tasmu.gov.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/probes/prd-upload-probe"
+            }
+          }
+        }
+      ]
+    },
+    "httpListeners": {
+      "value": [
+        {
+          "name": "prd-api-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-api-prd-we-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/sslCertificates/TASMU-Certificate"
+            },
+            "hostName": "api.tasmu.gov.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "prd-developer-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-api-prd-we-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/sslCertificates/TASMU-Certificate"
+            },
+            "hostName": "developer.tasmu.gov.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "prd-api-management-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-api-prd-we-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/sslCertificates/TASMU-Certificate"
+            },
+            "hostName": "api-management.tasmu.gov.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "prd-bot-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-api-prd-we-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/sslCertificates/TASMU-Certificate"
+            },
+            "hostName": "bot.tasmu.gov.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "prd-upload-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendIPConfigurations/pipagw-cph-pltf-api-prd-we-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/sslCertificates/TASMU-Certificate"
+            },
+            "hostName": "upload.tasmu.gov.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        }
+      ]
+    },
+    "requestRoutingRules": {
+      "value": [
+        {
+          "name": "prd-api-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/httpListeners/prd-api-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendHttpSettingsCollection/api-prd-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/rewriteRuleSets/xff-api-prd-rewrite"
+            }
+          }
+        },
+        {
+          "name": "prd-developer-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/httpListeners/prd-developer-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendHttpSettingsCollection/developer-prd-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/rewriteRuleSets/xff-developer-prd-rewrite"
+            }
+          }
+        },
+        {
+          "name": "prd-api-management-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/httpListeners/prd-api-management-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendHttpSettingsCollection/api-management-prd-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/rewriteRuleSets/xff-management-prd-rewrite"
+            }
+          }
+        },
+        {
+          "name": "prd-bot-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/httpListeners/prd-bot-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendHttpSettingsCollection/bot-prd-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/rewriteRuleSets/xff-bot-prd-rewrite"
+            }
+          }
+        },
+        {
+          "name": "prd-upload-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/httpListeners/prd-upload-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendAddressPools/pafw-cph-pltf-fwin-prd-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/backendHttpSettingsCollection/upload-prd-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-prd-we-01/providers/Microsoft.Network/applicationGateways/agw-cph-pltf-api-prd-we-01/rewriteRuleSets/xff-upload-prd-rewrite"
+            }
+          }
+        }
+      ]
+    },
+    "probes": {
+      "value": [
+        {
+          "name": "prd-api-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api.tasmu.gov.qa",
+            "path": "/config/api/feature",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        },
+        {
+          "name": "prd-developer-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "developer.tasmu.gov.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "prd-api-management-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api-management.tasmu.gov.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "prd-bot-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "bot.tasmu.gov.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "prd-upload-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "upload.tasmu.gov.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "rewriteRuleSets": {
+      "value": [
+        {
+          "name": "xff-api-prd-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-developer-prd-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-management-prd-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-bot-prd-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-upload-prd-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "sslCertificates": {
+      "value": [
+        {
+          "name": "TASMU-Certificate",
+          "properties": {
+            "keyVaultSecretId": "https://kv-cpp-pltf-prd-we-01.vault.azure.net/secrets/TASMU-Certificate"
+          }
+        }
+      ]
+    },
+    "managedIdentityId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cph-apps-prd-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    },
+    "tier": {
+      "value": "Standard_v2"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cph-pltf-edgeagw-prd-we-01"
+    },
+    "vnetResourceGroup": {
+      "value": "rg-cph-pltf-net-prd-we-01"
+    },
+    "zones": {
+      "value": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "enableHttp2": {
+      "value": true
+    },
+    "sslPolicy": {
+      "value": {
+        "policyType": "Custom",
+        "minProtocolVersion": "TLSv1_2",
+        "cipherSuites": [
+          "TLS_RSA_WITH_AES_256_CBC_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+          "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_RSA_WITH_AES_128_CBC_SHA256"
+        ]
+      }
+    },
+    "dnsSettings": {
+      "value": {
+        "domainNameLabel": "pipagw-cph-pltf-api-prd-we-01",
+        "fqdn": "pipagw-cph-pltf-api-prd-we-01.westeurope.cloudapp.azure.com"
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "diagnosticSettingsName": {
+      "value": "appgwdiag"
+    }
+  }
+}

@@ -1,0 +1,663 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpp-csp-bill-prd-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "When_a_file_is_created": {
+                    "evaluatedRecurrence": {
+                        "frequency": "Minute",
+                        "interval": 3
+                    },
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['onedriveforbusiness_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/datasets/default/triggers/onnewfilev2",
+                        "queries": {
+                            "folderId": "b!ICkyFSW940-kCIRQRMYZTHRnnumgeDhPjsiB0pTGDK-06kxrjJCTRoxVqFtrfRXw.01SHHCODUKP7PZSR753VFJVGC4LHKRF56C",
+                            "includeSubfolders": false,
+                            "inferContentType": true,
+                            "simulate": false
+                        }
+                    },
+                    "metadata": {
+                        "b!ICkyFSW940-kCIRQRMYZTHRnnumgeDhPjsiB0pTGDK-06kxrjJCTRoxVqFtrfRXw.01SHHCODUKP7PZSR753VFJVGC4LHKRF56C": "/CSP Billing Data"
+                    },
+                    "recurrence": {
+                        "frequency": "Minute",
+                        "interval": 3
+                    },
+                    "type": "ApiConnection"
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Charge_End_Date": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varChargeEndDate",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "IdCount": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Create_CSV_table": {
+                    "inputs": {
+                        "columns": [
+                            {
+                                "header": "",
+                                "value": "@item()['Date']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['Subscription ID/TerminalID']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['Usage Unit']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['Service Consumption']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['Service Name']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['RawFileName']"
+                            },
+                            {
+                                "header": "",
+                                "value": "@item()['Unit Type']"
+                            }
+                        ],
+                        "format": "CSV",
+                        "from": "@variables('varOutput')"
+                    },
+                    "runAfter": {
+                        "Final_Output": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Table"
+                },
+                "Create_blob_(V2)": {
+                    "inputs": {
+                        "body": "@body('Get_Aggregate_file_content')",
+                        "headers": {
+                            "ReadFileMetadataFromServer": true
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azureblob_1']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                        "queries": {
+                            "folderPath": "/cspconsumption",
+                            "name": "@body('Create_file')?['DisplayName']",
+                            "queryParametersSingleEncoded": true
+                        }
+                    },
+                    "runAfter": {
+                        "Get_Aggregate_file_content": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "contentTransfer": {
+                            "transferMode": "Chunked"
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Create_file": {
+                    "inputs": {
+                        "body": "@body('Create_CSV_table')",
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['onedriveforbusiness_1']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/default/files",
+                        "queries": {
+                            "folderPath": "/CSP Billing Aggregate Data",
+                            "name": "@{concat('azure_aggregate_file_output_',formatDateTime(utcNow(),'dd-MM-yyyy'),'.csv')}"
+                        }
+                    },
+                    "runAfter": {
+                        "Create_CSV_table": [
+                            "Succeeded"
+                        ]
+                    },
+                    "runtimeConfiguration": {
+                        "contentTransfer": {
+                            "transferMode": "Chunked"
+                        }
+                    },
+                    "type": "ApiConnection"
+                },
+                "Final_Output": {
+                    "inputs": "@variables('varOutput')",
+                    "runAfter": {
+                        "Until": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Compose"
+                },
+                "For_each": {
+                    "actions": {
+                        "Condition_2": {
+                            "actions": {
+                                "Append_to_array_variable": {
+                                    "inputs": {
+                                        "name": "Create Json",
+                                        "value": "@outputs('Json')"
+                                    },
+                                    "runAfter": {
+                                        "Json": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable"
+                                },
+                                "Json": {
+                                    "inputs": {
+                                        "ChargeEndDate": "@{concat(formatDateTime(outputs('SplitbyComma')?[7],'dd-MM-yyyy'), ' ', '23:59')}",
+                                        "Currency": "@string('QAR')",
+                                        "CustomerName": "@{if(equals(outputs('SplitbyComma')?[3], null), '', split(outputs('SplitbyComma')?[3], '-')[0])}",
+                                        "Subtotal": "@if(equals(outputs('SplitbyComma')?[23], null), '', float(outputs('SplitbyComma')?[23]))",
+                                        "Unit": "@if(equals(outputs('SplitbyComma')?[33], null), '', outputs('SplitbyComma')?[33])"
+                                    },
+                                    "runAfter": {},
+                                    "type": "Compose"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@empty(outputs('SplitbyComma')?[0])",
+                                                "@true"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "SplitbyComma": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "SplitbyComma": {
+                            "inputs": "@split(item(), ',')",
+                            "runAfter": {},
+                            "type": "Compose"
+                        }
+                    },
+                    "foreach": "@skip(variables('csv data'),1)",
+                    "runAfter": {
+                        "Initialize_Json": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Foreach"
+                },
+                "For_each_2": {
+                    "actions": {
+                        "Append_to_Id_Helper": {
+                            "inputs": {
+                                "name": "varIdHelper",
+                                "value": "@items('For_each_2')['CustomerName']"
+                            },
+                            "runAfter": {},
+                            "type": "AppendToArrayVariable"
+                        }
+                    },
+                    "foreach": "@body('Parse_JSON')",
+                    "runAfter": {
+                        "Parse_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Foreach"
+                },
+                "Get_Aggregate_file_content": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['onedriveforbusiness_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent(body('Create_file')?['Id']))}/content",
+                        "queries": {
+                            "inferContentType": true
+                        }
+                    },
+                    "runAfter": {
+                        "Create_file": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "Get_file_metadata_using_path": {
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['onedriveforbusiness_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/datasets/default/GetFileByPath",
+                        "queries": {
+                            "path": "@base64ToString(triggerOutputs()['headers']['x-ms-file-path-encoded'])"
+                        }
+                    },
+                    "runAfter": {},
+                    "type": "ApiConnection"
+                },
+                "IdCount": {
+                    "inputs": "@length(outputs('UniqueId'))",
+                    "runAfter": {
+                        "UniqueId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Compose"
+                },
+                "Id_Helper": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varIdHelper",
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "For_each": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Id_Step": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varIdStep",
+                                "type": "integer",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Id_Helper": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_Json": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "Create Json",
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Initialize_variable": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Initialize_variable": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "csv data",
+                                "type": "array",
+                                "value": "@split(triggerBody(),decodeUriComponent('%0A'))"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Get_file_metadata_using_path": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Output": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varOutput",
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Total_Temp": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "Parse_JSON": {
+                    "inputs": {
+                        "content": "@variables('Create Json')",
+                        "schema": {
+                            "items": {
+                                "properties": {
+                                    "ChargeEndDate": {
+                                        "type": "string"
+                                    },
+                                    "Currency": {
+                                        "type": "string"
+                                    },
+                                    "CustomerName": {
+                                        "type": "string"
+                                    },
+                                    "Subtotal": {
+                                        "type": "number"
+                                    },
+                                    "Unit": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "CustomerName",
+                                    "ChargeEndDate",
+                                    "Subtotal",
+                                    "Currency",
+                                    "Unit"
+                                ],
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "runAfter": {
+                        "Output": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson"
+                },
+                "Publish_Event": {
+                    "inputs": {
+                        "body": [
+                            {
+                                "data": {
+                                    "file": "@concat(string('https://stcppglobacmwe01.blob.core.windows.net'),outputs('Create_blob_(V2)')?['body/Path'])"
+                                },
+                                "dataVersion": "1.0",
+                                "eventTime": "@utcNow()",
+                                "eventType": "csp-metering",
+                                "id": "@outputs('Create_blob_(V2)')?['body/Id']",
+                                "metadataVersion": "1",
+                                "subject": "cspazureblobfile",
+                                "topic": "meteringdata"
+                            }
+                        ],
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azureeventgridpublish']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/eventGrid/api/events"
+                    },
+                    "runAfter": {
+                        "Create_blob_(V2)": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection"
+                },
+                "Total_Temp": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varTotalTemp",
+                                "type": "float",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Id_Step": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                },
+                "UniqueId": {
+                    "inputs": "@union(variables('varIdHelper'),variables('varIdHelper'))",
+                    "runAfter": {
+                        "For_each_2": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Compose"
+                },
+                "Until": {
+                    "actions": {
+                        "Append_to_Var_Output": {
+                            "inputs": {
+                                "name": "varOutput",
+                                "value": {
+                                    "Date": "@variables('varChargeEndDate')",
+                                    "RawFileName": "@body('Get_file_metadata_using_path')?['Name']",
+                                    "Service Consumption": "@substring(string(div(mul(variables('varTotalTemp'),3.6415),0.85)),0,add(indexOf(string(div(mul(variables('varTotalTemp'),3.6415),0.85)),'.'),3))",
+                                    "Service Name": "Azure Cloud Services",
+                                    "Subscription ID/TerminalID": "@outputs('UniqueId')[variables('varIdStep')]",
+                                    "Unit Type": "1",
+                                    "Usage Unit": "1"
+                                }
+                            },
+                            "runAfter": {
+                                "For_each_3": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "AppendToArrayVariable"
+                        },
+                        "For_each_3": {
+                            "actions": {
+                                "Condition_3": {
+                                    "actions": {
+                                        "AddTotalAmount": {
+                                            "inputs": {
+                                                "name": "varTotalTemp",
+                                                "value": "@items('For_each_3')['Subtotal']"
+                                            },
+                                            "runAfter": {},
+                                            "type": "IncrementVariable"
+                                        },
+                                        "Set_variable": {
+                                            "inputs": {
+                                                "name": "varChargeEndDate",
+                                                "value": "@items('For_each_3')['ChargeEndDate']"
+                                            },
+                                            "runAfter": {
+                                                "AddTotalAmount": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable"
+                                        },
+                                        "Set_variable_2": {
+                                            "inputs": {
+                                                "name": "varUsageUnit",
+                                                "value": "@items('For_each_3')['Unit']"
+                                            },
+                                            "runAfter": {
+                                                "Set_variable": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable"
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@items('For_each_3')['CustomerName']",
+                                                    "@outputs('UniqueId')[variables('varIdStep')]"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "runAfter": {},
+                                    "type": "If"
+                                }
+                            },
+                            "foreach": "@body('Parse_JSON')",
+                            "runAfter": {},
+                            "type": "Foreach"
+                        },
+                        "Increment_IdStep": {
+                            "inputs": {
+                                "name": "varIdStep",
+                                "value": 1
+                            },
+                            "runAfter": {
+                                "Append_to_Var_Output": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "IncrementVariable"
+                        },
+                        "Reset_var_Total_Temp": {
+                            "inputs": {
+                                "name": "varTotalTemp",
+                                "value": 0
+                            },
+                            "runAfter": {
+                                "Increment_IdStep": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "SetVariable"
+                        }
+                    },
+                    "expression": "@equals(variables('varIdStep'), int(outputs('IdCount')))",
+                    "limit": {
+                        "count": 60,
+                        "timeout": "PT1H"
+                    },
+                    "runAfter": {
+                        "Usage_Unit": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Until"
+                },
+                "Usage_Unit": {
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "varUsageUnit",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "runAfter": {
+                        "Charge_End_Date": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable"
+                }
+            }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpp-apps-mon-prd-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "azureblob_1": {
+                            "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-csp-bill-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-csp-bill-prd-we-01",
+                            "connectionName": "apicon-cpp-csp-bill-prd-we-01",
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+                        },
+                        "azureeventgridpublish": {
+                            "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-csp-bill-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-csp-integd-prd-we-01",
+                            "connectionName": "apicon-cpp-csp-integd-prd-we-01",
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
+                        },
+                        "onedriveforbusiness_1": {
+                          "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-csp-bill-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-csp-onedrive-prd-we-01",
+                          "connectionName": "apicon-cpp-csp-onedrive-prd-we-01",
+                          "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/onedriveforbusiness"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,830 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "utcYear": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyyy')]",
+            "metadata": {
+                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+            }
+        }
+    },
+    "variables": {
+        "lockForDeletion": false,
+        "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+
+        "accountSasProperties": {
+            "signedServices": "bt",
+            "signedPermission": "racuw",
+            "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+            "signedResourceTypes": "co",
+            "signedProtocol": "https"
+        },
+        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
+        "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+        "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+        "containerName": "components",
+        "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+        "location": "[deployment().location]"
+
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-rg-cpp-bpm-mon-pre-we-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-bpm-mon-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-08-01",
+            "name": "[variables('CUA')]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "rg-cpp-bpm-mon-pre-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-bpm-mon-pre-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+
+//        ///////////////////////////// bpm RG net
+//        {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-rg-cpp-bpm-net-pre-we-01",
+//             "location": "[variables('location')]",
+//             "dependsOn": [
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-bpm-net-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         //////////////////////////// bpm RG sec
+//        {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-rg-cpp-bpm-sec-pre-we-01",
+//             "location": "[variables('location')]",
+//             "dependsOn": [
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-bpm-sec-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////// itsm RG net
+//        {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-rg-cpp-itsm-net-pre-we-01",
+//             "location": "[variables('location')]",
+//             "dependsOn": [
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-itsm-net-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         //////////////////////////// ITSM RG sec
+//        {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-rg-cpp-itsm-sec-pre-we-01",
+//             "location": "[variables('location')]",
+//             "dependsOn": [
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-itsm-sec-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+
+// /////////////////////////// data RG net
+//        {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-rg-cpp-data-net-pre-we-01",
+//             "location": "[variables('location')]",
+//             "dependsOn": [
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-data-net-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+/////////////////////////// RG thrd-agw-
+       {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-rg-cpp-thrd-agw-pre-we-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-thrd-agw-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+// ///////////////////////////////////////////////////////////////////////////////
+// /////////////////////////// route table data db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-dbrpub-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-dbrpub-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table data dbpri
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-dbrpri-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-dbrpri-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         /////////////////////////// route table data daisvc
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-daisvcs-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-daisvcs-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         /////////////////////////// route table data hdi 01
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-hdi-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-hdi-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         /////////////////////////// route table data hdi 02
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-hdi-pre-we-02",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-hdi-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//         /////////////////////////// route table data sqlmi
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-sqlmi-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-sqlmi-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table data bkup
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-data-bkup-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-data-bkup-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+
+// ///////////////////// route table gis web////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-gis-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-gis-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+
+// /////////////////////////// route table gis app
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-gis-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-gis-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table gis db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-gis-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-gis-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table itsm web/////////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-itsm-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-itsm-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+
+// /////////////////////////// route table itsm app
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-itsm-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-itsm-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table itsm db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-itsm-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-itsm-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table bpm web////////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-bpm-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-bpm-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+
+// /////////////////////////// route table bpm app
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-bpm-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-bpm-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// /////////////////////////// route table bpm db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-route-cpp-bpm-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-net-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cpp-bpm-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////NSG data hdi 02
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-data-hdi-pre-we-02",
+//             "resourceGroup": "rg-cpp-data-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-data-hdi-pre-we-02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////NSG data bkup
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-data-bkup-pre-we-01",
+//             "resourceGroup": "rg-cpp-data-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-data-bkup-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////NSG gis app////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-gis-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-gis-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//  //////////////////////////////////NSG gis db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-gis-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-gis-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////NSG gis web
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-gis-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-gis-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-gis-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+      
+// //////////////////////////////////NSG bpm app////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-bpm-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-bpm-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//  //////////////////////////////////NSG bpm db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-bpm-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-bpm-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////NSG bpm web
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-bpm-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-bpm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-bpm-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//  },
+// //////////////////////////////////NSG itsm app////////////////////////////
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-itsm-app-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-itsm-app-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+//  //////////////////////////////////NSG itsm db
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-itsm-db-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-itsm-db-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//         },
+// //////////////////////////////////NSG itsm web
+// {
+//             "type": "Microsoft.Resources/deployments",
+//             "apiVersion": "2019-08-01",
+//             "name": "M-DEP-nsg-cpp-itsm-web-pre-we-01",
+//             "resourceGroup": "rg-cpp-itsm-sec-pre-we-01",
+//             "dependsOn": [
+                
+//             ],
+//             "properties": {
+//                 "mode": "Incremental",
+//                 "debugSetting": {
+//                     "detailLevel": "requestContent,responseContent"
+//                 },
+//                 "templateLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 },
+//                 "parametersLink": {
+//                     "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-itsm-web-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+//                 }
+//             }
+//  },
+
+//////////////////////////////////NSG AGW thrd web
+{
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "M-DEP-nsg-cpp-thrd-agw-pre-we-01",
+            "resourceGroup": "rg-cpp-thrd-agw-pre-we-01",
+            "dependsOn": [
+                "M-DEP-rg-cpp-thrd-agw-pre-we-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cpp-thrd-agw-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+ },
+
+
+
+
+
+    ],
+    "outputs": {
+    }
+}

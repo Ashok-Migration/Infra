@@ -1,0 +1,1 @@
+This template deploys an App Configuration Store

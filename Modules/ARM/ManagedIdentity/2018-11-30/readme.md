@@ -1,0 +1,1 @@
+This template deploys a user assigned managed identity

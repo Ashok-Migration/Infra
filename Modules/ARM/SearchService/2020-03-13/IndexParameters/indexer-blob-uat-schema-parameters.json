@@ -1,0 +1,54 @@
+{
+  "@odata.context": "https://srch-cpd-apps-cog-uat-we-01.search.windows.net/$metadata#indexers/$entity",
+  "@odata.etag": "\"0x8D863BA01D7D192\"",
+  "name": "azureblob-indexer",
+  "description": "",
+  "dataSourceName": "azureblob",
+  "skillsetName": "azureblob-skillset",
+  "targetIndexName": "content-index",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": 0,
+    "maxFailedItemsPerBatch": 0,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "dataToExtract": "contentAndMetadata",
+      "parsingMode": "default",
+      "imageAction": "generateNormalizedImages"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "search_id",
+      "targetFieldName": "search_id",
+      "mappingFunction": {
+        "name": "base64Encode"
+      }
+    }
+  ],
+  "outputFieldMappings": [
+    {
+      "sourceFieldName": "/document/language",
+      "targetFieldName": "language"
+    },
+    {
+      "sourceFieldName": "/document/merged_content/pages/*/keyphrases/*",
+      "targetFieldName": "keyphrases"
+    },
+    {
+      "sourceFieldName": "/document/merged_content",
+      "targetFieldName": "merged_content"
+    },
+    {
+      "sourceFieldName": "/document/normalized_images/*/text",
+      "targetFieldName": "text"
+    },
+    {
+      "sourceFieldName": "/document/normalized_images/*/layoutText",
+      "targetFieldName": "layoutText"
+    }
+  ],
+  "encryptionKey": null
+}

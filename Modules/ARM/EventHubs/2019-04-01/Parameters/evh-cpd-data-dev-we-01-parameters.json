@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "value": "evh-cpd-data-dev-we-01"
+    },
+    "eventHubName": {
+      "value": [
+        { "name": "eh-cpd-sp-pe-we-01" },
+        { "name": "eh-cpd-sp-ple-we-01" },
+        { "name": "eh-cpd-sp-td-we-01" },
+        { "name": "eh-cpd-sp-ta-we-01" },
+        { "name": "eh-cpd-sp-iot-we-01" }
+      ]
+    },
+    "consumerGroupName": {
+      "value": [
+        {
+          "eventHub": "eh-cpd-sp-td-we-01",
+          "consumerGroup": "ehcg-cpd-sp-td-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-ple-we-01",
+          "consumerGroup": "ehcg-cpd-sp-ple-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-pe-we-01",
+          "consumerGroup": "ehcg-cpd-sp-pe-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-pe-we-01",
+          "consumerGroup": "ehcg-cpd-sp-pe-af-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-ta-we-01",
+          "consumerGroup": "ehcg-cpd-sp-ta-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-ta-we-01",
+          "consumerGroup": "ehcg-cpd-sp-ta-la-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-iot-we-01",
+          "consumerGroup": "ehcg-cpd-sp-iot-adx-we-01"
+        }
+      ]
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development"
+      }
+    }
+  }
+}

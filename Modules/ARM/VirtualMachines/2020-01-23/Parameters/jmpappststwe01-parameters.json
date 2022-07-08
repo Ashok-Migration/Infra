@@ -1,0 +1,98 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNames": {
+            "value": [
+                "jmpappststwe01"
+            ]
+        },
+        "vmSize": {
+            "value": "Standard_B4ms"
+        },
+        "osDisk": {
+            "value": {
+                "createOption": "fromImage",
+                "diskSizeGB": "256",
+                "managedDisk": {
+                    "storageAccountType": "Premium_LRS"
+                }
+            }
+        },
+        "dataDisks": {
+            "value": []
+        },
+        "NetworkDetails": {
+            "value": {
+                "vnetRG": "rg-cpd-pltf-net-tst-we-01",
+                "vnet": "vnet-cpd-pltf-tst-we-01",
+                "subnet": "snet-cpd-pltf-testvms-tst-we-01"
+            }
+        },
+        "adminUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-tst-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-pltf-tst-we-01"
+                },
+                "secretName": "adminUsername"
+            }
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-tst-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-pltf-tst-we-01"
+                },
+                "secretName": "jmpappststwe01Password"
+            }
+        },
+        "availabilitySetName": {
+            "value": ""
+        },
+        "vmIPAddress": {
+            "value": "172.20.64.8"
+        },
+        "dnsServers": {
+            "value": []
+        },
+        "useAvailabilityZone": {
+            "value": false
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "enableBootDiagnostics": {
+            "value": false
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": "Test"
+            }
+        },
+        "enablePublicIP": {
+            "value": false
+        },
+        "enableIPForwarding": {
+            "value": true
+        },
+        "imageResourceId": {
+            "value": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-glob-bvm-we-01/providers/Microsoft.Compute/images/bvmcpdimage"
+            }
+        }
+    }
+}

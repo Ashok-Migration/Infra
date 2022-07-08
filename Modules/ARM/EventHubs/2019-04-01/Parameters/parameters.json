@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "value": "evh-cpd-data-dev-we-01"
+    },
+    "eventHubName": {
+      "value": [
+        { "name": "eh-cpd-sp-pe-we-01" },
+        { "name": "eh-cpd-sp-td-we-01" }
+      ]
+    },
+    "consumerGroupName": {
+      "value": [
+        {
+          "eventHub": "eh-cpd-sp-pe-we-01",
+          "consumerGroup": "ehcg-cpd-sp-td-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-td-we-01",
+          "consumerGroup": "ehcg-cpd-sp-pe-adx-we-01"
+        },
+        {
+          "eventHub": "eh-cpd-sp-td-we-01",
+          "consumerGroup": "ehcg-cpd-sp-pe-af-we-01"
+        }
+      ]
+    },
+     "isCaptureEnabled": {
+        "value": false
+      },
+      "storageAccount_capture": {
+        "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-pre-we-01/providers/Microsoft.Storage/storageAccounts/dlsrawzoneprewe01"
+      },
+    "tags": {
+      "value": {
+        "Environment": "Development"
+      }
+    }
+  }
+}

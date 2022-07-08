@@ -1,0 +1,440 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-cpd-data-adx-dev-we-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowMonitoring_B3356757_v2",
+          "properties": {
+              "description": "ClustersMonitoring",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "",              
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [
+                  "213.199.136.176/32",
+                  "51.124.87.112/32",
+                  "51.138.25.99/32",
+                  "51.138.30.62/32",
+                  "51.138.115.191/32",
+                  "51.137.28.48/32",
+                  "51.124.130.97/32",
+                  "51.124.128.116/32",
+                  "51.137.31.149/32",
+                  "51.124.134.75/32",
+                  "51.138.118.44/32",
+                  "51.138.118.116/32",
+                  "51.138.118.229/32",
+                  "51.138.113.193/32",
+                  "51.124.132.14/32",
+                  "51.138.119.62/32",
+                  "20.50.128.116/32",
+                  "20.50.129.112/32",
+                  "51.138.112.16/32",
+                  "51.138.114.184/32",
+                  "51.138.26.126/32",
+                  "51.138.113.26/32",
+                  "20.50.129.213/32",
+                  "20.50.129.245/32",
+                  "20.50.130.138/32",
+                  "51.138.118.70/32",
+                  "20.50.130.193/32",
+                  "20.50.130.235/32",
+                  "51.138.30.110/32",
+                  "20.50.131.112/32",
+                  "20.50.128.141/32",
+                  "20.50.2.46/32",
+                  "20.86.224.154/32",
+                  "20.86.226.79/32",
+                  "20.86.226.97/32",
+                  "20.86.228.200/32",
+                  "20.86.228.211/32",
+                  "20.86.229.24/32",
+                  "20.86.229.34/32",
+                  "20.86.229.55/32",
+                  "20.86.229.113/32",
+                  "20.86.229.153/32",
+                  "20.86.229.35/32",
+                  "20.86.229.215/32",
+                  "20.86.230.37/32",
+                  "20.86.230.168/32",
+                  "20.86.231.16/32",
+                  "20.86.231.103/32",
+                  "20.86.231.134/32",
+                  "20.86.231.176/32"
+              ],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowMonitoring_38BE9B64_v2",
+          "properties": {
+              "description": "ClustersMonitoring",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "",              
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [
+                  "20.86.231.243/32",
+                  "20.86.231.245/32",
+                  "20.93.176.60/32",
+                  "20.86.227.182/32",
+                  "20.93.176.67/32",
+                  "20.93.176.70/32",
+                  "20.93.176.72/32",
+                  "20.93.176.87/32",
+                  "20.93.176.109/32",
+                  "20.93.176.135/32",
+                  "20.93.176.173/32",
+                  "20.93.176.186/32",
+                  "20.50.2.62/32"
+              ],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowAzureDataExplorerManagement",
+          "properties": {
+              "description": "AllowAzureDataExplorerManagement",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "AzureDataExplorerManagement",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 104,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowLoadBalancer",
+          "properties": {
+              "description": "AllowLoadBalancer",  
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 105,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "destinationPortRanges": [
+                  "80",
+                  "443"
+              ],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowInterNodeCommunication_FE221B16_v2",
+          "properties": {
+              "description": "AllowInterNodeCommunication",
+              "protocol": "*",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "0-65535",
+              "sourceAddressPrefix": "172.20.51.0/27",
+              "destinationAddressPrefix": "172.20.51.0/27",
+              "access": "Allow",
+              "priority": 106,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowAzureDataExporerCMManagement",
+          "properties": {
+              "description": "AllowAzureDataExporerCMManagement",
+              "protocol": "*",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "51.145.176.215",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 107,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "AzureDataExplorerManagement",
+          "properties": {
+              "description": "AllowAzureDataExporerManagement",
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "AzureDataExplorerManagement",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "ADXHealthMonitoring",
+          "properties": {
+              "description": "ADXHealthMonitoring",
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "",                     
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1010,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [
+                  "213.199.136.176",
+                  "23.97.212.5"
+              ],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Allow-from-bldagent-to-adx",
+          "properties": {
+              "description": "Allowfrombldagenttoadx",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "",
+              "sourceAddressPrefix": "40.68.22.202",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1020,
+              "direction": "Inbound",              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRanges": [],
+              "destinationPortRanges": [
+                  "80",
+                  "443"
+              ],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowAzureKeyVault",
+          "properties": {
+              "description": "AllowAzureKeyVault",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "AzureKeyVault",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowStorage",
+          "properties": {
+              "description": "AllowStorage",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "Storage",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        }, 
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowEventHub",
+          "properties": {
+              "description": "AllowEventHub",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "EventHub",
+              "access": "Allow",
+              "priority": 102,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [
+                  "443",
+                  "5671"
+              ],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        }, 
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowAzureMonitor",
+          "properties": {
+              "description": "AllowAzureMonitor",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "AzureMonitor",
+              "access": "Allow",
+              "priority": 103,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowActiveDirectory",
+          "properties": {
+              "description": "AllowActiveDirectory",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "AzureActiveDirectory",
+              "access": "Allow",
+              "priority": 104,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowCertificateAuthority",
+          "properties": {
+              "description": "AllowCertificateAuthority",
+              "protocol": "Tcp",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 105,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Kusto-clusters_UseOnly_AllowDSTS",
+          "properties": {
+              "description": "AllowDSTS",
+              "protocol": "*",
+              "sourcePortRange": "0-65535",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "13.88.20.230/32",
+              "access": "Allow",
+              "priority": 106,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],              
+              "destinationApplicationSecurityGroups": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cpd-pltf-mon-npd-we-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcpdpltfnsgflnpdwe01"
+    },
+    "workspaceRGName": {
+      "value": "rg-cpd-pltf-mon-npd-we-01"
+    },
+    "workspaceName": {
+      "value": "log-cpd-pltf-npd-we-01"
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "d0694def-b27e-4bb7-900d-437fbeb802da"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {}
+    }
+  }
+}

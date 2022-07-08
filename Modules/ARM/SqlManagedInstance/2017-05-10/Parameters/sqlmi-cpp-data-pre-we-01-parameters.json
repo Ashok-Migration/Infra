@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "administratorLogin": {
+     "reference": {
+        "keyVault": {
+          "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-sec-pre-we-01/providers/Microsoft.KeyVault/vaults/kv-cpp-data-pre-we-01"
+        },
+        "secretName": "sqlmiadminname"
+      }
+    },
+    "administratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-sec-pre-we-01/providers/Microsoft.KeyVault/vaults/kv-cpp-data-pre-we-01"
+        },
+        "secretName": "sqlmiadminpwrd"
+      }
+    },
+    "managedInstanceName": {
+      "value": "sqlmi-cpp-data-pre-we-01"
+    },
+    "skuName": {
+      "value": "GP_Gen5"
+    },
+    "skuEdition": {
+      "value": "GeneralPurpose"
+    },
+    "storageSizeInGB": {
+      "value": 1024
+    },
+    "vCores": {
+      "value": 8
+    },
+    "hardwareFamily": {
+      "value": "Gen5"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "rg-cpp-pltf-net-pre-we-01"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cpp-pltf-pre-we-01"
+    },
+    "subnetName": {
+      "value": "snet-cpp-data-sqlmi-pre-we-01"
+    },
+    "createNSG": {
+      "value": false
+    },
+    "createRT": {
+      "value": false
+    },
+    "removedNSG": {
+      "value": false
+    },
+    "nsgForPublicEndpoint": {
+      "value": "allowFromAzureCloudTo3342NSGPRE"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    }
+  }
+}

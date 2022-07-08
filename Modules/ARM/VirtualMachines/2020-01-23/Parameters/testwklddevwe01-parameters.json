@@ -1,0 +1,108 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmNames": {
+            "value": ["testwklddevwe01"]
+        },
+        "vmSize" :{
+            "value": "Standard_D2s_v3"
+        },
+        "standardImage": {
+            "value": {
+                "publisher": "MicrosoftWindowsServer",
+                "offer": "WindowsServer",
+                "sku": "2019-Datacenter",
+                "version": "latest"
+            }
+        },
+        "osDisk": {
+            "value": {
+                "createOption": "fromImage",
+                "diskSizeGB": "128",
+            "managedDisk": {
+            "storageAccountType": "Premium_LRS"
+        }
+            }
+        },
+        "dataDisks": {
+            "value": [{
+                "caching": "ReadOnly",
+                "createOption": "Empty",
+                "diskSizeGB": "64",
+                "managedDisk": {
+                    "storageAccountType": "Standard_LRS"
+                }
+            }]
+        },
+        "NetworkDetails": {
+            "value": {
+                "vnetRG": "rg-cpd-pltf-net-dev-we-01",
+                "vnet": "vnet-cpd-pltf-dev-we-01",
+                "subnet": "snet-cpd-pltf-testvms-dev-we-01"
+            }
+        },
+        "adminUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-we-01"
+                },
+                "secretName": "adminUsername"
+            }
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-sec-prd-we-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-we-01"
+                },
+                "secretName": "adminPassword"
+            }
+        },
+        "availabilitySetName" : {
+            "value" : ""
+        },
+        "vmIPAddress": {
+            "value": "172.20.53.133"
+        },
+        "dnsServers": {
+            "value":  [ 
+
+            ]
+        },
+        "useAvailabilityZone": {
+            "value": false
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "enableBootDiagnostics": {
+            "value": false
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+          "value": {
+            "Environment": "Development"
+          }
+        },
+        "enablePublicIP": {
+            "value": false
+        },
+        "enableIPForwarding": {
+            "value": true
+        }
+    }
+}

@@ -1,0 +1,288 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "utcYear": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy')]",
+      "metadata": {
+        "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+      }
+    }
+  },
+  "variables": {
+    "lockForDeletion": false,
+    "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+    "accountSasProperties": {
+      "signedServices": "bt",
+      "signedPermission": "racuw",
+      "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+      "signedResourceTypes": "co",
+      "signedProtocol": "https"
+    },
+    "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-pre-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprewe01",
+    "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+    "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+    "containerName": "components",
+    "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+    "location": "[deployment().location]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-rg-cpp-shrd-pre-we-01",
+      "location": "[variables('location')]",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2019-10-01",
+      "name": "[variables('CUA')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apim-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagement/2019-12-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagement/2019-12-01/Parameters/apim-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimlab-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/Parameters/apimlab-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimlabpgw-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementLogicAppBackend/2019-01-01/Parameters/apimlabpgw-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimapi-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementAPI/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementAPI/2019-01-01/Parameters/apimapi-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimfab-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementFunctionAppBackend/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementFunctionAppBackend/2019-01-01/Parameters/apimfab-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimcms-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01",
+        "DEP-apimfab-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementCMSNotificationAPI/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementCMSNotificationAPI/2019-01-01/Parameters/apimcms-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-stcppshrdprewe01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/Parameters/stcppshrdprewe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-cdn-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetwork/2020-04-15/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetwork/2020-04-15/Parameters/cdn-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-pre-cdntasmu",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-cdn-cpp-shrd-pre-we-01",
+        "DEP-stcppshrdprewe01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ContentDeliveryNetworkEndpoint/2020-04-15/Parameters/pre-cdntasmu-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apimpgw-cpp-shrd-pre-we-01",
+      "resourceGroup": "rg-cpp-shrd-pre-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-shrd-pre-we-01",
+        "DEP-apim-cpp-shrd-pre-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementPGWAPI/2019-01-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiManagementPGWAPI/2019-01-01/Parameters/apimpgw-cpp-shrd-pre-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

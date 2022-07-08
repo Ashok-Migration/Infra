@@ -1,0 +1,499 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "allocationMethod": {
+      "value": "Static"
+    },
+    "applicationGatewayName": {
+      "value": "agw-cpp-apps-web-pre-we-01"
+    },
+    "autoScaleMaxCapacity": {
+      "value": 10
+    },
+    "capacity": {
+      "value": 2
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "privateIPAddress": {
+      "value": "172.20.92.68"
+    },
+    "publicIpAddressName": {
+      "value": "agw-cpp-apps-web-pre-we-01-ip"
+    },
+    "publicIpZones": {
+      "value": []
+    },
+    "sku": {
+      "value": "Standard"
+    },
+    "skuSize": {
+      "value": "WAF_v2"
+    },
+    "subnetName": {
+      "value": "snet-cpp-apps-agwweb-pre-we-01"
+    },
+    "frontendPorts": {
+      "value": [
+        {
+          "name": "port_80",
+          "properties": {
+            "port": 80
+          }
+        },
+        {
+          "name": "port_443",
+          "properties": {
+            "port": 443
+          }
+        }
+      ]
+    },
+    "backendAddressPools": {
+      "value": [
+        {
+          "name": "agw-cpp-apps-aks-pre-we-01",
+          "properties": {
+            "backendAddresses": [
+              {
+                "ipAddress": "172.20.92.4"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agw-cpp-tacc-pre-we-01",
+          "properties": {
+            "backendAddresses": [
+              {
+                "fqdn": "app-cpp-tacc-pre-we-01.azurewebsites.net"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "backendHttpSettingsCollection": {
+      "value": [
+        {
+          "name": "marketplace-pre-sqcp-http",
+          "properties": {
+            "port": 80,
+            "protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 120,
+            "probe": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/marketplace-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "mytasmu-pre-sqcp-http",
+          "properties": {
+            "port": 80,
+            "protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "path": "/eservices/",
+            "requestTimeout": 120,
+            "probe": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/mytasmu-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "cpadmin-pre-sqcp-http",
+          "properties": {
+            "port": 80,
+            "protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "path": "/adminportal/",
+            "requestTimeout": 120,
+            "probe": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/cpadmin-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "account-pre-sqcp-http",
+          "properties": {
+            "port": 80,
+            "protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "pickHostNameFromBackendAddress": false,
+            "path": "/account/",
+            "requestTimeout": 120,
+            "probe": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/account-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "tacc-pre-sqcp-https",
+          "properties": {
+            "port": 443,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 60,
+            "probe": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/probes/tacc-portal-probe"
+            }
+          }
+        }
+      ]
+    },
+    "httpListeners": {
+      "value": [
+        {
+          "name": "pre-mytasmu-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+            },
+            "hostName": "mytasmu.pre.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "pre-marketplace-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+            },
+            "hostName": "marketplace.pre.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "pre-accounts-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+            },
+            "hostName": "account.pre.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "pre-cpadmin-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+            },
+            "hostName": "cpadmin.pre.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "pre-tacc-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/sslCertificates/pre-sqcp-qa-httpsvaultCert"
+            },
+            "hostName": "accelerator.pre.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "pre-tacc-sqcp-http",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendIPConfigurations/agw-cpp-apps-web-pre-we-01-privateip"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/frontendPorts/port_80"
+            },
+            "protocol": "Http",
+            "hostNames": [],
+            "requireServerNameIndication": false
+          }
+        }
+      ]
+    },
+    "requestRoutingRules": {
+      "value": [
+        {
+          "name": "pre-marketplace-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-marketplace-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-apps-aks-pre-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/marketplace-pre-sqcp-http"
+            }
+          }
+        },
+        {
+          "name": "pre-cpadmin-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-cpadmin-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-apps-aks-pre-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/cpadmin-pre-sqcp-http"
+            }
+          }
+        },
+        {
+          "name": "pre-mytasmu-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-mytasmu-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-apps-aks-pre-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/mytasmu-pre-sqcp-http"
+            }
+          }
+        },
+        {
+          "name": "pre-accounts-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-accounts-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-apps-aks-pre-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/account-pre-sqcp-http"
+            }
+          }
+        },
+        {
+          "name": "pre-tacc-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-tacc-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendAddressPools/agw-cpp-tacc-pre-we-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/backendHttpSettingsCollection/tacc-pre-sqcp-https"
+            }
+          }
+        },
+        {
+          "name": "pre-tacc-sqcp-redirect",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/httpListeners/pre-tacc-sqcp-http"
+            },
+            "redirectConfiguration": {
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-waf-pre-we-01/providers/Microsoft.Network/applicationGateways/agw-cpp-apps-web-pre-we-01/redirectConfigurations/pre-tacc-sqcp-redirect"
+            }
+          }
+        }
+      ]
+    },
+    "probes": {
+      "value": [
+        {
+          "name": "mytasmu-portal-probe",
+          "properties": {
+            "protocol": "Http",
+            "host": "172.20.92.4",
+            "path": "/eservices/",
+            "interval": 30,
+            "timeout": 120,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        },
+        {
+          "name": "account-portal-probe",
+          "properties": {
+            "protocol": "Http",
+            "host": "172.20.92.4",
+            "path": "/account/",
+            "interval": 30,
+            "timeout": 120,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        },
+        {
+          "name": "cpadmin-portal-probe",
+          "properties": {
+            "protocol": "Http",
+            "host": "172.20.92.4",
+            "path": "/*",
+            "interval": 30,
+            "timeout": 120,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        },
+        {
+          "name": "marketplace-portal-probe",
+          "properties": {
+            "protocol": "Http",
+            "host": "172.20.92.4",
+            "path": "/",
+            "interval": 30,
+            "timeout": 120,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tacc-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "accelerator.pre.sqcp.qa",
+            "path": "/",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-399"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "firewallMode": {
+      "value": "Prevention"
+    },
+    "sslCertificates": {
+      "value": [
+        {
+          "name": "pre-sqcp-qa-httpsvaultCert",
+          "properties": {
+            "keyVaultSecretId": "https://kv-cpp-pltf-pre-we-01.vault.azure.net/secrets/pre-SQCP-Certificate/"
+          }
+        }
+      ]
+    },
+    "managedIdentityId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-sec-pre-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpp-pltf-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    },
+    "tier": {
+      "value": "WAF_v2"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cpp-pltf-pre-we-01"
+    },
+    "vnetResourceGroup": {
+      "value": "rg-cpp-pltf-net-pre-we-01"
+    },
+    "zones": {
+      "value": [
+        "1",
+        "2"
+      ]
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    }
+  }
+}

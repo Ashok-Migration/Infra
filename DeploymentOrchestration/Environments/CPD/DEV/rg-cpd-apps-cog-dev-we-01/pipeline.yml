@@ -1,0 +1,163 @@
+name: $(resourceGroupName)
+
+variables:
+  - name: PoolName
+    value: "tasmumsagents"
+  - name: templateFilePath
+    value: DeploymentOrchestration/Environments/CPD/DEV/rg-cpd-apps-cog-dev-we-01/deploy.json
+  - name: parameterFilePath
+    value:
+  - name: location
+    value: westeurope
+  - name: resourceGroupName
+    value: rg-cpd-apps-cog-dev-we-01
+  - name: serviceConnection
+    value: sqcp-ado-spn-dev
+  - name: subscriptionId
+    value: d0694def-b27e-4bb7-900d-437fbeb802da
+  - name: storageResourceGroup
+    value: rg-cpd-apps-str-dev-we-01
+  - name: storageAccountName
+    value: stcpdappsstrdevwe01 
+  - name: datasourceScriptPath
+    value: Modules/ARM/SearchService/2020-03-13/Scripts/link.datasource.indexer.ps1
+  - name: scriptPath
+    value: Modules/ARM/SearchService/2020-03-13/Scripts/create.index.indexer.ps1
+  - name: searchServicesName
+    value: srch-cpd-apps-cog-dev-we-01
+  - name: indexSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/IndexParameters/index-content-schema-parameters.json
+  - name: indexerSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/IndexParameters/indexer-blob-dev-schema-parameters.json
+  - name: dataSourceSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/IndexParameters/ds-blob-dev-schema-paramaters.json
+  - name: skillSetSchemaFile
+    value: Modules/ARM/SearchService/2020-03-13/IndexParameters/ss-blob-dev-schema-paramaters.json
+  - name: indexUrl
+    value: https://srch-cpd-apps-cog-dev-we-01.search.windows.net/indexes/content-index?api-version=2020-06-30
+  - name: indexerUrl
+    value: https://srch-cpd-apps-cog-dev-we-01.search.windows.net/indexers/azureblob-indexer?api-version=2020-06-30
+  - name: dataSourceUrl
+    value: https://srch-cpd-apps-cog-dev-we-01.search.windows.net/datasources/azureblob?api-version=2020-06-30
+  - name: skillSetUrl
+    value: https://srch-cpd-apps-cog-dev-we-01.search.windows.net/skillsets/azureblob-skillset?api-version=2020-06-30
+
+trigger: none
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#      - master
+#  paths:
+#    include:
+#    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
+
+stages:
+  - stage: Validate
+    jobs:
+      - job: ValidateTemplate
+        displayName: Validate Template
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzurePowerShell@4
+            displayName: Validate template on $(resourceGroupName)
+            inputs:
+              azureSubscription: $(serviceConnection)
+              ScriptType: InlineScript
+              inline: |
+                $ValidationErrors = $null
+
+                $Location = "$(location)" -replace " ",""
+
+                $DeploymentInputs = @{
+                  Location              = "$Location"
+                  TemplateFile          = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                  # TemplateParameterFile = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                  Verbose               = $true
+                  OutVariable           = "ValidationErrors"
+                }
+
+                Test-AzDeployment @DeploymentInputs
+
+                if ($ValidationErrors)
+                {
+                  Write-Error "Template is not valid."
+                }
+              azurePowerShellVersion: LatestVersion
+
+  - stage: DeployTemplate
+    jobs:
+      - job: DeployTemplate
+        displayName: Deploy Template
+        timeoutInMinutes: 90
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzurePowerShell@4
+            displayName: Deploy template on $(resourceGroupName)
+            inputs:
+              azureSubscription: $(serviceConnection)
+              ScriptType: InlineScript
+              inline: |
+                $Location = "$(location)" -replace " ",""
+
+                $DeploymentInputs = @{
+                  Name                    = "$(resourceGroupName)-master"
+                  Location                = "$Location"
+                  TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                  # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                  DeploymentDebugLogLevel = "All"
+                  Verbose                 = $true
+                  ErrorAction             = "Stop"
+                }
+                New-AzDeployment @DeploymentInputs
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@5
+            displayName: Create Index in Search
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(indexSchemaFile)" -url "$(indexUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@5
+            displayName: Link to blob datasource
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(datasourceScriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -storageResourceGroup "$(storageResourceGroup)" -storageAccountName "$(storageAccountName)" -schemaFile "$(Build.Repository.LocalPath)/$(dataSourceSchemaFile)" -url "$(dataSourceUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@5
+            displayName: Link to blob skillset
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(skillSetSchemaFile)" -url "$(skillSetUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzurePowerShell@5
+            displayName: Create Indexer in Search
+            inputs:
+              azureSubscription: "$(serviceConnection)"
+              ScriptPath: "$(Build.Repository.LocalPath)/$(scriptPath)"
+              ScriptArguments: '-searchServiceName "$(searchServicesName)" -resourceGroupName "$(resourceGroupName)" -schemaFile "$(Build.Repository.LocalPath)/$(indexerSchemaFile)" -url "$(indexerUrl)"'
+              azurePowerShellVersion: LatestVersion
+
+  - stage: SecurityVerification
+    jobs:
+      - job: ScanResourceGroup
+        displayName: Scan Resource Group
+        pool:
+          name: $(PoolName)
+        steps:
+          - task: AzSKSVTs@4
+            displayName: Scan $(resourceGroupName)
+            continueOnError: true
+            inputs:
+              ConnectedServiceNameARM: '$(serviceConnection)'
+              GenerateMethodParameterSetSelection: 'ResourceGroupName'
+              ResourceGroupName: '$(resourceGroupName)'
+              SubscriptionId: '$(subscriptionId)'

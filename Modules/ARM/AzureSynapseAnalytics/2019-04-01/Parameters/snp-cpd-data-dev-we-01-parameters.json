@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "snp-cpd-data-dev-we-01"
+    },
+    "sqlAdministratorLogin": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-dev-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-data-dev-we-01"
+        },
+        "secretName": "adminUsernamedata"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-dev-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-data-dev-we-01"
+        },
+        "secretName": "adminPassworddata"
+      }
+    },
+
+    "location": {
+      "value": "westeurope"
+    },
+    "defaultDataLakeStorageAccountName": {
+      "value": "dlsgoldzonedevwe01"
+    },
+    "defaultDataLakeStorageFilesystemName": {
+      "value": "synapse"
+    },
+    "setWorkspaceIdentityRbacOnStorageAccount": {
+      "value": false
+    },
+    "allowAllConnections": {
+      "value": true
+    },
+    "grantWorkspaceIdentityControlForSql": {
+      "value": "Enabled"
+    },
+    "managedVirtualNetwork": {
+      "value": "default"
+    },
+    "privateEndpointNameSqlOnDemand": {
+      "value": "prvep-cpd-data-dev-we-01"
+    },
+    "privateEndpointNameSql": {
+      "value": "prvep-cpd-data-dev-we-02"
+    },
+    "targetSubResourceSqlOnDemand": {
+      "value": [
+        "SqlOnDemand"
+      ]
+    },
+    "targetSubResourceSql": {
+      "value": [
+        "Sql"
+      ]
+    },
+    "subnetName": {
+      "value": "snet-cpd-data-daisvcs-dev-we-01"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cpd-pltf-dev-we-01"
+    },
+    "networkRG": {
+      "value": "rg-cpd-pltf-net-dev-we-01"
+    },
+    "RG": {
+      "value": "rg-cpd-data-dev-we-01"
+    },
+    "SubscriptionId": {
+      "value": "d0694def-b27e-4bb7-900d-437fbeb802da"
+    },
+    "tagValues": {
+      "value": {
+        "Env": "Development"
+      }
+    }
+  }
+}

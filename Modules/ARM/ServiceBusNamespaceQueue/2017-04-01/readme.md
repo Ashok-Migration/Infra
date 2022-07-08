@@ -1,0 +1,1 @@
+This template deploys an Service bus namespace queue

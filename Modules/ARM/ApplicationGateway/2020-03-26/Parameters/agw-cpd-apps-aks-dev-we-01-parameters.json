@@ -1,0 +1,100 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allocationMethod": {
+            "value": "Static"
+        },
+        "applicationGatewayName": {
+            "value": "agw-cpd-apps-aks-dev-we-01"
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        },
+        "capacity": {
+            "value": 2
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "privateIPAddress": {
+            "value": "172.20.42.30"
+        },
+        "publicIpAddressName": {
+            "value": "agw-cpd-apps-aks-dev-we-01-ip"
+        },
+        "publicIpZones": {
+            "value": []
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "Standard_v2"
+        },
+        "subnetName": {
+            "value": "snet-cpd-pltf-agw-dev-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        },
+        "tier": {
+            "value": "Standard_v2"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpd-pltf-dev-we-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpd-pltf-net-dev-we-01"
+        },
+        "zones": {
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "enableHttp2": {
+            "value": true
+        },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "sslCertificates": {
+            "value": [
+                {
+                    "name": "httpsvaultCert",
+                    "properties": {
+                        "keyVaultSecretId": "https://kv-cpd-pltf-dev-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
+                    }
+                }
+            ]
+        },
+        "managedIdentityId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-aks-dev-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-apps-agwaks-dev-we-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourcegroups/rg-cpd-pltf-mon-npd-we-01/providers/microsoft.operationalinsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-dev-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-dev-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-dev-we-01"
+        },
+        "firewallEnabled": {
+            "value": false
+        }
+    }
+}

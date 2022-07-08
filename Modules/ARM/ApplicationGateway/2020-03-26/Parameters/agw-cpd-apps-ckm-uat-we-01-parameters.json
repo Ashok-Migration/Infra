@@ -1,0 +1,450 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allocationMethod": {
+            "value": "Static"
+        },
+        "applicationGatewayName": {
+            "value": "agw-cpd-apps-ckm-uat-we-01"
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        },
+        "capacity": {
+            "value": 2
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "privateIPAddress": {
+            "value": "172.20.79.229"
+        },
+        "publicIpAddressName": {
+            "value": "agw-cpd-apps-ckm-uat-we-01-ip"
+        },
+        "publicIpZones": {
+            "value": []
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "WAF_v2"
+        },
+        "subnetName": {
+            "value": "snet-cpd-apps-agwckm-uat-we-01"
+        },
+        "frontendPorts": {
+            "value": [
+                {
+                    "name": "port_80",
+                    "properties": {
+                        "port": 80
+                    }
+                },
+                {
+                    "name": "port_443",
+                    "properties": {
+                        "port": 443
+                    }
+                }
+            ]
+        },
+        "backendAddressPools": {
+            "value": [
+                {
+                    "name": "agw-cpd-apps-ckan-uat-we-01",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "172.20.78.70"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "apim-cpd-shrd-uat-we-01",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "172.20.74.72"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "backendHttpSettingsCollection": {
+            "value": [
+                {
+                    "name": "opendata-uat-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 120,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/probes/opendata-portal-probe"
+                        }
+                    }
+                },
+                {
+                    "name": "apim-uat-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "upload.uat.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "affinityCookieName": "ApplicationGatewayAffinity",
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/probes/apimprobe"
+                        }
+                    }
+                }
+            ]
+        },
+        "httpListeners": {
+            "value": [
+                {
+                    "name": "uat-opendata-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendIPConfigurations/agw-cpd-apps-ckm-uat-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/sslCertificates/uat-sqcp-qa-httpsvaultCert"
+                        },
+                        "hostName": "opendata.uat.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
+                    "name": "uat-opendata-sqcp-http",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendIPConfigurations/agw-cpd-apps-ckm-uat-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendPorts/port_80"
+                        },
+                        "protocol": "Http",
+                        "hostName": "opendata.uat.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": false
+                    }
+                },
+                {
+                    "name": "uat-upload-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendIPConfigurations/agw-cpd-apps-ckm-uat-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/sslCertificates/uat-sqcp-qa-httpsvaultCert"
+                        },
+                        "hostName": "upload.uat.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                }
+            ]
+        },
+        "requestRoutingRules": {
+            "value": [
+                {
+                    "name": "uat-opendata-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/httpListeners/uat-opendata-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/backendAddressPools/agw-cpd-apps-ckan-uat-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/backendHttpSettingsCollection/opendata-uat-sqcp-https"
+                        }
+                    }
+                },
+                {
+                    "name": "uat-opendata-redirect",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/httpListeners/uat-opendata-sqcp-http"
+                        },
+                        "redirectConfiguration": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/redirectConfigurations/uat-opendata-redirect"
+                        }
+                    }
+                },
+                {
+                    "name": "uat-upload-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/httpListeners/uat-upload-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/backendAddressPools/apim-cpd-shrd-uat-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/backendHttpSettingsCollection/apim-uat-sqcp-https"
+                        }
+                    }
+                }
+            ]
+        },
+        "probes": {
+            "value": [
+                {
+                    "name": "opendata-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "opendata.uat.sqcp.qa",
+                        "path": "/",
+                        "interval": 30,
+                        "timeout": 120,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "apimprobe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "upload.uat.sqcp.qa",
+                        "path": "/status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 60,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "redirectConfigurations": {
+            "value": [
+                {
+                    "name": "uat-opendata-redirect",
+                    "properties": {
+                        "redirectType": "Permanent",
+                        "targetListener": {
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/httpListeners/uat-opendata-sqcp-https"
+                        },
+                        "includePath": true,
+                        "includeQueryString": true,
+                        "requestRoutingRules": [
+                            {
+                                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-waf-uat-we-01/providers/Microsoft.Network/applicationGateways/agw-cpd-apps-ckm-uat-we-01/requestRoutingRules/uat-opendata-redirect"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "firewallMode": {
+            "value": "Prevention"
+        },
+        "sslCertificates": {
+            "value": [
+                {
+                    "name": "uat-sqcp-qa-httpsvaultCert",
+                    "properties": {
+                        "keyVaultSecretId": "https://kv-cpd-pltf-uat-we-01.vault.azure.net/secrets/UAT-SQCP-Certificate/"
+                    }
+                }
+            ]
+        },
+        "managedIdentityId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-sec-uat-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpd-pltf-uat-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "uatining"
+            }
+        },
+        "tier": {
+            "value": "WAF_v2"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpd-pltf-uat-we-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpd-pltf-net-uat-we-01"
+        },
+        "zones": {
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "enableHttp2": {
+            "value": true
+        },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "wafPolicyName": {
+            "value": "waf-cpd-apps-ckm-uat-we-01"
+        },
+        "useAgwFirewallExclusions": {
+            "value": true
+        },
+        "firewallExclusions": {
+            "value": [
+                {
+                    "matchVariable": "RequestCookieNames",
+                    "selectorMatchOperator": "StartsWith",
+                    "selector": "auth_tkt"
+                }
+            ]
+        },
+        "managedRuleSets": {
+            "value": [
+                {
+                    "ruleSetType": "Microsoft_BotManagerRuleSet",
+                    "ruleSetVersion": "0.1",
+                    "ruleGroupOverrides": []
+                },
+                {
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.1",
+                    "ruleGroupOverrides": [
+                        {
+                            "ruleGroupName": "REQUEST-920-PROTOCOL-ENFORCEMENT",
+                            "rules": [
+                                {
+                                    "ruleId": "920140",
+                                    "state": "Disabled"
+                                }
+                            ]
+                        },
+                        {
+                            "ruleGroupName": "General",
+                            "rules": [
+                                {
+                                    "ruleId": "200004",
+                                    "state": "Disabled"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "customRules": {
+            "value": [
+                {
+                    "name": "CKANResourceCreate",
+                    "priority": 95,
+                    "ruleType": "MatchRule",
+                    "action": "Allow",
+                    "matchConditions": [
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestUri"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "/api/3/action/resource_create"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        },
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestHeaders",
+                                    "selector": "x-ckan-request"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "true"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "CKANDatasetView",
+                    "priority": 100,
+                    "ruleType": "MatchRule",
+                    "action": "Allow",
+                    "matchConditions": [
+                        {
+                            "matchVariables": [
+                                {
+                                    "variableName": "RequestUri"
+                                }
+                            ],
+                            "operator": "Contains",
+                            "negationConditon": false,
+                            "matchValues": [
+                                "dataset"
+                            ],
+                            "transforms": [
+                                "Lowercase"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "firewallEnabled": {
+            "value": true
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-uat-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-uat-we-01"
+        }
+    }
+}

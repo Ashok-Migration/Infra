@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "stcppshrdprewe01"
+    },
+    "storageAccountKind": {
+      "value": "StorageV2"
+    },
+    "storageAccountSku": {
+      "value": "Standard_ZRS"
+    },
+    "storageAccountAccessTier": {
+      "value": "Hot"
+    },
+    "vNetId": {
+      "value": ""
+    },
+    "networkAcls": {
+      "value": {}
+    },
+    "blobContainers": {
+      "value": [
+        {
+          "name": "app",
+          "publicAccess": "Blob"
+        },
+        {
+          "name": "content",
+          "publicAccess": "Blob"
+        }
+      ]
+    },
+    "lockForDeletion": {
+      "value": true
+    },
+    "blobCorsRules": {
+      "value": [
+        {
+          "allowedOrigins": [
+            "https://tasmucpb2cprod.b2clogin.com"
+          ],
+          "allowedMethods": [
+            "GET",
+            "OPTIONS"
+          ],
+          "maxAgeInSeconds": 200,
+          "exposedHeaders": [
+            "*"
+          ],
+          "allowedHeaders": [
+            "*"
+          ]
+        }
+      ]
+    },
+    "allowBlobPublicAccess": {
+      "value": true
+    },
+    "minimumTlsVersion": {
+      "value": "TLS1_2"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    }
+  }
+}

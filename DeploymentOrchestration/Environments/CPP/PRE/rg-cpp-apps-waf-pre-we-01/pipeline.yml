@@ -1,0 +1,85 @@
+name: $(resourceGroupName)
+
+variables:
+  - name: PoolName
+    value: "tasmumsiagents"
+  #- name: vmImage
+  #  value: windows-latest
+  - name: templateFilePath
+    value: DeploymentOrchestration/Environments/CPP/PRE/rg-cpp-apps-waf-pre-we-01/deploy.json
+  - name: parameterFilePath
+    value:
+  - name: location
+    value: westeurope
+  - name: resourceGroupName
+    value: rg-cpp-apps-waf-pre-we-01
+  - name: serviceConnection
+    value: sqcp-ado-spn-pre
+  - name: subscriptionId
+    value: 8964f3c1-44f5-4094-80eb-4334845bdfb1
+
+trigger: none
+
+stages:
+  - stage: Validate
+    jobs:
+      - job: ValidateTemplate
+        displayName: Validate Template
+        pool:
+          name: $(PoolName)
+          #vmImage: $(vmImage)
+        steps:
+          - task: AzurePowerShell@4
+            displayName: Validate template on $(resourceGroupName)
+            inputs:
+              azureSubscription: $(serviceConnection)
+              ScriptType: InlineScript
+              inline: |
+                $ValidationErrors = $null
+
+                $Location = "$(location)" -replace " ",""
+
+                $DeploymentInputs = @{
+                  Location              = "$Location"
+                  TemplateFile          = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                  # TemplateParameterFile = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                  Verbose               = $true
+                  OutVariable           = "ValidationErrors"
+                }
+
+                Test-AzDeployment @DeploymentInputs
+
+                if ($ValidationErrors)
+                {
+                  Write-Error "Template is not valid."
+                }
+              azurePowerShellVersion: LatestVersion
+
+  - stage: DeployTemplate
+    jobs:
+      - job: DeployTemplate
+        displayName: Deploy Template
+        timeoutInMinutes: 90
+        pool:
+          name: $(PoolName)
+          #vmImage: $(vmImage)
+        steps:
+          - task: AzurePowerShell@4
+            displayName: Deploy template on $(resourceGroupName)
+            inputs:
+              azureSubscription: $(serviceConnection)
+              ScriptType: InlineScript
+              inline: |
+                $Location = "$(location)" -replace " ",""
+
+                $DeploymentInputs = @{
+                  Name                    = "$(resourceGroupName)-master"
+                  Location                = "$Location"
+                  TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                  # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                  DeploymentDebugLogLevel = "All"
+                  Verbose                 = $true
+                  ErrorAction             = "Stop"
+                }
+                New-AzDeployment @DeploymentInputs
+              azurePowerShellVersion: LatestVersion

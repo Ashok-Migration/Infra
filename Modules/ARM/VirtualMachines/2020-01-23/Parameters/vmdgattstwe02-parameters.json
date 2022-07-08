@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmNames": {
+      "value": [ "vmdgattstwe02" ]
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "standardImage": {
+      "value": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2019-Datacenter",
+        "version": "latest"
+      }
+    },
+    "osDisk": {
+      "value": {
+        "createOption": "fromImage",
+        "diskSizeGB": "128",
+        "managedDisk": {
+          "storageAccountType": "Premium_LRS"
+        }
+      }
+    },
+    "dataDisks": {
+      "value": [
+        {
+          "caching": "ReadOnly",
+          "createOption": "Empty",
+          "diskSizeGB": "64",
+          "managedDisk": {
+            "storageAccountType": "Standard_LRS"
+          }
+        }
+      ]
+    },
+    "NetworkDetails": {
+      "value": {
+        "vnetRG": "rg-cpd-pltf-net-tst-we-01",
+        "vnet": "vnet-cpd-pltf-tst-we-01",
+        "subnet": "snet-cpd-data-daisvcs-tst-we-01"
+      }
+    },
+    "adminUsername": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-tst-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-data-tst-we-02"
+        },
+        "secretName": "adminUsernamedata"
+      }
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-tst-we-01/providers/Microsoft.KeyVault/vaults/kv-cpd-data-tst-we-02"
+        },
+        "secretName": "adminPassworddata"
+      }
+    },
+    "availabilitySetName": {
+      "value": ""
+    },
+    "vmIPAddress": {
+      "value": ""
+    },
+    "dnsServers": {
+      "value": [
+
+      ]
+    },
+    "useAvailabilityZone": {
+      "value": false
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "enableBootDiagnostics": {
+      "value": false
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-data-tst-we-01/providers/Microsoft.Storage/storageAccounts/stcpddatatstwe01"
+    },
+    "diagnosticStorageAccountName": {
+      "value": "stcpddatatstwe01"
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "tags": {
+      "value": {
+        "Environment": "Test"
+      }
+    },
+    "enablePublicIP": {
+      "value": false
+    },
+    "enableIPForwarding": {
+      "value": true
+    }
+  }
+}

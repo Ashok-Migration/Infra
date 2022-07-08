@@ -1,0 +1,45 @@
+trigger:
+  - none
+
+variables:
+  - name: PoolName
+    value: "datapool"
+  - name: serviceConnection
+    value: sqcp-ado-spn-dev
+  - group: "Shared"
+
+pool:
+  name: $(PoolName)
+
+stages:
+  - stage: PublishArtifacts
+    jobs:
+    - job: PublishArtifacts
+      steps:
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: Scripts/KeyVault
+          Contents: "**"
+          TargetFolder: "$(build.artifactstagingdirectory)/scripts"
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: Scripts/KeyVault
+          artifact: "scripts"
+          publishLocation: "pipeline"
+
+  - stage: uat
+    displayName: Add UATV Secrets
+    dependsOn: PublishArtifacts
+    variables:
+      - group: "uat"
+      - name: keyVaultName
+        value: kv-cpd-data-uat-we-01
+    jobs:
+      - deployment: Deploy
+        displayName: Add uat Key Vault Secrets
+        environment: data-uat
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: data-secrets-solution.yml

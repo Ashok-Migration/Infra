@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vpnGWLocalGatewayName": {
+        "type": "string",
+        "defaultValue": "localGateway",
+        "metadata": {
+          "description": "Aribtary name for gateway resource representing customer on-premise site"
+        }
+      },
+      "vpnGWLocalGatewayIpAddress": {
+        "type": "string",
+        "defaultValue": null,
+        "metadata": {
+          "description": "Public IP of remote customer site VPN device/instance"
+        }
+      },
+      "vpnGWLocalAddressPrefix1": {
+        "type": "string",
+        "defaultValue": null,
+        "metadata": {
+          "description": "Array of CIDR blocks representing the address space of the OnPremise VPN network's Subnet"
+        }
+      }
+    },
+    "variables": {
+    },
+    "resources": [
+      {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/localNetworkGateways",
+        "name": "[parameters('vpnGWLocalGatewayName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "localNetworkAddressSpace": {
+            "addressPrefixes": [
+              "[parameters('vpnGWLocalAddressPrefix1')]"
+            ]
+          },
+          "gatewayIpAddress": "[parameters('vpnGWLocalGatewayIpAddress')]"
+        }
+      }
+    ],
+    "outputs": {
+    }
+  }

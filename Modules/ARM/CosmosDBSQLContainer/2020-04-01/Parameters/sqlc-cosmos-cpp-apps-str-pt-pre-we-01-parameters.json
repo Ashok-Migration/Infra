@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "value": "cosmos-cpp-apps-str-pre-we-01"
+    },
+    "databaseName": {
+      "value": "paymenttransaction"
+    },
+    "containerName": {
+      "value": "transactionhistory"
+    },
+    "partitionKey": {
+      "value": "/profileid"
+    },
+    "options": {
+      "value": {
+        "autoscaleSettings": {
+          "maxThroughput": 6000
+        }
+      }
+    },
+    "includedPaths": {
+      "value": [
+        {
+          "path": "/*"
+        },
+        {
+          "path": "/trackid/?"
+        },
+        {
+          "path": "/originalrequesturl/?"
+        },
+        {
+          "path": "/originalqueryparams/?"
+        },
+        {
+          "path": "/paymentgatewayresponsequeryparams/?"
+        },
+        {
+          "path": "/responsecode/?"
+        },
+        {
+          "path": "/state/?"
+        },
+        {
+          "path": "/amount/?"
+        },
+        {
+          "path": "/currency/?"
+        }
+      ]
+    },
+    "uniqueKeys": {
+      "value": []
+    }
+  }
+}

@@ -1,0 +1,35 @@
+name: $(moduleName)-$(moduleVersion)
+
+variables:
+  - template: pipeline.variables.yml
+  - template: /Modules/.global/global.variables.yml
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - Modules/ARM/ServiceBusNamespace/*
+    exclude:
+      - Modules/ARM/ServiceBusNamespace/*/readme.md
+
+stages:  
+  - stage: Scan
+    jobs:
+      - template: /Modules/.global/global.azsk.yml
+        parameters:
+          templateFile: $(modulePath)/deploy.json
+          parametersFile: $(modulePath)/Parameters/parameters.json
+          
+  - stage: Validate
+    jobs:
+      - template: pipeline.jobs.validate.yml
+        parameters:
+          templateFile: $(modulePath)/deploy.json
+          parametersFile: $(modulePath)/Parameters/parameters.json
+
+  - stage: Publish
+    jobs:
+      - template: pipeline.jobs.publish.yml

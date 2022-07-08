@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "value": "sql-cpp-data-pre-we-01"
+        },
+        "administratorLogin": {
+            "value": "adminsa"
+        },
+        "administratorLoginPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-sec-pre-we-01/providers/Microsoft.KeyVault/vaults/kv-cpp-data-pre-we-01"
+                },
+                "secretName": "DataSqlAdminPassword"
+            }
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "privateEndpointNameSqlOnDemand": {
+          "value": "prvep-cpp-data-sql-pre-we-01"
+        },
+        "virtualNetworkName": {
+          "value": "vnet-cpp-pltf-pre-we-01"
+        },
+        "networkRG": {
+          "value": "rg-cpp-pltf-net-pre-we-01"
+        },
+        "subnetName": {
+            "value": "snet-cpp-data-daisvcs-pre-we-01"
+        },
+        "targetSubResourceSqlOnDemand": {
+          "value": [
+            "sqlServer"
+          ]
+        },
+        "storageName": {
+            "value": "stcppdataprewe01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Pre-Production"
+            }
+        }
+    }
+}

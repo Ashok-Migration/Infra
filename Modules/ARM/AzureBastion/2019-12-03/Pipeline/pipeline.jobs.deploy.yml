@@ -1,0 +1,37 @@
+parameters:
+  templateFile: $(modulePath)/deploy.json
+  parametersFile: $(modulePath)/Parameters/parameters.json
+  
+jobs:
+- job: DeployModule
+  displayName: Deploy Module
+  pool:
+    name: $(poolName)
+    #vmImage: $(vmImage)
+  variables:
+  - template: pipeline.variables.yml
+  steps:
+    - task: AzurePowerShell@4
+      displayName: 'Deploy $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)'
+      inputs:
+        azureSubscription: $(serviceConnectionPrd)
+        ScriptType: InlineScript
+        inline: |
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
+            {
+              New-AzResourceGroup -Name $(resourceGroupNamePrd) -Location "$(location)"
+            }
+
+            $timestamp = ([datetime]::UtcNow).tostring("yyyyMMddHHMMss")
+            $DeploymentInputs = @{
+              Name                  = "$(moduleName)-$(moduleVersion)-$timestamp"
+              ResourceGroupName     = "$(resourceGroupNamePrd)"
+              TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
+              TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
+              Mode                  = "Incremental"
+              Verbose               = $true
+              ErrorAction          = "Stop"
+            }
+            
+            New-AzResourceGroupDeployment @DeploymentInputs
+        azurePowerShellVersion: LatestVersion

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "profileName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the CDN Profile"
+      }
+    },
+    "properties": {
+      "type": "object"
+    },
+    "sku": {
+      "type": "object",
+      "metadata": {
+        "description": "CDN SKU names"
+      }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2020-04-15",
+      "name": "[parameters('profileName')]",
+      "location": "[parameters('location')]",
+      "sku": "[parameters('sku')]",
+      "properties": "[parameters('properties')]",
+      "type": "microsoft.cdn/profiles",
+      "tags": "[parameters('tags')]"
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

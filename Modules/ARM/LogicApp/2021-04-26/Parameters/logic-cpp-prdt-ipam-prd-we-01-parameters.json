@@ -1,0 +1,274 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "stcppprdtipamprdwe01"
+        },
+        "folderName": {
+          "value": "apim-cpp-shrd-prd-we-01"
+        },
+        "workflowName": {
+            "value": "logic-cpp-prdt-ipam-prd-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "Recurrence": {
+                    "recurrence": {
+                        "frequency": "Month",
+                        "interval": 1,
+                        "startTime": "2021-04-01T01:00:00",
+                        "timeZone": "Arab Standard Time"
+                    },
+                    "type": "Recurrence"
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Compose": {
+                    "runAfter": {
+                        "Parse_JSON": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Compose",
+                    "inputs": "@body('Parse_JSON')"
+                },
+                "Initialize_FilePath_object": {
+                    "runAfter": {
+                        "Insert_Data_Into_Blob_Storage": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "FilePath",
+                                "type": "string",
+                                "value": "@concat('https://',variables('StorageAccountName'),'.blob.core.windows.net',body('Insert_Data_Into_Blob_Storage')?['Path'])"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_StorageAccountName_String": {
+                    "runAfter": {
+                        "Initialize_TodayTime_Variable": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "StorageAccountName",
+                                "type": "string",
+                                "value": "stcppprdtipamprdwe01"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_TodayTime_Variable": {
+                    "runAfter": {
+                        "Compose": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TodayTime",
+                                "type": "string",
+                                "value": "@{utcNow('yyyy-MM-ddTHH:mm:ss')}"
+                            }
+                        ]
+                    }
+                },
+                "Insert_Data_Into_Blob_Storage": {
+                    "runAfter": {
+                        "Initialize_StorageAccountName_String": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": "@outputs('Compose')",
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/datasets/default/files",
+                        "queries": {
+                            "folderPath": "/apim-cpp-shrd-prd-we-01",
+                            "name": "@{concat('ADB2C-Metering-',formatDateTime(utcNow(),'yyyy-MM'))}",
+                            "queryParametersSingleEncoded": true
+                        }
+                    },
+                    "runtimeConfiguration": {
+                        "contentTransfer": {
+                            "transferMode": "Chunked"
+                        }
+                    }
+                },
+                "Parse_JSON": {
+                    "runAfter": {
+                        "Run_query_and_list_results": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ParseJson",
+                    "inputs": {
+                        "content": "@body('Run_query_and_list_results')",
+                        "schema": {
+                            "properties": {
+                                "value": {
+                                    "items": {
+                                        "properties": {
+                                            "application_id": {
+                                                "type": "string"
+                                            },
+                                            "number_of_active_users": {
+                                                "type": "integer"
+                                            },
+                                            "unit_type": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "application_id",
+                                            "number_of_active_users",
+                                            "unit_type"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "Publish_Event": {
+                    "runAfter": {
+                        "Initialize_FilePath_object": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": [
+                            {
+                                "data": "@variables('FilePath')",
+                                "dataVersion": "1.0",
+                                "eventTime": "@variables('TodayTime')",
+                                "eventType": "identity-metering",
+                                "id": "@{guid()}",
+                                "metadataVersion": "1",
+                                "subject": "Identity",
+                                "topic": "meteringdata"
+                            }
+                        ],
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/eventGrid/api/events"
+                    }
+                },
+                "Run_query_and_list_results": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": "let TempLastMonthEndDate = (startofmonth(now()) - 1h);\nlet LastMonthStartDate = startofmonth(TempLastMonthEndDate);\nlet LastMonthEndDate = TempLastMonthEndDate+59m+59s;\n AuditLogs\n| where LoggedByService == \"B2C\"\n    and Result == \"success\"\n    and Category == \"Authentication\"\n    and OperationName in (\"Issue an id_token to the application\", \"Exchange token\", \"Issue an authorization code to the application\", \"Issue an access token to the //application\")\n  and TimeGenerated between(LastMonthStartDate .. LastMonthEndDate)\n| extend UserId = extractjson(\"$.[0].id\", tostring(TargetResources))\n| extend application_id = tostring(AdditionalDetails[2][\"value\"])\n| extend unit_type = \"count\"\n| order by TimeGenerated desc\n| summarize TotalAuth = count() by UserId , application_id, unit_type\n| summarize number_of_active_users = count() by application_id, unit_type\n| order by application_id desc\n",
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azuremonitor']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/queryData",
+                        "queries": {
+                            "resourcegroups": "rg-cph-b2c-mon-prd-we-01",
+                            "resourcename": "log-cph-b2c-prd-we-01",
+                            "resourcetype": "Log Analytics Workspace",
+                            "subscriptions": "d8c326fb-f8b4-4854-a2af-dd55e86f6117",
+                            "timerange": "Set in query"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpp-apps-mon-prd-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "azureblob": {
+                            "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-prdt-ipam-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-prdt-ipam-prd-we-01",
+                            "connectionName": "apicon-cpp-prdt-ipam-prd-we-01",
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+                        },
+                        "azureeventgrid": {
+                            "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integd-prd-we-01",
+                            "connectionName": "apicon-cpp-apps-integd-prd-we-01",
+                            "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
+                        },
+                        "azuremonitor": {
+                          "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-prdt-ipam-prd-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-monitor-prd-we-01",
+                          "connectionName": "apicon-cpp-apps-monitor-prd-we-01",
+                          "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs"
+                        }
+                    }
+                }
+            }
+        },
+        "logAnalytics": {
+            "value": "log-cph-b2c-prd-we-01"
+        },
+        "logAnalyticsRG": {
+            "value": "rg-cph-b2c-mon-prd-we-01"
+        },
+        "subscriptionId": {
+            "value": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
+        }
+    }
+}

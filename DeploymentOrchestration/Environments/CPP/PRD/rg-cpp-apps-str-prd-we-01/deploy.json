@@ -1,0 +1,712 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"utcYear": {
+			"type": "string",
+			"defaultValue": "[utcNow('yyyy')]",
+			"metadata": {
+				"description": "Optional. Year data used to generate a SAS token. Default is the current year."
+			}
+		}
+	},
+	"variables": {
+		"lockForDeletion": false,
+		"CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+		"accountSasProperties": {
+			"signedServices": "bt",
+			"signedPermission": "racuw",
+			"signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+			"signedResourceTypes": "co",
+			"signedProtocol": "https"
+		},
+		"componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
+		"storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+		"componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+		"containerName": "components",
+		"modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+		"location": "[deployment().location]"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-rg-cpp-apps-str-prd-we-01",
+			"location": "[variables('location')]",
+			"dependsOn": [],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cpp-apps-str-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"apiVersion": "2019-10-01",
+			"name": "[variables('CUA')]",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"template": {
+					"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+					"contentVersion": "1.0.0.0",
+					"resources": []
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-ntfns-cpp-apps-str-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'NotificationHubNamespaces/2017-04-01/Parameters/ntfns-cpp-apps-str-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-acst-cpp-apps-str-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'AppConfigurationStore/2019-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'AppConfigurationStore/2019-10-01/Parameters/acst-cpp-apps-str-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-cosmos-cpp-apps-str-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBAccount/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBAccount/2020-04-01/Parameters/cosmos-cpp-apps-str-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpp-apps-str-ntf-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpp-apps-str-ntf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-ntf-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-ntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-ntf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpp-apps-str-bot-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpp-apps-str-bot-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-botfb-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-bot-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-botfb-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-botrt-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-bot-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-botrt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-botst-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-bot-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-botst-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpp-apps-str-pt-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpp-apps-str-pt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-pt-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-pt-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-pt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sqlc-cosmos-cpp-apps-str-prf-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01",
+				"DEP-sql-cosmos-cpp-apps-str-prf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQLContainer/2020-04-01/Parameters/sqlc-cosmos-cpp-apps-str-prf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sql-cosmos-cpp-apps-str-prf-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-cosmos-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'CosmosDBSQL/2020-04-01/Parameters/sql-cosmos-cpp-apps-str-prf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-redis-cpp-apps-str-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'RedisCache/2021-08-05/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'RedisCache/2021-08-05/Parameters/redis-cpp-apps-str-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-stcppappsstrprdwe01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/Parameters/stcppappsstrprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sb-cpp-apps-strntf-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespace/2021-03-18/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespace/2021-03-18/Parameters/sb-cpp-apps-strntf-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strntfbulk-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strntfbulk-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strntfbulk-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strntfbulk-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strntfbulk-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strntfbulkdl-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strntfbulkdl-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strntfbulkdl-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strntfbulk-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strntfbulkdl-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strntfoutboundgsmssingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strntfoutboundgsmssingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strntfoutboundgsmssingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strntfoutboundgsmssingle-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strntfoutboundgsmssingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strntfsingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strntfsingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strntfsingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strntfsingle-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strntfsingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strsmsbulk-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strsmsbulk-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strsmsbulk-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strsmsbulk-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strsmsbulk-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbt-cpp-apps-strsmssingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopic/2017-04-01/Parameters/sbt-cpp-apps-strsmssingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-sbts-cpp-apps-strsmssingle-prd-we-01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01",
+				"DEP-sb-cpp-apps-strntf-prd-we-01",
+				"DEP-sbt-cpp-apps-strsmssingle-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'ServiceBusNamespaceTopicSubscription/2017-04-01/Parameters/sbts-cpp-apps-strsmssingle-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2019-10-01",
+			"name": "DEP-stcppappsapimtprdwe01",
+			"resourceGroup": "rg-cpp-apps-str-prd-we-01",
+			"dependsOn": [
+				"DEP-rg-cpp-apps-str-prd-we-01"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"debugSetting": {
+					"detailLevel": "requestContent,responseContent"
+				},
+				"templateLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				},
+				"parametersLink": {
+					"uri": "[concat(variables('modulesPath'), 'StorageAccounts/2021-10-03/Parameters/stcppappsapimtprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+				}
+			}
+		}
+	],
+	"outputs": {}
+}

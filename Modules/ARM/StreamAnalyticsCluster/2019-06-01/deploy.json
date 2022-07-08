@@ -1,0 +1,164 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 63,
+      "metadata": {
+        "description": "Required. Stream Analytics Job Name, can contain alphanumeric characters and hypen and must be 3-63 characters long."
+      }
+    },
+    "streamingUnits": {
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 48,
+      "allowedValues": [
+        1,
+        3,
+        6,
+        12,
+        18,
+        24,
+        30,
+        36,
+        42,
+        48
+      ],
+      "metadata": {
+        "description": "Required. Specifies the number of streaming units that the streaming job uses."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Tags of the Storage Account resource."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Optional. Location for the resources."
+      }
+    },
+    "dataLocale": {
+      "type": "string",
+      "defaultValue": "en-US",
+      "metadata": {
+        "description": "Optional. The data locale of the Stream Analytics Job."
+      }
+    },
+    "compatibilityLevel": {
+      "type": "string",
+      "defaultValue": "1.0",
+      "metadata": {
+        "description": "Optional. Controls certain runtime behaviors of the streaming job."
+      }
+    },
+    "outputErrorPolicy": {
+      "type": "string",
+      "defaultValue": "Stop",
+      "allowedValues": [ "Stop", "Drop" ],
+      "metadata": {
+        "description": "Optional. Indicates the policy to apply to events that arrive at the output and cannot be written to the external storage due to being malformed (missing column values, column values of wrong type or size)."
+      }
+    },
+    "eventsOutOfOrderPolicy": {
+      "type": "string",
+      "defaultValue": "Adjust",
+      "allowedValues": [ "Adjust", "Drop" ],
+      "metadata": {
+        "description": "Optional. Indicates the policy to apply to events that arrive out of order in the input event stream."
+      }
+    },
+    "eventsOutOfOrderMaxDelayInSeconds": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Optional. The maximum tolerable delay in seconds where out-of-order events can be adjusted to be back in order."
+      }
+    },
+    "eventsLateArrivalMaxDelayInSeconds": {
+      "type": "int",
+      "minValue": -1,
+      "maxValue": 1814399,
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Optional. The maximum tolerable delay in seconds where events arriving late could be included. -1 is used to specify wait indefinitely."
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. A list of one or more inputs to the streaming job."
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. A list of one or more outputs to the streaming job."
+      }
+    },
+    "functions": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. A list of one or more functions to the streaming job."
+      }
+    },
+    "query": {
+      "type": "string",
+      "defaultValue": "SELECT\r\n    *\r\nINTO\r\n    [YourOutputAlias]\r\nFROM\r\n    [YourInputAlias]",
+      "metadata": {
+        "description": "Optional. Specifies the query that will be run in the streaming job."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.StreamAnalytics/StreamingJobs",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "sku": {
+          "name": "Standard"
+        },
+        "outputErrorPolicy": "[parameters('outputErrorPolicy')]",
+        "eventsOutOfOrderPolicy": "[parameters('eventsOutOfOrderPolicy')]",
+        "eventsOutOfOrderMaxDelayInSeconds": "[parameters('eventsOutOfOrderMaxDelayInSeconds')]",
+        "eventsLateArrivalMaxDelayInSeconds": "[parameters('eventsLateArrivalMaxDelayInSeconds')]",
+        "dataLocale": "[parameters('dataLocale')]",
+        "compatibilityLevel": "[parameters('compatibilityLevel')]",
+        "inputs": "[parameters('inputs')]",
+        "outputs": "[parameters('outputs')]",
+        "functions": "[parameters('functions')]",
+        "transformation": {
+          "name": "Transformation",
+          "properties": {
+            "streamingUnits": "[parameters('streamingUnits')]",
+            "query": "[parameters('query')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "streamAnalyticsName": {
+      "type": "string",
+      "value": "[parameters('name')]",
+      "metadata": {
+        "description": "The Name of the Stream Analytics Job"
+      }
+    }
+  },
+  "functions": []
+}

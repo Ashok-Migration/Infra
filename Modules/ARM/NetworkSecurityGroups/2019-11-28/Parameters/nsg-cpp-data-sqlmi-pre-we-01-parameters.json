@@ -1,0 +1,217 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-cpp-data-sqlmi-pre-we-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-sqlmgmt-in-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI provisioning Control Plane Deployment and Authentication Service",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "sourceAddressPrefix": "SqlManagement",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [
+              "9000",
+              "9003",
+              "1438",
+              "1440",
+              "1452"
+            ],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-corpsaw-in-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI Supportability",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "sourceAddressPrefix": "CorpNetSaw",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 101,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [
+              "9000",
+              "9003",
+              "1440"
+            ],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-corppublic-in-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI Supportability through Corpnet ranges",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "sourceAddressPrefix": "CorpNetPublic",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 102,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [
+              "9000",
+              "9003"
+            ],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-healthprobe-in-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow Azure Load Balancer inbound traffic",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "AzureLoadBalancer",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 103,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-internal-in-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI internal inbound traffic",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "172.20.97.192/26",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 104,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-services-out-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI services outbound traffic over https",
+            "protocol": "Tcp",
+            "sourcePortRange": "*",
+            "sourceAddressPrefix": "172.20.97.192/26",
+            "destinationAddressPrefix": "AzureCloud",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Outbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [
+              "443",
+              "12000"
+            ],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Microsoft.Sql-managedInstances_UseOnly_mi-internal-out-172-20-97-192-26-v10",
+          "properties": {
+            "description": "Allow MI internal outbound traffic",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "172.20.97.192/26",
+            "destinationAddressPrefix": "172.20.97.192/26",
+            "access": "Allow",
+            "priority": 101,
+            "direction": "Outbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "ALL",
+          "properties": {
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 114,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+          "name": "Allowall",
+          "properties": {
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "*",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 124,
+            "direction": "Outbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cph-pltf-mon-prd-we-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcphpltfnsgflprdwe01"
+    },
+    "workspaceRGName": {
+      "value": "rg-cph-pltf-mon-prd-we-01"
+    },
+    "workspaceName": {
+      "value": "log-cph-pltf-prd-we-01"
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    }
+  }
+}

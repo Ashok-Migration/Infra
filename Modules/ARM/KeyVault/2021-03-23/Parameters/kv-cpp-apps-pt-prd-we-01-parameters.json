@@ -1,0 +1,98 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "value": "kv-cpp-apps-pt-prd-we-01"
+        },
+        "accessPolicies": {
+            "value": [
+              {
+                "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+                "objectId": "4a0cad9d-4a73-4cc0-b9f7-3033fd5176f4",
+                "permissions": {
+                  "secrets": [
+                    "Get",
+                    "List",
+                    "Set"
+                  ]
+                }
+              },
+                {
+                    "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+                    "objectId": "73023e4d-2fab-4c8b-a926-0cb75e615532",
+                    "permissions": {
+                        "keys": [],
+                        "secrets": [
+                            "Get",
+                            "List",
+                            "Set"
+                        ],
+                        "certificates": [
+                            "Get",
+                            "List",
+                            "Update",
+                            "Create",
+                            "Import"
+                        ]
+                    }
+                }
+            ]
+        },
+        "secretsObject": {
+            "value": {
+                "secrets": []
+            }
+        },
+        "enableVaultForDeployment": {
+            "value": true
+        },
+        "enableVaultForDiskEncryption": {
+            "value": true
+        },
+        "enableVaultForTemplateDeployment": {
+            "value": true
+        },
+        "enableSoftDelete": {
+            "value": true
+        },
+        "softDeleteRetentionInDays": {
+            "value": 90
+        },
+        "enablePurgeProtection": {
+            "value": true
+        },
+        "vaultSku": {
+            "value": "Premium"
+        },
+        "networkAcls": {
+            "value": {}
+        },
+        "vNetName": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpp-apps-mon-prd-we-01"
+        },
+        "lockForDeletion": {
+            "value": true
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        }
+    }
+}

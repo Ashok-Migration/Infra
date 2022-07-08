@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiManagementServiceName": {
+      "metadata": {
+        "description": "The name of the api management service"
+      },
+      "type": "string"
+    },
+    "backendServiceName": {
+      "metadata": {
+        "description": "The name of the backend logic app being added"
+      },
+      "type": "string"
+    },
+    "backendServiceRG": {
+      "metadata": {
+        "description": "The resource group of the backend logic app being added"
+      },
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[concat(parameters('apiManagementServiceName'),'/',parameters('backendServiceName'))]",
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2019-01-01",
+      "properties": {
+        "title": "[parameters('backendServiceName')]",
+        "description": "[parameters('backendServiceName')]",
+        "resourceId": "[concat('https://management.azure.com',resourceId(subscription().subscriptionId,parameters('backendServiceRG'),'/Microsoft.Logic/workflows/',parameters('backendServiceName'),'manual'))]",
+        "url": "[concat(listCallbackUrl(resourceId(subscription().subscriptionId,parameters('backendServiceRG'),'/Microsoft.Logic/workflows/',parameters('backendServiceName'), 'manual'),'2016-06-01').basePath,'/triggers')]",
+        "protocol": "http"
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

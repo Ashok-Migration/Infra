@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "value": "cosmos-cpd-apps-str-tra-we-01"
+    },
+    "location": {
+      "value": "West Europe"
+    },
+    "locations": {
+      "value": [
+        {
+          "locationName": "westeurope",
+          "failoverPriority": 0,
+          "isZoneRedundant": true
+        }
+      ]
+    },
+    "isVirtualNetworkFilterEnabled": {
+      "value": true
+    },
+    "virtualNetworkRules": {
+      "value": [
+        {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-tra-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-tra-we-01/subnets/snet-cpd-apps-bkend-tra-we-01"
+        },
+        {
+          "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-tra-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-tra-we-01/subnets/snet-cpd-apps-aks-tra-we-01"
+        }
+      ]
+    },
+    "ipRules": {
+      "value": [
+        {
+          "ipAddressOrRange": "0.0.0.0"
+        }
+      ]
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tra-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tra-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpd-apps-mon-tra-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Training"
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Name for the data factory."
+      }
+    },
+    "identity": {
+      "type": "string",
+      "defaultValue": "SystemAssigned",
+      "metadata": {
+        "description": "Optional. Identity for the data factory."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Optional. Location for all resources."
+      }
+    },
+    "gitEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Set to true to integrate the data factory with GIT."
+      }
+    },
+    "gitAccountName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required if gitEnabled is set to true. Account name of the git repository."
+      }
+    },
+    "gitRepositoryName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required if gitEnabled is set to true. Name of the git repository."
+      }
+    },
+    "gitBranchName": {
+      "defaultValue": "master",
+      "type": "String",
+      "metadata": {
+        "description": "Required if gitEnabled is set to true. Collaboration branch name."
+      }
+    },
+    "gitRootFolder": {
+      "defaultValue": "/",
+      "type": "String",
+      "metadata": {
+        "description": "Required if gitEnabled is set to true. Root folder."
+      }
+    },
+    "gitProjectName": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required if gitEnabled is set to true. Project name of the git repository."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Tags of the Data Factory resource."
+      }
+    }
+  },
+  "variables": {
+    "gitConfiguration": {
+      "repoConfiguration": {
+        "type": "FactoryVSTSConfiguration",
+        "accountName": "[parameters('gitAccountName')]",
+        "repositoryName": "[parameters('gitRepositoryName')]",
+        "collaborationBranch": "[parameters('gitBranchName')]",
+        "rootFolder": "[parameters('gitRootFolder')]",
+        "projectName": "[parameters('gitProjectName')]"
+      }
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2018-06-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.DataFactory/factories",
+      "tags": "[parameters('tags')]",
+      "identity": {
+        "type": "[parameters('identity')]"
+      },
+      "properties": "[if(parameters('gitEnabled'), variables('gitConfiguration'), '')]"
+    },
+    {
+      "name": "[concat(parameters('name'), '/adf-integration-runtime')]",
+      "type": "Microsoft.DataFactory/factories/integrationRuntimes",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "type": "SelfHosted",
+        "typeProperties": {}
+      },
+      "dependsOn": [
+        "[concat('Microsoft.DataFactory/factories/',parameters('name'))]"
+      ]
+    }
+  ],
+  "functions": [],
+  "outputs": {
+    "dataFactoryname": {
+      "type": "string",
+      "value": "[parameters('name')]",
+      "metadata": {
+        "description": "The name of the data factory"
+      }
+    }
+  }
+}

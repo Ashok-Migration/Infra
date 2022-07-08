@@ -1,0 +1,225 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-oopg-mtr-pre-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowActions": {
+      "value": {
+        "Condition": {
+          "actions": {
+            "HTTP": {
+              "inputs": {
+                "authentication": {
+                  "audience": "https://storage.azure.com/",
+                  "type": "ManagedServiceIdentity"
+                },
+                "body": "@decodeBase64(variables('FileContent'))",
+                "headers": {
+                  "Content-Length": "@{triggerOutputs()['headers']['Content-Length']}",
+                  "x-ms-blob-content-disposition": "attachment; filename=@{variables('FileName')}",
+                  "x-ms-blob-type": "BlockBlob",
+                  "x-ms-meta-type": "@{triggerOutputs()['headers']['x-ms-meta-type']}",
+                  "x-ms-version": "2020-08-04"
+                },
+                "method": "PUT",
+                "uri": "https://stcppoopgmtprewe01.blob.core.windows.net/@{triggerOutputs()['headers']['x-ms-meta-type']}/@{variables('FileName')}"
+              },
+              "runAfter": {},
+              "type": "Http"
+            },
+            "Response": {
+              "inputs": {
+                "body": "@body('HTTP')",
+                "statusCode": "@outputs('HTTP')['statusCode']"
+              },
+              "kind": "Http",
+              "runAfter": {
+                "HTTP": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Response"
+            }
+          },
+          "else": {
+            "actions": {
+              "Response_2": {
+                "inputs": {
+                  "body": {
+                    "message": "Invalid value in x-ms-meta-type header"
+                  },
+                  "statusCode": 500
+                },
+                "kind": "Http",
+                "runAfter": {},
+                "type": "Response"
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "contains": [
+                  "@parameters('x-ms-meta-type')",
+                  "@triggerOutputs()['headers']['x-ms-meta-type']"
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "For_each": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "For_each": {
+          "actions": {
+            "Set_FileContent": {
+              "inputs": {
+                "name": "FileContent",
+                "value": "@{base64(items('For_each')?['body'])}"
+              },
+              "runAfter": {},
+              "type": "SetVariable"
+            },
+            "Set_FileName": {
+              "inputs": {
+                "name": "FileName",
+                "value": "@{trim(replace(replace(split(items('For_each')?['headers']['Content-Disposition'],';')[2],'filename=',''),'\"',''))}"
+              },
+              "runAfter": {
+                "Set_FileContent": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable"
+            }
+          },
+          "foreach": "@triggerBody()?['$multipart']",
+          "runAfter": {
+            "Initialize_FileContent": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "Initialize_FileContent": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileContent",
+                "type": "string"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_FileName": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Initialize_FileName": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileName",
+                "type": "string"
+              }
+            ]
+          },
+          "runAfter": {},
+          "type": "InitializeVariable"
+        }
+      }
+    },
+    "workflowTriggers": {
+      "value": {
+        "manual": {
+          "inputs": {
+            "schema": {
+              "properties": {
+                "$content": {
+                  "type": "string"
+                },
+                "$content-type": {
+                  "type": "string"
+                },
+                "$multipart": {
+                  "items": {
+                    "properties": {
+                      "body": {
+                        "type": "string"
+                      },
+                      "headers": {
+                        "properties": {
+                          "Content-Disposition": {
+                            "type": "string"
+                          },
+                          "Content-Type": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "headers",
+                      "body"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "kind": "Http",
+          "type": "Request"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "x-ms-meta-type": {
+          "defaultValue": [
+            "pgw-metering",
+            "pgw-transaction",
+            "pgw-settlement"
+          ],
+          "type": "Array"
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    }
+  }
+}

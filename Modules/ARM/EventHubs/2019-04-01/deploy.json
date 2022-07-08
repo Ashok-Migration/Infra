@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Specifies a project name to be used as Event Hub Namespace name."
+      }
+    },
+    "eventHubName": {
+      "type": "array",
+      "defaultValue": [
+      ],
+      "metadata": {
+        "description": "Optional. List of specific Event Hubs to create."
+      }
+    },
+    "consumerGroupName": {
+      "type": "array",
+      "defaultValue": [
+      ],
+      "metadata": {
+        "description": "Optional. List of specific Consumer Groups to create in each Event Hub."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Specifies the Azure location for all resources."
+      }
+    },
+    "eventHubSku": {
+      "type": "string",
+      "allowedValues": [ "Basic", "Standard" ],
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "Specifies the messaging tier for service Bus namespace."
+      }
+    },
+    "isCaptureEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies if capture feature should be enabled."
+      }
+    },
+    "storageAccount_capture": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Specifies the destination in case capture feature is enabled."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Tags of the Storage Account resource."
+      }
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-04-01",
+      "type": "Microsoft.EventHub/namespaces",
+      "name": "[parameters('projectName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('eventHubSku')]",
+        "tier": "[parameters('eventHubSku')]",
+        "capacity": 1
+      },
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "isAutoInflateEnabled": false,
+        "maximumThroughputUnits": 0
+      }
+    },
+    {
+      "apiVersion": "2017-04-01",
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "condition": "[not(empty(parameters('eventHubName')))]",
+      "name": "[concat(parameters('projectName'), '/', parameters('eventHubName')[copyIndex('eventHubNameLoop')].name)]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "eventHubNameLoop",
+        "count": "[if(empty(parameters('eventHubName')) , 1, length(parameters('eventHubName')))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('projectName'))]"
+      ],
+      "properties": {
+        "messageRetentionInDays": 7,
+        "partitionCount": 1,
+        "status": "Active",
+        "captureDescription": {
+          "enabled": "[parameters('isCaptureEnabled')]",
+          "encoding": "Avro",
+          "destination": {
+            "name": "EventHubArchive.AzureBlockBlob",
+            "properties": {
+              "storageAccountResourceId": "[parameters('storageAccount_capture')]",
+              "blobContainer": "platformevents",
+              "archiveNameFormat": "{Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}"
+            }
+          },
+          "intervalInSeconds": 300,
+          "sizeLimitInBytes": 314572800
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-04-01",
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "condition": "[not(empty(parameters('consumerGroupName')))]",
+      "name": "[concat(parameters('projectName'), '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub, '/', parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].consumerGroup)]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "consumerGroupNameLoop",
+        "count": "[if(empty(parameters('consumerGroupName')) , 1, length(parameters('consumerGroupName')))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('projectName'))]",
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('projectName'), parameters('consumerGroupName')[copyIndex('consumerGroupNameLoop')].eventHub)]"
+      ],
+      "properties": {}
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

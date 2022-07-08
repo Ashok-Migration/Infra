@@ -1,0 +1,184 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "networkSecurityGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Required. Name of the Network Security Group."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Optional. Location for all resources."
+            }
+        },
+        "networkSecurityGroupSecurityRules": {
+            "type": "array",
+            "metadata": {
+                "description": "Required. Array of Security Rules to deploy to the Network Security Group."
+            }
+        },
+        "flowLogsDeloy": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Optional. If 'true' - NSG Flow Logs feature will be deployed for the NSG. If 'false' - NSG Flow Logs featur will not be deployed. Default value - 'true'"
+            }
+        },
+        "flowLogsEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Optional. If 'true' - NSG Flow Logs feature will be enables on the NSG. If 'false' - NSG Flow Logs featur will not be enabled. Default value - 'true'"
+            }
+        },
+        "flowLogStorageAccountRGName": {
+            "type": "string",
+            "metadata": {
+                "description": "In case if NSG Flow Log is deployed - should be the name of the resource group of the storage account to store logs to."
+            }
+        },
+        "flowLogStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "In case if NSG Flow Log is deployed - should be the name of the storage account to store logs to."
+            }
+        },
+        "lockForDeletion": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Optional. Switch to lock NSG from deletion."
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {
+            },
+            "metadata": {
+                "description": "Optional. Tags of the NSG resource."
+            }
+        }
+    },
+    "variables": {
+        "emptyArray": [
+        ],
+        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+        "nsgFlowLogsStorageAccountId": "[resourceId(parameters('flowLogStorageAccountRGName'), 'Microsoft.Storage/storageAccounts', parameters('flowLogStorageAccountName'))]",
+        "nsgFlowLogName": "[concat('NetworkWatcher_uaenorth/Microsoft.Network', resourceGroup().name, parameters('networkSecurityGroupName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-09-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('networkSecurityGroupName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "copy": [
+                    {
+                        "name": "securityRules",
+                        "count": "[length(parameters('networkSecurityGroupSecurityRules'))]",
+                        "input": {
+                            "name": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].name]",
+                            "properties": {
+                                "description": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.description]",
+                                "access": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.access]",
+                                "destinationAddressPrefix": "[if(equals(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationAddressPrefix, ''), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationAddressPrefix)]",
+                                "destinationAddressPrefixes": "[if(equals(length(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationAddressPrefixes), 0), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationAddressPrefixes)]",
+                                "destinationApplicationSecurityGroups": "[if(equals(length(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationApplicationSecurityGroups), 0), json('null'), concat(variables('emptyArray'), array(json(concat('{\"id\": \"', resourceId('Microsoft.Network/applicationSecurityGroups', parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationApplicationSecurityGroups[0].name), '\"', ',', '\"location\": \"', parameters('location'), '\"}')))))]",
+                                "destinationPortRanges": "[if(equals(length(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationPortRanges), 0), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationPortRanges)]",
+                                "destinationPortRange": "[if(equals(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationPortRange, ''), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.destinationPortRange)]",
+                                "direction": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.direction]",
+                                "priority": "[int(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.priority)]",
+                                "protocol": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.protocol]",
+                                "sourceAddressPrefix": "[if(equals(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourceAddressPrefix, ''), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourceAddressPrefix)]",
+                                "sourceApplicationSecurityGroups": "[if(equals(length(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourceApplicationSecurityGroups), 0), json('null'), concat(variables('emptyArray'), array(json(concat('{\"id\": \"', resourceId('Microsoft.Network/applicationSecurityGroups', parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourceApplicationSecurityGroups[0].name), '\"', ',', '\"location\": \"', parameters('location'), '\"}')))))]",
+                                "sourcePortRanges": "[if(equals(length(parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourcePortRanges), 0), json('null'), parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourcePortRanges)]",
+                                "sourcePortRange": "[parameters('networkSecurityGroupSecurityRules')[copyIndex('securityRules')].properties.sourcePortRange]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "providers/locks",
+                    "apiVersion": "2016-09-01",
+                    "condition": "[parameters('lockForDeletion')]",
+                    "name": "Microsoft.Authorization/networkSecurityGroupDoNotDelete",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+                    ],
+                    "comments": "Resource lock on Network Security Group",
+                    "properties": {
+                        "level": "CannotDelete"
+                    }
+                }
+            ]
+        },
+        {
+            "condition": "[parameters('flowLogsDeloy')]",
+            "dependsOn": [
+                "[parameters('networkSecurityGroupName')]"
+            ],
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "DEP-NSG-FlowLog",
+            "resourceGroup": "NetworkWatcherRG",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/networkWatchers/FlowLogs",
+                            "apiVersion": "2019-11-01",
+                            "name": "[variables('nsgFlowLogName')]",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "targetResourceId": "[variables('nsgId')]",
+                                "storageId": "[variables('nsgFlowLogsStorageAccountId')]",
+                                "enabled": "[parameters('flowLogsEnabled')]",
+                                "flowAnalyticsConfiguration": {},
+                                "retentionPolicy": {},
+                                "format": {}
+                                }
+                        }
+                    ]
+                }
+            }            
+        }
+    ],
+    "outputs": {
+        "networkSecurityGroupResourceGroup": {
+            "type": "string",
+            "value": "[resourceGroup().name]",
+            "metadata": {
+                "description": "The name of the Resource Group the Network Security Groups were created in."
+            }
+        },
+        "networkSecurityGroupResourceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+            "metadata": {
+                "description": "The Resource Ids of the Network Security Group deployed."
+            }
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "value": "[parameters('networkSecurityGroupName')]",
+            "metadata": {
+                "description": "The Name of the Network Security Group deployed."
+            }
+        }
+    }
+}

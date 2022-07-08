@@ -1,0 +1,178 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "0.9.0.0",
+  "parameters": {
+    "clusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the HDInsight cluster to create."
+      }
+    },
+    "clusterLoginUserName": {
+      "type": "string",
+      "defaultValue": "admin",
+      "metadata": {
+        "description": "These credentials can be used to submit jobs to the cluster and to log into cluster dashboards."
+      }
+    },
+    "clusterLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope",
+      "metadata": {
+        "description": "The location where all azure resources will be deployed."
+      }
+    },
+    "clusterVersion": {
+      "type": "string",
+      "defaultValue": "3.6",
+      "metadata": {
+        "description": "HDInsight cluster version."
+      }
+    },
+    "clusterWorkerNodeCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "The number of nodes in the HDInsight cluster."
+      }
+    },
+    "clusterKind": {
+      "type": "string",
+      "defaultValue": "SPARK",
+      "metadata": {
+        "description": "The type of the HDInsight cluster to create."
+      }
+    },
+    "sshUserName": {
+      "type": "string",
+      "defaultValue": "sshuser",
+      "metadata": {
+        "description": "These credentials can be used to remotely access the cluster."
+      }
+    },
+    "sshPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+      }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-03-01-preview",
+      "name": "[parameters('clusterName')]",
+      "type": "Microsoft.HDInsight/clusters",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "Microsoft.Storage/storageAccounts/sthdiclusterdev01"
+      ],
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "clusterVersion": "[parameters('clusterVersion')]",
+        "osType": "Linux",
+        "tier": "standard",
+        "clusterDefinition": {
+          "kind": "[parameters('clusterKind')]",
+          "componentVersion": {
+            "Spark": "2.3"
+          },
+          "configurations": {
+            "gateway": {
+              "restAuthCredential.isEnabled": true,
+              "restAuthCredential.username": "[parameters('clusterLoginUserName')]",
+              "restAuthCredential.password": "[parameters('clusterLoginPassword')]"
+            }
+          }
+        },
+        "storageProfile": {
+          "storageaccounts": [
+            {
+              "name": "sthdiclusterdev01.blob.core.windows.net",
+              "isDefault": true,
+              "container": "hadoop-cpd-data-dev-we-01",
+              "key": "[listKeys('Microsoft.Storage/storageAccounts/sthdiclusterdev01', '2015-05-01-preview').key1]"
+            }
+          ]
+        },
+        "computeProfile": {
+          "roles": [
+            {
+              "autoscale": null,
+              "name": "headnode",
+              "minInstanceCount": 1,
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "Standard_D13_V2"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "[parameters('sshUserName')]",
+                  "password": "[parameters('sshPassword')]"
+                },
+                "windowsOperatingSystemProfile": null
+              },
+              "virtualNetworkProfile": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01",
+                "subnet": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-hdi-dev-we-01"
+              },
+              "scriptActions": [],
+              "dataDisksGroups": null
+            },
+            {
+              "autoscale": {
+                "capacity": {
+                  "minInstanceCount": 2,
+                  "maxInstanceCount": 5
+                },
+                "recurrence": null
+              },
+              "name": "workernode",
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "Standard_D13_V2"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "[parameters('sshUserName')]",
+                  "password": "[parameters('sshPassword')]"
+                },
+                "windowsOperatingSystemProfile": null
+              },
+              "virtualNetworkProfile": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01",
+                "subnet": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-net-dev-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpd-pltf-dev-we-01/subnets/snet-cpd-pltf-hdi-dev-we-01"
+              },
+              "scriptActions": [],
+              "dataDisksGroups": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "sthdiclusterdev01",
+      "apiVersion": "2015-05-01-preview",
+      "location": "West Europe",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    }
+  ],
+  "variables": {},
+  "outputs": {},
+  "functions": []
+}

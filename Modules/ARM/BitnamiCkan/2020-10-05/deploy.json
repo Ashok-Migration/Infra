@@ -1,0 +1,1739 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appPassword": {
+      "type": "securestring",
+      "maxLength": 32,
+      "metadata": {
+        "description": "Application password"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "australiacentral",
+        "canadacentral",
+        "eastus",
+        "eastus2",
+        "northcentralus",
+        "northeurope",
+        "southeastasia",
+        "uksouth",
+        "westeurope",
+        "westus2"
+      ]
+    },
+    "stackId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 23,
+      "metadata": {
+        "description": "Stack ID - it is the Application Stack identifier."
+      }
+    },
+    "authenticationType": {
+      "type": "string",
+      "defaultValue": "password",
+      "allowedValues": [
+        "password",
+        "sshPublicKey"
+      ],
+      "metadata": {
+        "description": "Authentication type"
+      }
+    },
+    "adminUsername": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "OS Admin Username"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "OS Admin password"
+      }
+    },
+    "sshKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D1_v2",
+      "metadata": {
+        "description": "Size of the VM"
+      }
+    },
+    "vmZones": {
+      "type": "array",
+      "defaultValue": [
+        "1",
+        "2",
+        "3"
+      ],
+      "metadata": {
+        "description": "Availability zones"
+      }
+    },
+    "customData": {
+      "type": "string",
+      "metadata": {
+        "description": "customData"
+      },
+      "defaultValue": "# blank"
+    },
+    "BitnamiTags": {
+      "type": "object",
+      "defaultValue": {
+        "provider": "0FE3856A-6009-4EB1-96C3-1774DA058F86"
+      }
+    },
+    "ckanCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "minValue": 1,
+      "maxValue": 32,
+      "metadata": {
+        "description": "CKAN nodes count"
+      }
+    },
+    "databaseUsername": {
+      "type": "string",
+      "defaultValue": "citus",
+      "metadata": {
+        "description": "Database Username"
+      }
+    },
+    "databasePassword": {
+      "type": "securestring",
+      "maxLength": 128,
+      "metadata": {
+        "description": "Database password"
+      }
+    },
+    "databaseWorkersVCores": {
+      "type": "int",
+      "defaultValue": 4,
+      "allowedValues": [
+        4,
+        8,
+        16,
+        32,
+        64
+      ],
+      "metadata": {
+        "description": "Number of VCores of the worker node"
+      }
+    },
+    "databaseWorkersStorageSizeMB": {
+      "type": "int",
+      "defaultValue": 524288,
+      "allowedValues": [
+        524288,
+        1048576,
+        2097152
+      ],
+      "metadata": {
+        "description": "Disk storage for the worker node."
+      }
+    },
+    "databaseSkuName": {
+      "type": "string",
+      "defaultValue": "GP_Gen5_2",
+      "allowedValues": [
+        "GP_Gen5_2",
+        "GP_Gen5_4",
+        "GP_Gen5_8",
+        "GP_Gen5_16",
+        "GP_Gen5_32",
+        "GP_Gen5_64",
+        "MO_Gen5_2",
+        "MO_Gen5_4",
+        "MO_Gen5_8",
+        "MO_Gen5_16",
+        "MO_Gen5_32"
+      ],
+      "metadata": {
+        "description": "PostgreSQL database pricing tier."
+      }
+    },
+    "databaseSkuSizeGB": {
+      "type": "int",
+      "minValue": 5,
+      "maxValue": 4096,
+      "defaultValue": 50,
+      "metadata": {
+        "description": "PostgreSQL database size (GB)."
+      }
+    },
+    "redisCacheSku": {
+      "type": "string",
+      "defaultValue": "Premium_P_1",
+      "allowedValues": [
+        "Premium_P_1",
+        "Premium_P_2",
+        "Premium_P_3",
+        "Premium_P_4"
+      ],
+      "metadata": {
+        "description": "Redis Cache pricing tier."
+      }
+    },
+    "solrDataDiskSize": {
+      "type": "int",
+      "defaultValue": 50,
+      "minValue": 10,
+      "maxValue": 2000,
+      "metadata": {
+        "description": "Data Disk Size in GB for the Apache Solr node"
+      }
+    },
+    "defaultSubnet": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Default Subnet Id"
+      }
+    },
+    "agwSubnet": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Gateway Subnet Id"
+      }
+    },
+    "redisSubnet": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Redis Subnet Id"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Storage Account Name"
+      }
+    },
+    "storageAccountSKU": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "Storage Account SKU"
+      }
+    },
+    "serverGroupName": {
+      "type": "string",
+      "defaultValue": "citus",
+      "metadata": {
+        "description": "Server Group Name"
+      }
+    },
+    "singlePostgreSQLServerName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Single PostgreSQL Server Name"
+      }
+    },
+    "singlePostgreSQLServerUsername": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Single PostgreSQL Server Username"
+      }
+    },
+    "singlePostgreSQLServerSKU": {
+      "type": "string",
+      "defaultValue": "GP_Gen5_4",
+      "metadata": {
+        "description": "Single PostgreSQL Server SKU"
+      }
+    },
+    "singlePostgreSQLServerTier": {
+      "type": "string",
+      "defaultValue": "GeneralPurpose",
+      "metadata": {
+        "description": "Single PostgreSQL Server Tier"
+      }
+    },
+    "singlePostgreSQLServerFamily": {
+      "type": "string",
+      "defaultValue": "Gen5",
+      "metadata": {
+        "description": "Single PostgreSQL Server Family"
+      }
+    },
+    "singlePostgreSQLServerCapacity": {
+      "type": "int",
+      "defaultValue": 4,
+      "metadata": {
+        "description": "Single PostgreSQL Server Capacity"
+      }
+    },
+    "singlePostgreSQLServerStorageProfile": {
+      "type": "object",
+      "defaultValue": {
+        "storageMB": 102400,
+        "backupRetentionDays": 7,
+        "geoRedundantBackup": "Disabled",
+        "storageAutogrow": "Enabled"
+      },
+      "metadata": {
+        "description": "Single PostgreSQL Storage Profile"
+      }
+    },
+    "singlePostgreSQLServerVersion": {
+      "type": "string",
+      "defaultValue": "11",
+      "metadata": {
+        "description": "Single PostgreSQL Server Version"
+      }
+    },
+    "singlePostgreSQLServerSSL": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Single PostgreSQL SSL Enforcement"
+      }
+    },
+    "singlePostgreSQLServerTLSVersion": {
+      "type": "string",
+      "defaultValue": "TLSEnforcementDisabled",
+      "metadata": {
+        "description": "Single PostgreSQL Server TLS Version"
+      }
+    },
+    "singlePostgreSQLServerInfrastructureEncryption": {
+      "type": "string",
+      "defaultValue": "Disabled",
+      "metadata": {
+        "description": "Single PostgreSQL Infrastructure Encryption"
+      }
+    },
+    "singlePostgreSQLServerPublicAccess": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Single PostgreSQL Server Public Access"
+      }
+    },
+    "redisName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Redis Instance Name"
+      }
+    },
+    "redisZones": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Availability zones"
+      }
+    },
+    "redisEnableNonSslPort": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable/Disable Non SSL Ports"
+      }
+    },
+    "redisMinimumTlsVersion": {
+      "type": "string",
+      "defaultValue": "1.2",
+      "metadata": {
+        "description": "Minimum TLS Version for Redis Instance"
+      }
+    },
+    "redisVersion": {
+      "type": "string",
+      "defaultValue": "4",
+      "metadata": {
+        "description": "Redis version"
+      }
+    },
+    "redisConfiguration": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Redis Configuration."
+      },
+      "type": "object"
+    },
+    "redisReplicasPerMaster": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Replicas per master."
+      }
+    },
+    "frontendVirtualMachineNames": {
+      "type": "array",
+      "metadata": {
+        "description": "Frontend VM Names"
+      }
+    },
+    "solrVirtualMachineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Solr VM Name"
+      }
+    },
+    "cacheVirtualMachineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Cache VM Name"
+      }
+    },
+    "applicationGatewayName": {
+      "type": "string",
+      "metadata": {
+        "description": "Application Gateway Name"
+      }
+    },
+    "azFirewallPublicIP": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Az Firewall Public IP"
+      }
+    },
+    "agwZones": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Availability Zones for Application Gateway"
+      }
+    },
+    "agwPrivateIP": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Gateway Private IP Address"
+      }
+    },
+    "frontendPorts": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "port_80",
+          "properties": {
+            "Port": 80
+          }
+        }
+      ]
+    },
+    "backendAddressPoolName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "backendAddressPools": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "backendPool",
+          "properties": {
+            "backendAddresses": []
+          }
+        }
+      ]
+    },
+    "backendHttpSettingName": {
+      "type": "string",
+      "defaultValue": "backendHttpSetting"
+    },
+    "backendHttpSettingsCollection": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "[parameters('backendHttpSettingName')]",
+          "properties": {
+            "Port": 80,
+            "Protocol": "Http",
+            "cookieBasedAffinity": "Disabled",
+            "requestTimeout": 60
+          }
+        }
+      ]
+    },
+    "httpListeners": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "httpListener",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), concat('/frontendIPConfigurations/', parameters('applicationGatewayName'), '-privateip'))]"
+            },
+            "frontendPort": {
+              "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_80')]"
+            },
+            "sslCertificate": null,
+            "protocol": "Http",
+            "hostName": null,
+            "hostNames": [],
+            "requireServerNameIndication": false
+          }
+        }
+      ]
+    },
+    "urlPathMaps": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "requestRoutingRules": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "probes": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "sslCertificates": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Application Gateway SSL Certificates"
+      }
+    },
+    "sslPolicyType": {
+      "type": "string",
+      "defaultValue": "Predefined",
+      "metadata": {
+        "description": "Type of the SSL policy"
+      }
+    },
+    "sslPolicyName": {
+      "type": "string",
+      "defaultValue": "AppGwSslPolicy20170401S",
+      "metadata": {
+        "description": "Name of the SSL policy"
+      }
+    },
+    "managedIdentityId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Gateway Managed Identity"
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "type": "int",
+      "defaultValue": 365,
+      "minValue": 0,
+      "maxValue": 365,
+      "metadata": {
+        "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+      }
+    },
+    "diagnosticStorageAccountId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+      }
+    },
+    "workspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource identifier of Log Analytics."
+      }
+    },
+    "eventHubAuthorizationRuleId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+      }
+    },
+    "eventHubName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+      }
+    },
+    "utcYear": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyy')]",
+      "metadata": {
+        "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+      }
+    },
+    "accountSasProperties": {
+      "type": "object",
+      "defaultValue": {
+        "signedServices": "b",
+        "signedPermission": "rl",
+        "signedResourceTypes": "sco",
+        "keyToSign": "key2",
+        "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 100)), '-12-31T23:59:59Z')]"
+      },
+      "metadata": {
+        "description": "SAS account properties"
+      }
+    },
+    "storageMinimumTlsVersion": {
+      "type": "string",
+      "defaultValue": "TLS1_2",
+      "metadata": {
+        "description": "Minimum TLS Version for Storage Account"
+      }
+    },
+    "allowBlobPublicAccess": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "vNetId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Virtual Network Identifier used to create a service endpoint."
+      }
+    },
+    "networkAcls": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Networks ACLs, this value contains IPs to whitelist and/or Subnet information."
+      }
+    },
+    "vmDiagnosticsEventVolume": {
+      "type": "string",
+      "defaultValue": "Medium",
+      "metadata": {
+        "description": "VM Diagnostics Event Volume"
+      }
+    },
+    "vmDiagnosticsMetricAggregation": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "VM Diagnostics Metric Aggregation"
+      }
+    },
+    "vmDiagnosticsPerformanceCounters": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "VM Diagnostics Performance Counters"
+      }
+    },
+    "vmDiagnosticsSyslogEvents": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "VM Diagnostics Sys Log Events"
+      }
+    },
+    "vmDiagnosticsSampleRate": {
+      "type": "int",
+      "defaultValue": 15,
+      "metadata": {
+        "description": "VM Diagnostics Sample Rate in Seconds"
+      }
+    },
+    "vmImageReferenceVersion": {
+      "type": "string",
+      "defaultValue": "2.9.2107271211",
+      "metadata": {
+        "description": "VM Reference Image Version. Pass Latest value as Default Value and Deployed VM Image version in parameter file."
+      }
+    },
+    "solrvmImageReferenceVersion": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "VM Reference Image Version. Pass Latest value as Default Value and Deployed VM Image version in parameter file."
+      }
+    },
+    "enableHa": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable HA for Server Groups."
+      }
+    },
+    "coordinatorCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Coordinator Servers"
+      }
+    },
+    "workersCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Number of Worker Servers"
+      }
+    }
+  },
+    "variables": {
+        "appId": "ckan",
+        "appVersion": "2.9.2-0",
+        "uniqueDeploymentString": "[uniqueString(subscription().subscriptionId, ' ', resourceGroup().id, ' ', deployment().name, parameters('stackId'), variables('appId'), variables('appVersion'), parameters('appPassword'))]",
+        "cloudAccountId": "[uniqueString(subscription().subscriptionId)]",
+        "stackUniqueId": "[concat(parameters('stackId'), uniquestring(resourceGroup().id))]",
+        "dnsPrefix": "[concat(variables('stackUniqueId'), '-')]",
+        "coordinatorFqdn": "[concat('c.', toLower(parameters('serverGroupName')), '.postgres.database.azure.com')]",
+        "linuxConfigurationSshPublicKey": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "/home/bitnami/.ssh/authorized_keys",
+                        "keyData": "[parameters('sshKey')]"
+                    }
+                ]
+            }
+        },
+        "linuxConfigurationPassword": {
+            "disablePasswordAuthentication": false
+        },
+        "appGw": {
+            "id": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]",
+            "name": "[parameters('applicationGatewayName')]",
+            "gateways": [
+                {
+                    "name": "[concat(parameters('stackId'), 'agw-gateway')]",
+                    "subnet": "[parameters('agwSubnet')]"
+                }
+            ],
+            "frontends": [
+                {
+                    "name": "[concat(parameters('applicationGatewayName'), '-publicIP')]",
+                    "publicIPAddress": "[concat(parameters('applicationGatewayName'), '-ip')]"
+                }
+            ]
+        },
+        "defaultRequestRoutingRules": [
+            {
+                "Name": "routingRule",
+                "properties": {
+                    "RuleType": "Basic",
+                    "httpListener": {
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/httpListeners/httpListener')]"
+                    },
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendAddressPools/backendPool')]"
+                    },
+                    "backendHttpSettings": {
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways',parameters('applicationGatewayName')), '/backendHttpSettingsCollection/backendHttpSetting')]"
+                    }
+                }
+            }
+        ],
+        "agwIdentity": {
+            "type": "UserAssigned",
+            "userAssignedIdentities": {
+                "[parameters('managedIdentityId')]": {}
+            }
+        },
+        "databasePassword": "[parameters('databasePassword')]",
+        "databaseAdministratorLogin": "[parameters('databaseUsername')]",
+        "singlePostgreSQLServerAdministratorLogin": "[parameters('singlePostgreSQLServerUsername')]",
+        "databaseSkuSizeMB": "[mul(parameters('databaseSkuSizeGB'), 1024)]",
+        "redisCacheSkuName": "[split(parameters('redisCacheSku'), '_')[0]]",
+        "redisCacheSkuFamily": "[split(parameters('redisCacheSku'), '_')[1]]",
+        "redisCacheSkuCapacity": "[split(parameters('redisCacheSku'), '_')[2]]",
+        "machineCount": "[parameters('ckanCount')]",
+        "citusServerGroupName": "[parameters('serverGroupName')]",
+        "coordinatorStorageSizeMB": 524288,
+        "coordinatorVcores": 4,
+        "citusStandbyCount": 0,
+        "solrNicName": "[concat(parameters('solrVirtualMachineName'), '-0nic')]",
+        "memcachedNicName": "[concat(parameters('cacheVirtualMachineName'), '-0nic')]",
+        "backendAddressPoolId": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), parameters('backendAddressPoolName'))]",
+        "storageDiagnosticsMetrics": [
+            {
+                "category": "Transaction",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "storageDiagnosticsLogs": [
+            {
+                "category": "StorageRead",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageWrite",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "StorageDelete",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsMetricsAll": [
+            {
+                "category": "AllMetrics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogsGreSQL": [
+            {
+                "category": "PostgreSQLLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogsGreSQLSingle": [
+            {
+                "category": "PostgreSQLLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "QueryStoreRuntimeStatistics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "QueryStoreWaitStatistics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogsAGW": [
+            {
+                "category": "ApplicationGatewayAccessLog",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "ApplicationGatewayPerformanceLog",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "ApplicationGatewayFirewallLog",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsLogsPublicIP": [
+            {
+                "category": "DDoSProtectionNotifications",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
+                }
+            },
+            {
+                "category": "DDoSMitigationFlowLogs",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
+                }
+            },
+            {
+                "category": "DDoSMitigationReports",
+                "enabled": true,
+                "retentionPolicy": {
+                    "enabled": true,
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]"
+                }
+            }
+        ],
+        "virtualNetworkRules": {
+            "copy": [
+                {
+                    "name": "virtualNetworkRules",
+                    "count": "[if(empty(parameters('networkAcls')), 0, length(parameters('networkAcls').virtualNetworkRules))]",
+                    "input": {
+                        "id": "[concat(parameters('vNetId'), '/subnets/', parameters('networkAcls').virtualNetworkRules[copyIndex('virtualNetworkRules')].subnet)]"
+                    }
+                }
+            ]
+        },
+        "networkAcls": {
+            "bypass": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').bypass)]",
+            "defaultAction": "[if(empty(parameters('networkAcls')), json('null'), parameters('networkAcls').defaultAction)]",
+            "virtualNetworkRules": "[if(empty(parameters('networkAcls')), json('null'), variables('virtualNetworkRules').virtualNetworkRules)]",
+            "ipRules": "[if(empty(parameters('networkAcls')), json('null'), if(equals(length(parameters('networkAcls').ipRules), 0), json('null'), parameters('networkAcls').ipRules))]"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-06-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "sku": {
+                "name": "[parameters('storageAccountSKU')]"
+            },
+            "kind": "Storage",
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "minimumTlsVersion": "[parameters('storageMinimumTlsVersion')]",
+                "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]",
+                "networkAcls": "[if(empty(parameters('networkAcls')), json('null'), variables('networkAcls'))]"
+            }
+        },
+        {
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2018-07-01",
+            "properties": {
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 30
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticsettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(parameters('storageAccountName'),'/default/Microsoft.Insights/', 'service')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices/', parameters('storageAccountName'), 'default')]"
+            ],
+            "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+            "properties": {
+                "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('storageDiagnosticsMetrics'))]",
+                "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('storageDiagnosticsLogs'))]"
+            }
+        },
+        {
+            "apiVersion": "2020-10-05-privatepreview",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.DBforPostgreSQL/serverGroupsv2",
+            "name": "[variables('citusServerGroupName')]",
+            "properties": {
+                "createMode": "Default",
+                "administratorLogin": "citus",
+                "administratorLoginPassword": "[variables('databasePassword')]",
+                "backupRetentionDays": 35,
+                "enableMx": false,
+                "enableZfs": false,
+                "previewFeatures": true,
+                "postgresqlVersion": "11",
+                "serverRoleGroups": [
+                    {
+                        "name": "",
+                        "role": "Coordinator",
+                        "serverCount": "[parameters('coordinatorCount')]",
+                        "serverEdition": "GeneralPurpose",
+                        "vCores": "[variables('coordinatorVcores')]",
+                        "storageQuotaInMb": "[variables('coordinatorStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]"
+                    },
+                    {
+                        "name": "",
+                        "role": "Worker",
+                        "serverCount": "[parameters('workersCount')]",
+                        "serverEdition": "MemoryOptimized",
+                        "vCores": "[parameters('databaseWorkersVCores')]",
+                        "storageQuotaInMb": "[parameters('databaseWorkersStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]",
+                        "enablePublicIpAccess": false
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('singlePostgreSQLServerName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('singlePostgreSQLServerSKU')]",
+                "tier": "[parameters('singlePostgreSQLServerTier')]",
+                "family": "[parameters('singlePostgreSQLServerFamily')]",
+                "capacity": "[parameters('singlePostgreSQLServerCapacity')]"
+            },
+            "properties": {
+                "createMode": "Default",
+                "administratorLogin": "[variables('singlePostgreSQLServerAdministratorLogin')]",
+                "administratorLoginPassword": "[variables('databasePassword')]",
+                "storageProfile": "[parameters('singlePostgreSQLServerStorageProfile')]",
+                "version": "[parameters('singlePostgreSQLServerVersion')]",
+                "sslEnforcement": "[parameters('singlePostgreSQLServerSSL')]",
+                "minimalTlsVersion": "[parameters('singlePostgreSQLServerTLSVersion')]",
+                "infrastructureEncryption": "[parameters('singlePostgreSQLServerInfrastructureEncryption')]",
+                "publicNetworkAccess": "[parameters('singlePostgreSQLServerPublicAccess')]"
+            },
+            "resources": [
+                {
+                    "name": "AllowCkanVnetRule",
+                    "condition": "[equals(parameters('singlePostgreSQLServerPublicAccess'),'Enabled')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('singlePostgreSQLServerName'))]"
+                    ],
+                    "type": "virtualNetworkRules",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "virtualNetworkSubnetId": "[parameters('defaultSubnet')]"
+                    }
+                },
+                {
+                    "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('singlePostgreSQLServerName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('singlePostgreSQLServerName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsGreSQLSingle'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Cache/Redis",
+            "name": "[parameters('redisName')]",
+            "zones": "[parameters('redisZones')]",
+            "properties": {
+                "enableNonSslPort": "[parameters('redisEnableNonSslPort')]",
+                "minimumTlsVersion": "[parameters('redisMinimumTlsVersion')]",
+                "redisVersion": "[parameters('redisVersion')]",
+                "redisConfiguration": "[parameters('redisConfiguration')]",
+                "replicasPerMaster": "[parameters('redisReplicasPerMaster')]",
+                "sku": {
+                    "name": "[variables('redisCacheSkuName')]",
+                    "family": "[variables('redisCacheSkuFamily')]",
+                    "capacity": "[variables('redisCacheSkuCapacity')]"
+                },
+                "subnetId": "[parameters('redisSubnet')]"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Cache/Redis/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('redisName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Cache/Redis/', parameters('redisName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(parameters('stackId'), '-ckan', copyIndex() ,'nic')]",
+            "apiVersion": "2020-03-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "copy": {
+                "name": "niccopy",
+                "count": "[parameters('ckanCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('solrVirtualMachineName'), '/extensions/setupMachine')]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('cacheVirtualMachineName'), '/extensions/setupMachine')]",
+                "[concat('Microsoft.Network/applicationGateways/', variables('appGw').name)]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('defaultSubnet')]"
+                            },
+                            "applicationGatewayBackendAddressPools": [
+                                {
+                                    "id": "[variables('backendAddressPoolId')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('stackId'), '-ckan', copyIndex() ,'nic', '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', parameters('stackId'), '-ckan', copyIndex() ,'nic')]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
+        },
+        {
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('solrNicName')]",
+            "apiVersion": "2020-03-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('defaultSubnet')]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('solrNicName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', variables('solrNicName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
+        },
+        {
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('memcachedNicName')]",
+            "apiVersion": "2020-03-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('defaultSubnet')]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/networkInterfaces/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('memcachedNicName'), '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', variables('memcachedNicName'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[json('null')]"
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('frontendVirtualMachineNames')[copyIndex('vmcopy')]]",
+            "copy": {
+                "name": "vmcopy",
+                "count": "[parameters('ckanCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', concat(concat(parameters('stackId'), '-ckan'), copyIndex(), 'nic'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('solrVirtualMachineName'), '/extensions/setupMachine')]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('cacheVirtualMachineName'), '/extensions/setupMachine')]",
+                "[concat('Microsoft.Cache/Redis/', parameters('redisName'))]",
+                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('citusServerGroupName'))]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "zones": [
+                "[parameters('vmZones')[copyIndex('vmcopy')]]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('frontendVirtualMachineNames')[copyIndex('vmcopy')]]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[if(equals(parameters('authenticationType'), 'password'), parameters('adminPassword'), '')]",
+                    "customData": "[base64(concat('\n', '# PROVISIONER_APP_PASSWORD=', parameters('appPassword'), '\n', '# PROVISIONER_PEER_NODES_COUNT=', variables('machineCount'), '\n', '# PROVISIONER_PEER_NODES_INDEX=', copyIndex(), '\n', '# PROVISIONER_PEER_NODES_PREFIX=', parameters('stackId'), '\n', '# PROVISIONER_PEER_PASSWORD_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_SHARED_UNIQUE_ID_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_CLOUD_ACCOUNT_ID=', variables('cloudAccountId'), '\n', '# PROVISIONER_TIER=', 'ckan', '\n', '# PROVISIONER_STORAGE_ACCOUNT_NAME=', parameters('storageAccountName'), '\n', '# PROVISIONER_STORAGE_ACCOUNT_KEY=', listKeys(parameters('storageAccountName'), '2019-06-01').keys[0].value, '\n', '# PROVISIONER_EXTRA_SERVICES=', base64(concat('[{\"name\":\"postgresql\",\"host\":\"', variables('coordinatorFqdn'), '\",\"port\":\"5432\",\"user\":\"', variables('databaseAdministratorLogin'), '\",\"password\":\"', variables('databasePassword'), '\",\"ssl\":\"yes\"},{\"name\":\"solr\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('solrNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"8983\"},{\"name\":\"memcached\",\"host\":\"', reference(resourceId('Microsoft.Network/networkInterfaces' , variables('memcachedNicName'))).ipConfigurations[0].properties.privateIPAddress, '\",\"port\":\"11211\"},{\"name\":\"redis\",\"host\":\"', reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).hostName, '\",\"port\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), '6379', '6380'), '\",\"password\":\"', listKeys(parameters('redisName'), '2019-07-01').primaryKey, '\",\"ssl\":\"', if(bool(reference(resourceId('Microsoft.Cache/Redis', parameters('redisName'))).enableNonSslPort), 'no', 'yes'), '\"}]')), '\n', '# PROVISIONER_PUBLIC_ENDPOINT=', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('appGw').frontends[0].publicIPAddress)).dnsSettings.fqdn, '\n', parameters('customData')))]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), variables('linuxConfigurationPassword'), variables('linuxConfigurationSshPublicKey'))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "bitnami",
+                        "offer": "ckan-ckan-topology-multitier-image",
+                        "sku": "default",
+                        "version": "[parameters('vmImageReferenceVersion')]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('frontendVirtualMachineNames')[copyIndex('vmcopy')], '-disk-os-01')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(concat(parameters('stackId'), '-ckan'), copyIndex(), 'nic'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(parameters('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "plan": {
+                "publisher": "bitnami",
+                "product": "ckan-ckan-topology-multitier-image",
+                "name": "default"
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('frontendVirtualMachineNames')[copyIndex('vmCopy')])]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('frontendVirtualMachineNames')[copyIndex('vmCopy')])]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('frontendVirtualMachineNames')[copyIndex('vmextcopy')], '/setupMachine')]",
+            "copy": {
+                "name": "vmextcopy",
+                "count": "[parameters('ckanCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('frontendVirtualMachineNames')[copyIndex('vmextcopy')])]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": "sh /opt/bitnami/scripts/wait_provisioner_first_boot"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('solrVirtualMachineName')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('solrNicName'))]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('solrVirtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[if(equals(parameters('authenticationType'), 'password'), parameters('adminPassword'), '')]",
+                    "customData": "[base64(concat('\n', '# PROVISIONER_APP_PASSWORD=', parameters('appPassword'), '\n', '# PROVISIONER_PEER_NODES_COUNT=', variables('machineCount'), '\n', '# PROVISIONER_PEER_NODES_INDEX=', '0', '\n', '# PROVISIONER_PEER_NODES_PREFIX=', parameters('solrVirtualMachineName'), '\n', '# PROVISIONER_PEER_PASSWORD_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_SHARED_UNIQUE_ID_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_CLOUD_ACCOUNT_ID=', variables('cloudAccountId'), '\n', '# PROVISIONER_TIER=', 'solr', '\n', parameters('customData')))]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), variables('linuxConfigurationPassword'), variables('linuxConfigurationSshPublicKey'))]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "bitnami",
+                    "offer": "ckan-ckan-topology-multitier-image",
+                    "sku": "default",
+                    "version": "[if(not(empty(parameters('solrvmImageReferenceVersion'))), parameters('solrvmImageReferenceVersion'), parameters('vmImageReferenceVersion'))]"
+                  },
+                    "osDisk": {
+                        "name": "[concat(parameters('solrVirtualMachineName'),'-disk-os-01')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[concat(parameters('solrVirtualMachineName'),'-disk-data-01')]",
+                            "diskSizeGB": "[parameters('solrDataDiskSize')]",
+                            "lun": 0,
+                            "createOption": "empty"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('solrNicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(parameters('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "plan": {
+                "publisher": "bitnami",
+                "product": "ckan-ckan-topology-multitier-image",
+                "name": "default"
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('solrVirtualMachineName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('solrVirtualMachineName'))]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('solrVirtualMachineName'), '/setupMachine')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('solrVirtualMachineName'))]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": "sh /opt/bitnami/scripts/wait_provisioner_first_boot"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('cacheVirtualMachineName')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('memcachedNicName'))]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('cacheVirtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[if(equals(parameters('authenticationType'), 'password'), parameters('adminPassword'), '')]",
+                    "customData": "[base64(concat('\n', '# PROVISIONER_APP_PASSWORD=', parameters('appPassword'), '\n', '# PROVISIONER_PEER_NODES_COUNT=', variables('machineCount'), '\n', '# PROVISIONER_PEER_NODES_INDEX=', '0', '\n', '# PROVISIONER_PEER_NODES_PREFIX=', parameters('cacheVirtualMachineName'), '\n', '# PROVISIONER_PEER_PASSWORD_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_SHARED_UNIQUE_ID_INPUT=', variables('uniqueDeploymentString'), '\n', '# PROVISIONER_CLOUD_ACCOUNT_ID=', variables('cloudAccountId'), '\n', '# PROVISIONER_TIER=', 'memcached', '\n', parameters('customData')))]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), variables('linuxConfigurationPassword'), variables('linuxConfigurationSshPublicKey'))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "bitnami",
+                        "offer": "ckan-ckan-topology-multitier-image",
+                        "sku": "default",
+                        "version": "[parameters('vmImageReferenceVersion')]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('cacheVirtualMachineName'), '-disk-os-01')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('memcachedNicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(parameters('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "plan": {
+                "publisher": "bitnami",
+                "product": "ckan-ckan-topology-multitier-image",
+                "name": "default"
+            },
+            "resources": [
+                {
+                    "name": "Microsoft.Insights.VMDiagnosticsSettings",
+                    "type": "extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('cacheVirtualMachineName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "AzureDiagnostics"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Diagnostics",
+                        "type": "LinuxDiagnostic",
+                        "typeHandlerVersion": "3.0",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "storageAccountName": "[parameters('storageAccountName')]",
+                            "storageAccountSasToken": "[listAccountSas(parameters('StorageAccountName'), '2018-07-01', parameters('accountSasProperties')).accountSasToken]"
+                        },
+                        "settings": {
+                            "StorageAccount": "[parameters('storageAccountName')]",
+                            "ladCfg": {
+                                "diagnosticMonitorConfiguration": {
+                                    "eventVolume": "[parameters('vmDiagnosticsEventVolume')]",
+                                    "metrics": {
+                                        "metricAggregation": "[parameters('vmDiagnosticsMetricAggregation')]",
+                                        "resourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('cacheVirtualMachineName'))]"
+                                    },
+                                    "performanceCounters": "[parameters('vmDiagnosticsPerformanceCounters')]",
+                                    "syslogEvents": "[parameters('vmDiagnosticsSyslogEvents')]"
+                                },
+                                "sampleRateInSeconds": "[parameters('vmDiagnosticsSampleRate')]"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('cacheVirtualMachineName'), '/setupMachine')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('cacheVirtualMachineName'))]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": "sh /opt/bitnami/scripts/wait_provisioner_first_boot"
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-03-01",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('appGw').frontends[0].publicIPAddress]",
+            "sku": {
+                "name": "Standard"
+            },
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(variables('dnsPrefix'), 'agw-dns')]"
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/publicIPAddresses/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('appGw').frontends[0].publicIPAddress, '/Microsoft.Insights/service')]",
+                    "location": "[parameters('location')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/publicIPAddresses/', variables('appGw').frontends[0].publicIPAddress)]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsPublicIP'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "location": "[parameters('location')]",
+            "type": "Microsoft.Network/applicationGateways",
+            "name": "[variables('appGw').name]",
+            "apiVersion": "2020-11-01",
+            "comments": "Using API versions from https://github.com/Azure/azure-rest-api-specs/blob/master/profile/2019-03-01-hybrid.json in order to maintain Azure Stack compatibility",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('appGw').frontends[0].publicIPAddress)]"
+            ],
+            "tags": {
+                "provider": "[toUpper(parameters('BitnamiTags').provider)]"
+            },
+            "zones": "[parameters('agwZones')]",
+            "identity": "[if(empty(parameters('managedIdentityId')), json('null'), variables('agwIdentity'))]",
+            "properties": {
+                "sku": {
+                    "name": "Standard_v2",
+                    "tier": "Standard_v2",
+                    "capacity": 3
+                },
+                "gatewayIPConfigurations": [
+                    {
+                        "name": "appGatewayIpConfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[parameters('agwSubnet')]"
+                            }
+                        }
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[concat(parameters('applicationGatewayName'), '-publicip')]",
+                        "properties": {
+                            "PublicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('appGw').frontends[0].publicIPAddress)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('applicationGatewayName'), '-privateip')]",
+                        "properties": {
+                            "privateIPAddress": "[parameters('agwPrivateIP')]",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[parameters('agwSubnet')]"
+                            }
+                        }
+                    }
+                ],
+                "frontendPorts": "[parameters('frontendPorts')]",
+                "backendAddressPools": "[parameters('backendAddressPools')]",
+                "backendHttpSettingsCollection": "[parameters('backendHttpSettingsCollection')]",
+                "httpListeners": "[parameters('httpListeners')]",
+                "requestRoutingRules": "[if(empty(parameters('requestRoutingRules')), variables('defaultRequestRoutingRules'), parameters('requestRoutingRules'))]",
+                "sslCertificates": "[parameters('sslCertificates')]",
+                "sslPolicy": {
+                    "policyType": "[parameters('sslPolicyType')]",
+                    "policyName": "[parameters('sslPolicyName')]"
+                },
+                "probes": "[parameters('probes')]",
+                "urlPathMaps": "[parameters('urlPathMaps')]"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Network/applicationGateways/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(variables('appGw').name, '/Microsoft.Insights/service')]",
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/applicationGateways/', variables('appGw').name)]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetricsAll'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogsAGW'))]"
+                    }
+                }
+            ]
+        }
+    ],
+    "functions": [],
+    "outputs": {
+        "fqdn": {
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('appGw').frontends[0].publicIPAddress)).dnsSettings.fqdn]",
+            "type": "string"
+        }
+    }
+}

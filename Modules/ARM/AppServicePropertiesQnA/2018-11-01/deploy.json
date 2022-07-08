@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cognitiveServiceName": {
+            "type": "String"
+        },
+        "appInsightsResourceId": {
+            "type": "String"
+        },
+        "searchName": {
+            "type": "String"
+        },
+        "webAppName": {
+            "type": "String"
+        },
+        "cognitiveResourceGroupName": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "SearchServiceId": "[resourceId(parameters('cognitiveResourceGroupName'), 'Microsoft.Search/searchServices/',parameters('searchName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-02-01",
+            "name": "[concat(parameters('webAppName'), '/appsettings')]",
+            "type": "Microsoft.Web/sites/config",
+            "dependsOn": [],
+            "properties": {
+                "AzureSearchName": "[parameters('searchName')]",
+                "AzureSearchAdminKey": "[listAdminKeys(variables('SearchServiceId'), '2015-08-19').primaryKey]",
+                "UserAppInsightsKey": "[reference(parameters('appInsightsResourceId'), '2015-05-01').InstrumentationKey]",
+                "UserAppInsightsName": "[split(parameters('appInsightsResourceId'),'/')[8]]",
+                "UserAppInsightsAppId": "[reference(parameters('appInsightsResourceId'), '2015-05-01').AppId]",
+                "PrimaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-PrimaryEndpointKey')]",
+                "SecondaryEndpointKey": "[concat(parameters('cognitiveServiceName'), '-SecondaryEndpointKey')]",
+                "DefaultAnswer": "No good match found in KB.",
+                "QNAMAKER_EXTENSION_VERSION": "latest"
+            }
+        }
+    ],
+    "functions": [],
+    "outputs": {}
+}

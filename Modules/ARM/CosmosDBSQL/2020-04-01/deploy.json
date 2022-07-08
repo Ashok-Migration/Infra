@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "defaultValue": "[concat('sql-', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "Cosmos DB account name, max length 44 characters"
+      }
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "myDatabase",
+      "metadata": {
+        "description": "The name for the database"
+      }
+    },
+    "tags": {
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {
+    "accountName": "[toLower(parameters('accountName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2021-01-15",
+      "name": "[concat(variables('accountName'), '/', parameters('databaseName'))]",
+      "properties": {
+        "resource": {
+          "id": "[parameters('databaseName')]"
+        },
+        "options": {}
+      },
+      "tags": "[parameters('tags')]",
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases"
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}

@@ -1,0 +1,94 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "trm-notification-dev-sqcp-qa"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "profileStatus": {
+            "value": "Enabled"
+        },
+        "trafficRoutingMethod": {
+            "value": "Priority"
+        },
+        "relativeName": {
+            "value": "trm-notification-dev-sqcp-qa"
+        },
+        "ttl": {
+            "value": 60
+        },
+        "monitorConfig": {
+            "value": {
+                "profileMonitorStatus": "Online",
+                "protocol": "HTTPS",
+                "port": "443",
+                "path": "/",
+                "intervalInSeconds": 30,
+                "toleratedNumberOfFailures": 3,
+                "timeoutInSeconds": 10,
+                "customHeaders": [
+                    {
+                        "name": "host",
+                        "value": "notification.dev.sqcp.qa"
+                    }
+                ],
+                "expectedStatusCodeRanges": [ 
+                    {
+                        "min": 200,
+                        "max": 699
+                    }
+                ]
+            }
+        },
+        "endpoints": {
+            "value": [
+                {
+                    "name": "pipagw-cph-pltf-ntf-npd-we-01",
+                    "endpointStatus": "Enabled",
+                    "endpointMonitorStatus": "Online",
+                    "targetResourceId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-edgeagw-npd-we-01/providers/Microsoft.Network/publicIPAddresses/pipagw-cph-pltf-ntf-npd-we-01",
+                    "target": "pipagw-cph-pltf-ntf-npd-we-01.westeurope.cloudapp.azure.com",
+                    "weight": "1",
+                    "priority": "1",
+                    "endpointLocation": "westeurope"
+                },
+                {
+                    "name": "pip-cph-pltf-ntf-dev-we-01",
+                    "endpointStatus": "Enabled",
+                    "endpointMonitorStatus": "Online",
+                    "targetResourceId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-net-prd-we-01/providers/Microsoft.Network/publicIPAddresses/pip-cph-pltf-ntf-dev-we-01",
+                    "target": "pip-cph-pltf-ntf-dev-we-01.westeurope.cloudapp.azure.com",
+                    "weight": "1",
+                    "priority": "2",
+                    "endpointLocation": "westeurope"
+                }
+            ]
+        },
+        "trafficViewEnrollmentStatus": {
+            "value": "Disabled"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"  
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        }
+    }
+}

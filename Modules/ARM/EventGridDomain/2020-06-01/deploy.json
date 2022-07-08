@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventGridDomainName": {
+            "type": "string",
+            "metadata": {
+                "description": "Required. Specifies the Event Grid Domain resource name."
+            }
+        },
+        "eventGridDomainTopics": {
+            "type": "array",
+            "metadata": {
+                "description": "Specifies the Event Grid Domain topics to be created."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the Azure location for all resources."
+            }
+        },
+        "logAnalyticsWorkspace": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Specifies the log Analytics Workspace to use for Diagnostic Settings. Leave empty if not required."
+            }
+        },
+        "logAnalyticsWorkspaceRG": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Specifies the Resource Group log Analytics Workspace to use for Diagnostic Settings. Leave empty if not required."
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Tags of the Storage Account resource."
+            }
+        },
+        "publicNetworkAccess": {
+            "type": "string",
+            "defaultValue": "Enabled",
+            "metadata": {
+                "description": "Optional. Whether public network access enabled or disabled."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.EventGrid/domains",
+            "apiVersion": "2020-06-01",
+            "name": "[parameters('eventGridDomainName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "inputSchema": "EventGridSchema",
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.EventGrid/domains/providers/diagnosticSettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('eventGridDomainName'),'/Microsoft.Insights/',parameters('eventGridDomainName'),'-diag')]",
+                    "condition": "[and(not(empty(parameters('logAnalyticsWorkspace'))),not(empty(parameters('logAnalyticsWorkspaceRG'))))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.EventGrid/domains', parameters('eventGridDomainName'))]"
+                    ],
+                    "properties": {
+                        "metrics": [
+                            {
+                                "category": "AllMetrics",
+                                "timeGrain": null,
+                                "enabled": true
+                            }
+                        ],
+                        "logs": [
+                            {
+                                "category": "DeliveryFailures",
+                                "enabled": true
+                            },
+                            {
+                                "category": "PublishFailures",
+                                "enabled": true
+                            }
+                        ],
+                        "workspaceId": "[resourceId(subscription().subscriptionId,parameters('logAnalyticsWorkspaceRG'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.EventGrid/domains/topics",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('eventGridDomainName'), '/', parameters('eventGridDomainTopics')[copyIndex()])]",
+            "copy": {
+                "name": "eventdomaintopic",
+                "count": "[length(parameters('eventGridDomainTopics'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventGrid/domains', parameters('eventGridDomainName'))]"
+            ]
+        }
+    ],
+    "functions": [],
+    "outputs": {}
+}
