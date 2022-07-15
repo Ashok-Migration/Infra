@@ -1,29 +1,89 @@
-# Starter pipeline
-- task: AzureResourceManagerTemplateDeployment@3
-  inputs:
-    deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: 'sqcp-ado-spn-hub-qc'
-    subscriptionId: '4e865dba-bf2f-463a-a957-c69f5fb32ec5'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: 'Test'
-    location: 'UAE Central'
-    templateLocation: 'Linked artifact'
-    deploymentMode: 'Incremental'
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+name: $(resourceGroupNamePrd)
 
-trigger:
-- master
+variables:
+- name: vmImage
+  value: "ubuntu-latest"
+- name: templateFilePath
+  value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-extr-net-prd-qc-01/deploy.json
+- name: parameterFilePath
+  value: 
+- name: location
+  value: qatarcentral
+- name: resourceGroupNamePrd
+  value: rg-cph-pltf-iactst-prd-qc-01
+- name: serviceConnection
+  value: sqcp-ado-spn-hub-qc
+  
+trigger: none
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#      - master
+#  paths:
+#    include:
+#    - DeploymentOrchestration/TemplateBased/ARM/Contoso-private-hub/*
 
-pool:
-  vmImage: ubuntu-latest
+stages:
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- stage: Validate
+  jobs:
+  - job: ValidateTemplate
+    displayName: Validate Template
+    pool:
+      #name: $(PoolName)
+      vmImage: $(vmImage)
+    steps:
+      - task: AzurePowerShell@4
+        displayName: Validate template on $(resourceGroupNamePrd)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          ScriptType: InlineScript
+          inline: |
+              $ValidationErrors = $null
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+              $Location = "$(location)" -replace " ",""
+
+              $DeploymentInputs = @{
+                Location              = "$Location"
+                TemplateFile          = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                # TemplateParameterFile = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                Verbose               = $true
+                OutVariable           = "ValidationErrors"
+              }
+              
+              Test-AzDeployment @DeploymentInputs
+
+              if ($ValidationErrors)
+              {
+                Write-Error "Template is not valid."
+              }
+          azurePowerShellVersion: LatestVersion
+
+- stage: DeployTemplate
+  jobs:
+  - job: DeployTemplate
+    displayName: Deploy Template
+    pool:
+      #name: $(PoolName)
+      vmImage: $(vmImage)
+    steps:
+      - task: AzurePowerShell@4
+        displayName: Deploy template on $(resourceGroupNamePrd)
+        inputs:
+          azureSubscription: $(serviceConnection)
+          ScriptType: InlineScript
+          inline: |
+              $Location = "$(location)" -replace " ",""
+              
+              $DeploymentInputs = @{
+                Name                    = "$(resourceGroupNamePrd)-master"
+                Location                = "$Location"
+                TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
+                # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
+                DeploymentDebugLogLevel = "All"
+                Verbose                 = $true
+                ErrorAction             = "Stop"
+              }
+              New-AzDeployment @DeploymentInputs
+          azurePowerShellVersion: LatestVersion
