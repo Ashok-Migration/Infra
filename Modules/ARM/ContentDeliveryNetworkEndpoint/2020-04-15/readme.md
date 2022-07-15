@@ -1,1 +1,0 @@
-This template creates a CDN Profile Endpoint

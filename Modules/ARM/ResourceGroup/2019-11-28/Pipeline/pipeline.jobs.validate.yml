@@ -6,8 +6,8 @@ jobs:
   - job: ValidateModule
     displayName: Validate Module
     pool:
-      name: $(PoolName)
-    #   vmImage: $(vmImage)
+      #name: $(PoolName)
+      vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -37,9 +37,9 @@ jobs:
           testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
       - task: AzurePowerShell@4
-        displayName: "Validate $(moduleName) in $(resourceGroupNameNpd) via $(serviceConnectionNpd)"
+        displayName: "Validate $(moduleName) in $(resourceGroupNameNpd) via $(serviceConnectionPrd)"
         inputs:
-          azureSubscription: $(serviceConnectionNpd)
+          azureSubscription: $(serviceConnectionPrd)
           ScriptType: InlineScript
           inline: |
             $ValidationErrors = $null
