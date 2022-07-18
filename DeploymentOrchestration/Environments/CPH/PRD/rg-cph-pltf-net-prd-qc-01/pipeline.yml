@@ -1,19 +1,19 @@
 name: $(resourceGroupNamePrd)
 
 variables:
-- name: vmImage
-  value: "ubuntu-latest"
+- name: PoolName
+  value: "tasmumsagents"
 - name: templateFilePath
-  value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-pltf-net-prd-qc-01/deploy.json
+  value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-pltf-mon-prd-qc-01/deploy.json
 - name: parameterFilePath
   value: 
 - name: location
-  value: qatarcentral
-- name: resourceGroupNamePrd
-  value: rg-cph-pltf-net-prd-qc-01
+  value: westeurope
+- name: resourceGroupName
+  value: rg-cph-pltf-mon-prd-qc-01
 - name: serviceConnection
   value: sqcp-ado-spn-hub-qc
-  
+
 trigger: none
 #trigger:
 #  batch: true
@@ -31,13 +31,12 @@ stages:
   - job: ValidateTemplate
     displayName: Validate Template
     pool:
-      #name: $(PoolName)
       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupNamePrd)
         inputs:
-          azureSubscription: $(serviceConnection)
+          azureSubscription: $(serviceConnectionPrd)
           ScriptType: InlineScript
           inline: |
               $ValidationErrors = $null
@@ -65,13 +64,12 @@ stages:
   - job: DeployTemplate
     displayName: Deploy Template
     pool:
-      #name: $(PoolName)
       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupNamePrd)
         inputs:
-          azureSubscription: $(serviceConnection)
+          azureSubscription: $(serviceConnectionPrd)
           ScriptType: InlineScript
           inline: |
               $Location = "$(location)" -replace " ",""
