@@ -1,1 +1,0 @@
-This template deploys a ServiceBus Namespace Topic Subscription

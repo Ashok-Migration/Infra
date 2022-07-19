@@ -1,0 +1,1823 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "utcYear": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyyy')]",
+            "metadata": {
+                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+            }
+        }
+    },
+    "variables": {
+        "lockForDeletion": false,
+        "CUA": "pid-735d6c08-4f5b-403d-87d1-e4b50381e3c8",
+
+        "accountSasProperties": {
+            "signedServices": "bt",
+            "signedPermission": "racuw",
+            "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+            "signedResourceTypes": "co",
+            "signedProtocol": "https"
+        },
+        "componentStorageAccountId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiactstprdqc01",
+        "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
+        "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+        "containerName": "components",
+        "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
+        "location": "[deployment().location]"
+
+    },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-rg-cph-pltf-net-prd-qc-01",
+      "location": "[variables('location')]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-net-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    /*{
+      "apiVersion": "2019-08-01",
+      "name": "[variables('CUA')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },/**/
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-iacbl-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-iacbl-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-mgmt-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-mgmt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-adds-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-adds-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-adds-npd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-adds-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-dnspxy-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-dnspxy-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-dnspxy-npd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-dnspxy-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-route-cph-pltf-fwewmgt-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-fwewmgt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-cph-pltf-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-route-cph-pltf-iacbl-prd-qc-01",
+        "DEP-route-cph-pltf-mgmt-prd-qc-01",
+        "DEP-route-cph-pltf-adds-prd-qc-01",
+        "DEP-route-cph-pltf-adds-npd-qc-01",
+        "DEP-route-cph-pltf-dnspxy-prd-qc-01",
+        "DEP-route-cph-pltf-dnspxy-npd-qc-01",
+        "DEP-route-cph-pltf-fwewmgt-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-cph-pltf-edgeagw-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-pltf-edgeagw-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    }
+    /*{
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-cph-pltf-prd-qc-01-peering-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-cpd-pltf-dev-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-cph-pltf-prd-qc-01-peering-02",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-cpd-pltf-tst-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-apimanagement-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-apimanagement-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-tacc-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-tacc-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-dev-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-tra-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-tra-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-apimanagement-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-apimanagement-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-tst-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-apimanagement-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-apimanagement-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-opendata-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-opendata-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-tacc-uat-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-tacc-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-apimanagement-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-apimanagement-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-opendata-pre-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-opendata-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-account-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-account-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-api-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-api-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-apimanagement-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-apimanagement-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-bot-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-bot-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-cpadmin-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-cpadmin-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-developer-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-developer-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-marketplace-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-marketplace-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-mytasmu-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-mytasmu-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-notification-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-notification-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-upload-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-upload-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-opendata-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-opendata-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-trm-tacc-prd-sqcp-qa",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-rg-cph-pltf-net-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-tacc-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-trm-opendata-dev-sqcp-qa",
+            "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-net-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-opendata-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-trm-opendata-tst-sqcp-qa",
+            "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-net-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-opendata-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-dev-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-dev-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-tst-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-tst-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-uat-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-uat-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-pre-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-pre-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-trm-orderingtool-prd-sqcp-qa",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'TrafficManager/2021-09-22/Parameters/trm-orderingtool-prd-sqcp-qa-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        } /**/
+  ],
+"outputs": {}
+}
+

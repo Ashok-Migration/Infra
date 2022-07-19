@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cph-extr-net-prd-qc-01"
+        } ,
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.27.104.0/25"
+            ]
+        },
+        
+        "subnets": {
+            "value": [
+                {
+                    "name": "AzureFirewallSubnet",
+                    "addressPrefix": "172.27.104.0/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "AzureFirewallManagementSubnet",
+                    "addressPrefix": "172.27.104.64/26",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName":"",
+                    "routesRGName": ""
+                }
+
+            ]
+        },
+        "dnsServers":{
+            "value": [
+                "172.20.33.170"
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+          "value": {
+            "Environment": "Production"
+          }
+        }
+    }
+}
