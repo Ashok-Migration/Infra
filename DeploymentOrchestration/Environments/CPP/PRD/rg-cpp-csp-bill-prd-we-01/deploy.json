@@ -129,6 +129,27 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "DEP-apicon-cpp-csp-invoice-prd-we-01",
+      "resourceGroup": "rg-cpp-csp-bill-prd-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-csp-bill-prd-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'ApiConnectionKeyVault/2019-04-01/Parameters/apicon-cpp-csp-invoice-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
       "name": "DEP-logic-cpp-csp-bill-prd-we-01",
       "resourceGroup": "rg-cpp-csp-bill-prd-we-01",
@@ -172,6 +193,28 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-csp-bill-prd-we-01-New-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-logic-cpp-csp-invoice-prd-we-01",
+      "resourceGroup": "rg-cpp-csp-bill-prd-we-01",
+      "dependsOn": [
+        "DEP-rg-cpp-csp-bill-prd-we-01",
+        "DEP-apicon-cpp-csp-invoice-prd-we-01",
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpp-csp-invoice-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }
