@@ -9,8 +9,8 @@ variables:
   value: 
 - name: location
   value: qatarcentral
-- name: resourceGroupName
-  value: rg-cph-pltf-sec-prd-qc-01
+- name: resourceGroupNamePrd
+  value: rg-cph-pltf-net-prd-qc-01
 - name: serviceConnection
   value: sqcp-ado-spn-hub-qc
 
@@ -36,7 +36,7 @@ stages:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupNamePrd)
         inputs:
-          azureSubscription: $(serviceConnectionPrd)
+          azureSubscription: $(serviceConnection)
           ScriptType: InlineScript
           inline: |
               $ValidationErrors = $null
@@ -69,7 +69,7 @@ stages:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupNamePrd)
         inputs:
-          azureSubscription: $(serviceConnectionPrd)
+          azureSubscription: $(serviceConnection)
           ScriptType: InlineScript
           inline: |
               $Location = "$(location)" -replace " ",""
