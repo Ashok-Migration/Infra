@@ -1,0 +1,114 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmNames": {
+      "value": [ "vmdnspprdqc01" ]
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "standardImage": {
+      "value": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2019-Datacenter",
+        "version": "latest"
+      }
+    },
+    "osDisk": {
+      "value": {
+        "createOption": "fromImage",
+        "diskSizeGB": "128",
+        "managedDisk": {
+          "storageAccountType": "Standard_LRS"
+        }
+      }
+    },
+    "dataDisks": {
+      "value": [
+        {
+          "caching": "ReadOnly",
+          "createOption": "Empty",
+          "diskSizeGB": "256",
+          "managedDisk": {
+            "storageAccountType": "Standard_LRS"
+          }
+        }
+      ]
+    },
+    "NetworkDetails": {
+      "value": {
+        "vnetRG": "rg-cph-pltf-dnsp-prd-qc-01",
+        "vnet": "vnet-cph-pltf-prd-qc-01",
+        "subnet": "snet-cph-pltf-dnsp-prd-qc-01"
+      }
+    },
+    "adminUsername": {
+      "reference": {
+        "keyVault": {
+            "id": ""
+        //   "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-data-sec-pre-we-01/providers/Microsoft.KeyVault/vaults/kv-cpp-data-pre-we-01"
+        },
+        "secretName": "Tasmuqc123qc"
+      }
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": ""
+        },
+        "secretName": "Welcome12345@"
+      }
+    },
+    "availabilitySetName": {
+      "value": ""
+    },
+    "vmIPAddress": {
+      "value": "172.27.93.161"
+    },
+    "dnsServers": {
+      "value": [
+
+      ]
+    },
+    "useAvailabilityZone": {
+      "value": true
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "enableBootDiagnostics": {
+      "value": false
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": ""
+    },
+    "diagnosticStorageAccountName": {
+      "value": ""
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    },
+    "enablePublicIP": {
+      "value": false
+    },
+    "enableIPForwarding": {
+      "value": true
+    }
+  }
+}
