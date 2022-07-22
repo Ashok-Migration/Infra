@@ -2,7 +2,8 @@ jobs:
   - job: PublishArtifact
     displayName: Publish Artifact
     pool:
-      name: $(poolName)
+      #name: $(poolName)
+      vmImage: $(vmImage)
       
     variables:
       - template: pipeline.variables.yml
@@ -16,7 +17,8 @@ jobs:
   - job: PublishComponentPrd
     displayName: Publish Component Prd
     pool:
-      name: $(poolName)
+      #name: $(poolName)
+      vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -45,8 +47,8 @@ jobs:
   - job: PublishComponentPre
     displayName: Publish Component Pre
     pool:
-      name: $(poolName)
-      #vmImage: $(vmImage)
+      #name: $(poolName)
+      vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -72,31 +74,31 @@ jobs:
           inlineScript: |
             az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePre)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
 
-  - job: PublishComponentNpd
-    displayName: Publish Component Npd
-    pool:
-      name: $(poolName)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionNpd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameNpd)" --subscription "$(componentStorageAccountSubscriptionIdNpd)"           
+  # - job: PublishComponentNpd
+  #   displayName: Publish Component Npd
+  #   pool:
+  #     name: $(poolName)
+  #   variables:
+  #     - template: pipeline.variables.yml
+  #   steps:
+  #     - task: CopyFiles@2
+  #       displayName: Filter folders
+  #       inputs:
+  #         Contents: |
+  #           Modules/ARM/$(moduleName)/$(moduleVersion)/**
+  #         targetFolder: $(Build.ArtifactStagingDirectory)
+  #     - task: AzureCLI@1
+  #       displayName: Create container $(componentStorageContainerName)
+  #       inputs:
+  #         azureSubscription: $(serviceConnectionNpd)
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameNpd)" --subscription "$(componentStorageAccountSubscriptionIdNpd)"           
         
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameNpd)
-        inputs:
-          azureSubscription: $(serviceConnectionNpd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameNpd)" --subscription  "$(componentStorageAccountSubscriptionIdNpd)"
+  #     - task: AzureCLI@1
+  #       displayName: Copy Module to $(componentStorageAccountNameNpd)
+  #       inputs:
+  #         azureSubscription: $(serviceConnectionNpd)
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameNpd)" --subscription  "$(componentStorageAccountSubscriptionIdNpd)"
