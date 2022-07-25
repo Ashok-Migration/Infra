@@ -188,7 +188,6 @@
         },
         "zones": {
            "type": "string",
-        //    "defaultValue": "1",
            "allowedValues": [
               "1",
               "2",
@@ -703,8 +702,7 @@
                 "[if(not(empty(parameters('scaleSetName'))),parameters('scaleSetName'),'dummyScaleSet')]",
                 "[if(not(empty(parameters('proximityPlacementGroupName'))),parameters('proximityPlacementGroupName'),'dummyProximityGroup')]"
             ],
-            // "zones": "[if(parameters('useAvailabilityZone'), array(variables('allZones').zones[copyIndex()]), json('null'))]",
-            "zones": ["3"],
+             "zones": "[if(parameters('useAvailabilityZone'), array(variables('allZones').zones[copyIndex()]), json('null'))]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
