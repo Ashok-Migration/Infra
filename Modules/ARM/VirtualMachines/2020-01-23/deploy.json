@@ -181,7 +181,7 @@
         },
         "useAvailabilityZone": {
             "type": "bool",
-            // "defaultValue": false,
+             "defaultValue": true,
             "metadata": {
                 "description": "Optional. Creates an availability zone and adds the VMs to it. Cannot be used in combination with availability set nor scale set."
             }
@@ -712,7 +712,7 @@
                 "[if(not(empty(parameters('proximityPlacementGroupName'))),parameters('proximityPlacementGroupName'),'dummyProximityGroup')]"
             ],
             // "zones": "[if(parameters('useAvailabilityZone'), array(variables('allZones').zones[copyIndex()]), json('null'))]",
-            "zones": "[3]",
+            "zones": ["3"],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
