@@ -1820,7 +1820,7 @@
         {
           "type": "Microsoft.Resources/deployments",
           "apiVersion": "2019-08-01",
-          "name": "DEP-trm-orderingtool-prd-sqcp-qa",
+          "name": "DEP-privatelink.agentsvc.azure-automation.net",
           "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
           "dependsOn": [
             "DEP-rg-cph-pltf-net-prd-qc-01"
@@ -1837,7 +1837,70 @@
               "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.agentsvc.azure-automation.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
             }
           }
-        } 
+        } ,
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-privatelink.monitor.azure.com",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/privatelink.monitor.azure.com-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-privatelink.ods.opinsights.azure.com",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/privatelink.ods.opinsights.azure.com-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2019-08-01",
+          "name": "DEP-privatelink.oms.opinsights.azure.com",
+          "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+          "dependsOn": [
+            "DEP-rg-cph-pltf-net-prd-qc-01"
+          ],
+          "properties": {
+            "mode": "Incremental",
+            "debugSetting": {
+              "detailLevel": "requestContent,responseContent"
+            },
+            "templateLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            },
+            "parametersLink": {
+              "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/privatelink.oms.opinsights.azure.com-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+            }
+          }
+        }
   ],
 "outputs": {}
 }
