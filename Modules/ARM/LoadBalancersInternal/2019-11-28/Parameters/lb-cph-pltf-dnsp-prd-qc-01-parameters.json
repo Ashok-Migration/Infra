@@ -20,6 +20,88 @@
       "parentResourceGroup": {
         "value": "rg-cph-pltf-net-prd-qc-01"
       },
+      "backendAddressPools": [
+          {
+            "name": "[variables('backendpoolName')]",
+            "properties": {
+                            "loadBalancerBackendAddresses": [
+                                {
+                                    "name": "vmdnsprdqc01",
+                                    "properties": { 
+                                    
+                                        "ipAddress": "172.27.93.166"
+                                      
+                                      }
+                                 },
+                                {
+                                    "name": "vmdnsprdqc02",
+                                    "properties": {
+                                       "ipAddress": "172.27.93.167"
+                                    }
+                                },
+                                {
+                                    "name": "vmdnsprdqc03",
+                                    "properties": {
+                                       "ipAddress": "172.27.93.168"
+                                    }
+                                }
+                            ]
+                        }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "lbrule-cph-pltf-dnsp-prd-qc-01",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "TCP",
+              "frontendPort": 53,
+              "backendPort": 53,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          },
+          {
+            "name": "lbrulecph-pltf-dnsp-prd-qc-02",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "UDP",
+              "frontendPort": 53,
+              "backendPort": 53,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "hprobe-cph-pltf-dnsp-prd-qc-53",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 53,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+          },
+
       "tags": {
         "value": {
             "Environment": "Production"
