@@ -181,9 +181,20 @@
         },
         "useAvailabilityZone": {
             "type": "bool",
-            "defaultValue": false,
+             "defaultValue": true,
             "metadata": {
                 "description": "Optional. Creates an availability zone and adds the VMs to it. Cannot be used in combination with availability set nor scale set."
+            }
+        },
+        "zones": {
+           "type": "array",
+           "allowedValues": [
+              1,
+              2,
+              3
+            ],
+            "metadata": {
+                   "description": "Zone number for the virtual machine"
             }
         },
         "subnetId": {
@@ -439,7 +450,7 @@
         },
         "lockForDeletion": {
             "type": "bool",
-            "defaultValue": true,
+            "defaultValue": false,
             "metadata": {
                 "description": "Optional. Switch to lock VM from deletion."
             }
@@ -691,7 +702,7 @@
                 "[if(not(empty(parameters('scaleSetName'))),parameters('scaleSetName'),'dummyScaleSet')]",
                 "[if(not(empty(parameters('proximityPlacementGroupName'))),parameters('proximityPlacementGroupName'),'dummyProximityGroup')]"
             ],
-            "zones": "[if(parameters('useAvailabilityZone'), array(variables('allZones').zones[copyIndex()]), json('null'))]",
+             "zones": [1],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
@@ -769,7 +780,7 @@
                     ],
                     "comments": "Resource lock on Azure Key Vault",
                     "properties": {
-                        "level": "CannotDelete"
+                        "level": ""
                     }
                 },
                 {
