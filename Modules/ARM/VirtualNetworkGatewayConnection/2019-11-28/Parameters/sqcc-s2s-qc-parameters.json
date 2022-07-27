@@ -1,53 +1,32 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "connectionName": {
       "value": "sqcc-s2s-qc"
     },
-    "virtualNetworkGatewayConnectionType": {
-      "value": "Ipsec"
-    },
     "localVirtualNetworkGatewayName": {
-       "value": "vng-cph-mgmt-s2s-prd-qc-01"
+      "value": "vng-cph-mgmt-s2s-prd-qc-01"
     },
     "vpnSharedKey": {
-       "value": "m3ydz4gJG@Ji78zRiH$La#D"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-sec-prd-qc-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-qc-01"
+        },
+        "secretName": "vpnSharedKey"
+      }
     },
     "remoteEntityName": {
-       "value": "lgw-infsh-azne-01"
+      "value": "lng-cph-mgmt-s2s-prd-qc-01"
     },
     "remoteEntityResourceGroup": {
-        "value": ""
+      "value": ""
     },
     "remoteEntitySubscriptionId": {
-        "value": ""
+      "value": ""
     },
     "enableBgp": {
-        "value": false
-    },
-    "lockForDeletion": {
-        "value": false
-    },
-    "tags": {
-        "value": {
-        }
-    },
-    "usePolicyBasedTrafficSelectors": {
-      "value":true
-    },
-    "customIPSecPolicy": {
-  
-      "value":{
-          "saLifeTimeSeconds": 28800,
-          "saDataSizeKilobytes": 4608000,
-          "ipsecEncryption": "DES3",
-          "ipsecIntegrity": "SHA256",
-          "ikeEncryption": "AES256",
-          "ikeIntegrity": "SHA256",
-          "dhGroup": "DHGroup2",
-          "pfsGroup": "None"
-      }
-  }
+      "value": false
+    }
   }
 }
