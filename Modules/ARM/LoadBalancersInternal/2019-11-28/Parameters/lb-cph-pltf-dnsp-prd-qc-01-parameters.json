@@ -22,24 +22,12 @@
     },
     "backendAddressPools": [
         {
-          "name": "bkpool-cph-pltf-dnsp-prd-qc-01",
-          "properties": {
-                          "backendIPConfigurations": [
-                      {
-                          "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-dnsp-prd-qc-01/providers/Microsoft.Network/networkInterfaces/vmdnsprdqc01-nic-01"
-                      },
-                      {
-                          "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-dnsp-prd-qc-01/providers/Microsoft.Network/networkInterfaces/vmdnsprdqc02-nic-01"
-                      },
-                      {
-                          "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-dnsp-prd-qc-01/providers/Microsoft.Network/networkInterfaces/vmdnsprdqc03-nic-01"
-                      }
-                  ]
-                      }
+          "name": "bkpool-cph-pltf-dnsp-prd-qc-01"
+
         }
       ],
-      "loadBalancingRules": {
-          "value": [{
+      "loadBalancingRules": [
+          {
                   "name": "lbrule-cph-pltf-dnsp-prd-qc-01",
                   "properties": {
                       "frontendIPConfigurationName": "lbIPAddress",
@@ -58,9 +46,9 @@
                {
                  "name": "lbrule-cph-pltf-dnsp-prd-qc-02",
                  "properties": {
-                   "frontendIPConfigurationName": "lbIPAddress",
-                   "frontendPort": 53,
-                   "backendPort": 53,
+                  "frontendIPConfiguration": {
+                    "id": "[variables('frontEndIPConfigID')]"
+                  },
                    "enableFloatingIP": false,
                    "idleTimeoutInMinutes": 5,
                    "protocol": "UDP",
