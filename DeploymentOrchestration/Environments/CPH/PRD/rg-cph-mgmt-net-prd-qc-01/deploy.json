@@ -487,6 +487,28 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
+            "name": "DEP-lng-cph-mgmt-s2s-prd-qc-01",
+            
+            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "dependsOn": [
+                "vng-cph-mgmt-s2s-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'LocalNetworkGateway/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'LocalNetworkGateway/2019-11-28/Parameters/lng-cph-mgmt-s2s-prd-qc-01parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
             "name": "vng-cph-mgmt-s2s-prd-qc-01",
             
             "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
