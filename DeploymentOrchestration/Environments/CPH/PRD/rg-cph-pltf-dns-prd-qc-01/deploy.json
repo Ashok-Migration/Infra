@@ -30,30 +30,47 @@
 
     },
     "resources": [
-      {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-rg-cph-pltf-dns-prd-qc-01",
-      "location": "[variables('location')]",
-      "dependsOn": [
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-dns-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-       }
-      }
-/*         {
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-cph-privatelink.westeurope.azmk8s.io",
+            "name": "DEP-rg-cph-pltf-dns-prd-qc-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-dns-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        // {
+        //     "apiVersion": "2019-08-01",
+        //     "name": "[variables('CUA')]",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+        //     "dependsOn": [
+        //         "DEP-rg-cph-pltf-dns-prd-qc-01"
+        //     ],
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "template": {
+        //             "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        //             "contentVersion": "1.0.0.0",
+        //             "resources": []
+        //         }
+        //     }
+        // },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.azconfig.windows.net",
             "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
             "dependsOn": [
                 "DEP-rg-cph-pltf-dns-prd-qc-01"
@@ -67,12 +84,159 @@
                     "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.westeurope.azmk8s.io-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.azconfig.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-        }*/
-         ],
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.blob.core.windows.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.blob.core.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.blob.storage.azure.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.database.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.database.windows.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.file.core.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatprivatelink.file.core.windows.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.queue.core.windows.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.queue.core.windows.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.vaultcore.azure.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.vaultcore.azure.net",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.qac.backup.windowsazure.com-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-cph-privatelink.qac.backup.windowsazure.com",
+            "resourceGroup": "rg-cph-pltf-dns-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-dns-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateDNSZones/2019-11-28/Parameters/cph-privatelink.blob.storage.azure.net-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        }
+
+    ],
     "outputs": {
     }
 }
-
