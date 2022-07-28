@@ -21,6 +21,7 @@
             "signedResourceTypes": "co",
             "signedProtocol": "https"
         },
+
         "componentStorageAccountId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiactstprdqc01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
@@ -54,7 +55,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
       "name": "DEP-bldvmdevqc02",
-      "location": "[variables('location')]",
+      "resourceGroup": "rg-cph-pltf-bldvms-prd-qc-01",
       "dependsOn": [
           "DEP-rg-cph-pltf-bldvms-prd-qc-01"
       ],
@@ -75,7 +76,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
       "name": "DEP-bldvmdevqc01",
-      "location": "[variables('location')]",
+      "resourceGroup": "rg-cph-pltf-bldvms-prd-qc-01",
       "dependsOn": [
           "DEP-rg-cph-pltf-bldvms-prd-qc-01"
       ],
