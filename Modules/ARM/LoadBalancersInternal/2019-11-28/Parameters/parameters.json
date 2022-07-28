@@ -1,33 +1,79 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "lbName": {
-        "value": "testlb"
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "loadBalancerName": {
+          "value": "lbi-cph-pltf-dnsp-prd-qc-01"
       },
-      "lbfrontSubnetName": {
-        "value": "snet-cloudperimeter-private-uaen-prod",
-        "metadata": {
-          "description": "cloud perimeter subnet for the LB front"
-        }
+      "frontendIPConfigurations": {
+          "value": [{
+                "name": "LoadBalancerFrontEnd",
+                "properties": {
+                  "publicIPAddressId": "",
+                  "subnetId":  "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-cph-pltf-prd-qc-01/subnets/snet-cph-pltf-dnsp-prd-qc-01",
+                  "privateIPAddress": "172.27.93.170"
+                }
+              }
+          ]
       },
-      "lbIPAddress": {
-        "value": "10.106.0.63"
+      "backendAddressPools": {
+          "value": [{
+              "name": "bkpool-cph-pltf-dnsp-prd-qc-01"
+          }]
       },
-      "vnetName": {
-        "value": "vnet-shared-private-uaen-prod"
+      "loadBalancingRules": {
+          "value": [{
+                  "name": "lbrule-cph-pltf-dnsp-prd-qc-01",
+                  "properties": {
+                      "frontendIPConfigurationName": "publicIPConfig",
+                      "frontendPort": 53,
+                      "backendPort": 53,
+                      "enableFloatingIP": false,
+                      "idleTimeoutInMinutes": 5,
+                      "protocol": "TCP",
+                      "enableTcpReset": false,
+                      "loadDistribution": "Default",
+                      "disableOutboundSnat": false,
+                      "probeName": "hprobe-cph-pltf-dnsp-prd-qc-53",
+                      "backendAddressPoolName": "bkpool-cph-pltf-dnsp-prd-qc-01"
+                  }
+              },
+              {
+                               "name": "lbrule-cph-pltf-dnsp-prd-qc-02",
+                               "properties": {
+                                 "frontendIPConfigurationName": "lbIPAddress",
+                                 "frontendPort": 53,
+                                 "backendPort": 53,
+                                 "enableFloatingIP": false,
+                                 "idleTimeoutInMinutes": 5,
+                                 "protocol": "UDP",
+                                 "enableTcpReset": false,
+                                 "loadDistribution": "Default",
+                                 "disableOutboundSnat": false,
+                                 "probeName": "hprobe-cph-pltf-dnsp-prd-qc-53",
+                                 "backendAddressPoolName": "bkpool-cph-pltf-dnsp-prd-qc-01"
+            
+                               }
+                             }
+          ]
       },
-      "parentResourceGroup": {
-        "value": "parentRG"
+      "probes": {
+          "value": [{
+              "name": "hprobe-cph-pltf-dnsp-prd-qc-53",
+              "properties": {
+                  "protocol": "TCP",
+                  "port": 53,
+                  "requestPath": "/",
+                  "intervalInSeconds": 10,
+                  "numberOfProbes": 5
+              }
+          }]
       },
+
       "tags": {
         "value": {
-            "Environment": "Production",
-            "Contact": "test.user@testcompany.com",
-            "CostCenter": "",
-            "Section": "Private-Hub"
+            "Environment": "Production"
         }
-    }
-      
-    }
+     }
+  }
 }
