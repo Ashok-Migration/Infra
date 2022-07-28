@@ -23,6 +23,12 @@
         "description": "LB Front IP Addr"
       }
     },
+     "backendpoolName": {
+      "type": "string",
+      "metadata": {
+        "description": "BackendPool Name"
+      }
+    },
     "vnetName": {
       "type": "string"
     },
@@ -40,7 +46,7 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "backendpoolName": "nva_internal_backendpool_01",
+    "backendpoolName": "[resourceId('Microsoft.Network/loadBalancers',parameters('backendpoolName'))]",
     "vnetId": "[resourceId(parameters('parentResourceGroup'), 'Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
     "lbfrontSubnetId": "[concat(variables('vnetId'), '/subnets/', parameters('lbfrontSubnetName'))]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
