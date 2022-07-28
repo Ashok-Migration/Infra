@@ -33,7 +33,7 @@
       {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-rg-cph-pltf-dnsp-prd-qc-01",
+      "name": "DEP-rg-cph-pltf-bldvms-prd-qc-01",
       "location": "[variables('location')]",
       "dependsOn": [
       ],
@@ -46,97 +46,10 @@
           "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-dnsp-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-bldvms-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
        }
-      },
-    //   {
-    //   "type": "Microsoft.Resources/deployments",
-    //   "apiVersion": "2019-08-01",
-    //   "name": "DEP-rg-cph-pltf-dnsp-prd-qc-01",
-    //   "resourceGroup": "rg-cph-pltf-dnsp-prd-qc-01",
-    //   "dependsOn": [
-    //     "DEP-rg-cph-pltf-dnsp-prd-qc-01"
-    //   ],
-    //   "properties": {
-    //     "mode": "Incremental",
-    //     "debugSetting": {
-    //       "detailLevel": "requestContent,responseContent"
-    //     },
-    //     "templateLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'LoadBalancersInternal/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     },
-    //     "parametersLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'LoadBalancersInternal/2019-11-28/Parameters/lb-cph-pltf-dnsp-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     }
-    //   }
-    //  },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vmdnsprdqc03",
-      "resourceGroup": "rg-cph-pltf-dnsp-prd-qc-01",
-      "dependsOn": [
-        "DEP-rg-cph-pltf-dnsp-prd-qc-01",
-        // "DEP-stcpddatadevwe01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdnsprdqc03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    }
-    // {
-    //   "type": "Microsoft.Resources/deployments",
-    //   "apiVersion": "2019-08-01",
-    //   "name": "DEP-vmdnsprdqc02",
-    //   "resourceGroup": "rg-cph-pltf-dnsp-prd-qc-01",
-    //   "dependsOn" : [
-    //     "DEP-rg-cph-pltf-dnsp-prd-qc-01",
-    //     // "DEP-stcpddatadevwe01"
-    //   ],
-    //   "properties": {
-    //     "mode": "Incremental",
-    //     "debugSetting": {
-    //       "detailLevel": "requestContent,responseContent"
-    //     },
-    //     "templateLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     },
-    //     "parametersLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdnsprdqc02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     }
-    //   }
-    // }
-    // {
-    //   "type": "Microsoft.Resources/deployments",
-    //   "apiVersion": "2019-08-01",
-    //   "name": "DEP-vmdnsprdqc01",
-    //   "resourceGroup": "rg-cph-pltf-dnsp-prd-qc-01",
-    //   "dependsOn": [
-    //     "DEP-rg-cph-pltf-dnsp-prd-qc-01",
-    //     // "DEP-stcpddatadevwe01"
-    //   ],
-    //   "properties": {
-    //     "mode": "Incremental",
-    //     "debugSetting": {
-    //       "detailLevel": "requestContent,responseContent"
-    //     },
-    //     "templateLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     },
-    //     "parametersLink": {
-    //       "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/vmdnsprdqc01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-    //     }
-    //   }
-    // }
+ }
     ],
     "outputs": {
     }
