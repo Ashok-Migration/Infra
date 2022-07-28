@@ -46,7 +46,7 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "backendpoolName": "[resourceId('Microsoft.Network/loadBalancers',parameters('backendpoolName'))]",
+    "backendpoolName": "[concat(parameters('lbName'),'-backendpool')]",
     "vnetId": "[resourceId(parameters('parentResourceGroup'), 'Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
     "lbfrontSubnetId": "[concat(variables('vnetId'), '/subnets/', parameters('lbfrontSubnetName'))]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
