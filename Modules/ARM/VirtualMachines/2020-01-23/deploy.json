@@ -902,22 +902,21 @@
                     }
                 },
                 {
-                                                    "type": "Microsoft.Compute/virtualMachines/extensions",
-                                                    "apiVersion": "2019-07-01",
-                                                    "name": "[concat(parameters('vmNames'), '/DependencyAgentWindows')]",
-                                                    "location": "[parameters('location')]",
-                                                    "condition": "[parameters('enableWindowsDependencyAgent')]",
-                                                    "dependsOn": [
-                                                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNames'))]",
-                                                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmNames'), 'LinuxDiskEncryption')]"
-                                                    ],
-                                                    "properties": {
-                                                        "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
-                                                        "type": "DependencyAgentWindows",
-                                                        "typeHandlerVersion": "9.5",
-                                                        "autoUpgradeMinorVersion": true
-                                                    }
-                                                }
+                  "type": "Microsoft.Compute/virtualMachines/extensions",
+                  "apiVersion": "2019-07-01",
+                  "name": "[concat(parameters('vmNames')[copyIndex()], '/DependencyAgentWindows')]",											   
+                  "location": "[parameters('location')]",
+                  "condition": "[parameters('enableWindowsDependencyAgent')]",
+                  "dependsOn": [
+                     "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNames')[copyIndex()])]"                                   
+                    ],
+                    "properties": {
+                    "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
+                     "type": "DependencyAgentWindows",
+                     "typeHandlerVersion": "9.5",
+                     "autoUpgradeMinorVersion": true																																					
+                      }
+                }			  
             ]
         }
     ],
