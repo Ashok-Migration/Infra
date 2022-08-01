@@ -91,6 +91,9 @@
                 "description": "Optional. Specifies Windows operating system settings on the virtual machine."
             }
         },
+        "enableWindowsDependencyAgent": {
+            "type": "bool"
+        },
         "linuxConfiguration": {
             "type": "object",
             "defaultValue": {},
@@ -326,7 +329,7 @@
         },
         "enableWindowsDiskEncryption": {
             "type": "bool",
-            "defaultValue": false,
+            "defaultValue": true,
             "metadata": {
                 "description": "Optional. Specifies if Windows VM disks should be encrypted. If enabled, boot diagnostics must be enabled as well."
             }
@@ -897,7 +900,24 @@
                             "VolumeType": "[parameters('diskEncryptionVolumeType')]"
                         }
                     }
-                }
+                },
+                {
+                                                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                                                    "apiVersion": "2019-07-01",
+                                                    "name": "[concat(parameters('vmNames'), '/DependencyAgentWindows')]",
+                                                    "location": "[parameters('location')]",
+                                                    "condition": "[parameters('enableWindowsDependencyAgent')]",
+                                                    "dependsOn": [
+                                                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNames'))]",
+                                                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmNames'), 'LinuxDiskEncryption')]"
+                                                    ],
+                                                    "properties": {
+                                                        "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
+                                                        "type": "DependencyAgentWindows",
+                                                        "typeHandlerVersion": "9.5",
+                                                        "autoUpgradeMinorVersion": true
+                                                    }
+                                                }
             ]
         }
     ],
