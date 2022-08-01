@@ -1,0 +1,40 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"routeTableName": {
+			"value": "route-cph-mgmt-gateway-prd-qc-01"
+		},
+		"routes": {
+			"value": [
+				{
+					"name": "route-pltf-OO",
+					"properties": {
+						"addressPrefix": "192.168.44.140/32",
+						"nextHopType": "VirtualAppliance",
+						"nextHopIpAddress": "172.27.96.4"
+					}
+				},
+				{
+					"name": "route-pltf-vnet",
+					"properties": {
+						"addressPrefix": "172.27.92.0/22",
+						"nextHopType": "VirtualAppliance",
+						"nextHopIpAddress": "172.27.104.4"
+					}
+				}
+			]
+		},
+		"disableBgpRoutePropagation": {
+			"value": false
+		},
+		"lockForDeletion": {
+			"value": false
+		},
+		"tags": {
+			"value": {
+				"Environment": "Production"
+			}
+		}
+	}
+}
