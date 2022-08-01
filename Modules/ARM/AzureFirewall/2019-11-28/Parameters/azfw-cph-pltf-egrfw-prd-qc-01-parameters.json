@@ -30,17 +30,191 @@
                                         "port": "443"
                                     }
                                 ],
+                                "targetFqdns": [
+                                    "management.azure.com"
+                                ],
+                                "fqdnTags": []
+                      
+                               },
+                       {
+                                "name": "Windows Update",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "80"
+                                    },
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "32526"
+                                    },
+                                    {
+                                        "protocolType": "HTTPS",
+                                        "port": "443"
+                                    }
+                                ],
+                                "targetFqdns": [
+                                    "*.ods.opinsights.azure.com",
+                                   "*.oms.opinsights.azure.com",
+                                   "*.blob.core.windows.net",
+                                   "*.azure-automation.net,*.windowsupdate.microsoft.com",
+                                   "*.windowsupdate.microsoft.com",
+                                   "*.windowsupdate.com",
+                                   "wustat.windows.com",
+                                   "ntservicepack.microsoft.com"
+                                   
+                                ],
+                                "fqdnTags": []
+                                },
+                            {
+                                "name": "login",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "80"
+                                    },
+                                    {
+                                        "protocolType": "HTTPS",
+                                        "port": "443"
+                                    }
+                                ],
+                                "targetFqdns": [
+                                    "*.microsoftonline.com",
+                                   "*.login.microsoftonline.com",
+                                   "*.microsoft.com"
+                                ],
+                                "fqdnTags": []
+                                 },                           
+                           {
+                                "name": "Redhat",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "80"
+                                    },
+                                    {
+                                        "protocolType": "HTTPS",
+                                        "port": "443"
+                                    }
+                                ],
+                                "targetFqdns": [
+                                   "mirrors.fedoraproject.org",
+                                   "*subscription.rhsm.redhat.com",
+                                   "*.efficios.com"
+                                ],
+                                "fqdnTags": []
+                                 },
+                            {
+                                "name": "Backup",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "80"
+                                    },
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "32526"
+                                    },
+                                    {
+                                        "protocolType": "HTTPS",
+                                        "port": "443"
+                                    }
+                                ],
+                                "targetFqdns": [
+                                   "*.blob.storage.azure.net",
+                                   "*.microsoftonline-p.com",
+                                   "*.msauth.net",
+                                   "*.msecnd.net",
+                                   "*.msauthimages.net",
+                                   "*.msftauth.net",
+                                   "*.msftauthimages.net",
+                                   "*.phonefactor.net",
+                                   "enterpriseregistration.windows.net",
+                                   "*.msftidentity.com",
+                                   "management.azure.com",
+                                   "policykeyservice.dc.ad.msft.net",
+                                   "*.hip.live.com",
+                                   "*.msidentity.com",
+                                   "graph.microsoft.com",
+                                   "graph.windows.net",
+                                   "account.activedirectory.windowsazure.com",
+                                   "accounts.accesscontrol.windows.net",
+                                   "*.passport.net",
+                                   "*.digicert.com"
+                                ],
+                                "fqdnTags": []
+                                 }, 
+                            {
+                                "name": "License",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "1688"
+                                    }
+                                    
+                                ],
+                                "targetFqdns": [
+                                    "kms.core.windows.net"
+                                ],
+                                "fqdnTags": []
+                                 },
+                          {
+                                "name": "Google",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    {
+                                        "protocolType": "HTTP",
+                                        "port": "80"
+                                    },
+                                    {
+                                        "protocolType": "HTTPS",
+                                        "port": "443"
+                                    }
+                                    
+                                ],
+                                "targetFqdns": [
+                                    "tools.google.com",
+                                    "dl.google.com",
+                                    "*.gvt1.com"
+                                ],
+                                "fqdnTags": []
+                                 },
+                           {
+                                "name": "WindowsUpdate",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "protocols": [ ],
+                                "targetFqdns": [],
                                 "fqdnTags": [
-                                    "AzureBackup",
-                                    "WindowsUpdate"
+                                  "WindowsUpdate",
+                                  "AzureBackup"
                                 ]
-
-      ]
-    },
+                                 },                           
+{
     "networkRuleCollections": {
       "value": [
       ]
     },
+
+
+    
     "vNetId": {
       "value": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-cph-pltf-prd-qc-01"
     },
