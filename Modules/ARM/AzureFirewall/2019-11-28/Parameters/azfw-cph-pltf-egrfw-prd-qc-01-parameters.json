@@ -36,7 +36,7 @@
                                 "fqdnTags": []
                       
                                },
-                       {
+                            {
                                 "name": "Windows Update",
                                 "sourceAddresses": [
                                     "*"
@@ -210,11 +210,242 @@
 {
     "networkRuleCollections": {
       "value": [
+        {
+                    "name": "Allow-Management-Services",
+                    "properties": {
+                        "priority": 150,
+                        "action": {
+                            "type": "allow"
+                        },
+                        "rules": [
+                            {
+                                "name": "Qualys",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "destinationAddresses": [
+                                    "64.39.104.113",
+                                    "154.59.121.74"
+                                ],
+                                "destinationPorts": [
+                                    "443"
+                                ],
+                                "protocols": [
+                                    "TCP"
+                                ]
+                            },
+                           {
+                                "name": "Azure Infra",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "destinationAddresses": [
+                                   "168.63.129.16"
+                                ],
+                                "destinationPorts": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    "TCP",
+                                    "UDP"
+                                ]
+                            },
+                          {
+                                "name": "Monitor,Update,Cloud,Backup,AAD,GuestConfiguratoin",
+                                "sourceAddresses": [
+                                    "*"
+                                ],
+                                "destinationAddresses": [],
+                                "Servicetags": [
+                                  "AzureMonitor",
+                                  "AzureActiveDirectory",
+                                  "AzureBackup",
+                                  "EventHub",
+                                  "GuestAndHybridManagement",
+                                  "Storage"
+                                ],
+                                "destinationPorts": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    "TCP"
+                                    
+                                ]
+                            },
+                          {
+                                "name": "ITSM-DB-Backup-Tags",
+                                "sourceAddresses": [
+                                    "172.20.127.0/26",
+                                    "172.20.103.0/26"
+                                ],
+                                "destinationAddresses": [],
+                                "Servicetags": [
+                                  "AzureActiveDirectory",
+                                  "AzureBackup",
+                                  "Storage"
+                                ],
+                                "destinationPorts": [
+                                    "80",
+                                    "443"
+                                ],
+                                "protocols": [
+                                    "TCP"
+                                    
+                                ]
+                            } 
+        
       ]
-    },
+    }
+   },
+               {
+                    "name": "allow-out-dnsp-tcp-53",
+                    "properties": {
+                        "priority": 171,
+                        "action": {
+                            "type": "allow"
+                        },
+                        "rules": [
+                            {
+                                "name": "azure dns",
+                                "sourceAddresses": [
+                                    "172.20.33.160/27"
+                                ],
+                                "destinationAddresses": [
+                                    "168.63.129.16/32",
+                                    "169.254.169.254/32"
+                                ],
+                                "destinationPorts": [
+                                    "80",
+                                    "443",
+                                    "53"
+                                ],
+                                "protocols": [
+                                    "TCP",
+                                    "UDP"
+                                ]
+                            },
+                           {
+                                "name": "Azure DNS proxy",
+                                "sourceAddresses": [
+                                    "172.20.33.160/27"
+                                ],
+                                "destinationAddresses": [
+                                   "*"
+                                ],
+                                "destinationPorts": [
+                                    "*"
+                                ],
+                                "protocols": [
+                                    "TCP",
+                                    "UDP"
+                                ]
+                           }
+                          
+                            
 
 
-    
+        
+      ]
+    }
+   }, 
+           {
+                    "name": "InternetOutbound_ManagementHub",
+                    "properties": {
+                        "priority": 250,
+                        "action": {
+                            "type": "allow"
+                        },
+                        "rules": [
+                            {
+                                "name": "TCPallow",
+                                "sourceAddresses": [
+                                    "172.20.36.0/26",
+                                    "172.20.36.64/26",
+                                    "172.20.36.128/27",
+                                    "172.20.36.160/27"
+                                ],
+                                "destinationAddresses": [
+                                    "*"
+                                ],
+                                "destinationPorts": [
+                                    "80",
+                                    "443"
+                                    
+                                ],
+                                "protocols": [
+                                    "TCP"
+                                    
+                                ]
+                            }
+        
+      ]
+    }
+   },
+       {
+                    "name": "allow-internet-fwew-mgmt-traffic",
+                    "properties": {
+                        "priority": 350,
+                        "action": {
+                            "type": "allow"
+                        },
+                        "rules": [
+                            {
+                                "name": "Internet",
+                                "sourceAddresses": [
+                                    "172.20.34.32/27",
+                                    "172.20.34.32/28",
+                                    "172.20.33.64/27",
+                                    "172.20.34.96/28"
+                                ],
+                                "destinationAddresses": [
+                                    "*"
+                                ],
+                                "destinationPorts": [
+                                    "*"
+                                    
+                                ],
+                                "protocols": [
+                                    "TCP",
+                                    "UDP",
+                                    "ICMP",
+                                    "Any"
+                                    
+                                ]
+                            }
+        
+      ]
+    }
+   },
+    {
+                    "name": "allow-iacbl-internet-outbound",
+                    "properties": {
+                        "priority": 352,
+                        "action": {
+                            "type": "allow"
+                        },
+                        "rules": [
+                            {
+                                "name": "BuildAgents",
+                                "sourceAddresses": [
+                                    "172.20.32.0/26"
+                                ],
+                                "destinationAddresses": [
+                                    "*"
+                                ],
+                                "destinationPorts": [
+                                    "*"
+                                    
+                                ],
+                                "protocols": [
+                                    "Any"
+                                    
+                                ]
+                            }
+        
+      ]
+    }
+   },
+
     "vNetId": {
       "value": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-cph-pltf-prd-qc-01"
     },
