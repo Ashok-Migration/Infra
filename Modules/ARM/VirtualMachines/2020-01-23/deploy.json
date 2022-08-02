@@ -91,6 +91,9 @@
                 "description": "Optional. Specifies Windows operating system settings on the virtual machine."
             }
         },
+        "enableWindowsDependencyAgent": {
+            "type": "bool"
+        },
         "linuxConfiguration": {
             "type": "object",
             "defaultValue": {},
@@ -399,7 +402,7 @@
         },
         "enableBootDiagnostics": {
             "type": "bool",
-            "defaultValue": false,
+            "defaultValue": true,
             "metadata": {
                 "description": "Optional. Whether boot diagnostics should be enabled on the Virtual Machine."
             }
@@ -897,7 +900,23 @@
                             "VolumeType": "[parameters('diskEncryptionVolumeType')]"
                         }
                     }
-                }
+                },
+                {
+                  "type": "Microsoft.Compute/virtualMachines/extensions",
+                  "apiVersion": "2019-07-01",
+                  "name": "[concat(parameters('vmNames')[copyIndex()], '/DependencyAgentWindows')]",											   
+                  "location": "[parameters('location')]",
+                  "condition": "[parameters('enableWindowsDependencyAgent')]",
+                  "dependsOn": [
+                     "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNames')[copyIndex()])]"                                   
+                    ],
+                    "properties": {
+                    "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
+                     "type": "DependencyAgentWindows",
+                     "typeHandlerVersion": "9.5",
+                     "autoUpgradeMinorVersion": true																																					
+                      }
+                }			  
             ]
         }
     ],
