@@ -36,12 +36,12 @@ jobs:
           testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
       - task: AzurePowerShell@4
-        displayName: "Validate $(moduleName) in $(resourceGroupNameprd) via $(serviceConnectionprd)"
+        displayName: "Validate $(moduleName) in $(resourceGroupNamePrd) via $(serviceConnectionPrd)"
         inputs:
-          azureSubscription: $(serviceConnectionNpd)
+          azureSubscription: $(serviceConnectionPrd)
           ScriptType: InlineScript
           inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupNameprd) -ErrorAction SilentlyContinue))
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupNamePrd) -ErrorAction SilentlyContinue))
             {
               New-AzResourceGroup -Name $(resourceGroupNameprd) -Location "$(location)"
             }
@@ -49,7 +49,7 @@ jobs:
             $ValidationErrors = $null
 
             $DeploymentInputs = @{
-              ResourceGroupName     = "$(resourceGroupNameNpd)"
+              ResourceGroupName     = "$(resourceGroupNamePrd)"
               TemplateFile          = "$(Build.Repository.LocalPath)/${{ parameters.templateFile }}"
               TemplateParameterFile = "$(Build.Repository.LocalPath)/${{ parameters.parametersFile }}"
               Mode                  = "Incremental"
