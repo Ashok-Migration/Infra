@@ -36,14 +36,14 @@ jobs:
           testResultsFiles: $(Agent.WorkFolder)/testsresult.xml
 
       - task: AzurePowerShell@4
-        displayName: "Validate $(moduleName) in $(resourceGroupNameNpd) via $(serviceConnectionNpd)"
+        displayName: "Validate $(moduleName) in $(resourceGroupNameprd) via $(serviceConnectionprd)"
         inputs:
           azureSubscription: $(serviceConnectionNpd)
           ScriptType: InlineScript
           inline: |
-            if (-not (Get-AzResourceGroup -Name $(resourceGroupNameNpd) -ErrorAction SilentlyContinue))
+            if (-not (Get-AzResourceGroup -Name $(resourceGroupNameprd) -ErrorAction SilentlyContinue))
             {
-              New-AzResourceGroup -Name $(resourceGroupNameNpd) -Location "$(location)"
+              New-AzResourceGroup -Name $(resourceGroupNameprd) -Location "$(location)"
             }
 
             $ValidationErrors = $null
