@@ -117,17 +117,17 @@
                 {
                     "name": "snet-cpd-pltf-asecog-dev-we-01",
                     "addressPrefix": "172.20.43.160/27",
-                    "networkSecurityGroupName": "nsg-cpd-apps-asecog-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-apps-asecog-dev-we-01",
                     "serviceEndpoints": [],
                     "delegations": [],
-                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-apps-net-dev-we-01"
                 },
                 {
                     "name": "snet-cpd-pltf-planint-dev-we-01",
                     "addressPrefix": "172.20.43.192/27",
-                    "networkSecurityGroupName": "nsg-cpd-apps-planint-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-apps-planint-dev-we-01",
                     "serviceEndpoints": [
                         {
@@ -145,13 +145,13 @@
                             }
                         }
                     ],
-                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-apps-net-dev-we-01"
                 },
                 {
                     "name": "snet-cpd-pltf-planpt-dev-we-01",
                     "addressPrefix": "172.20.43.224/27",
-                    "networkSecurityGroupName": "nsg-cpd-apps-planpt-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-apps-planpt-dev-we-01",
                     "serviceEndpoints": [],
                     "delegations": [
@@ -162,7 +162,7 @@
                             }
                         }
                     ],
-                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-apps-net-dev-we-01"
                 },
                 {
@@ -328,7 +328,14 @@
                     "networkSecurityGroupName": "nsg-cpd-bpm-web-dev-we-01",
                     "routeTableName": "route-cpd-bpm-web-dev-we-01",
                     "serviceEndpoints": [],
-                    "delegations": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
                     "nsgsRGName": "rg-cpd-bpm-sec-dev-we-01",
                     "routesRGName": "rg-cpd-bpm-net-dev-we-01"
                 },
@@ -355,31 +362,31 @@
                 {
                     "name": "snet-cpd-itsm-web-dev-we-01",
                     "addressPrefix": "172.20.53.32/27",
-                    "networkSecurityGroupName": "nsg-cpd-itsm-web-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-itsm-web-dev-we-01",
                     "serviceEndpoints": [],
                     "delegations": [],
-                    "nsgsRGName": "rg-cpd-itsm-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-itsm-net-dev-we-01"
                 },
                 {
                     "name": "snet-cpd-itsm-app-dev-we-01",
                     "addressPrefix": "172.20.53.64/27",
-                    "networkSecurityGroupName": "nsg-cpd-itsm-app-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-itsm-app-dev-we-01",
                     "serviceEndpoints": [],
                     "delegations": [],
-                    "nsgsRGName": "rg-cpd-itsm-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-itsm-net-dev-we-01"
                 },
                 {
                     "name": "snet-cpd-itsm-db-dev-we-01",
                     "addressPrefix": "172.20.53.96/27",
-                    "networkSecurityGroupName": "nsg-cpd-itsm-db-dev-we-01",
+                    "networkSecurityGroupName": "",
                     "routeTableName": "route-cpd-itsm-db-dev-we-01",
                     "serviceEndpoints": [],
                     "delegations": [],
-                    "nsgsRGName": "rg-cpd-itsm-sec-dev-we-01",
+                    "nsgsRGName": "",
                     "routesRGName": "rg-cpd-itsm-net-dev-we-01"
                 },
                 {
@@ -395,12 +402,12 @@
                 {
                     "name": "snet-cpd-apps-testvms-dev-we-01",
                     "addressPrefix": "172.20.42.128/27",
-                    "networkSecurityGroupName": "nsg-cpd-apps-testvms-dev-we-01",
-                    "routeTableName": "route-cpd-apps-testvms-dev-we-01",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
                     "serviceEndpoints": [],
                     "delegations": [],
-                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
-                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                    "nsgsRGName": "",
+                    "routesRGName": ""
                 },
                 {
                     "name": "snet-cpd-apps-agwntf-dev-we-01",
@@ -477,7 +484,14 @@
                     "addressPrefix": "172.20.44.0/26",
                     "networkSecurityGroupName": "nsg-cpd-data-dbrpub-dev-we-01",
                     "routeTableName": "route-cpd-data-dbrpub-dev-we-01",
-                    "serviceEndpoints": [],
+                    "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage",
+                          "locations": [
+                            "westeurope"
+                          ]
+                        }
+                    ],
                     "delegations": [
                         {
                             "name": "Microsoft.Databricks.workspaces",
@@ -494,7 +508,14 @@
                     "addressPrefix": "172.20.44.64/26",
                     "networkSecurityGroupName": "nsg-cpd-data-dbrpri-dev-we-01",
                     "routeTableName": "route-cpd-data-dbrpri-dev-we-01",
-                    "serviceEndpoints": [],
+                    "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage",
+                          "locations": [
+                            "westeurope"
+                          ]
+                        }
+                    ],
                     "delegations": [
                         {
                             "name": "Microsoft.Databricks.workspaces",
@@ -527,7 +548,124 @@
                     ],
                     "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
                     "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-pwa-dev-we-01",
+                    "addressPrefix": "172.20.53.160/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-pwa-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-pwa-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-oor-dev-we-01",
+                    "addressPrefix": "172.20.45.0/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-oor-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-oor-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-hia-dev-we-01",
+                    "addressPrefix": "172.20.45.16/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-hia-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-hia-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-mwa-dev-we-01",
+                    "addressPrefix": "172.20.45.32/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-mwa-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-mwa-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-scom-dev-we-01",
+                    "addressPrefix": "172.20.45.48/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-scom-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-scom-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-q22-dev-we-01",
+                    "addressPrefix": "172.20.45.64/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-q22-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-q22-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qrail-dev-we-01",
+                    "addressPrefix": "172.20.45.80/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qrail-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qrail-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qmic-dev-we-01",
+                    "addressPrefix": "172.20.45.96/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qmic-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qmic-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qeeri-dev-we-01",
+                    "addressPrefix": "172.20.45.112/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qeeri-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qeeri-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qta-dev-we-01",
+                    "addressPrefix": "172.20.45.128/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qta-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qta-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-ubr-dev-we-01",
+                    "addressPrefix": "172.20.45.144/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-ubr-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-ubr-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-plancog-dev-we-01",
+                    "addressPrefix": "172.20.43.128/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "",
+                    "routesRGName": ""
                 }
+                
             ]
         },
         "dnsServers": {
