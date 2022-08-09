@@ -1,155 +1,54 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "policyAssignmentName": {
-            "type": "string",
-            "metadata": {
-                "description": "Required. Specifies the name of the policy assignment."
-            }
+        "activityLogAlerts_alt_cph_metrics_vm_cpu_namenew": {
+            "defaultValue": "alt-cph-metrics-vm-cpu",
+            "type": "String"
         },
-       "location": {
-            "type": "string",
-            "defaultValue": "[deployment().location]",
-            "metadata": {
-                "description": "Optional. Location for all resources."
-            }
-        },
-        "resourceGroupName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Optional. Specifies the name of the resource group where you want to assign the policy."
-            }
-        },
-        "policyDefinitionID": {
-            "type": "string",
-            "metadata": {
-                "description": "Required. Specifies the ID of the policy definition or policy set definition being assigned."
-            }
-        },
-        "parameters": {
-            "type": "object",
-            "defaultValue": {
-            },
-            "metadata": {
-                "description": "Optional. Parameters for the policy assignment if needed."
-            }
-        },
-        "identity": {
-            "type": "string",
-            "defaultValue": "SystemAssigned",
-            "metadata": {
-                "description": "Optional. The managed identity associated with the policy assignment. Policy assignments must include a resource identity when assigning 'Modify' policy definitions."
-            }
-        },
-        "cuaId": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Optional. Customer Usage Attribution id (GUID). This GUID must be previously registered"
-            }
+        "actiongroups_ag_tasmu_health_externalid": {
+            "defaultValue": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actiongroups/ag-tasmu-health",
+            "type": "String"
         }
     },
-    "variables": {
-        "policyAssignmentName": "[replace(parameters('policyAssignmentName'),' ','')]"
-    },
+    "variables": {},
     "resources": [
         {
-            "condition": "[not(empty(parameters('cuaId')))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "name": "[concat('pid-', parameters('cuaId'))]",
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('activityLogAlerts_alt_cph_metrics_vm_cpu_name')]",
+            "location": "Global",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-                    ]
-                }
-            }
-        },
-        // Policy Assignment on Subscription scope
-        {
-            "name": "[concat(variables('policyAssignmentName'), '-subDeployment')]",
-            "apiVersion": "2020-06-01",
-            "type": "Microsoft.Resources/deployments",
-            "location": "[parameters('location')]",
-            "condition": "[empty(parameters('resourceGroupName'))]",
-            "dependsOn": [
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
+                "scopes": [
+                    "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
+                ],
+                "condition": {
+                    "allOf": [
                         {
-                            "type": "Microsoft.Authorization/policyAssignments",
-                            "name": "[variables('policyAssignmentName')]",
-                            "location": "[parameters('location')]",
-                            "apiVersion": "2019-09-01",
-                            "properties": {
-                                "policyDefinitionId": "[parameters('policyDefinitionID')]",
-                                "parameters": "[parameters('parameters')]"
-                            },
-                            "identity": {
-                                "type": "[parameters('identity')]"
-                            }
+                            "field": "category",
+                            "equals": "ResourceHealth"
+                        },
+                        {
+                            "anyOf": [
+                                {
+                                    "field": "resourceGroup",
+                                    "equals": "rg-cph-pltf-bldvms-prd-qc-01"
+                                }
+                            ]
                         }
                     ]
-                }
-            }
-        },
-        // Policy Assignment on Resource group scope
-        {
-            "name": "[concat(variables('policyAssignmentName'), '-rgDeployment')]",
-            "apiVersion": "2020-06-01",
-            "type": "Microsoft.Resources/deployments",
-            "condition": "[not(empty(parameters('resourceGroupName')))]",
-            "dependsOn": [
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
+                },
+                "actions": {
+                    "actionGroups": [
                         {
-                            "type": "Microsoft.Authorization/policyAssignments",
-                            "name": "[variables('policyAssignmentName')]",
-                            "location": "[resourceGroup().location]",
-                            "apiVersion": "2019-09-01",
-                            "properties": {
-                                "policyDefinitionId": "[parameters('policyDefinitionID')]",
-                                "parameters": "[parameters('parameters')]"
-                            },
-                            "identity": {
-                                "type": "[parameters('identity')]"
-                            }
+                            "actionGroupId": "[parameters('actiongroups_ag_tasmu_health_externalid')]",
+                            "webhookProperties": {}
                         }
                     ]
-                }
+                },
+                "enabled": true,
+                "description": "Virtual machine metrics alerting for HUB (CPH) subscription"
             }
         }
-    ],
-    "functions": [
-    ],
-    "outputs": {
-        "policyAssignmentName": {
-            "type": "string",
-            "value": "[variables('policyAssignmentName')]",
-            "metadata": {
-                "description": "Name of the policy assignment."
-            }
-        },
-        "assignmentScope": {
-            "type": "string",
-            "value": "[if(empty(parameters('resourceGroupName')), subscription().id , concat(subscription().id, '/resourceGroups/', parameters('resourceGroupName')))]",
-            "metadata": {
-                "description": "The scope (subscription or resource group) of the assignment."
-            }
-        }
-    }
+    ]
 }
