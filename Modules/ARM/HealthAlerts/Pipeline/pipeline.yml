@@ -1,69 +1,35 @@
-name: $(moduleName)
-
-parameters:
-- name: versioningOption
-  displayName: Default publish version
-  type: string
-  default: patch
-  values:
-  - patch
-  - minor
-  - major
-- name: uiCustomVersion
-  displayName: -OR- Custom publish version
-  type: string
-  default: '-'
-- name: removeDeployment
-  displayName: Remove resources post-deployment
-  type: boolean
-  default: false # removal in progress
+name: $(moduleName)-$(moduleVersion)
 
 variables:
-- template: /Modules/ARM/.global/global.variables.yml
-- name: moduleName
-  value: HealthAlert
-- name: pipelineCustomVersion
-  value: 1.0.0
+- template: pipeline.variables.yml
+- template: /Modules/.global/global.variables.yml
 
 trigger:
   batch: true
   branches:
     include:
-    - main
-    - raja-policyupdate 
+      - raja-policyupdate
   paths:
     include:
-    - Modules/ARM/.global/*
-    - Modules/ARM/HealthAlert/*
+    - Modules/ARM/HealthAlerts/*
     exclude:
-    - Modules/ARM/HealthAlert/readme.md
+    - Modules/ARM/HealthAlerts/*/readme.md
     
-stages:
-- stage: Validation
+stages:  
+- stage: Scan
   jobs:
-  - template: /Modules/ARM/.global/PipelineTemplates/pipeline.jobs.validate.yml
-    parameters:
-      deploymentBlocks:
-      - path: $(parametersPath)/parameters.json
-      
-- stage: Deployment
-  jobs:
-  - template: /Modules/ARM/.global/PipelineTemplates/pipeline.jobs.deploy.yml
-    parameters:
-      removeDeployment: '${{ parameters.removeDeployment }}'
-      deploymentBlocks:
-      - path: $(parametersPath)/parameters.json
+    - template: /Modules/.global/global.azsk.yml
+      parameters:
+        templateFile: $(modulePath)/deploy.json
+        parametersFile: $(modulePath)/Parameters/parameters.json   
 
-- stage: Publishing
-  condition: and(succeeded(), in(variables['Build.SourceBranch'], 'refs/heads/main','refs/heads/master'))
+- stage: Validate
   jobs:
-  - template: /Modules/ARM/.global/PipelineTemplates/pipeline.jobs.publish.yml
+  - template: pipeline.jobs.validate.yml
     parameters:
-      versioningOption: '${{ parameters.versioningOption }}'
-      uiCustomVersion: '${{ parameters.uiCustomVersion }}'
+      templateFile: $(modulePath)/deploy.json
+      parametersFile: $(modulePath)/Parameters/parameters.json
 
-- stage: Removal
-  dependsOn: Deployment
-  condition: and(succeededOrFailed(), eq( '${{ parameters.removeDeployment }}', 'true'))
+- stage: Publish
   jobs:
-  - template: /Modules/ARM/.global/PipelineTemplates/pipeline.jobs.remove.yml
+  - template: pipeline.jobs.publish.yml
