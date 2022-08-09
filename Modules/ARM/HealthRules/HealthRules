@@ -2,54 +2,52 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "metricalerts_alt_cph_metrics_vm_memory_name": {
-            "defaultValue": "alt-cph-metrics-vm-memoryy",
+        "activityLogAlerts_alt_cph_metrics_vm_cpu_namenew": {
+            "defaultValue": "alt-cph-metrics-vm-cpu",
             "type": "String"
         },
-        "actionGroups__ag_cph_glob_mon_prd_we_01_externalid": {
-            "defaultValue": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health",
+        "actiongroups_ag_tasmu_health_externalid": {
+            "defaultValue": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actiongroups/ag-tasmu-health",
             "type": "String"
         }
     },
     "variables": {},
     "resources": [
         {
-            "type": "microsoft.insights/metricalerts",
-            "apiVersion": "2018-03-01",
-            "name": "[parameters('metricalerts_alt_cph_metrics_vm_memory_name')]",
-            "location": "global",
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('activityLogAlerts_alt_cph_metrics_vm_cpu_name')]",
+            "location": "Global",
             "properties": {
-                "description": "Virtual machine metrics alerting for Production (CPH) subscription",
-                "severity": 2,
-                "enabled": true,
                 "scopes": [
                     "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
                 ],
-                "evaluationFrequency": "PT15M",
-                "windowSize": "PT15M",
-                "criteria": {
+                "condition": {
                     "allOf": [
                         {
-                            "threshold": 500000000,
-                            "name": "Metric1",
-                            "metricNamespace": "microsoft.compute/virtualmachines",
-                            "metricName": "Available Memory Bytes",
-                            "operator": "LessThan",
-                            "timeAggregation": "Average",
-                            "criterionType": "StaticThresholdCriterion"
+                            "field": "category",
+                            "equals": "ResourceHealth"
+                        },
+                        {
+                            "anyOf": [
+                                {
+                                    "field": "resourceGroup",
+                                    "equals": "rg-cph-pltf-bldvms-prd-qc-01"
+                                }
+                            ]
                         }
-                    ],
-                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                    ]
                 },
-                "autoMitigate": true,
-                "targetResourceType": "microsoft.compute/virtualmachines",
-                "targetResourceRegion": "qatarcentral",
-                "actions": [
-                    {
-                        "actionGroupId": "[parameters('actionGroups__ag_cph_glob_mon_prd_we_01_externalid')]",
-                        "webHookProperties": {}
-                    }
-                ]
+                "actions": {
+                    "actionGroups": [
+                        {
+                            "actionGroupId": "[parameters('actiongroups_ag_tasmu_health_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "Virtual machine metrics alerting for HUB (CPH) subscription"
             }
         }
     ]
