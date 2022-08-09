@@ -613,9 +613,30 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-mgmt-prd-qc-01-to-cph-shdo-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
-    }    
+    },
+    {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-azfw-cph-mgmt-onpfw-prd-qc-01",
+            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "dependsOn": [
+               "DEP-vnet-cph-mgmt-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'AzureFirewall/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'AzureFirewall/2019-11-28/Parameters/azfw-cph-mgmt-onpfw-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+    }
+       
     ],
     "outputs": {
     }
 }
-
