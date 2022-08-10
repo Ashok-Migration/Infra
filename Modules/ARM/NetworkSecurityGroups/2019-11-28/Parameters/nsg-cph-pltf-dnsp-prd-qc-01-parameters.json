@@ -6,9 +6,126 @@
       "value": "nsg-cph-pltf-dnsp-prd-qc-01"
     },
     "networkSecurityGroupSecurityRules": {
-      "value": [
+      "value": [{
+                    "name": "allow-in-any-dnsp-prd-53",
+                    "properties": {
+                        "description": "",
+                        "protocol": "*",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "53",
+                        "sourceAddressPrefix": "*",
+                        "destinationAddressPrefix": "",
+                        "sourceAddressPrefixes": [],
+                        "destinationAddressPrefixes": [
+                                                     "172.27.93.170",
+                                                     "172.27.93.166",
+                                                     "172.27.93.167",
+                                                     "172.27.93.168"
+                                                     ],
+                        "access": "Allow",
+                        "priority": 151,
+                        "direction": "Inbound"
+                    }
+                }
+                // {
+                //     "name": "allowazureloadbalancerhealthprobe",
+                //     "properties": {
+                //         "description": "Allow Azure Load Balancer health Probe",
+                //         "protocol": "*",
+                //         "access": "Allow",
+                //         "priority": 161,
+                //         "direction": "Inbound",
+                //         "sourcePortRanges": "*",
+                //         "destinationPortRange": "*",
+                //         "sourceAddressPrefix": "AzureLoadBalancer",
+                //         "destinationAddressPrefix": "172.27.93.160/27"
+                //     }
+                // },
+                // {
+                //     "name": "denyallinbound",
+                //     "properties": {
+                //         "description": "Deny All Inbound",
+                //         "protocol": "*",
+                //         "access": "Deny",
+                //         "priority": 4096,
+                //         "direction": "Inbound",
+                //         "sourcePortRange": "*",
+                //         "destinationPortRange": "*",
+                //         "sourceAddressPrefix": "*",
+                //         "destinationAddressPrefix": "*"
+                //     }
+                // },
+                // {
+                //     "name": "allow-in-dnsp-azmon-prd-01",
+                //     "properties": {
+                //         "description": "Allow connection to Log analytics private endpoints for Azure Monitor",
+                //         "protocol": "*",
+                //         "access": "Allow",
+                //         "priority": 151,
+                //         "direction": "Outbound",
+                //         "sourcePortRanges": "*",
+                //         "destinationPortRange": "*",
+                //         "sourceAddressPrefixes": [
+                //                                      "172.27.93.166",
+                //                                      "172.27.93.167",
+                //                                      "172.27.93.168"
+                //                                      ],
+                //         "destinationAddressPrefix": "172.27.94.160/27"
+                //     }
+                // },
+                // {
+                //     "name": "allow-out-dnp-azbakp-prd-01",
+                //     "properties": {
+                //         "description": "Allow connection to Azure Backup",
+                //         "protocol": "*",
+                //         "access": "Allow",
+                //         "priority": 161,
+                //         "direction": "Outbound",
+                //         "sourcePortRange": "*",
+                //         "destinationPortRange": "*",
+                //         "sourceAddressPrefixes": [
+                //                                      "172.27.93.166",
+                //                                      "172.27.93.167",
+                //                                      "172.27.93.168"
+                //                                      ],
+                //         "destinationAddressPrefix": "AzueBackup"
+                //     }
+                // },
+                // {
+                //     "name": "allow-out-dnp-Qualys-prd-01",
+                //     "properties": {
+                //         "description": "Allow Outbound to Qualys",
+                //         "protocol": "TCP",
+                //         "sourcePortRange": "*",
+                //         "destinationPortRange": "443",
+                //         "access": "Allow",
+                //         "priority": 171,
+                //         "direction": "Outbound",
+                //         "sourceAddressPrefixes": [
+                //                                      "172.27.93.166",
+                //                                      "172.27.93.167",
+                //                                      "172.27.93.168"
+                //                                      ],
+                //         "destinationAddressPrefix": "154.59.121.74"
+                //     }
+                // },
+                // {
+                //     "name": "denyalloutbound",
+                //     "properties": {
+                //         "description": "Deny All Outbound",
+                //         "protocol": "*",
+                //         "access": "Deny",
+                //         "priority": 4096,
+                //         "direction": "Outbound",
+                //         "sourcePortRange": "*",
+                //         "destinationPortRange": "*",
+                //         "sourceAddressPrefix": "*",
+                //         "destinationAddressPrefix": "*"
+                //     }
+                // }   
       ]
     },
+
     "flowLogsDeloy": {
       "value": true
     },
