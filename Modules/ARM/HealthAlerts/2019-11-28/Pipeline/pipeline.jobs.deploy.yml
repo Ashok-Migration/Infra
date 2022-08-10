@@ -1,0 +1,17 @@
+ jobs:
+  - job:
+    displayName: "Deploy Alerts"
+    pool:
+      vmImage: $(vmImage)
+    variables:
+      - template: pipeline.variables.yml
+    steps:
+      - task: AzureCLI@2
+        displayName: 'Deploy Alert'
+        inputs:
+            azureSubscription: $(serviceConnectionPrd)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+                az deployment group create --resource-group rg-cph-pltf-vldvms-prd-qc-01 --name healthalerts \
+                --template-file deploy.json
