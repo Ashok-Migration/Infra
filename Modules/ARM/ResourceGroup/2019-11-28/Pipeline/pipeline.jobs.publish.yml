@@ -94,7 +94,7 @@ jobs:
           azureSubscription: $(serviceConnectionNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "module" --public-access off --account-name  "stcphpltfiactstnpdqc01" --subscription "f9795662-4020-4ccf-ae1a-426542cab5c4"           
+            az storage container create --name "module" --public-access off --account-name  "stcphpltfiactstnpdqc01" --account-key "gIba1aDFPVLhtmFID+20/Ra2IBTDjhItoHitxs5JRUMpFMENjX4X3w4jVa3RrWQj0XDBzA62O8mi+ASt3s2grA==" --subscription "f9795662-4020-4ccf-ae1a-426542cab5c4"           
            #az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameNpd)" --subscription "$(componentStorageAccountSubscriptionIdNpd)"           
         
       - task: AzureCLI@1
@@ -103,4 +103,4 @@ jobs:
           azureSubscription: $(serviceConnectionNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "components/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name  "stcphpltfiactstnpdqc01" --subscription "f9795662-4020-4ccf-ae1a-426542cab5c4"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "components/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name  "stcphpltfiactstnpdqc01" --account-key "gIba1aDFPVLhtmFID+20/Ra2IBTDjhItoHitxs5JRUMpFMENjX4X3w4jVa3RrWQj0XDBzA62O8mi+ASt3s2grA==" --subscription "f9795662-4020-4ccf-ae1a-426542cab5c4"
