@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "utcYear": {
@@ -169,6 +169,29 @@
         },
         "parametersLink": {
           "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-csp-invoice-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-logic-cpd-csp-bill-dev-we-02",
+      "resourceGroup": "rg-cpd-csp-bill-dev-we-01",
+      "dependsOn": [
+        "DEP-rg-cpd-csp-bill-dev-we-01",
+        "DEP-apicon-cpd-csp-bill-dev-we-01",
+        "DEP-apicon-cpd-csp-integd-dev-we-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'LogicApp/2016-10-01/Parameters/logic-cpd-csp-bill-dev-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }

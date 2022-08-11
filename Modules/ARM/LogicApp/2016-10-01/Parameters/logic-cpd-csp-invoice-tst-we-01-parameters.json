@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workflowName": {
@@ -16,15 +16,11 @@
                 "Recurrence": {
                     "evaluatedRecurrence": {
                         "frequency": "Month",
-                        "interval": 1,
-                        "startTime": "2022-07-07T00:00:00Z",
-                        "timeZone": "Arab Standard Time"
+                        "interval": 7
                     },
                     "recurrence": {
                         "frequency": "Month",
-                        "interval": 1,
-                        "startTime": "2022-07-07T00:00:00Z",
-                        "timeZone": "Arab Standard Time"
+                        "interval": 7
                     },
                     "type": "Recurrence"
                 }
@@ -32,169 +28,219 @@
         },
         "workflowActions": {
             "value": {
+                "Filter_array_Invoice_Data": {
+                    "inputs": {
+                        "from": "@body('Parse_JSON_Invoice_Data')?['items']",
+                        "where": "@equals(item()?['invoiceType'], 'OneTime')"
+                    },
+                    "runAfter": {
+                        "Parse_JSON_Invoice_Data": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Query"
+                },
                 "For_each": {
                     "actions": {
                         "Condition": {
-                            "actions": {
-                                "Filter_array": {
-                                    "inputs": {
-                                        "from": "@body('Parse_JSON__Invoice_by_ID')",
-                                        "where": "@contains(item()['customerCompanyName'], 'SQCP')"
-                                    },
-                                    "runAfter": {
-                                        "Parse_JSON__Invoice_by_ID": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Query"
-                                },
-                                "For_each_2": {
-                                    "actions": {
+                            "actions": {                               
                                         "Create_CSV_table": {
                                             "inputs": {
                                                 "columns": [
                                                     {
                                                         "header": "PartnerId",
-                                                        "value": "@items('For_each_2')['partnerId']"
-                                                    },
-                                                    {
-                                                        "header": "PartnerName",
-                                                        "value": "@items('For_each_2')['partnerName']"
-                                                    },
-                                                    {
-                                                        "header": "PartnerBillableAccountId",
-                                                        "value": "@items('For_each_2')['partnerBillableAccountId']"
-                                                    },
-                                                    {
-                                                        "header": "CustomerCompanyName",
-                                                        "value": "@items('For_each_2')['customerCompanyName']"
-                                                    },
-                                                    {
-                                                        "header": "MpnId",
-                                                        "value": "@items('For_each_2')['mpnId']"
-                                                    },
-                                                    {
-                                                        "header": "InvoiceNumber",
-                                                        "value": "@items('For_each_2')['invoiceNumber']"
-                                                    },
-                                                    {
-                                                        "header": "ChargeStartDate",
-                                                        "value": "@items('For_each_2')['chargeStartDate']"
-                                                    },
-                                                    {
-                                                        "header": "ChargeEndDate",
-                                                        "value": "@items('For_each_2')['chargeEndDate']"
-                                                    },
-                                                    {
-                                                        "header": "SubscriptionId",
-                                                        "value": "@items('For_each_2')['subscriptionId']"
-                                                    },
-                                                    {
-                                                        "header": "SubscriptionName",
-                                                        "value": "@items('For_each_2')['subscriptionName']"
-                                                    },
-                                                    {
-                                                        "header": "SubscriptionDescription",
-                                                        "value": "@items('For_each_2')['subscriptionDescription']"
-                                                    },
-                                                    {
-                                                        "header": "OrderId",
-                                                        "value": "@items('For_each_2')['orderId']"
-                                                    },
-                                                    {
-                                                        "header": "ServiceName",
-                                                        "value": "@items('For_each_2')['serviceName']"
-                                                    },
-                                                    {
-                                                        "header": "ServiceType",
-                                                        "value": "@items('For_each_2')['serviceType']"
-                                                    },
-                                                    {
-                                                        "header": "ResourceGuid",
-                                                        "value": "@items('For_each_2')['resourceGuid']"
-                                                    },
-                                                    {
-                                                        "header": "ResourceName",
-                                                        "value": "@items('For_each_2')['resourceName']"
-                                                    },
-                                                    {
-                                                        "header": "Region",
-                                                        "value": "@items('For_each_2')['region']"
-                                                    },
-                                                    {
-                                                        "header": "Sku",
-                                                        "value": "@items('For_each_2')['sku']"
-                                                    },
-                                                    {
-                                                        "header": "DetailLineItemId",
-                                                        "value": "@items('For_each_2')['detailLineItemId']"
-                                                    },
-                                                    {
-                                                        "header": "ConsumedQuantity",
-                                                        "value": "@items('For_each_2')['consumedQuantity']"
-                                                    },
-                                                    {
-                                                        "header": "IncludedQuantity",
-                                                        "value": "@items('For_each_2')['includedQuantity']"
-                                                    },
-                                                    {
-                                                        "header": "OverageQuantity",
-                                                        "value": "@items('For_each_2')['overageQuantity']"
-                                                    },
-                                                    {
-                                                        "header": "ListPrice",
-                                                        "value": "@items('For_each_2')['listPrice']"
-                                                    },
-                                                    {
-                                                        "header": "PretaxCharges",
-                                                        "value": "@items('For_each_2')['pretaxCharges']"
-                                                    },
-                                                    {
-                                                        "header": "TaxAmount",
-                                                        "value": "@items('For_each_2')['taxAmount']"
-                                                    },
-                                                    {
-                                                        "header": "PostTaxTotal",
-                                                        "value": "@items('For_each_2')['postTaxTotal']"
-                                                    },
-                                                    {
-                                                        "header": "Currency",
-                                                        "value": "@items('For_each_2')['currency']"
-                                                    },
-                                                    {
-                                                        "header": "PretaxEffectiveRate",
-                                                        "value": "@items('For_each_2')['pretaxEffectiveRate']"
-                                                    },
-                                                    {
-                                                        "header": "PostTaxEffectiveRate",
-                                                        "value": "@items('For_each_2')['postTaxEffectiveRate']"
-                                                    },
-                                                    {
-                                                        "header": "ChargeType",
-                                                        "value": "@items('For_each_2')['chargeType']"
+                                                        "value": "@item()?['partnerId']"
                                                     },
                                                     {
                                                         "header": "CustomerId",
-                                                        "value": "@items('For_each_2')['customerId']"
+                                                        "value": "@item()?['customerId']"
                                                     },
                                                     {
-                                                        "header": "DomainName",
-                                                        "value": "@items('For_each_2')['domainName']"
+                                                        "header": "CustomerName",
+                                                        "value": "@item()?['customerName']"
                                                     },
                                                     {
-                                                        "header": "BillingCycleType",
-                                                        "value": "@items('For_each_2')['billingCycleType']"
+                                                        "header": "CustomerDomainName",
+                                                        "value": "@item()?['customerDomainName']"
                                                     },
                                                     {
-                                                        "header": "Unit",
-                                                        "value": "@items('For_each_2')['unit']"
+                                                        "header": "CustomerCountry",
+                                                        "value": "@item()?['customerCountry']"
+                                                    },
+                                                    {
+                                                        "header": "InvoiceNumber",
+                                                        "value": "@item()?['invoiceNumber']"
+                                                    },
+                                                    {
+                                                        "header": "MpnId",
+                                                        "value": "@item()?['mpnId']"
+                                                    },
+                                                    {
+                                                        "header": "OrderId",
+                                                        "value": "@item()?['orderId']"
+                                                    },
+                                                    {
+                                                        "header": "OrderDate",
+                                                        "value": "@item()?['orderDate']"
+                                                    },
+                                                    {
+                                                        "header": "ProductId",
+                                                        "value": "@item()?['productId']"
+                                                    },
+                                                    {
+                                                        "header": "SkuId",
+                                                        "value": "@item()?['skuId']"
+                                                    },
+                                                    {
+                                                        "header": "SkuName",
+                                                        "value": "@item()?['skuName']"
+                                                    },
+                                                    {
+                                                        "header": "ProductName",
+                                                        "value": "@item()?['productName']"
+                                                    },
+                                                    {
+                                                        "header": "ChargeType",
+                                                        "value": "@item()?['chargeType']"
+                                                    },
+                                                    {
+                                                        "header": "UnitPrice",
+                                                        "value": "@item()?['unitPrice']"
+                                                    },
+                                                    {
+                                                        "header": "Quantity",
+                                                        "value": "@item()?['quantity']"
+                                                    },
+                                                    {
+                                                        "header": "Subtotal",
+                                                        "value": "@item()?['subtotal']"
+                                                    },
+                                                    {
+                                                        "header": "TaxTotal",
+                                                        "value": "@item()?['taxTotal']"
+                                                    },
+                                                    {
+                                                        "header": "Total",
+                                                        "value": "@item()?['totalForCustomer']"
+                                                    },
+                                                    {
+                                                        "header": "Currency",
+                                                        "value": "@item()?['currency']"
+                                                    },
+                                                    {
+                                                        "header": "PriceAdjustmentDescription",
+                                                        "value": "@item()?['priceAdjustmentDescription']"
+                                                    },
+                                                    {
+                                                        "header": "PublisherName",
+                                                        "value": "@item()?['publisherName']"
+                                                    },
+                                                    {
+                                                        "header": "PublisherId",
+                                                        "value": "@item()?['publisherId']"
+                                                    },
+                                                    {
+                                                        "header": "SubscriptionDescription",
+                                                        "value": "@item()?['subscriptionDescription']"
+                                                    },
+                                                    {
+                                                        "header": "ChargeStartDate",
+                                                        "value": "@item()?['chargeStartDate']"
+                                                    },
+                                                    {
+                                                        "header": "ChargeEndDate",
+                                                        "value": "@item()?['chargeEndDate']"
+                                                    },
+                                                    {
+                                                        "header": "TermAndBillingCycle",
+                                                        "value": "@item()?['termAndBillingCycle']"
+                                                    },
+                                                    {
+                                                        "header": "EffectiveUnitPrice",
+                                                        "value": "@item()?['effectiveUnitPrice']"
+                                                    },
+                                                    {
+                                                        "header": "UnitType",
+                                                        "value": "@item()?['unitType']"
+                                                    },
+                                                    {
+                                                        "header": "AlternateId",
+                                                        "value": "@item()?['alternateId']"
+                                                    },
+                                                    {
+                                                        "header": "BillableQuantity",
+                                                        "value": "@item()?['billableQuantity']"
+                                                    },
+                                                    {
+                                                        "header": "BillingFrequency",
+                                                        "value": "@item()?['billingFrequency']"
+                                                    },
+                                                    {
+                                                        "header": "PricingCurrency",
+                                                        "value": "@item()?['pricingCurrency']"
+                                                    },
+                                                    {
+                                                        "header": "PCToBCExchangeRate",
+                                                        "value": "@item()?['pcToBCExchangeRate']"
+                                                    },
+                                                    {
+                                                        "header": "PCToBCExchangeRateDate",
+                                                        "value": "@item()?['pcToBCExchangeRateDate']"
+                                                    },
+                                                    {
+                                                        "header": "MeterDescription",
+                                                        "value": "@item()?['meterDescription']"
+                                                    },
+                                                    {
+                                                        "header": "ReservationOrderId",
+                                                        "value": "@item()?['reservationOrderId']"
+                                                    },
+                                                    {
+                                                        "header": "CreditReasonCode",
+                                                        "value": ""
+                                                    },
+                                                    {
+                                                        "header": "SubscriptionStartDate",
+                                                        "value": "@item()?['subscriptionStartDate']"
+                                                    },
+                                                    {
+                                                        "header": "SubscriptionEndDate",
+                                                        "value": "@item()?['subscriptionEndDate']"
+                                                    },
+                                                    {
+                                                        "header": "ReferenceId",
+                                                        "value": "@item()?['referenceId']"
+                                                    },
+                                                    {
+                                                        "header": "ProductQualifiers",
+                                                        "value": "@item()?['productQualifiers']"
+                                                    },
+                                                    {
+                                                        "header": "PromotionId",
+                                                        "value": "@item()?['promotionId']"
                                                     }
                                                 ],
                                                 "format": "CSV",
-                                                "from": "@body('Filter_array')"
+                                                "from": "@body('Filter_array__Invoice_by_ID')"
                                             },
-                                            "runAfter": {},
+                                            "runAfter": {
+                                                "Filter_array__Invoice_by_ID": [
+                                                    "Succeeded"
+                                                ]
+                                            },
                                             "type": "Table"
+                                        },
+                                        "Filter_array__Invoice_by_ID": {
+                                            "inputs": {
+                                                "from": "@body('Parse_JSON__Invoice_by_ID')",
+                                                "where": "@contains(item()['customerName'], 'SQCP')"
+                                            },
+                                            "runAfter": {
+                                                "Parse_JSON__Invoice_by_ID": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Query"                                           
                                         },
                                         "HTTP": {
                                             "inputs": {
@@ -217,191 +263,225 @@
                                                 ]
                                             },
                                             "type": "Http"
-                                        }
-                                    },
-                                    "foreach": "@body('Filter_array')",
-                                    "runAfter": {
-                                        "Filter_array": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Foreach"
-                                },
-                                "Parse_JSON__Invoice_by_ID": {
-                                    "inputs": {
-                                        "content": "@body('Get_invoice_by_ID').items",
-                                        "schema": {
-                                            "items": {
-                                                "properties": {
-                                                    "attributes": {
+                                        },
+                                        "Parse_JSON__Invoice_by_ID": {
+                                            "inputs": {
+                                                "content": "@body('Get_invoice_by_ID').items",
+                                                "schema": {
+                                                    "items": {
                                                         "properties": {
-                                                            "objectType": {
+                                                            "alternateId": {
+                                                                "type": "string"
+                                                            },
+                                                            "attributes": {
+                                                                "properties": {
+                                                                    "objectType": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "availabilityId": {
+                                                                "type": "string"
+                                                            },
+                                                            "billableQuantity": {
+                                                                "type": "number"
+                                                            },
+                                                            "billingFrequency": {
+                                                                "type": "string"
+                                                            },
+                                                            "billingProvider": {
+                                                                "type": "string"
+                                                            },
+                                                            "chargeEndDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "chargeStartDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "chargeType": {
+                                                                "type": "string"
+                                                            },
+                                                            "currency": {
+                                                                "type": "string"
+                                                            },
+                                                            "customerCountry": {
+                                                                "type": "string"
+                                                            },
+                                                            "customerDomainName": {
+                                                                "type": "string"
+                                                            },
+                                                            "customerId": {
+                                                                "type": "string"
+                                                            },
+                                                            "customerName": {
+                                                                "type": "string"
+                                                            },
+                                                            "discountDetails": {
+                                                                "type": "string"
+                                                            },
+                                                            "effectiveUnitPrice": {
+                                                                "type": "number"
+                                                            },
+                                                            "invoiceLineItemType": {
+                                                                "type": "string"
+                                                            },
+                                                            "invoiceNumber": {
+                                                                "type": "string"
+                                                            },
+                                                            "meterDescription": {
+                                                                "type": "string"
+                                                            },
+                                                            "mpnId": {
+                                                                "type": "string"
+                                                            },
+                                                            "orderDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "orderId": {
+                                                                "type": "string"
+                                                            },
+                                                            "partnerId": {
+                                                                "type": "string"
+                                                            },
+                                                            "pcToBCExchangeRate": {
+                                                                "type": "integer"
+                                                            },
+                                                            "pcToBCExchangeRateDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "priceAdjustmentDescription": {
+                                                                "type": "string"
+                                                            },
+                                                            "pricingCurrency": {
+                                                                "type": "string"
+                                                            },
+                                                            "productId": {
+                                                                "type": "string"
+                                                            },
+                                                            "productName": {
+                                                                "type": "string"
+                                                            },
+                                                            "productQualifiers": {
+                                                                "type": "array"
+                                                            },
+                                                            "promotionId": {
+                                                                "type": "string"
+                                                            },
+                                                            "publisherId": {
+                                                                "type": "string"
+                                                            },
+                                                            "publisherName": {
+                                                                "type": "string"
+                                                            },
+                                                            "quantity": {
+                                                                "type": "integer"
+                                                            },
+                                                            "referenceId": {
+                                                                "type": "string"
+                                                            },
+                                                            "resellerMpnId": {
+                                                                "type": "integer"
+                                                            },
+                                                            "reservationOrderId": {
+                                                                "type": "string"
+                                                            },
+                                                            "skuId": {
+                                                                "type": "string"
+                                                            },
+                                                            "skuName": {
+                                                                "type": "string"
+                                                            },
+                                                            "subscriptionDescription": {
+                                                                "type": "string"
+                                                            },
+                                                            "subscriptionEndDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "subscriptionId": {
+                                                                "type": "string"
+                                                            },
+                                                            "subscriptionStartDate": {
+                                                                "type": "string"
+                                                            },
+                                                            "subtotal": {
+                                                                "type": "number"
+                                                            },
+                                                            "taxTotal": {
+                                                                "type": "integer"
+                                                            },
+                                                            "termAndBillingCycle": {
+                                                                "type": "string"
+                                                            },
+                                                            "totalForCustomer": {
+                                                                "type": "number"
+                                                            },
+                                                            "unitPrice": {
+                                                                "type": "number"
+                                                            },
+                                                            "unitType": {
                                                                 "type": "string"
                                                             }
                                                         },
+                                                        "required": [
+                                                            "partnerId",
+                                                            "customerId",
+                                                            "customerName",
+                                                            "customerDomainName",
+                                                            "customerCountry",
+                                                            "invoiceNumber",
+                                                            "mpnId",
+                                                            "resellerMpnId",
+                                                            "orderId",
+                                                            "orderDate",
+                                                            "productId",
+                                                            "skuId",
+                                                            "availabilityId",
+                                                            "productName",
+                                                            "skuName",
+                                                            "productQualifiers",
+                                                            "chargeType",
+                                                            "unitPrice",
+                                                            "effectiveUnitPrice",
+                                                            "unitType",
+                                                            "quantity",
+                                                            "subtotal",
+                                                            "taxTotal",
+                                                            "totalForCustomer",
+                                                            "currency",
+                                                            "publisherName",
+                                                            "publisherId",
+                                                            "subscriptionDescription",
+                                                            "subscriptionId",
+                                                            "chargeStartDate",
+                                                            "chargeEndDate",
+                                                            "termAndBillingCycle",
+                                                            "alternateId",
+                                                            "referenceId",
+                                                            "priceAdjustmentDescription",
+                                                            "discountDetails",
+                                                            "pricingCurrency",
+                                                            "pcToBCExchangeRate",
+                                                            "pcToBCExchangeRateDate",
+                                                            "billableQuantity",
+                                                            "meterDescription",
+                                                            "billingFrequency",
+                                                            "reservationOrderId",
+                                                            "invoiceLineItemType",
+                                                            "billingProvider",
+                                                            "promotionId",
+                                                            "attributes"
+                                                        ],
                                                         "type": "object"
                                                     },
-                                                    "billingCycleType": {
-                                                        "type": "string"
-                                                    },
-                                                    "billingProvider": {
-                                                        "type": "string"
-                                                    },
-                                                    "chargeEndDate": {
-                                                        "type": "string"
-                                                    },
-                                                    "chargeStartDate": {
-                                                        "type": "string"
-                                                    },
-                                                    "chargeType": {
-                                                        "type": "string"
-                                                    },
-                                                    "consumedQuantity": {
-                                                        "type": "number"
-                                                    },
-                                                    "currency": {
-                                                        "type": "string"
-                                                    },
-                                                    "customerCompanyName": {
-                                                        "type": "string"
-                                                    },
-                                                    "customerId": {
-                                                        "type": "string"
-                                                    },
-                                                    "detailLineItemId": {
-                                                        "type": "integer"
-                                                    },
-                                                    "domainName": {
-                                                        "type": "string"
-                                                    },
-                                                    "includedQuantity": {
-                                                        "type": "integer"
-                                                    },
-                                                    "invoiceLineItemType": {
-                                                        "type": "string"
-                                                    },
-                                                    "invoiceNumber": {
-                                                        "type": "string"
-                                                    },
-                                                    "listPrice": {
-                                                        "type": "number"
-                                                    },
-                                                    "mpnId": {
-                                                        "type": "integer"
-                                                    },
-                                                    "orderId": {
-                                                        "type": "string"
-                                                    },
-                                                    "overageQuantity": {
-                                                        "type": "number"
-                                                    },
-                                                    "partnerBillableAccountId": {
-                                                        "type": "string"
-                                                    },
-                                                    "partnerId": {
-                                                        "type": "string"
-                                                    },
-                                                    "partnerName": {
-                                                        "type": "string"
-                                                    },
-                                                    "postTaxEffectiveRate": {
-                                                        "type": "number"
-                                                    },
-                                                    "postTaxTotal": {
-                                                        "type": "number"
-                                                    },
-                                                    "pretaxCharges": {
-                                                        "type": "number"
-                                                    },
-                                                    "pretaxEffectiveRate": {
-                                                        "type": "number"
-                                                    },
-                                                    "region": {
-                                                        "type": "string"
-                                                    },
-                                                    "resourceGuid": {
-                                                        "type": "string"
-                                                    },
-                                                    "resourceName": {
-                                                        "type": "string"
-                                                    },
-                                                    "serviceName": {
-                                                        "type": "string"
-                                                    },
-                                                    "serviceType": {
-                                                        "type": "string"
-                                                    },
-                                                    "sku": {
-                                                        "type": "string"
-                                                    },
-                                                    "subscriptionDescription": {
-                                                        "type": "string"
-                                                    },
-                                                    "subscriptionId": {
-                                                        "type": "string"
-                                                    },
-                                                    "subscriptionName": {
-                                                        "type": "string"
-                                                    },
-                                                    "taxAmount": {
-                                                        "type": "integer"
-                                                    },
-                                                    "tier2MpnId": {
-                                                        "type": "integer"
-                                                    },
-                                                    "unit": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "required": [
-                                                    "detailLineItemId",
-                                                    "sku",
-                                                    "includedQuantity",
-                                                    "overageQuantity",
-                                                    "listPrice",
-                                                    "currency",
-                                                    "pretaxCharges",
-                                                    "taxAmount",
-                                                    "postTaxTotal",
-                                                    "pretaxEffectiveRate",
-                                                    "postTaxEffectiveRate",
-                                                    "chargeType",
-                                                    "invoiceLineItemType",
-                                                    "partnerId",
-                                                    "partnerName",
-                                                    "partnerBillableAccountId",
-                                                    "customerId",
-                                                    "domainName",
-                                                    "customerCompanyName",
-                                                    "mpnId",
-                                                    "tier2MpnId",
-                                                    "invoiceNumber",
-                                                    "subscriptionId",
-                                                    "subscriptionName",
-                                                    "subscriptionDescription",
-                                                    "billingCycleType",
-                                                    "orderId",
-                                                    "serviceName",
-                                                    "serviceType",
-                                                    "resourceGuid",
-                                                    "resourceName",
-                                                    "region",
-                                                    "consumedQuantity",
-                                                    "chargeStartDate",
-                                                    "chargeEndDate",
-                                                    "unit",
-                                                    "billingProvider",
-                                                    "attributes"
-                                                ],
-                                                "type": "object"
+                                                    "type": "array"
+                                                }
                                             },
-                                            "type": "array"
+                                            "runAfter": {},
+                                            "type": "ParseJson"
+
                                         }
-                                    },
-                                    "runAfter": {},
-                                    "type": "ParseJson"
-                                }
-                            },
+                            },        
                             "expression": {
                                 "and": [
                                     {
@@ -428,15 +508,15 @@
                                     "Authorization": "Bearer @{body('Parse_JSON')?['access_token']}"
                                 },
                                 "method": "GET",
-                                "uri": "https://api.partnercenter.microsoft.com/v1/invoices/@{items('For_each')?['id']}/lineitems?provider=Azure&invoicelineitemtype=BillingLineItems"
+                                "uri": "https://api.partnercenter.microsoft.com/v1/invoices/@{items('For_each')?['id']}/lineitems?provider=@{items('For_each')?['invoiceType']}&invoicelineitemtype=BillingLineItems"
                             },
                             "runAfter": {},
                             "type": "Http"
                         }
                     },
-                    "foreach": "@body('Parse_JSON_Invoice_Data')?['items']",
+                    "foreach": "@body('Filter_array_Invoice_Data')",
                     "runAfter": {
-                        "Parse_JSON_Invoice_Data": [
+                        "Filter_array_Invoice_Data": [
                             "Succeeded"
                         ]
                     },
@@ -461,7 +541,7 @@
                     "inputs": {
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpd-csp-invoice-tst-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['keyvault']['connectionId']"
                             }
                         },
                         "method": "get",
@@ -474,7 +554,7 @@
                     "inputs": {
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpd-csp-invoice-tst-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['keyvault']['connectionId']"
                             }
                         },
                         "method": "get",
@@ -491,7 +571,7 @@
                     "inputs": {
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpd-csp-invoice-tst-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['keyvault']['connectionId']"
                             }
                         },
                         "method": "get",
@@ -508,7 +588,7 @@
                     "inputs": {
                         "host": {
                             "connection": {
-                                "name": "@parameters('$connections')['apicon-cpd-csp-invoice-tst-we-01']['connectionId']"
+                                "name": "@parameters('$connections')['keyvault']['connectionId']"
                             }
                         },
                         "method": "get",
@@ -746,8 +826,8 @@
                     },
                     "type": "ParseJson"
                 }
-            }
-        },
+            }   
+        },    
         "workflowParameters": {
             "value": {
                 "$connections": {
@@ -780,7 +860,7 @@
             "value": {
                 "$connections": {
                     "value": {
-                        "apicon-cpd-csp-invoice-tst-we-01": {
+                        "keyvault": {
                             "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-csp-bill-tst-we-01/providers/Microsoft.Web/connections/apicon-cpd-csp-invoice-tst-we-01",
                             "connectionName": "apicon-cpd-csp-invoice-tst-we-01",
                             "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
