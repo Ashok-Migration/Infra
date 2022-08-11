@@ -9,7 +9,7 @@
       "value": [{
                     "name": "allow-in-any-dnsp-prd-53",
                     "properties": {
-                        "description": "",
+                        "description": "Allow Any Inbound for DNS -53",
                         "protocol": "*",
                         "sourcePortRange": "*",
                         "destinationPortRange": "53",
@@ -30,35 +30,47 @@
                         "priority": 151,
                         "direction": "Inbound"
                     }
+                },
+                {
+                    "name": "allowazureloadbalancerhealthprobe",
+                    "properties": {
+                        "description": "Allow Azure Load Balancer health Probe",
+                        "protocol": "*",
+                        "access": "Allow",
+                        "priority": 161,
+                        "direction": "Inbound",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "*",
+                        "sourcePortRanges": [],
+                        "sourceAddressPrefixes": [],
+                        "destinationPortRanges": [],
+                        "destinationAddressPrefixes": [],
+                        "sourceApplicationSecurityGroups": [],
+                        "destinationApplicationSecurityGroups" : [],
+                        "sourceAddressPrefix": "AzureLoadBalancer",
+                        "destinationAddressPrefix": "172.27.93.160/27"
+                    }
                 }
-                // {
-                //     "name": "allowazureloadbalancerhealthprobe",
-                //     "properties": {
-                //         "description": "Allow Azure Load Balancer health Probe",
-                //         "protocol": "*",
-                //         "access": "Allow",
-                //         "priority": 161,
-                //         "direction": "Inbound",
-                //         "sourcePortRanges": "*",
-                //         "destinationPortRange": "*",
-                //         "sourceAddressPrefix": "AzureLoadBalancer",
-                //         "destinationAddressPrefix": "172.27.93.160/27"
-                //     }
-                // },
-                // {
-                //     "name": "denyallinbound",
-                //     "properties": {
-                //         "description": "Deny All Inbound",
-                //         "protocol": "*",
-                //         "access": "Deny",
-                //         "priority": 4096,
-                //         "direction": "Inbound",
-                //         "sourcePortRange": "*",
-                //         "destinationPortRange": "*",
-                //         "sourceAddressPrefix": "*",
-                //         "destinationAddressPrefix": "*"
-                //     }
-                // },
+                {
+                    "name": "denyallinbound",
+                    "properties": {
+                        "description": "Deny All Inbound",
+                        "protocol": "*",
+                        "access": "Deny",
+                        "priority": 4096,
+                        "direction": "Inbound",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "*",
+                        "sourcePortRanges": [],
+                        "sourceAddressPrefixes": [],
+                        "destinationPortRanges": [],
+                        "destinationAddressPrefixes": [],
+                        "sourceApplicationSecurityGroups": [],
+                        "destinationApplicationSecurityGroups" : [],
+                        "sourceAddressPrefix": "*",
+                        "destinationAddressPrefix": "*"
+                    }
+                }
                 // {
                 //     "name": "allow-in-dnsp-azmon-prd-01",
                 //     "properties": {
@@ -67,8 +79,14 @@
                 //         "access": "Allow",
                 //         "priority": 151,
                 //         "direction": "Outbound",
-                //         "sourcePortRanges": "*",
+                //         "sourcePortRange": "*",
                 //         "destinationPortRange": "*",
+                //         "sourcePortRanges": [],
+                //         "sourceAddressPrefix": [],
+                //         "destinationPortRanges": [],
+                //         "destinationAddressPrefixes": [],
+                //         "sourceApplicationSecurityGroups": [],
+                //         "destinationApplicationSecurityGroups" : [],
                 //         "sourceAddressPrefixes": [
                 //                                      "172.27.93.166",
                 //                                      "172.27.93.167",
@@ -87,6 +105,12 @@
                 //         "direction": "Outbound",
                 //         "sourcePortRange": "*",
                 //         "destinationPortRange": "*",
+                //         "sourcePortRanges": [],
+                //         "sourceAddressPrefix": [],
+                //         "destinationPortRanges": [],
+                //         "destinationAddressPrefixes": [],
+                //         "sourceApplicationSecurityGroups": [],
+                //         "destinationApplicationSecurityGroups" : [],
                 //         "sourceAddressPrefixes": [
                 //                                      "172.27.93.166",
                 //                                      "172.27.93.167",
@@ -102,6 +126,12 @@
                 //         "protocol": "TCP",
                 //         "sourcePortRange": "*",
                 //         "destinationPortRange": "443",
+                //         "sourcePortRanges": [],
+                //         "sourceAddressPrefix": [],
+                //         "destinationPortRanges": [],
+                //         "destinationAddressPrefixes": [],
+                //         "sourceApplicationSecurityGroups": [],
+                //         "destinationApplicationSecurityGroups" : [],
                 //         "access": "Allow",
                 //         "priority": 171,
                 //         "direction": "Outbound",
@@ -124,9 +154,15 @@
                 //         "sourcePortRange": "*",
                 //         "destinationPortRange": "*",
                 //         "sourceAddressPrefix": "*",
-                //         "destinationAddressPrefix": "*"
+                //         "sourcePortRanges": [],
+                //         "sourceAddressPrefixes": [],
+                //         "destinationPortRanges": [],
+                //         "destinationAddressPrefixes": [],
+                //         "sourceApplicationSecurityGroups": [],
+                //         "destinationApplicationSecurityGroups" : [],
+                //          "destinationAddressPrefix": "*"
                 //     }
-                // }   
+                // }  
       ]
     },
 
