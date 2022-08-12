@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alt-cph-dnsplb-healthprobe-prd-qc-01"
+        },
+        "alertDescription": {
+            "value": "Monitoring of ingress Load Balancer Health probe, alert should be generated if status is less than 100%"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-dnsp-net-prd-qc-01/providers/Microsoft.Network/loadBalancers/lbi-cph-pltf-dnsp-prd-qc-01"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        },
+        "targetResourceType": {
+            "value": "Microsoft.Network/loadBalancers"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                            "threshold": 100,
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Network/loadBalancers",
+                            "metricName": "DipAvailability",
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
+    }
+}

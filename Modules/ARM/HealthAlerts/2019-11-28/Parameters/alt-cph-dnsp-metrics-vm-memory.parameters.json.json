@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alt-cph-dnsp-metrics-vm-memory-qc-01"
+        },
+        "alertDescription": {
+            "value": "Available Memory Bytes is less than 500000000"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-dnsp-prd-qc-01"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        },
+        "targetResourceType": {
+            "value": "microsoft.compute/virtualmachines"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                            "threshold": 500000000,
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.compute/virtualmachines",
+                            "metricName": "Available Memory Bytes",
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
+    }
+}

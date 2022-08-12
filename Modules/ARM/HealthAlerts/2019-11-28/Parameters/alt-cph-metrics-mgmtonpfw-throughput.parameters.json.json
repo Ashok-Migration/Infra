@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alt-cph-mgmt-metrics-mgmt-prd-qc-01"
+        },
+        "alertDescription": {
+            "value": "MGMT-Throughput is Greater than 300000000"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-mgmt-net-prd-qc-01/providers/Microsoft.Network/azureFirewalls/azfw-cph-mgmt-onpfw-prd-qc-01"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        },
+        "targetResourceType": {
+            "value": "Microsoft.Network/azureFirewalls"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                            "threshold": 300000000,
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Network/azureFirewalls",
+                            "metricName": "Throughput",
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
+    }
+}

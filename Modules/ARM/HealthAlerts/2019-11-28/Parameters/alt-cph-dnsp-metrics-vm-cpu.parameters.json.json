@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alt-cph-dnsp-metrics-vm-percentage-cpu-prd-qc-01"
+        },
+        },
+        "alertDescription": {
+            "value": "PLTF-Percentage CPU is Greater than 90"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-dnsp-prd-qc-01"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        },
+        "targetResourceType": {
+            "value": "microsoft.compute/virtualmachines"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                "criterionType": "StaticThresholdCriterion",
+                "metricName": "Percentage CPU",
+                "metricNamespace": "microsoft.compute/virtualmachines",
+                "name": "HighCPU",
+                "operator": "GreaterThan",
+                "threshold": "90",
+                "timeAggregation": "Average"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
+    }
+}
