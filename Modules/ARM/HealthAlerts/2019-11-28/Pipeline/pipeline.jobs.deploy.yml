@@ -13,5 +13,7 @@
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
-                az deployment group create --resource-group rg-cph-pltf-net-prd-qc-01 --name healthalerts \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/parameters.json'
+                az deployment group create --resource-group rg-cph-pltf-bldvms-prd-qc-01 --name healthalerts1 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-vm-cpu.parameters.json'
+                az deployment group create --resource-group rg-cph-pltf-net-prd-qc-01 --name healthalerts2 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-egrfw-health.parameters.json'
