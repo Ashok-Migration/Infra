@@ -3,18 +3,18 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "alertName": {
-            "value": "alt-cph-dnsplb-healthprobe-prd-qc-01"
+            "value": "alt-cph-pltf-metrics-egrfw-healthprobe-prd-qc-01"
         },
         "alertDescription": {
-            "value": "Monitoring of ingress Load Balancer Health probe, alert should be generated if status is less than 100%"
+            "value": "Verify if system sends notification alert when threshold for FirewallHealth is Greater than 1"
         },
         "scopes": {
             "value": [
-                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-dnsp-net-prd-qc-01/providers/Microsoft.Network/loadBalancers/lbi-cph-pltf-dnsp-prd-qc-01"
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/azureFirewalls/azfw-cph-pltf-egrfw-prd-qc-01"
             ]
         },
         "windowSize": {
-            "value": "PT15M"
+            "value": "PT5M"
         },
         "actions": {
             "value": [{
@@ -22,18 +22,27 @@
             }]
         },
         "targetResourceType": {
-            "value": "Microsoft.Network/loadBalancers"
+            "value": "Microsoft.Network/azureFirewalls"
         },
         "targetResourceRegion": {
             "value": "qatarcentral"
         },
         "criterias": {
             "value": [{
-                            "threshold": 100,
+                            "threshold": 1,
                             "name": "Metric1",
-                            "metricNamespace": "Microsoft.Network/loadBalancers",
-                            "metricName": "DipAvailability",
-                            "operator": "LessThan",
+                            "metricNamespace": "Microsoft.Network/azureFirewalls",
+                            "metricName": "FirewallHealth",
+                            "dimensions": [
+                                {
+                                    "name": "Status",
+                                    "operator": "Exclude",
+                                    "values": [
+                                        "Healthy"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
                             "timeAggregation": "Average",
                             "criterionType": "StaticThresholdCriterion"
             }]
