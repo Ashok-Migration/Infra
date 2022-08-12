@@ -3,11 +3,14 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "alertName": {
-            "value": "percentage-cpu-tasmu-alert5"
+            "value": "alt-cph-dnsplb-healthprobe-prd-qc-01"
+        },
+        "alertDescription": {
+            "value": "Monitoring of ingress Load Balancer Health probe, alert should be generated if status is less than 100%"
         },
         "scopes": {
             "value": [
-                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-bldvms-prd-qc-01"
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-dnsp-net-prd-qc-01/providers/microsoft.insights/metricalerts/alt-cph-dnsplb-healthprobe-prd-qc-01"
             ]
         },
         "windowSize": {
@@ -19,24 +22,24 @@
             }]
         },
         "targetResourceType": {
-            "value": "microsoft.compute/virtualmachines"
+            "value": "Microsoft.Network/loadBalancers"
         },
         "targetResourceRegion": {
             "value": "qatarcentral"
         },
         "criterias": {
             "value": [{
-                "criterionType": "StaticThresholdCriterion",
-                "metricName": "Percentage CPU",
-                "metricNamespace": "microsoft.compute/virtualmachines",
-                "name": "HighCPU",
-                "operator": "GreaterThan",
-                "threshold": "90",
-                "timeAggregation": "Average"
+                            "threshold": 100,
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Network/loadBalancers",
+                            "metricName": "DipAvailability",
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
             }]
         },
         "alertCriteriaType": {
-            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+            "value": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
         }
         // "roleAssignments": {
         //     "value": [
