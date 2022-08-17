@@ -37,9 +37,9 @@ stages:
       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
-        displayName: Validate template on $(resourceGroupNameCOPPrd)
+        displayName: Validate template on $(resourceGroupName)
         inputs:
-          azureSubscription: $(serviceConnectionCOPPrd)
+          azureSubscription: $(serviceConnection)
           ScriptType: InlineScript
           inline: |
               $ValidationErrors = $null
@@ -71,15 +71,15 @@ stages:
       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
-        displayName: Deploy template on $(resourceGroupNameCOPPrd)
+        displayName: Deploy template on $(resourceGroupName)
         inputs:
-          azureSubscription: $(serviceConnectionCOPPrd)
+          azureSubscription: $(serviceConnection)
           ScriptType: InlineScript
           inline: |
               $Location = "$(location)" -replace " ",""
               
               $DeploymentInputs = @{
-                Name                    = "$(resourceGroupNameCOPPrd)-master"
+                Name                    = "$(resourceGroupName)-master"
                 Location                = "$Location"
                 TemplateFile            = "$(Build.Repository.LocalPath)/$(templateFilePath)"
                 # TemplateParameterFile  = "$(Build.Repository.LocalPath)/$(parameterFilePath)"
