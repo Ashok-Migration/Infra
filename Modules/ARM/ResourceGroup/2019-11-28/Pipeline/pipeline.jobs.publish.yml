@@ -34,7 +34,7 @@ jobs:
           azureSubscription: $(serviceConnectionPrd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNamePrd)" --subscription "$(componentStorageAccountSubscriptionIdPrd)"           
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNamePrd)" --account-key "$(account-key)" --subscription "$(componentStorageAccountSubscriptionIdPrd)"           
         
       - task: AzureCLI@1
         displayName: Copy Module to $(componentStorageAccountNamePrd)
@@ -42,7 +42,7 @@ jobs:
           azureSubscription: $(serviceConnectionPrd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --account-key "$(account-key)" --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
 
   - job: PublishComponentCOPNPD
     displayName: Publish Component COP NPD
