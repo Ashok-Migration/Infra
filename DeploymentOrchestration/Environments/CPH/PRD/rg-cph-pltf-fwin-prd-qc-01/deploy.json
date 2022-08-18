@@ -21,7 +21,7 @@
             "signedResourceTypes": "co",
             "signedProtocol": "https"
         },
-        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
+        "componentStorageAccountId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiactstprdqc01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
         "containerName": "components",
@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-pltf-fwew-prd-we-01",
+            "name": "DEP-rg-cph-pltf-fwew-prd-qc-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -46,18 +46,15 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-fwew-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-pltf-fwin-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
-        {
+  /*      {
             "apiVersion": "2019-08-01",
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
-            "dependsOn": [
-                "DEP-rg-cph-pltf-fwew-prd-we-01"
-            ],
+            "resourceGroup": "rg-cph-pltf-fwew-prd-qc-01",
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -66,36 +63,33 @@
                     "resources": []
                 }
             }
-        },
+        }, */
+        // {
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2019-08-01",
+        //     "name": "DEP-stcphpltffwewprdwe01",
+        //     "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
+        //     "dependsOn": [
+        //         "DEP-rg-cph-pltf-fwew-prd-we-01"
+        //     ],
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "debugSetting": {
+        //             "detailLevel": "requestContent,responseContent"
+        //         },
+        //         "templateLink": {
+        //             "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        //         },
+        //         "parametersLink": {
+        //             "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcphpltffwewprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        //         }
+        //     }
+        // },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-stcphpltffwewprdwe01",
-            "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
-            "dependsOn": [
-                "DEP-rg-cph-pltf-fwew-prd-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcphpltffwewprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-lb-cph-pltf-fwewtrs-prd-we-01",
-            "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
-            "dependsOn": [
-                "DEP-rg-cph-pltf-fwew-prd-we-01"
-            ],
+            "name": "DEP-lbe-cph-pltf-fwin-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-fwin-prd-qc-01",
             "properties": {
                 "mode": "Incremental",
                 "debugSetting": {
@@ -105,31 +99,31 @@
                     "uri": "[concat(variables('modulesPath'), 'LoadBalancersInternal/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'LoadBalancersInternal/2019-11-28/Parameters/lb-cph-pltf-fwewtrs-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-pltf-fwewunt-prd-we-01",
-            "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
-            "dependsOn": [
-                "DEP-rg-cph-pltf-fwew-prd-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-fwewunt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LoadBalancersInternal/2019-11-28/Parameters/lbe-cph-pltf-fwinlb-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
+        // {
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2019-08-01",
+        //     "name": "DEP-route-cph-pltf-fwewunt-prd-we-01",
+        //     "resourceGroup": "rg-cph-pltf-fwew-prd-we-01",
+        //     "dependsOn": [
+        //         "DEP-rg-cph-pltf-fwew-prd-we-01"
+        //     ],
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "debugSetting": {
+        //             "detailLevel": "requestContent,responseContent"
+        //         },
+        //         "templateLink": {
+        //             "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        //         },
+        //         "parametersLink": {
+        //             "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-pltf-fwewunt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        //         }
+        //     }
+        // }
     ],
     "outputs": {
     }
