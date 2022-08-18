@@ -1,12 +1,57 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "metricAlerts_alt_cph_bldvsm_metrics_vm_percentage_cpu_prd_qc_01_name": {
-            "value": "alt-cph-bldvsm-metrics-vm-percentage-cpu-prd-qc-01-alert2"
+        "alertName": {
+            "value": "alt-cph-bldvsm-metrics-vm-percentage-cpu-prd-qc-01-alert"
         },
-        "actionGroups_ag_tasmu_health_externalid": {
-            "value": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+        },
+        "alertDescription": {
+            "value": "PLTF-Percentage CPU is Greater than 90"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-bldvms-prd-qc-01"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        },
+        "targetResourceType": {
+            "value": "microsoft.compute/virtualmachines"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                "criterionType": "StaticThresholdCriterion",
+                "metricName": "Percentage CPU",
+                "metricNamespace": "microsoft.compute/virtualmachines",
+                "name": "HighCPU",
+                "operator": "GreaterThan",
+                "threshold": "90",
+                "timeAggregation": "Average"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
         }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
     }
 }
