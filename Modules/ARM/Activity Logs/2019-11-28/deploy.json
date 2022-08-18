@@ -2,11 +2,11 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "activityLogAlerts_alt_cph_activity_name": {
-            "defaultValue": "alt-cph-activityalert",
+        "metricAlerts_alt_cph_bldvsm_metrics_vm_percentage_cpu_prd_qc_01_name": {
+            "defaultValue": "alt-cph-bldvsm-metrics-vm-percentage-cpu-prd-qc-01",
             "type": "String"
         },
-        "actiongroups_ag_cph_glob_activity_mon_prd_we_01_externalid": {
+        "actionGroups_ag_tasmu_health_externalid": {
             "defaultValue": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health",
             "type": "String"
         }
@@ -14,35 +14,42 @@
     "variables": {},
     "resources": [
         {
-            "type": "microsoft.insights/activityLogAlerts",
-            "apiVersion": "2020-10-01",
-            "name": "[parameters('activityLogAlerts_alt_cph_activity_name')]",
-            "location": "Global",
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_alt_cph_bldvsm_metrics_vm_percentage_cpu_prd_qc_01_name')]",
+            "location": "global",
             "properties": {
+                "description": "PLTF-Percentage CPU is Greater than 90",
+                "severity": 2,
+                "enabled": true,
                 "scopes": [
-                    "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
+                    "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-bldvms-prd-qc-01"
                 ],
-                "condition": {
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT15M",
+                "criteria": {
                     "allOf": [
                         {
-                            "field": "category",
-                            "equals": "Administrative"
-                        },
-                        {
-                            "field": "resourceType",
-                            "equals": "microsoft.network/azurefirewalls"
+                            "threshold": 90,
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.compute/virtualmachines",
+                            "metricName": "Percentage CPU",
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
                         }
-                    ]
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
                 },
-                "actions": {
-                    "actionGroups": [
-                        {
-                            "actionGroupId": "[parameters('actiongroups_ag_cph_glob_activity_mon_prd_we_01_externalid')]",
-                            "webhookProperties": {}
-                        }
-                    ]
-                },
-                "enabled": true
+                "autoMitigate": true,
+                "targetResourceType": "microsoft.compute/virtualmachines",
+                "targetResourceRegion": "qatarcentral",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actionGroups_ag_tasmu_health_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
             }
         }
     ]
