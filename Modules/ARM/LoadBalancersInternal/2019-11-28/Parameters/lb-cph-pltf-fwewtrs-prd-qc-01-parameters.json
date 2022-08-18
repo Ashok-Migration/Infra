@@ -7,11 +7,19 @@
         },
         "frontendIPConfigurations": {
             "value": [{
-                  "name": "LoadBalancerFrontEnd",
+                  "name": "lbfip-cph-fwew-trust-prd-qc-01",
                   "properties": {
                     "publicIPAddressId": "",
                     "subnetId":  "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-cph-pltf-prd-qc-01/subnets/snet-cph-pltf-fwewtrs-prd-qc-01",
                     "privateIPAddress": "172.27.94.14"
+                  }
+                },
+                {
+                  "name": "lbfip-cph-fwew-unt-prd-qc-01",
+                  "properties": {
+                    "publicIPAddressId": "",
+                    "subnetId":  "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-net-prd-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-cph-pltf-prd-qc-01/subnets/snet-cph-pltf-fwewunt-prd-we-01",
+                    "privateIPAddress": "172.27.94.30"
                   }
                 }
             ]
@@ -19,13 +27,18 @@
         "backendAddressPools": {
             "value": [{
                 "name": "bkpool-cph-fwew-trust-prd-qc-01"
-            }]
+            },
+            {
+                "name": "bkpool-cph-fwew-unt-prd-qc-01"
+            }
+
+            ]
         },
         "loadBalancingRules": {
             "value": [{
                     "name": "lbrule-cph-fwew-trust-prd-qc-01",
                     "properties": {
-                        "frontendIPConfigurationName": "LoadBalancerFrontEnd",
+                        "frontendIPConfigurationName": "lbfip-cph-fwew-trust-prd-qc-01",
                         "frontendPort": 0,
                         "backendPort": 0,
                         "enableFloatingIP": false,
@@ -34,14 +47,14 @@
                         "enableTcpReset": false,
                         "loadDistribution": "Default",
                         "disableOutboundSnat": false,
-                        "probeName": "hprobe-cph-pltf-dnsp-prd-qc-53",
-                        "backendAddressPoolName": "hpool-cph-fwew-trust-prd-we-22"
+                        "probeName": "hpool-cph-fwew-trust-prd-qc-22",
+                        "backendAddressPoolName": "bkpool-cph-fwew-trust-prd-qc-01"
                     }
                 },
                 {
-                                 "name": "lbrule-cph-pltf-dnsp-prd-qc-02",
+                                 "name": "lbfip-cph-fwew-unt-prd-qc-01",
                                  "properties": {
-                                   "frontendIPConfigurationName": "LoadBalancerFrontEnd",
+                                   "frontendIPConfigurationName": "lbrule-cph-fwew-unt-prd-qc-01",
                                    "frontendPort": 0,
                                    "backendPort": 0,
                                    "enableFloatingIP": false,
@@ -50,8 +63,8 @@
                                    "enableTcpReset": false,
                                    "loadDistribution": "Default",
                                    "disableOutboundSnat": false,
-                                   "probeName": "hpool-cph-fwew-trust-prd-we-22",
-                                   "backendAddressPoolName": "bkpool-cph-fwew-unt-prd-we-01"
+                                   "probeName": "hpool-cph-fwew-trust-prd-qc-22",
+                                   "backendAddressPoolName": "bkpool-cph-fwew-unt-prd-qc-01"
               
                                  }
                                }
@@ -59,7 +72,7 @@
         },
         "probes": {
             "value": [{
-                "name": "hpool-cph-fwew-trust-prd-we-22",
+                "name": "hpool-cph-fwew-trust-prd-qc-22",
                 "properties": {
                     "protocol": "TCP",
                     "port": 22,
