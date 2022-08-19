@@ -104,6 +104,65 @@ jobs:
           inlineScript: |
             az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameNpd)" --subscription  "$(componentStorageAccountSubscriptionIdNpd)"
 
+ - job: PublishComponentCOPPrd
+    displayName: Publish Component COP PRD
+    pool:
+      #name: $(poolName)
+      vmImage: $(vmImage)
+    variables:
+      - template: pipeline.variables.yml
+    steps:
+      - task: CopyFiles@2
+        displayName: Filter folders
+        inputs:
+          Contents: |
+            Modules/ARM/$(moduleName)/$(moduleVersion)/**
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: AzureCLI@1
+        displayName: Create container $(componentStorageContainerName)
+        inputs:
+          azureSubscription: $(serviceConnectionCOPPrd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPPrd)" --subscription "$(componentStorageAccountSubscriptionIdCOPPrd)"           
+        
+      - task: AzureCLI@1
+        displayName: Copy Module to $(componentStorageAccountNameCOPPrd)
+        inputs:
+          azureSubscription: $(serviceConnectionCOPPrd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPPrd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPPrd)"
+
+  - job: PublishComponentScalePrd
+    displayName: Publish Component Scale PRD
+    pool:
+      #name: $(poolName)
+      vmImage: $(vmImage)
+    variables:
+      - template: pipeline.variables.yml
+    steps:
+      - task: CopyFiles@2
+        displayName: Filter folders
+        inputs:
+          Contents: |
+            Modules/ARM/$(moduleName)/$(moduleVersion)/**
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: AzureCLI@1
+        displayName: Create container $(componentStorageContainerName)
+        inputs:
+          azureSubscription: $(serviceConnectionSCALEPrd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameSCALEPRD)" --subscription "$(componentStorageAccountSubscriptionIdSCALEPrd)"           
+        
+      - task: AzureCLI@1
+        displayName: Copy Module to $(componentStorageAccountNameCOPPrd)
+        inputs:
+          azureSubscription: $(serviceConnectionSCALEPrd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameSCALEPRD)" --subscription  "$(componentStorageAccountSubscriptionIdSCALEPrd)"
  
   - job: PublishComponentVSEEPrd
     displayName: Publish Component VSEE PRD
