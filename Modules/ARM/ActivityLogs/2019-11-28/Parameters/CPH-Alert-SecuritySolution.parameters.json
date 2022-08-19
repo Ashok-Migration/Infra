@@ -1,1 +1,45 @@
-test
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "CPH-Alert-SecuritySolution-qc-01"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
+            ]
+        },
+        "conditions": {
+            "value": [{
+                    "field": "category",
+                    "equals": "Security"
+                },
+                {
+                    "field": "resourceType",
+                    "equals": "microsoft.security/securitysolutions"
+                },
+                {
+                    "field": "operationName",
+                    "equals": "Microsoft.Security/securitySolutions/write"
+                }
+            ]
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
+            }]
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // },
+    }
+}
