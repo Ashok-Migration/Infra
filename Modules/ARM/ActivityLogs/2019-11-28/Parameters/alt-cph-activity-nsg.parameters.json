@@ -3,44 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "alertName": {
-            "value": "alt-cph-bldvsm-metrics-vm-percentage-cpu-prd-qc-01-alert"
-        },
-        },
-        "alertDescription": {
-            "value": "PLTF-Percentage CPU is Greater than 90"
+            "value": "alt-cph-activity-nsg-qc-01"
         },
         "scopes": {
             "value": [
-                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-bldvms-prd-qc-01"
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
             ]
         },
-        "windowSize": {
-            "value": "PT15M"
+        "conditions": {
+            "value": [{
+                    "field": "category",
+                    "equals": "Administrative"
+                },
+                {
+                    "field": "resourceType",
+                    "equals": "microsoft.network/networksecuritygroups"
+                }
+            ]
         },
         "actions": {
             "value": [{
                 "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actionGroups/ag-tasmu-health"
             }]
-        },
-        "targetResourceType": {
-            "value": "microsoft.compute/virtualmachines"
-        },
-        "targetResourceRegion": {
-            "value": "qatarcentral"
-        },
-        "criterias": {
-            "value": [{
-                "criterionType": "StaticThresholdCriterion",
-                "metricName": "Percentage CPU",
-                "metricNamespace": "microsoft.compute/virtualmachines",
-                "name": "HighCPU",
-                "operator": "GreaterThan",
-                "threshold": "90",
-                "timeAggregation": "Average"
-            }]
-        },
-        "alertCriteriaType": {
-            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
         }
         // "roleAssignments": {
         //     "value": [
@@ -52,6 +36,6 @@
         //             ]
         //         }
         //     ]
-        // }
+        // },
     }
 }
