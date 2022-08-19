@@ -21,14 +21,14 @@ stages:
     - template: /Modules/.global/global.azsk.yml
       parameters:
         templateFile: $(modulePath)/deploy.json
-        parametersFile: $(modulePath)/Parameters/CPUAlert.json   
+        parametersFile: $(modulePath)/Parameters/parameters.json   
 
 - stage: Validate
   jobs:
   - template: pipeline.jobs.validate.yml
     parameters:
       templateFile: $(modulePath)/deploy.json
-      parametersFile: $(modulePath)/Parameters/CPUAlert.json
+      parametersFile: $(modulePath)/Parameters/parameters.json
 
 - stage: Publish
   jobs:
