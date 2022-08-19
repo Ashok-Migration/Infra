@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "loadBalancerName": {
+            "value": "lbe-cph-pltf-fwinlb-prd-qc-01"
+        },
+        "frontendIPConfigurations": {
+            "value": [{
+                  "name": "lbfip-cph-fwinlb-prd-qc-01",
+                  "properties": {
+					    "publicIPAddressId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-fwin-prd-qc-01/providers/Microsoft.Network/publicIPAddresses/pip-lbe-cph-pltf-fwinlb-prd-qc-01",
+                        "subnetId": "",
+                        "privateIPAddress": ""
+                  }
+                }
+            ]
+        },
+        "backendAddressPools": {
+            "value": [{
+                "name": "bkpool-cph-fwinlb-prd-qc-01"
+            }
+            ]
+        },
+        "loadBalancingRules": {
+            "value": [{
+                    "name": "lbrule-cph-fwinlb-prd-qc-01",
+                    "properties": {
+                        "frontendIPConfigurationName": "lbfip-cph-fwinlb-prd-qc-01",
+                        "frontendPort": 80,
+                        "backendPort": 80,
+                        "enableFloatingIP": false,
+                        "idleTimeoutInMinutes": 4,
+                        "protocol": "TCP",
+                        "enableTcpReset": false,
+                        "loadDistribution": "Default",
+                        "disableOutboundSnat": false,
+                        "probeName": "hpool-cph-fwinlb-prd-qc-22",
+                        "backendAddressPoolName": "bkpool-cph-fwinlb-prd-qc-01"
+                    }
+                }
+            ]
+        },
+        "probes": {
+            "value": [{
+                "name": "hpool-cph-fwinlb-prd-qc-22",
+                "properties": {
+                    "protocol": "TCP",
+                    "port": 22,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+            }]
+        },
+  
+      "diagnosticStorageAccountId": {
+        "Value": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-mon-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdqc01"
+    },
+    "workspaceId": {
+        "Value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+  
+        "tags": {
+          "value": {
+              "Environment": "Production"
+          }
+       }
+    }
+  }
