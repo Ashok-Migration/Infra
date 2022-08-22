@@ -1,20 +1,18 @@
 name: $(resourceGroupName)
 
 variables:
-# - name: PoolName
-#   value: "tasmumsagents"
 - name: vmImage
   value: "ubuntu-latest"
 - name: templateFilePath
-  value: DeploymentOrchestration/UC/VSEE/PRD/rg-vsee-pltf-net-prd-qc-01/deploy.json
+  value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-pltf-fwin-prd-qc-01/deploy.json
 - name: parameterFilePath
   value: 
 - name: location
   value: qatarcentral
 - name: resourceGroupName
-  value: rg-vsee-pltf-net-prd-qc-01
+  value: rg-cph-pltf-fwin-prd-qc-01
 - name: serviceConnection
-  value: spn-uc-health-vsee-qc-prd
+  value: sqcp-ado-spn-hub-qc
 
 trigger: none
 #trigger:
@@ -34,7 +32,7 @@ stages:
     displayName: Validate Template
     pool:
       # name: $(PoolName)
-      vmImage: $(vmImage)
+       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
@@ -67,7 +65,6 @@ stages:
   - job: DeployTemplate
     displayName: Deploy Template
     pool:
-      # name: $(PoolName)
       vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4

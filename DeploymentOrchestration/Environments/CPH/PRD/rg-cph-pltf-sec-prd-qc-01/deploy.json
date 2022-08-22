@@ -50,10 +50,27 @@
                 }
             }
         },
+   /*    {
+            "apiVersion": "2019-08-01",
+            "name": "[variables('CUA')]",
+            "type": "Microsoft.Resources/deployments",
+             "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },*/
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-prvep-cph-pltf-stcphpltfdiagprdqc01-prd-qc-01",
+            "name": "DEP-nsg-cph-pltf-iacbl-prd-qc-01",
             "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
             "dependsOn": [
                 "DEP-rg-cph-pltf-sec-prd-qc-01"
@@ -64,76 +81,76 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cph-pltf-stcphpltfdiagprdqc01-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-iacbl-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-        }
-        // {,,,,
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-iacbl-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-iacbl-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        //  {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-kv-cph-pltf-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'KeyVault/2021-03-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'KeyVault/2021-03-23/Parameters/kv-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-mgmt-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-mgmt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
+        },
+         {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-kv-cph-pltf-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2021-03-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'KeyVault/2021-03-23/Parameters/kv-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-mgmt-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-mgmt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+    //    {
+    //         "type": "Microsoft.Resources/deployments",
+    //         "apiVersion": "2019-08-01",
+    //         "name": "DEP-kv-cph-pltf-prd-qc-01",
+    //         "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+    //         "dependsOn": [
+    //             "DEP-rg-cph-pltf-sec-prd-qc-01"
+    //         ],
+    //         "properties": {
+    //             "mode": "Incremental",
+    //             "debugSetting": {
+    //                 "detailLevel": "requestContent,responseContent"
+    //             },
+    //             "templateLink": {
+    //                 "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //             },
+    //             "parametersLink": {
+    //                 "uri": "[concat(variables('modulesPath'), 'KeyVault/2019-11-28/Parameters/kv-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+    //             }
+    //         }
+    //     },
         // {
         //     "type": "Microsoft.Resources/deployments",
         //     "apiVersion": "2019-08-01",
@@ -154,7 +171,28 @@
         //             "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cph-pltf-kv-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         //         }
         //     }
-        // },,,,,
+        // },
+         {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-prvep-cph-pltf-stcphpltfdiagprdqc01-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cph-pltf-stcphpltfdiagprdqc01-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
         /*{
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
@@ -239,237 +277,237 @@
                 }
             }
         }*/
-        //  {,,,,,
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-arc-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-arc-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwewtrs-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewtrs-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwewunt-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewunt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwewmgt-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewmgt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwmon-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwmon-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwinunt-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinunt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwinmgt-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinmgt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwinlb-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinlb-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-fwintrs-prd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwintrs-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // }/*,,,,,,
-        // {,,,,
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-api-npd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-api-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Resources/deployments",
-        //     "apiVersion": "2019-08-01",
-        //     "name": "DEP-nsg-cph-pltf-ntf-npd-qc-01",
-        //     "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
-        //     "dependsOn": [
-        //         "DEP-rg-cph-pltf-sec-prd-qc-01"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "debugSetting": {
-        //             "detailLevel": "requestContent,responseContent"
-        //         },
-        //         "templateLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         },
-        //         "parametersLink": {
-        //             "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-ntf-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        //         }
-        //     }
-        // },,,,
+         {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-arc-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-arc-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwewtrs-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewtrs-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwewunt-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewunt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwewmgt-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwewmgt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwmon-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwmon-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwinunt-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinunt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwinmgt-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinmgt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwinlb-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwinlb-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-fwintrs-prd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-fwintrs-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        }/*,
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-api-npd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-api-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-nsg-cph-pltf-ntf-npd-qc-01",
+            "resourceGroup": "rg-cph-pltf-sec-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-cph-pltf-sec-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'NetworkSecurityGroups/2019-11-28/Parameters/nsg-cph-pltf-ntf-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
         // {
         //     "type": "Microsoft.Resources/deployments",
         //     "apiVersion": "2019-08-01",
