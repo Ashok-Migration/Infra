@@ -184,7 +184,7 @@ jobs:
           azureSubscription: $(serviceConnectionVSEEStg)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameVSEEStg)"  --subscription "$(componentStorageAccountSubscriptionIdVSEEStg)"           
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameVSEEStg)" --account-key "$(account-key-vseestg)"  --subscription "$(componentStorageAccountSubscriptionIdVSEEStg)"           
         
       - task: AzureCLI@1
         displayName: Copy Module to $(componentStorageAccountNameVSEEStg)
@@ -192,5 +192,5 @@ jobs:
           azureSubscription: $(serviceConnectionVSEEStg)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameVSEEStg)" --subscription  "$(componentStorageAccountSubscriptionIdVSEEStg)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameVSEEStg)" --account-key "$(account-key-vseestg)"  --subscription  "$(componentStorageAccountSubscriptionIdVSEEStg)"
       
