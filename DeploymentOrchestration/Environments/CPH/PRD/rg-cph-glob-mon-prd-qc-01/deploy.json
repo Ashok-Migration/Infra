@@ -5,9 +5,9 @@
         "utcYear": {
             "type": "string",
             "defaultValue": "[utcNow('yyyy')]",
-            "metadata": {
-                "description": "Optional. Year data used to generate a SAS token. Default is the current year."
-            }
+          "metadata": {
+            "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+          }
         }
     },
     "variables": {
@@ -21,19 +21,19 @@
             "signedResourceTypes": "co",
             "signedProtocol": "https"
         },
-
-        "componentStorageAccountId": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01",
+        "componentStorageAccountId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiactstprdqc01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
         "containerName": "components",
         "modulesPath": "[concat(variables('componentsBaseUrl'), '/Modules/ARM/')]",
         "location": "[deployment().location]"
+
     },
-    "resources": [
+    "resources": [ 
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-fw-unt-prd-we-01",
+            "name": "DEP-rg-cph-glob-mon-prd-qc-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -46,49 +46,27 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-fw-unt-prd-we-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-glob-mon-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
-        {
-            "apiVersion": "2019-08-01",
+        { 
+            "apiVersion": "2019-08-01", 
             "name": "[variables('CUA')]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-cph-fw-unt-prd-we-01",
+            "type": "Microsoft.Resources/deployments", 
+            "resourceGroup": "rg-cph-glob-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-fw-unt-prd-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": []
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-stcphpltffwuntprdwe01",
-            "resourceGroup": "rg-cph-fw-unt-prd-we-01",
-            "dependsOn": [
-                "DEP-rg-cph-fw-unt-prd-we-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'StorageAccounts/2019-11-28/Parameters/stcphpltffwuntprdwe01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        }
 
+            ],
+            "properties": { 
+                "mode": "Incremental", 
+                "template": { 
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+                    "contentVersion": "1.0.0.0", 
+                    "resources": [] 
+                }        
+            } 
+        }
     ],
     "outputs": {
     }
