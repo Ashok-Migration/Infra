@@ -33,7 +33,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-rg-vsee-pltf-net-prd-qc-01",
+      "name": "DEP-rg-vcp-net-prd-qc-01",
       "location": "[variables('location')]",
       "dependsOn": [
       ],
@@ -46,15 +46,15 @@
           "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-vsee-pltf-net-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-vcp-net-prd-qc-01.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-vsee-pltf-prd-qc-01",
-      "resourceGroup": "rg-vsee-pltf-net-prd-qc-01",
+      "name": "DEP-vnet-vcp-core-prd-qc-01",
+      "resourceGroup": "rg-vcp-net-prd-qc-01",
       "dependsOn": [
         
       ],
@@ -67,7 +67,7 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-vsee-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-vcp-core-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
