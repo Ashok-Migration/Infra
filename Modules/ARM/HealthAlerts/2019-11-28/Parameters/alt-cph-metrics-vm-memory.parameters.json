@@ -1,0 +1,59 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "value": "alt-cph-metrics-vm-memory-qc-01"
+        },
+        "alertDescription": {
+            "value": "Virtual machine metrics alerting for Production (CPH) subscription"
+        },
+        "scopes": {
+            "value": [
+                "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
+            ]
+        },
+        "windowSize": {
+            "value": "PT15M"
+        },
+        "severity": {
+            "value": "2"
+        },
+        "actions": {
+            "value": [{
+                "actionGroupId": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-glob-mon-prd-qc-01/providers/microsoft.insights/actionGroups/ag-cph-glob-activity-mon-prd-qc-01"
+            }]
+        },
+        "targetResourceType": {
+            "value": "microsoft.compute/virtualmachines"
+        },
+        "targetResourceRegion": {
+            "value": "qatarcentral"
+        },
+        "criterias": {
+            "value": [{
+                            "threshold": 500000000,
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.compute/virtualmachines",
+                            "metricName": "Available Memory Bytes",
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+            }]
+        },
+        "alertCriteriaType": {
+            "value": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        }
+        // "roleAssignments": {
+        //     "value": [
+        //         {
+        //             "roleDefinitionIdOrName": "Desktop Virtualization User",
+        //             "principalIds": [
+        //                 "12345678-1234-1234-1234-123456789012", // object 1
+        //                 "78945612-1234-1234-1234-123456789012" // object 2
+        //             ]
+        //         }
+        //     ]
+        // }
+    }
+}

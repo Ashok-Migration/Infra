@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01//deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "activityLogAlerts_alt_cph_metrics_vm_cpu_name": {
+            "defaultValue": "alt-cph-metrics-vm-cpu",
+            "type": "String"
+        },
+        "actiongroups_ag_tasmu_health_externalid": {
+            "defaultValue": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-tasmu-health/providers/microsoft.insights/actiongroups/ag-tasmu-health",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2020-10-01",
+            "name": "[parameters('activityLogAlerts_alt_cph_metrics_vm_cpu_name')]",
+            "location": "Global",
+            "properties": {
+                "scopes": [
+                    "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5"
+                ],
+                "condition": {
+                    "allOf": [
+                        {
+                            "field": "category",
+                            "equals": "ResourceHealth"
+                        },
+                        {
+                            "anyOf": [
+                                {
+                                    "field": "resourceGroup",
+                                    "equals": "rg-cph-pltf-bldvms-prd-qc-01"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [
+                        {
+                            "actionGroupId": "[parameters('actiongroups_ag_tasmu_health_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "Virtual machine metrics alerting for HUB (CPH) subscription"
+            }
+        }
+    ]
+}

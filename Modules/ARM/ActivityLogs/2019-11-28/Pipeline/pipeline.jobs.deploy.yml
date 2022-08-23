@@ -1,0 +1,31 @@
+ jobs:
+  - job:
+    displayName: "Deploy Alerts"
+    pool:
+      vmImage: $(vmImage)
+    variables:
+      - template: pipeline.variables.yml
+    steps:
+      - task: AzureCLI@2
+        displayName: 'Deploy Alert'
+        inputs:
+            azureSubscription: $(serviceConnectionPrd)
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog1 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-activity-nsg.parameters.json'
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog2 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-activity.parameters.json'
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog3 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/CPH-Alert-PolicyCreation.parameters.json'
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog4 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/CPH-Alert-SecurityPolicy.parameters.json'
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog5 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/CPH-Alert-SecuritySolution-Delete.parameters.json'
+                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name activitylog6 \
+                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/CPH-Alert-SecuritySolution.parameters.json'
+
+
+                
+                
