@@ -1,226 +1,95 @@
-jobs:
-  - job: PublishArtifact
-    displayName: Publish Artifact
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-      
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: PublishBuildArtifacts@1
-        displayName: Publish $(moduleName) Artifacts
-        inputs:
-          PathtoPublish: $(modulePath)
-          ArtifactName: $(moduleName)-$(moduleVersion)
-
-  - job: PublishComponentPrd
-    displayName: Publish Component Prd
-    pool:
-      name: tasmuagents
-      #  vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNamePrd)" --account-key "$(account-keycph)" --subscription "$(componentStorageAccountSubscriptionIdPrd)" 
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNamePrd)
-        inputs:
-          azureSubscription: $(serviceConnectionPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNamePrd)" --account-key "$(account-keycph) --subscription  "$(componentStorageAccountSubscriptionIdPrd)"
-
-  - job: PublishComponentCOPPrd
-    displayName: Publish Component COP PRD
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionCOPPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPPrd)" --subscription "$(componentStorageAccountSubscriptionIdCOPPrd)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameCOPPrd)
-        inputs:
-          azureSubscription: $(serviceConnectionCOPPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPPrd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPPrd)"
-    
-  - job: PublishComponentCOPNpd
-    displayName: Publish Component COP Npd
-    pool:
-      #name: $(poolName)
-      vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionCOPNpd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            echo "I am here"
-            echo $componentStorageAccountSubscriptionIdCOPNpd         
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPNpd)" --account-key "$(account-keyCOPNpd)" --subscription "$(componentStorageAccountSubscriptionIdCOPNpd)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameCOPNpd)
-        inputs:
-          azureSubscription: $(serviceConnectionCOPNpd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "components/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name  "$(componentStorageAccountNameCOPNpd)" --account-key "$(account-keyCOPNpd)" --subscription "$(componentStorageAccountSubscriptionIdCOPNpd)"
-  
-  - job: PublishComponentScalePrd
-    displayName: Publish Component Scale PRD
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionSCALEPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameSCALEPRD)" --subscription "$(componentStorageAccountSubscriptionIdSCALEPrd)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameCOPPrd)
-        inputs:
-          azureSubscription: $(serviceConnectionSCALEPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameSCALEPRD)" --subscription  "$(componentStorageAccountSubscriptionIdSCALEPrd)"
-
-  - job: PublishComponentVSEEPrd
-    displayName: Publish Component VSEE PRD
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionVSEEPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameVSEEPRD)" --account-key "$(account-key-vsee)" --subscription "$(componentStorageAccountSubscriptionIdVSEEPrd)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameCOPPrd)
-        inputs:
-          azureSubscription: $(serviceConnectionVSEEPrd)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameVSEEPRD)" --account-key "$(account-key-vsee)" --subscription  "$(componentStorageAccountSubscriptionIdVSEEPrd)"
-
-  - job: PublishComponentSCALEStg
-    displayName: Publish Component SCALE STG
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionSCALEStg)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameSCALEStg)"  --subscription "$(componentStorageAccountSubscriptionIdSCALEStg)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameSCALEStg)
-        inputs:
-          azureSubscription: $(serviceConnectionSCALEStg)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameSCALEStg)" --subscription  "$(componentStorageAccountSubscriptionIdSCALEStg)"
-  
-  - job: PublishComponentVSEEStg
-    displayName: Publish Component VSEE STG
-    pool:
-      name: tasmuagents
-      # vmImage: $(vmImage)
-    variables:
-      - template: pipeline.variables.yml
-    steps:
-      - task: CopyFiles@2
-        displayName: Filter folders
-        inputs:
-          Contents: |
-            Modules/ARM/$(moduleName)/$(moduleVersion)/**
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: AzureCLI@1
-        displayName: Create container $(componentStorageContainerName)
-        inputs:
-          azureSubscription: $(serviceConnectionVSEEStg)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameVSEEStg)" --account-key "$(account-key-vseestg)"  --subscription "$(componentStorageAccountSubscriptionIdVSEEStg)"           
-        
-      - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameVSEEStg)
-        inputs:
-          azureSubscription: $(serviceConnectionVSEEStg)
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameVSEEStg)" --account-key "$(account-key-vseestg)"  --subscription  "$(componentStorageAccountSubscriptionIdVSEEStg)"
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-sclp-core-prd-qc-01"
+        },
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.27.113.0/24"
+            ]
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-sclp-web-prd-qc-01",
+                    "addressPrefix": "172.27.113.0/28",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "qatarcentral"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-sclp-net-prd-qc-01",
+                    "routesRGName": "rg-sclp-net-prd-qc-01"
+                },
+                {
+                    "name": "snet-sclp-app-prd-qc-01",
+                    "addressPrefix": "172.27.113.16/28",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "qatarcentral"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-sclp-net-prd-qc-01",
+                    "routesRGName": "rg-sclp-net-prd-qc-01"
+                },
+                {
+                    "name": "snet-sclp-db-prd-qc-01",
+                    "addressPrefix": "172.27.113.32/28",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "qatarcentral"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-sclp-net-prd-qc-01",
+                    "routesRGName": "rg-sclp-net-prd-qc-01"
+                }   
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+                "Environment": "VC_prd"
+            }
+        }
+    }
+}
