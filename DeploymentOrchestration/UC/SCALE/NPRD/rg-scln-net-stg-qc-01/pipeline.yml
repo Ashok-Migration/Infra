@@ -3,8 +3,8 @@ name: $(resourceGroupName)
 variables:
 - name: PoolName
   value: "tasmuagents"
-# - name: vmImage
-#   value: "ubuntu-latest"
+- name: vmImage
+  value: "ubuntu-latest"
 - name: templateFilePath
   value: DeploymentOrchestration/UC/SCALE/NPRD/rg-scln-net-stg-qc-01/deploy.json
 - name: parameterFilePath
@@ -33,7 +33,7 @@ stages:
   - job: ValidateTemplate
     displayName: Validate Template
     pool:
-       name: $(PoolName)
+        name: $(PoolName)
       # vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
