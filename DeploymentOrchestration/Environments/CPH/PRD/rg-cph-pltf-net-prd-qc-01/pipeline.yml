@@ -1,8 +1,8 @@
 name: $(resourceGroupNamePrd)
 
 variables:
-- name: vmImage
-  value: "ubuntu-latest"
+- name: PoolName
+  value: "tasmuagents"
 - name: templateFilePath
   value: DeploymentOrchestration/Environments/CPH/PRD/rg-cph-pltf-net-prd-qc-01/deploy.json
 - name: parameterFilePath
@@ -31,7 +31,7 @@ stages:
   - job: ValidateTemplate
     displayName: Validate Template
     pool:
-      vmImage: $(vmImage)
+      name: $(poolName)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
@@ -64,7 +64,7 @@ stages:
   - job: DeployTemplate
     displayName: Deploy Template
     pool:
-      vmImage: $(vmImage)
+      name: $(poolName)
     steps:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupName)
