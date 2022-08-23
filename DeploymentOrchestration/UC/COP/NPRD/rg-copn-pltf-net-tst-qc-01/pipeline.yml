@@ -2,17 +2,19 @@ name: $(resourceGroupName)
 
 variables:
 - name: PoolName
-  value: "tasmuagents"
+  value: "tasmumsagents"
+# - name: vmImage
+#   value: "ubuntu-latest"
 - name: templateFilePath
-  value: DeploymentOrchestration/Environments/CPD/DEV/rg-cpd-pltf-net-dev-we-01/deploy.json
+  value: DeploymentOrchestration/Environments/COP/NPRD/rg-copn-pltf-net-tst-qc-01/deploy.json
 - name: parameterFilePath
   value: 
 - name: location
-  value: westeurope
+  value: qatarcentral
 - name: resourceGroupName
-  value: rg-cpd-pltf-net-dev-we-01
+  value: rg-copn-pltf-net-tst-qc-01
 - name: serviceConnection
-  value: sqcp-ado-spn-dev
+  value: sqcp-ado-spn-tst
 
 trigger: none
 #trigger:
@@ -32,6 +34,7 @@ stages:
     displayName: Validate Template
     pool:
       name: $(PoolName)
+      #vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
@@ -65,6 +68,7 @@ stages:
     displayName: Deploy Template
     pool:
       name: $(PoolName)
+      #vmImage: $(vmImage)
     steps:
       - task: AzurePowerShell@4
         displayName: Deploy template on $(resourceGroupName)
