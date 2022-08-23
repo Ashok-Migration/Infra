@@ -13,23 +13,5 @@ jobs:
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
-                az deployment group create --resource-group rg-cph-pltf-fwin-prd-qc-01 --name healthalerts3 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-fwinlb-healthprobe-prd-qc-01.parameters.json'
-                az deployment group create --resource-group rg-cph-pltf-net-prd-qc-01 --name healthalerts4 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-egrfw-health.parameters.json'
-                az deployment group create --resource-group rg-cph-pltf-net-prd-qc-01 --name healthalerts5 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-egrfw-SNAT.parameters.json'
-                az deployment group create --resource-group rg-cph-pltf-net-prd-qc-01 --name healthalerts6 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-egrfw-throughput.parameters.json'
-                az deployment group create --resource-group rg-cph-extr-net-prd-qc-01 --name healthalerts7 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-extronpfw-health.parameters.json'
-                az deployment group create --resource-group rg-cph-mgmt-net-prd-qc-01 --name healthalerts8 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-mgmtonpfw-health.parameters.json'
                 az deployment group create --resource-group rg-cph-mgmt-net-prd-qc-01 --name healthalerts9 \
                 --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-mgmtonpfw-SNAT.parameters.json'
-                az deployment group create --resource-group rg-cph-mgmt-net-prd-qc-01 --name healthalerts10 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-mgmtonpfw-throughput.parameters.json'
-                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name healthalerts1 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-vm-cpu.parameters.json'
-                az deployment group create --resource-group rg-cph-glob-mon-prd-qc-01 --name healthalerts2 \
-                --template-file $(modulePath)/deploy.json --parameters @'$(modulePath)/Parameters/alt-cph-metrics-vm-memory.parameters.json'
