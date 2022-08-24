@@ -21,7 +21,7 @@
             "signedResourceTypes": "co",
             "signedProtocol": "https"
         },
-        "componentStorageAccountId": "/subscriptions/2b4775b0-692e-4e02-ac8d-e0737a385c77/resourceGroups/rg-vsee-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stvseepltfiactstprdqc01",
+        "componentStorageAccountId": "/subscriptions/2a4dd208-2b9b-4c02-887c-2d583548d669/resourceGroups/rg-vcn-pltf-iactst-stg-qc-01/providers/Microsoft.Storage/storageAccounts/stvcnpltfstgqc01",
         "storageAccountName": "[if(not(empty(variables('componentStorageAccountId'))), split(variables('componentStorageAccountId'), '/')[8], 'placeholder')]",
         "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
         "containerName": "components",
@@ -33,7 +33,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-rg-vsee-pltf-net-prd-qc-01",
+      "name": "DEP-rg-vcn-net-stg-qc-01",
       "location": "[variables('location')]",
       "dependsOn": [
       ],
@@ -46,15 +46,15 @@
           "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-vsee-pltf-net-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-vcn-net-stg-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-vsee-pltf-prd-qc-01",
-      "resourceGroup": "rg-vsee-pltf-net-prd-qc-01",
+      "name": "DEP-vnet-vcn-core-stg-qc-01",
+      "resourceGroup": "rg-vcn-net-stg-qc-01",
       "dependsOn": [
         
       ],
@@ -67,7 +67,7 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-vsee-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-vcn-core-stg-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     },
@@ -75,8 +75,8 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-vsee-pltf-prd-qc-01-to-cph-pltf-prd-qc-01",
-      "resourceGroup": "rg-vsee-pltf-net-prd-qc-01",
+      "name": "DEP-vnet-peer-vcn-core-stg-qc-01-to-cph-pltf-prd-qc-01",
+      "resourceGroup": "rg-vcn-net-stg-qc-01",
       "properties": {
         "mode": "Incremental",
         "debugSetting": {
@@ -86,7 +86,7 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         },
         "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-vsee-pltf-prd-qc-01-to-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-vcn-core-stg-qc-01-to-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
     }

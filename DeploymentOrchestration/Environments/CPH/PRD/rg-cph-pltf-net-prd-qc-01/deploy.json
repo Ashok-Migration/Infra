@@ -516,28 +516,6 @@
         }
       }
     },
-    
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-cph-pltf-edgeagw-prd-qc-01-to-cph-pltf-prd-qc-01",
-      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
-      "dependsOn": [
-        "DEP-vnet-cph-pltf-edgeagw-prd-qc-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-edgeagw-prd-qc-01-to-cph-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
@@ -581,49 +559,7 @@
       }
     },
 
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-vsee-pltf-prd-qc-01",
-      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
-      "dependsOn": [
-        "DEP-vnet-cph-pltf-prd-qc-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-vsee-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-scale-pltf-prd-qc-01",
-      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
-      "dependsOn": [
-        "DEP-vnet-cph-pltf-prd-qc-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-scale-pltf-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-
+    
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-08-01",
@@ -666,7 +602,92 @@
           "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-cop-pltf-pre-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-sclp-core-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-sclp-core-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-vcp-core-prd-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-vcp-core-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-vcn-core-stg-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-vcn-core-stg-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-vnet-peer-cph-pltf-prd-qc-01-to-scln-core-stg-qc-01",
+      "resourceGroup": "rg-cph-pltf-net-prd-qc-01",
+      "dependsOn": [
+        "DEP-vnet-cph-pltf-prd-qc-01"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-pltf-prd-qc-01-to-scln-core-stg-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
     }
+
   ],
 "outputs": {}
 }
