@@ -479,6 +479,27 @@
         }
       }
     }
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-08-01",
+      "name": "DEP-prvep-cpd-data-st-uat-we-03",
+      "resourceGroup": "rg-cpd-data-uat-we-02",
+      "dependsOn": [
+        "DEP-rg-cpd-data-uat-we-02"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        },
+        "parametersLink": {
+          "uri": "[concat(variables('modulesPath'), 'PrivateEndpoint/2021-04-20/Parameters/prvep-cpd-data-st-uat-we-03-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      }
+    }
   ],
   "outputs": {
   }
