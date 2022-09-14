@@ -91,18 +91,18 @@ jobs:
       - task: AzureCLI@1
         displayName: Create container $(componentStorageContainerName)
         inputs:
-          azureSubscription: $(serviceConnectionCOPNprd)
+          azureSubscription: $(serviceConnectionCOPNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPNprd)" --subscription "$(componentStorageAccountSubscriptionIdCOPNprd)"           
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPNpd)" --subscription "$(componentStorageAccountSubscriptionIdCOPNpd)"           
         
       - task: AzureCLI@1
-        displayName: Copy Module to $(componentStorageAccountNameCOPNprd)
+        displayName: Copy Module to $(componentStorageAccountNameCOPNpd)
         inputs:
-          azureSubscription: $(serviceConnectionCOPNprd)
+          azureSubscription: $(serviceConnectionCOPNpd)
           scriptLocation: inlineScript
           inlineScript: |
-            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPNprd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPNprd)"
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPNpd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPNpd)"
   
   - job: PublishComponentScalePrd
     displayName: Publish Component Scale PRD
@@ -223,4 +223,3 @@ jobs:
           scriptLocation: inlineScript
           inlineScript: |
             az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameVSEEStg)" --account-key "$(account-key-vseestg)"  --subscription  "$(componentStorageAccountSubscriptionIdVSEEStg)"
-      
