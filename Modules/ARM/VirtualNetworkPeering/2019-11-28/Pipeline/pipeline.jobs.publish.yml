@@ -2,8 +2,8 @@ jobs:
   - job: PublishArtifact
     displayName: Publish Artifact
     pool:
-      name: tasmuagents
-      # vmImage: ubuntu-latest
+       name: $(poolName)
+      #  vmImage: $(vmImage)
       
     variables:
       - template: pipeline.variables.yml
@@ -17,8 +17,8 @@ jobs:
   - job: PublishComponentPrd
     displayName: Publish Component Prd
     pool:
-      name: tasmuagents
-      # vmImage: ubuntu-latest
+       name: tasmuagents
+      # vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -47,8 +47,8 @@ jobs:
   - job: PublishComponentCOPPrd
     displayName: Publish Component COP PRD
     pool:
-      name: tasmuagents
-      # vmImage: ubuntu-latest
+       name: tasmuagents
+      #  vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -73,12 +73,42 @@ jobs:
           scriptLocation: inlineScript
           inlineScript: |
             az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPPrd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPPrd)"
-
+  
+  - job: PublishComponentCOPNprd
+    displayName: Publish Component COP NPRD
+    pool:
+       name: tasmuagents
+      #  vmImage: $(vmImage)
+    variables:
+      - template: pipeline.variables.yml
+    steps:
+      - task: CopyFiles@2
+        displayName: Filter folders
+        inputs:
+          Contents: |
+            Modules/ARM/$(moduleName)/$(moduleVersion)/**
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: AzureCLI@1
+        displayName: Create container $(componentStorageContainerName)
+        inputs:
+          azureSubscription: $(serviceConnectionCOPNprd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage container create --name "$(componentStorageContainerName)" --public-access off --account-name  "$(componentStorageAccountNameCOPNprd)" --subscription "$(componentStorageAccountSubscriptionIdCOPNprd)"           
+        
+      - task: AzureCLI@1
+        displayName: Copy Module to $(componentStorageAccountNameCOPNprd)
+        inputs:
+          azureSubscription: $(serviceConnectionCOPNprd)
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob upload-batch --source "$(Build.ArtifactStagingDirectory)/Modules/ARM/$(moduleName)/$(moduleVersion)" --destination "$(componentStorageContainerName)/Modules/ARM/$(moduleName)/$(moduleVersion)" --account-name "$(componentStorageAccountNameCOPNprd)" --subscription  "$(componentStorageAccountSubscriptionIdCOPNprd)"
+  
   - job: PublishComponentScalePrd
     displayName: Publish Component Scale PRD
     pool:
-      name: tasmuagents
-       #vmImage: ubuntu-latest
+      # name: tasmuagents
+       vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -107,8 +137,8 @@ jobs:
   - job: PublishComponentVSEEPrd
     displayName: Publish Component VSEE PRD
     pool:
-       name: tasmuagents
-      #  vmImage: ubuntu-latest
+      # name: tasmuagents
+      vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -138,7 +168,7 @@ jobs:
     displayName: Publish Component SCALE STG
     pool:
        name: tasmuagents
-      #  vmImage: ubuntu-latest
+      # vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
@@ -168,7 +198,7 @@ jobs:
     displayName: Publish Component VSEE STG
     pool:
        name: tasmuagents
-      #  vmImage: ubuntu-latest
+      #  vmImage: $(vmImage)
     variables:
       - template: pipeline.variables.yml
     steps:
