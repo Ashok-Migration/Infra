@@ -5,11 +5,7 @@ parameters:
     default: ""
 
 jobs:
-  - ${{ if eq(variables['isProdEnvironment'], true) }}:
-  - template: build-prd-template.yml
-    parameters:
-      name: ${{ parameters.name }}
-  - ${{ if eq(variables['isProdEnvironment'], false) }}:
+  # - ${{ if eq(variables['isProdEnvironment'], false) }}:
   - template: build-npd-template.yml
     parameters:
       name: ${{ parameters.name }}
