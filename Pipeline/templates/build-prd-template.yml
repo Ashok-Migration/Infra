@@ -5,7 +5,7 @@ parameters:
 jobs:
   # Upload artifacts for pre and prd environments
   - ${{ each environment in parameters.prdenvironments }}:
-      - job: ${{ parameters.name }}_build_for_APIM_${{ TASMU Central Platform/environment }}
+      - job: ${{ parameters.name }}_build_for_APIM_${{ environment }}
         dependsOn: Build_Queue
         condition: and(and(succeeded(), eq(variables.isProdEnvironment, true)), or(contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.name }}'), contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], 'AllApis')))
         variables:
