@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-adds-mon-prd-qc-01",
+            "name": "DEP-rg-ccnw-net-prd-qc-01",
             "location": "[variables('location')]",
             "dependsOn": [
                 
@@ -47,7 +47,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-adds-mon-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-ccnw-net-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -55,9 +55,9 @@
             "apiVersion": "2019-08-01",
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-adds-mon-prd-qc-01",
+            "resourceGroup": "rg-ccnw-net-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-adds-mon-prd-qc-01"
+                "DEP-rg-ccnw-net-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -71,10 +71,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-aut-adds-auto-prd-qc-01",
-            "resourceGroup": "rg-adds-mon-prd-qc-01",
+            "name": "DEP-aut-ccnw-auto-prd-qc-01",
+            "resourceGroup": "rg-ccnw-net-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-adds-mon-prd-qc-01"
+                "DEP-rg-ccnw-net-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -85,7 +85,7 @@
                     "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/Parameters/aut-adds-auto-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'AutomationAccounts/2020-03-20/Parameters/aut-ccnw-auto-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
