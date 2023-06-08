@@ -1,0 +1,177 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-ccnw-net-prd-qc-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+            "name": "allow-in-sqcc-netmon-01",
+            "properties": {
+                "protocol": "TCP",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "192.168.32.0/22",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 121,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [
+                    "22",
+                    "80",
+                    "443",
+                    "514"
+                ],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-in-sqcc-netmon-02",
+            "properties": {
+                "protocol": "UDP",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "192.168.32.0/20",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 131,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [
+                    "514",
+                    "161"
+                ],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-out-netmon-sqcc-01",
+            "properties": {
+                "protocol": "TCP",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "192.168.32.0/20",
+                "access": "Allow",
+                "priority": 121,
+                "direction": "Outbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [
+                    "22",
+                    "80",
+                    "443",
+                    "3389",
+                    "514"
+                ],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-out-netmon-sqcc-02",
+            "properties": {
+                "protocol": "ICMP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "192.168.32.0/20",
+                "access": "Allow",
+                "priority": 131,
+                "direction": "Outbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-out-netmon-sqcc-03",
+            "properties": {
+                "protocol": "UDP",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "192.168.32.0/20",
+                "access": "Allow",
+                "priority": 141,
+                "direction": "Outbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [
+                    "514",
+                    "161"
+                ],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-in-sqcc-netmon-03",
+            "properties": {
+                "protocol": "ICMP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "192.168.32.0/20",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 141,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "name": "allow-in-ccnw-ccnw-we-01",
+            "properties": {
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "172.20.34.160/27",
+                "destinationAddressPrefix": "172.20.34.160/27",
+                "access": "Allow",
+                "priority": 151,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cph-pltf-mon-prd-qc-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcphpltfnsgflprdqc01"
+    },
+    "workspaceRGName": {
+      "value": ""
+    },
+    "workspaceName": {
+      "value": ""
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "a18d9218-4e1f-4faa-8027-e1600440272a"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    }
+  }
+}
