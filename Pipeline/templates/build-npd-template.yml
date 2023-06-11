@@ -239,11 +239,11 @@ jobs:
             displayName: $(Environment) Create APIMTemplate Tool
             inputs:
             script: |
-            dotnet restore
-            dotnet pack -c Release
-            cd $(Agent.BuildDirectory)/apis-repo/pipelines/APIM/src
-            dotnet new tool-manifest
-            dotnet tool install --add-source `$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release` --tool-path `$(Agent.BuildDirectory)/tools` apimtemplate
+              dotnet restore
+              dotnet pack -c Release
+              cd $(Agent.BuildDirectory)/apis-repo/pipelines/APIM/src
+              dotnet new tool-manifest
+              dotnet tool install --add-source `$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release` --tool-path `$(Agent.BuildDirectory)/tools` apimtemplate
             workingDirectory: `$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate`
             failOnStderr: true
 
