@@ -236,16 +236,16 @@ jobs:
             path: apim-devopskit
 
           - task: CmdLine@2
-            displayName: '$(Environment) Create APIMTemplate Tool'
+            displayName: $(Environment) Create APIMTemplate Tool
             inputs:
-            script: |
-              dotnet restore
-              dotnet pack -c Release
-              cd $(Agent.BuildDirectory)/apis-repo/pipelines/APIM/src
-              dotnet new tool-manifest
-              dotnet tool install --add-source `$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release` --tool-path `$(Agent.BuildDirectory)/tools` apimtemplate
-            workingDirectory: '$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate'
-            failOnStderr: true
+              script: |
+                dotnet restore
+                dotnet pack -c Release
+                cd $(Agent.BuildDirectory)/apis-repo/pipelines/APIM/src
+                dotnet new tool-manifest
+                dotnet tool install --add-source "$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release" --tool-path "$(Agent.BuildDirectory)/tool" apimtemplate
+              workingDirectory: "$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate"
+              failOnStderr: true
 
           - task: CmdLine@2
             displayName: $(Environment) Generate ARM templates using Tool
