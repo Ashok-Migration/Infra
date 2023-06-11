@@ -212,14 +212,6 @@ jobs:
               installationPath: $(Agent.ToolsDirectory)/dotnet
 
           - task: PowerShell@2
-            displayName: "Create repository folder (workaround)"
-            inputs:
-              targetType: inline
-              script: |
-                New-Item -Path . -Name "$(Build.Repository.Name)" -Force -ItemType "directory" # Equals "self"
-              pwsh: true
-
-          - task: PowerShell@2
             displayName: "Create repository folder for apis-repo(workaround)"
             inputs:
               targetType: inline
