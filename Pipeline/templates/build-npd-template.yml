@@ -220,12 +220,20 @@ jobs:
               pwsh: true
 
           - task: PowerShell@2
-            displayName: "Create repository folder for devops kit(workaround)"
+            displayName: "Create repository folder for apis-repo(workaround)"
             inputs:
               targetType: inline
               script: |
                 New-Item -Path . -Name "apim-devopskit" -Force -ItemType "directory" # Equals "self"
               pwsh: true
+
+          - task: PowerShell@2
+            displayName: "Create repository folder for devops kit(workaround)"
+            inputs:
+              targetType: inline
+              script: |
+                New-Item -Path . -Name "apim-devopskit" -Force -ItemType "directory" # Equals "self"
+              pwsh: true    
 
           - checkout: apis-repo # self represents the repo where the initial Pipelines YAML file was found
             clean: true # whether to fetch clean each time
