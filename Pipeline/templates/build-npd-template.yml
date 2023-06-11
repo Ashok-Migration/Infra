@@ -237,11 +237,11 @@ jobs:
 
           - checkout: apis-repo # self represents the repo where the initial Pipelines YAML file was found
             clean: true # whether to fetch clean each time
-            path: TASMU Central Platform/apis-repo
+            path: apis-repo
 
           - checkout: apim-devopskit # self represents the repo where the initial Pipelines YAML file was found
             clean: true # whether to fetch clean each time
-            path: TASMU Central Platform/apim-devopskit
+            path: apim-devopskit
 
           - task: CmdLine@2
             displayName: $(Environment) Create APIMTemplate Tool
@@ -249,10 +249,10 @@ jobs:
               script: |
                 dotnet restore
                 dotnet pack -c Release
-                cd $(Agent.BuildDirectory)/TASMU Central Platform/apis-repo/pipelines/APIM/src
+                cd $(Agent.BuildDirectory)/apis-repo/pipelines/APIM/src
                 dotnet new tool-manifest
-                dotnet tool install --add-source "$(Agent.BuildDirectory)/TASMU Central Platform/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release" apimtemplate
-              workingDirectory: "$(Agent.BuildDirectory)/TASMU Central Platform/apim-devopskit/src/APIM_ARMTemplate/apimtemplate"
+                dotnet tool install --add-source "$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate/bin/Release" apimtemplate
+              workingDirectory: "$(Agent.BuildDirectory)/apim-devopskit/src/APIM_ARMTemplate/apimtemplate"
               failOnStderr: true
 
           - task: CmdLine@2
