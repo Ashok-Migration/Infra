@@ -1,0 +1,11 @@
+parameters:
+  - name: name
+    displayName: "api name"
+    type: string
+    default: ""
+
+jobs:
+  # - ${{ if eq(variables['isProdEnvironment'], false) }}:
+  - template: build-npd-template.yml
+    parameters:
+      name: ${{ parameters.name }}
