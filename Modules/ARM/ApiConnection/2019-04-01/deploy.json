@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "connection_name": {
+      "type": "String"
+    },
+    "display_name": {
+      "type": "String"
+    },
+    "api_id": {
+      "type": "String"
+    },
+    "deploy":{
+      "type": "bool",
+      "defaultValue": true
+    },
+    "tags": {
+      "defaultValue": {
+      },
+      "metadata": {
+        "description": "Optional. Resource tags."
+      },
+      "type": "object"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "condition": "[parameters('deploy')]",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('connection_name')]",
+      "location": "westeurope",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "displayName": "[parameters('display_name')]",
+        "parameterValues": {},
+        "customParameterValues": {},
+        "api": {
+          "id": "[parameters('api_id')]"
+        }
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}
