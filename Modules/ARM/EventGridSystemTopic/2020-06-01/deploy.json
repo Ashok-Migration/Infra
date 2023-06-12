@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "systemTopics_name": {
+      "type": "String"
+    },
+    "vaults_externalid": {
+      "type": "String"
+    },
+    "namespaces_sb_externalid": {
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.EventGrid/systemTopics",
+      "apiVersion": "2020-04-01-preview",
+      "name": "[parameters('systemTopics_name')]",
+      "location": "westeurope",
+      "tags": {
+        "Workstream": "Data"
+      },
+      "properties": {
+        "source": "[parameters('vaults_externalid')]",
+        "topicType": "Microsoft.KeyVault.vaults"
+      }
+    },
+    {
+      "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+      "apiVersion": "2020-04-01-preview",
+      "name": "[concat(parameters('systemTopics_name'), '/kvmonitor')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopics_name'))]"
+      ],
+      "properties": {
+        "destination": {
+          "properties": {
+            "resourceId": "[concat(parameters('namespaces_sb_externalid'), '/queues/kvqueue')]"
+          },
+          "endpointType": "ServiceBusQueue"
+        },
+        "filter": {
+          "includedEventTypes": [
+            "Microsoft.KeyVault.CertificateNearExpiry",
+            "Microsoft.KeyVault.SecretNearExpiry",
+            "Microsoft.KeyVault.KeyNearExpiry"
+          ]
+        },
+        "labels": [],
+        "eventDeliverySchema": "EventGridSchema",
+        "retryPolicy": {
+          "maxDeliveryAttempts": 30,
+          "eventTimeToLiveInMinutes": 1440
+        }
+      }
+    }
+  ],
+  "functions": [],
+  "outputs": {}
+}
