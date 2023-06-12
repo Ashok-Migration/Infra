@@ -1,0 +1,586 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-qnakbsync-uat-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_resource_event_occurs": {
+          "inputs": {
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "kbarticle-deleted",
+                    "kbarticle-created",
+                    "kbarticle-updated"
+                  ]
+                },
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-uat-we-01/topics/d365"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-uat-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpd-apps-qnakbsync-uat-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
+          },
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook"
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Condition": {
+          "actions": {
+            "Send_message_Arabic_Delete": {
+              "inputs": {
+                "body": {
+                  "ContentData": "@{base64(body('UpdateArabicDeleteJson'))}",
+                  "ContentType": "application/json",
+                  "SessionId": "logicappmessageaddorupdate"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-intsb-uat-we-01']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/@{encodeURIComponent(encodeURIComponent('qnaadd'))}/messages",
+                "queries": {
+                  "systemProperties": "Run Details"
+                }
+              },
+              "runAfter": {
+                "Send_message_English": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "Send_message_English": {
+              "inputs": {
+                "body": {
+                  "ContentData": "@{base64(body('UpdateDeleteJson'))}",
+                  "ContentType": "application/json",
+                  "SessionId": "logicappmessageaddorupdate"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-intsb-uat-we-01']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/@{encodeURIComponent(encodeURIComponent('qnaadd'))}/messages",
+                "queries": {
+                  "systemProperties": "Run Details"
+                }
+              },
+              "runAfter": {
+                "UpdateArabicDeleteJson": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "UpdateArabicDeleteJson": {
+              "inputs": {
+                "from": "@createArray(variables('DeleteJson'))",
+                "select": {
+                  "id": "@body('ParseJSON')?['data']?['id']",
+                  "isDeleteKb": "true",
+                  "languageId": "ar"
+                }
+              },
+              "runAfter": {
+                "UpdateDeleteJson": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Select"
+            },
+            "UpdateDeleteJson": {
+              "inputs": {
+                "from": "@createArray(variables('DeleteJson'))",
+                "select": {
+                  "id": "@body('ParseJSON')?['data']?['id']",
+                  "isDeleteKb": "true",
+                  "languageId": "en"
+                }
+              },
+              "runAfter": {},
+              "type": "Select"
+            }
+          },
+          "expression": {
+            "or": [
+              {
+                "equals": [
+                  "@triggerBody()?['eventType']",
+                  "kbarticle-deleted"
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "ParseJSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "Initialize_variable": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "DeleteJson",
+                "type": "object",
+                "value": {
+                  "id": "",
+                  "isDeleteKb": true
+                }
+              }
+            ]
+          },
+          "runAfter": {},
+          "type": "InitializeVariable"
+        },
+        "ParseJSON": {
+          "inputs": {
+            "content": "@triggerBody()",
+            "schema": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value": {
+                      "properties": {
+                        "articlePublicNumber": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "content": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "expirationDate": {},
+                        "expirationStateId": {},
+                        "expirationStatusId": {},
+                        "featuredArticle": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "featuredRating": {},
+                        "id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "isInternal": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "isLatestVersion": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "keywords": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "knowledgeArticleViews": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "languageCode": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "languageId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "languageLookupId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "languageName": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "languageShortCode": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "majorVersionNumber": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "minorVersionNumber": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "modifiedOn": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "ownerId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "popularArticle": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "popularityRating": {},
+                        "rating": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "readyForReview": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "relatedArticles": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "relatedProducts": {
+                          "items": {
+                            "properties": {
+                              "catalogueId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "productCategoryName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "productName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "sectorNames": {
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "reviewId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "statusId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "statusReasonId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "title": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "dataVersion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "eventTime": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "eventType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "metadataVersion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subject": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "topic": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "type": "ParseJson"
+        },
+        "Perform_action_as_per_eventtype": {
+          "actions": {
+            "Select": {
+              "inputs": {
+                "from": "@createArray(body('ParseJSON'))",
+                "select": {
+                  "description": "@body('ParseJSON')?['data']?['value']?['description']",
+                  "id": "@body('ParseJSON')?['data']?['value']?['id']",
+                  "keywords": "@body('ParseJSON')?['data']?['value']?['keywords']",
+                  "languageId": "@body('ParseJSON')?['data']?['value']?['languageShortCode']",
+                  "modifiedOn": "@body('ParseJSON')?['data']?['value']?['modifiedOn']",
+                  "relatedProducts": "@body('ParseJSON')?['data']?['value']?['relatedProducts']",
+                  "title": "@body('ParseJSON')?['data']?['value']?['title']"
+                }
+              },
+              "runAfter": {},
+              "type": "Select"
+            },
+            "Send_message": {
+              "inputs": {
+                "body": {
+                  "ContentData": "@{base64(body('Select'))}",
+                  "ContentType": "application/json",
+                  "SessionId": "logicappmessageaddorupdate"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['apicon-cpd-apps-intsb-uat-we-01']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/@{encodeURIComponent(encodeURIComponent('qnaadd'))}/messages",
+                "queries": {
+                  "systemProperties": "Run Details"
+                }
+              },
+              "runAfter": {
+                "Select": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            }
+          },
+          "expression": {
+            "or": [
+              {
+                "equals": [
+                  "@triggerBody()?['eventType']",
+                  "kbarticle-created"
+                ]
+              },
+              {
+                "equals": [
+                  "@triggerBody()?['eventType']",
+                  "kbarticle-updated"
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "ParseJSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-uat-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpd-apps-mon-uat-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "UAT"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpd-apps-intsb-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-intsb-uat-we-01",
+              "connectionName": "apicon-cpd-apps-intsb-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+            },
+            "apicon-cpd-apps-integd-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integd-uat-we-01",
+              "connectionName": "apicon-cpd-apps-integd-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgridpublish"
+            },
+            "apicon-cpd-apps-integ-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-uat-we-01",
+              "connectionName": "apicon-cpd-apps-integ-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            }
+          }
+        }
+      }
+    }
+  }
+}

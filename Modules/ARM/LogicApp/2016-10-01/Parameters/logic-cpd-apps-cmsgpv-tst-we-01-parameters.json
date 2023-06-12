@@ -1,0 +1,219 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflowName": {
+            "value": "logic-cpd-apps-cmsgpv-tst-we-01"
+        },
+        "workflowLocation": {
+            "value": "westeurope"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "manual": {
+                    "inputs": {
+                        "method": "GET",
+                        "schema": {
+                            "properties": {
+                                "additionalProperties": {
+                                    "type": "boolean"
+                                },
+                                "properties": {
+                                    "properties": {
+                                        "cmsgenericpagename": {
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "required": {
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "kind": "Http",
+                    "operationOptions": "EnableSchemaValidation",
+                    "type": "Request"
+                }
+            }
+        },
+        "workflowActions": {
+          "value": {
+            "For_each": {
+                "actions": {
+                    "Cosmos_DB_Item_Parse_JSON": {
+                        "inputs": {
+                            "content": "@items('For_each')",
+                            "schema": {
+                                "properties": {
+                                    "OData__UIVersionString": {
+                                        "type": "string"
+                                    },
+                                    "cmsgenericpagename": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "runAfter": {},
+                        "type": "ParseJson"
+                    }
+                },
+                "foreach": "@body('Query_documents_V5')?['value']",
+                "runAfter": {
+                    "Query_documents_V5": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "Initialize_PageName": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PageName",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "Initialize_PageVersion": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PageVersion",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_PageName": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Query_documents_V5": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['documentdb']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/v5/cosmosdb/@{encodeURIComponent('AccountNameFromSettings')}/dbs/@{encodeURIComponent('cms')}/colls/@{encodeURIComponent('cmsgenericpageversion')}/query",
+                    "queries": {
+                        "queryText": "SELECT c.cmsgenericpagename,c.OData__UIVersionString from c where c.cmsgenericpagename ='@{triggerOutputs()['queries']['cmsgenericpagename']}'"
+                    }
+                },
+                "runAfter": {
+                    "Initialize_PageVersion": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Response": {
+                "inputs": {
+                    "body": {
+                        "name": "@variables('PageName')",
+                        "version": "@variables('PageVersion')"
+                    },
+                    "statusCode": 200
+                },
+                "kind": "Http",
+                "runAfter": {
+                    "Set_PageVersion": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response"
+            },
+            "Set_PageName": {
+                "inputs": {
+                    "name": "PageName",
+                    "value": "@{body('Cosmos_DB_Item_Parse_JSON')?[0]?['cmsgenericpagename']}"
+                },
+                "runAfter": {
+                    "For_each": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "SetVariable"
+            },
+            "Set_PageVersion": {
+                "inputs": {
+                    "name": "PageVersion",
+                    "value": "@{body('Cosmos_DB_Item_Parse_JSON')?[0]?['OData__UIVersionString']}"
+                },
+                "runAfter": {
+                    "Set_PageName": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "SetVariable"
+            }
+        }
+        },
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-tst-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-tst-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpd-apps-mon-tst-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Test"
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "documentdb": {
+                            "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-tst-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-cmsdb-tst-we-01",
+                            "connectionName": "apicon-cpd-apps-cmsdb-tst-we-01",
+                            "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/documentdb"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

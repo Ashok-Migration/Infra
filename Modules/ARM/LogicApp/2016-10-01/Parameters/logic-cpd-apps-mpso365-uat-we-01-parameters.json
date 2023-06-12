@@ -1,0 +1,137 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpd-apps-mpso365-uat-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_resource_event_occurs": {
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "news-created",
+                    "news-updated",
+                    "news-deleted"
+                  ]
+                },
+                "topic": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.EventGrid/domains/egd-cpd-apps-int-uat-we-01/topics/o365"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpd-apps-integ-uat-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('d0694def-b27e-4bb7-900d-437fbeb802da')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpd-apps-mpso365-uat-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
+          }
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Convert_Message_To_Object": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "EventMessage",
+                "type": "object",
+                "value": "@triggerBody()"
+              }
+            ]
+          }
+        },
+        "logic-cpd-apps-mpsidx-uat-we-01": {
+          "runAfter": {
+            "Convert_Message_To_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "data": "@variables('EventMessage').data",
+              "dataVersion": "@{variables('EventMessage').dataVersion}",
+              "eventTime": "@triggerBody()?['eventTime']",
+              "eventType": "@triggerBody()?['eventType']",
+              "id": "@triggerBody()?['id']",
+              "metadataVersion": "@{variables('EventMessage').metadataVersion}",
+              "subject": "@triggerBody()?['subject']",
+              "topic": "@triggerBody()?['topic']"
+            },
+            "host": {
+              "triggerName": "manual",
+              "workflow": {
+                "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Logic/workflows/logic-cpd-apps-mpsidx-uat-we-01"
+              }
+            }
+          }
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpd-apps-integ-uat-we-01": {
+              "connectionId": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-int-uat-we-01/providers/Microsoft.Web/connections/apicon-cpd-apps-integ-uat-we-01",
+              "connectionName": "apicon-cpd-apps-integ-uat-we-01",
+              "id": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            }
+          }
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfdiagnpdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-mon-npd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cpd-pltf-npd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-apps-mon-uat-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpd-apps-mon-uat-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpd-apps-mon-uat-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "UAT"
+      }
+    }
+  }
+}

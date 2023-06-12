@@ -1,0 +1,522 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": {
+      "value": "logic-cpp-apps-itsm-pre-we-01"
+    },
+    "workflowLocation": {
+      "value": "westeurope"
+    },
+    "workflowSchema": {
+      "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "workflowTriggers": {
+      "value": {
+        "When_a_resource_event_occurs": {
+          "inputs": {
+            "body": {
+              "properties": {
+                "destination": {
+                  "endpointType": "webhook",
+                  "properties": {
+                    "endpointUrl": "@{listCallbackUrl()}"
+                  }
+                },
+                "filter": {
+                  "includedEventTypes": [
+                    "servicerequest-routed-itsm",
+                    "servicerequest-updated"
+                  ]
+                },
+                "topic": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.EventGrid/domains/egd-cpp-apps-int-pre-we-01/topics/d365"
+              }
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['apicon-cpp-apps-integ-pre-we-01']['connectionId']"
+              }
+            },
+            "path": "/subscriptions/@{encodeURIComponent('8964f3c1-44f5-4094-80eb-4334845bdfb1')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Domains')}/resource/eventSubscriptions",
+            "queries": {
+              "subscriptionName": "logic-cpp-apps-itsm-pre-we-01-sub",
+              "x-ms-api-version": "2017-09-15-preview"
+            }
+          },
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnectionWebhook"
+        }
+      }
+    },
+    "workflowActions": {
+      "value": {
+        "Condition": {
+          "actions": {
+            "Compose": {
+              "inputs": {
+                "ServiceName": "SR_LogServiceRequestCatalog",
+                "objCommonParameters": {
+                  "SR_TicketParame": {
+                    "CustomFields": [
+                      {
+                        "AttributeName": "Title",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['title']}",
+                        "GroupName": "Default Group"
+                      },
+                      {
+                        "AttributeName": "Organization",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['organisationName']}",
+                        "GroupName": "Default Group"
+                      },
+                      {
+                        "AttributeName": "Product",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['productId']}",
+                        "GroupName": "Default Group"
+                      },
+                      {
+                        "AttributeName": "Subscription ID",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['billingSubscriptionId']}",
+                        "GroupName": "Default Group"
+                      }
+                    ],
+                    "Instance": "IT",
+                    "LogSRForUserMode": true,
+                    "RequesterEmailID": "@{body('Parse_JSON')?['value']?['submitterEmail']}",
+                    "SRCustomFields": [
+                      {
+                        "AttributeName": "CRM TIcket ID",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['id']}",
+                        "GroupName": "Integration"
+                      },
+                      {
+                        "AttributeName": "CRM Case No",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['caseNumber']}",
+                        "GroupName": "Integration"
+                      },
+                      {
+                        "AttributeName": "Category",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['categoryName']}",
+                        "GroupName": "Integration"
+                      },
+                      {
+                        "AttributeName": "Sub Category",
+                        "AttributeValue": "@{body('Parse_JSON')?['value']?['subCategoryName']}",
+                        "GroupName": "Integration"
+                      }
+                    ],
+                    "SRRemarks": "@{if(equals(body('Parse_JSON')?['value']?['description'],null),body('Parse_JSON')?['value']?['title'],body('Parse_JSON')?['value']?['description'])}",
+                    "ServiceCatalogName": "CRM Service Request"
+                  },
+                  "_ProxyDetails": {
+                    "APIKey": "/CKSK941L8qzzZzeFwhM5w/9765xW3dg5N7aTBAPslo=",
+                    "AuthType": "APIKEY",
+                    "OrgID": "1",
+                    "ProxyID": 0,
+                    "ReturnType": "JSON",
+                    "TokenID": ""
+                  }
+                }
+              },
+              "runAfter": {},
+              "type": "Compose"
+            },
+            "Condition_2": {
+              "actions": {
+                "Compose_3": {
+                  "inputs": {
+                    "extRefNumber": "@{body('Parse_JSON_3')?['TicketID_Internal']}"
+                  },
+                  "runAfter": {
+                    "Parse_JSON_3": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Compose"
+                },
+                "Get_Client_Secret": {
+                  "runAfter": {
+                    "Compose_3": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['keyvault']['connectionId']"
+                      }
+                    },
+                    "method": "get",
+                    "path": "/secrets/@{encodeURIComponent('itsm-spn-secret')}/value"
+                  },
+                  "runtimeConfiguration": {
+                    "secureData": {
+                      "properties": [
+                        "outputs"
+                      ]
+                    }
+                  }
+                },
+                "HTTP_3": {
+                  "inputs": {
+                    "authentication": {
+                      "audience": "5b71785c-a9a9-4ab1-9acd-fc95f7e2f580",
+                      "clientId": "908901be-5c84-4c23-9215-f0178ec27c60",
+                      "secret": "@body('Get_Client_Secret')?['value']",
+                      "tenant": "26aa757b-a20c-4270-bc1c-d946b1f3e4a2",
+                      "type": "ActiveDirectoryOAuth"
+                    },
+                    "body": "@outputs('Compose_3')",
+                    "headers": {
+                      "Content-Type": "application/json-patch+json"
+                    },
+                    "method": "PATCH",
+                    "uri": "https://api.pre.sqcp.qa/case/api/servicerequests/@{body('Parse_JSON')?['value']?['id']}?api-version=1.0"
+                  },
+                  "runAfter": {
+                    "Get_Client_Secret": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Http"
+                },
+                "Parse_JSON_3": {
+                  "inputs": {
+                    "content": "@json(body('HTTP'))",
+                    "schema": {
+                      "properties": {
+                        "TicketID_Internal": {
+                          "type": "integer"
+                        },
+                        "TicketNo": {
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "runAfter": {},
+                  "type": "ParseJson"
+                }
+              },
+              "else": {
+                "actions": {
+                  "Terminate": {
+                    "inputs": {
+                      "runStatus": "Failed"
+                    },
+                    "runAfter": {},
+                    "type": "Terminate"
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@body('Parse_JSON_2')?['Errors']",
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "runAfter": {
+                "Parse_JSON_2": [
+                  "Succeeded"
+                ]
+              },
+              "type": "If"
+            },
+            "HTTP": {
+              "inputs": {
+                "body": "@outputs('Compose')",
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "method": "POST",
+                "uri": "https://itsm.pre.sqcp.qa/SummitProxyService/REST/Summit_RESTWCF.svc/RESTService/CommonWS_JsonObjCall"
+              },
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http"
+            },
+            "Parse_JSON_2": {
+              "inputs": {
+                "content": "@json(body('HTTP'))",
+                "schema": {
+                  "properties": {
+                    "Errors": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "runAfter": {
+                "HTTP": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson"
+            }
+          },
+          "else": {
+            "actions": {
+              "Condition_3": {
+                "actions": {
+                  "Compose_2": {
+                    "inputs": {
+                      "ServiceName": "SR_UpdateServiceRequest",
+                      "objCommonParameters": {
+                        "_ProxyDetails": {
+                          "APIKey": "/CKSK941L8qzzZzeFwhM5w/9765xW3dg5N7aTBAPslo=",
+                          "AuthType": "APIKEY",
+                          "ProxyID": 0,
+                          "ReturnType": "JSON"
+                        },
+                        "objSRServiceTicket": {
+                          "CancellationRemarks": "Cancelled from CRM",
+                          "IncidentTicketID": "@body('Parse_JSON')?['value']?['extRefNumber']",
+                          "Org_ID": "1",
+                          "Status": "@if(equals(body('Parse_JSON')?['value']?['statusReasonId'],6),'Cancelled',if(equals(body('Parse_JSON')?['value']?['statusReasonId'],2000),'Cancelled',null))",
+                          "SupportFunction": "IT"
+                        }
+                      }
+                    },
+                    "runAfter": {},
+                    "type": "Compose"
+                  },
+                  "HTTP_2": {
+                    "inputs": {
+                      "body": "@outputs('Compose_2')",
+                      "headers": {
+                        "Content-Type": "application/json"
+                      },
+                      "method": "POST",
+                      "uri": "https://itsm.pre.sqcp.qa/SummitProxyService/REST/Summit_RESTWCF.svc/RESTService/CommonWS_JsonObjCall"
+                    },
+                    "runAfter": {
+                      "Compose_2": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Http"
+                  },
+                  "Parse_JSON_4": {
+                    "inputs": {
+                      "content": "@json(body('HTTP_2'))",
+                      "schema": {
+                        "properties": {
+                          "Errors": {
+                            "type": "string"
+                          },
+                          "Input": {},
+                          "Message": {
+                            "type": "string"
+                          },
+                          "OrgID": {
+                            "type": "integer"
+                          },
+                          "Output": {
+                            "type": "string"
+                          },
+                          "OutputID": {
+                            "type": "integer"
+                          },
+                          "OutputObject": {},
+                          "TokenID": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "runAfter": {
+                      "HTTP_2": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "ParseJson"
+                  }
+                },
+                "expression": {
+                  "and": [
+                    {
+                      "not": {
+                        "equals": [
+                          "@body('Parse_JSON')?['value']?['extRefNumber']",
+                          "@null"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "runAfter": {},
+                "type": "If"
+              }
+            }
+          },
+          "expression": {
+            "or": [
+              {
+                "equals": [
+                  "@triggerBody()?['eventType']",
+                  "servicerequest-routed-itsm"
+                ]
+              }
+            ]
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "If"
+        },
+        "Parse_JSON": {
+          "inputs": {
+            "content": "@triggerBody()?['data']",
+            "schema": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "value": {
+                  "properties": {
+                    "billingSubscriptionId": {
+                      "type": "string"
+                    },
+                    "caseNumber": {
+                      "type": "string"
+                    },
+                    "categoryId": {
+                      "type": "string"
+                    },
+                    "categoryName": {
+                      "type": "string"
+                    },
+                    "createdByName": {
+                      "type": "string"
+                    },
+                    "createdOn": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "extRefNumber": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "files": {},
+                    "firstResponseBy": {},
+                    "id": {
+                      "type": "string"
+                    },
+                    "isAssignToProvider": {
+                      "type": "boolean"
+                    },
+                    "location": {},
+                    "modifiedByName": {
+                      "type": "string"
+                    },
+                    "modifiedOn": {
+                      "type": "string"
+                    },
+                    "organisationName": {},
+                    "parentId": {
+                      "type": "string"
+                    },
+                    "priorityId": {
+                      "type": "integer"
+                    },
+                    "productId": {
+                      "type": "string"
+                    },
+                    "profileId": {
+                      "type": "string"
+                    },
+                    "resolveBy": {},
+                    "statusId": {
+                      "type": "integer"
+                    },
+                    "statusReasonId": {
+                      "type": "integer"
+                    },
+                    "subCategoryId": {
+                      "type": "string"
+                    },
+                    "subCategoryName": {
+                      "type": "string"
+                    },
+                    "submitterEmail": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "runAfter": {},
+          "type": "ParseJson"
+        }
+      }
+    },
+    "workflowParameters": {
+      "value": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+    },
+    "workspaceId": {
+      "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-pre-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-pre-we-01/authorizationrules/RootManageSharedAccessKey"
+    },
+    "eventHubName": {
+      "value": "evh-cpp-apps-mon-pre-we-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Pre-Production"
+      }
+    },
+    "connectionParameters": {
+      "value": {
+        "$connections": {
+          "value": {
+            "apicon-cpp-apps-integ-pre-we-01": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-int-pre-we-01/providers/Microsoft.Web/connections/apicon-cpp-apps-integ-pre-we-01",
+              "connectionName": "apicon-cpp-apps-integ-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+            },
+            "keyvault": {
+              "connectionId": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-itsm-int-pre-we-02/providers/Microsoft.Web/connections/apicon-cpp-apps-itsmkv-pre-we-01",
+              "connectionName": "apicon-cpp-apps-itsmkv-pre-we-01",
+              "id": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault"
+            }
+          }
+        }
+      }
+    }
+  }
+}
