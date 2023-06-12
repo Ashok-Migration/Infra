@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-nvampan-sec-prd-qc-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "deny-in-nvampan-mgmt-01",
+          "properties": {
+            "description": "deny management traffic to panorama from internet",
+            "protocol": "TCP",
+            "sourcePortRange": "*",
+            "sourceAddressPrefix": "Internet",
+            "destinationAddressPrefix": "51.105.167.107/32",
+            "access": "Deny",
+            "priority": 1001,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [
+                "22",
+                "443"
+            ],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }
+        },
+        {
+            "name": "On_Prem",
+            "properties": {
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1011,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [
+                  "80",
+                  "443"
+              ],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                  "192.168.41.161",
+                  "192.168.41.162"
+              ]
+          }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": ""
+    },
+    "flowLogStorageAccountName": {
+      "value": ""
+    },
+    "workspaceRGName": {
+      "value": ""
+    },
+    "workspaceName": {
+      "value": ""
+    },
+    "NSGFlowsubscriptionid": {
+      "value": ""
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    }
+  }
+}
