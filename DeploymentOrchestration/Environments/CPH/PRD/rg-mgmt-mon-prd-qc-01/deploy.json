@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-rg-mgmt-mon-prd-qc-01",
             "location": "[variables('location')]",
             "dependsOn": [
             ],
@@ -46,7 +46,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-cph-mgmt-net-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-mgmt-mon-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -54,9 +54,9 @@
         //     "apiVersion": "2019-08-01", 
         //     "name": "[variables('CUA')]",
         //     "type": "Microsoft.Resources/deployments", 
-        //     "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+        //     "resourceGroup": "rg-mgmt-mon-prd-qc-01",
         //     "dependsOn": [
-        //         "DEP-rg-cph-mgmt-net-prd-qc-01"
+        //         "DEP-rg-mgmt-mon-prd-qc-01"
         //     ],
         //     "properties": { 
         //         "mode": "Incremental", 
@@ -70,10 +70,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-6d-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-keyvault-3",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -81,20 +81,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-6d-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/keyvault-3-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-6d-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-keyvault-2",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -102,42 +102,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-6d-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-gis-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-gis-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/keyvault-2-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-gis-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-keyvault-1",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -145,20 +123,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-gis-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/keyvault-1-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-bpm-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-teams",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -166,20 +144,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-bpm-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/teams-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-bpm-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-teams-1",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -187,20 +165,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-bpm-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/teams-1-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-itsm-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-teams-2",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -208,20 +186,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-itsm-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ApiConnection/2019-04-01/Parameters/teams-2-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-itsm-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-logic-mon-activitylog-qc-01",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -229,20 +207,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-itsm-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/Parameters/logic-mon-activitylog-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-cctr-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-logic-mon-log-qc-01",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -250,20 +228,20 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-cctr-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/Parameters/logic-mon-log-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-cctr-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
+            "name": "DEP-logic-mon-metrics-qc-01",
+            "resourceGroup": "rg-mgmt-mon-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
+                "DEP-rg-mgmt-mon-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -271,371 +249,13 @@
                     "detailLevel": "requestContent,responseContent"
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-cctr-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'LogicApp/2021-04-26/Parameters/logic-mon-metrics-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-apps-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-apps-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-apps-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-apps-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-data-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-data-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-data-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-data-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-adds-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-adds-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-adds-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-adds-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-fw-npd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-fw-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-fw-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-fw-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-route-cph-mgmt-gateway-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-rg-cph-mgmt-net-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'RouteTables/2019-11-28/Parameters/route-cph-mgmt-gateway-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-vnet-cph-mgmt-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-route-cph-mgmt-6d-npd-qc-01",
-                "DEP-route-cph-mgmt-6d-prd-qc-01",
-                "DEP-route-cph-mgmt-gis-npd-qc-01",
-                "DEP-route-cph-mgmt-gis-prd-qc-01",
-                "DEP-route-cph-mgmt-bpm-npd-qc-01",
-                "DEP-route-cph-mgmt-bpm-prd-qc-01",
-                "DEP-route-cph-mgmt-itsm-npd-qc-01",
-                "DEP-route-cph-mgmt-itsm-prd-qc-01",
-                "DEP-route-cph-mgmt-cctr-npd-qc-01",
-                "DEP-route-cph-mgmt-cctr-prd-qc-01",
-                "DEP-route-cph-mgmt-apps-npd-qc-01",
-                "DEP-route-cph-mgmt-apps-prd-qc-01",
-                "DEP-route-cph-mgmt-data-npd-qc-01",
-                "DEP-route-cph-mgmt-data-prd-qc-01",
-                "DEP-route-cph-mgmt-adds-npd-qc-01",
-                "DEP-route-cph-mgmt-adds-prd-qc-01",
-                "DEP-route-cph-mgmt-fw-npd-qc-01",
-                "DEP-route-cph-mgmt-fw-prd-qc-01",
-                "DEP-route-cph-mgmt-gateway-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetwork/2019-11-28/Parameters/vnet-cph-mgmt-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-lng-cph-mgmt-s2s-prd-qc-01",
-            
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-vng-cph-mgmt-s2s-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'LocalNetworkGateway/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'LocalNetworkGateway/2019-11-28/Parameters/lng-cph-mgmt-s2s-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-sqcc-s2s-qc-01",
-            
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-lng-cph-mgmt-s2s-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkGatewayConnection/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkGatewayConnection/2019-11-28/Parameters/sqcc-s2s-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-vng-cph-mgmt-s2s-prd-qc-01",
-            
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-                "DEP-vnet-cph-mgmt-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkGateway/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualNetworkGateway/2019-11-28/Parameters/vng-cph-mgmt-s2s-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-        },
-          {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-cph-mgmt-prd-qc-01-to-cph-pltf-extr-qc-01",
-      "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-      "dependsOn": [
-        "DEP-vnet-cph-mgmt-prd-qc-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-mgmt-prd-qc-01-to-cph-pltf-extr-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
         }
-      }
-    },
-       {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-08-01",
-      "name": "DEP-vnet-peer-cph-mgmt-prd-qc-01-to-cph-shdo-prd-qc-01",
-      "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-      "dependsOn": [
-        "DEP-vnet-cph-mgmt-prd-qc-01"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "debugSetting": {
-          "detailLevel": "requestContent,responseContent"
-        },
-        "templateLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        },
-        "parametersLink": {
-          "uri": "[concat(variables('modulesPath'), 'VirtualNetworkPeering/2019-11-28/Parameters/peer-cph-mgmt-prd-qc-01-to-cph-shdo-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-        }
-      }
-    },
-    {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-08-01",
-            "name": "DEP-azfw-cph-mgmt-onpfw-prd-qc-01",
-            "resourceGroup": "rg-cph-mgmt-net-prd-qc-01",
-            "dependsOn": [
-               "DEP-vnet-cph-mgmt-prd-qc-01"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "debugSetting": {
-                    "detailLevel": "requestContent,responseContent"
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('modulesPath'), 'AzureFirewall/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                },
-                "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'AzureFirewall/2019-11-28/Parameters/azfw-cph-mgmt-onpfw-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
-                }
-            }
-    }
-       
     ],
     "outputs": {
     }
