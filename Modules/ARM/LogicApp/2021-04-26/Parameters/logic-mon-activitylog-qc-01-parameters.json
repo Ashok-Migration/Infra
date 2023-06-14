@@ -1,0 +1,890 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": ""
+        },
+        "folderName": {
+          "value": ""
+        },
+        "workflowName": {
+            "value": "logic-mon-activitylog-qc-01"
+        },
+        "workflowLocation": {
+            "value": "qatarcentral"
+        },
+        "workflowSchema": {
+            "value": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+        },
+        "workflowTriggers": {
+            "value": {
+                "manual": {
+                    "type": "Request",
+                    "kind": "Http",
+                    "inputs": {
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "properties": {
+                                        "alertContext": {
+                                            "properties": {
+                                                "Activity Log Event Description": {
+                                                    "type": "string"
+                                                },
+                                                "authorization": {
+                                                    "properties": {
+                                                        "action": {
+                                                            "type": "string"
+                                                        },
+                                                        "scope": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "caller": {
+                                                    "type": "string"
+                                                },
+                                                "channels": {
+                                                    "type": "string"
+                                                },
+                                                "claims": {
+                                                    "type": "string"
+                                                },
+                                                "correlationId": {
+                                                    "type": "string"
+                                                },
+                                                "eventDataId": {
+                                                    "type": "string"
+                                                },
+                                                "eventSource": {
+                                                    "type": "string"
+                                                },
+                                                "eventTimestamp": {
+                                                    "type": "string"
+                                                },
+                                                "level": {
+                                                    "type": "string"
+                                                },
+                                                "operationId": {
+                                                    "type": "string"
+                                                },
+                                                "operationName": {
+                                                    "type": "string"
+                                                },
+                                                "properties": {
+                                                    "properties": {
+                                                        "entity": {
+                                                            "type": "string"
+                                                        },
+                                                        "eventCategory": {
+                                                            "type": "string"
+                                                        },
+                                                        "hierarchy": {
+                                                            "type": "string"
+                                                        },
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "subStatus": {
+                                                    "type": "string"
+                                                },
+                                                "submissionTimestamp": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "essentials": {
+                                            "properties": {
+                                                "alertContextVersion": {
+                                                    "type": "string"
+                                                },
+                                                "alertId": {
+                                                    "type": "string"
+                                                },
+                                                "alertRule": {
+                                                    "type": "string"
+                                                },
+                                                "alertTargetIDs": {
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "configurationItems": {
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "essentialsVersion": {
+                                                    "type": "string"
+                                                },
+                                                "firedDateTime": {
+                                                    "type": "string"
+                                                },
+                                                "monitorCondition": {
+                                                    "type": "string"
+                                                },
+                                                "monitoringService": {
+                                                    "type": "string"
+                                                },
+                                                "originAlertId": {
+                                                    "type": "string"
+                                                },
+                                                "severity": {
+                                                    "type": "string"
+                                                },
+                                                "signalType": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "schemaId": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "workflowActions": {
+            "value": {
+                "Get_NotificationClientId": {
+                    "runAfter": {
+                        "Set_ITSM_Description": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['keyvault_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('notification-api-client-id')}/value"
+                    }
+                },
+                "Get_NotificationClientSecret": {
+                    "runAfter": {
+                        "Get_NotificationClientId": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['keyvault_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('notification-api-client-secret')}/value"
+                    }
+                },
+                "Get_Scope": {
+                    "runAfter": {
+                        "Get_NotificationClientSecret": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['keyvault_1']['connectionId']"
+                            }
+                        },
+                        "method": "get",
+                        "path": "/secrets/@{encodeURIComponent('notification-scope')}/value"
+                    }
+                },
+                "Initialize_EmailBody": {
+                    "runAfter": {},
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "EmailBody",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_ITSM_Description": {
+                    "runAfter": {
+                        "Initialize_SMSBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ITSM Description",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_SMSBody": {
+                    "runAfter": {
+                        "Initialize_EmailBody": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "SMSBody",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Initialize_Teams_Message": {
+                    "runAfter": {
+                        "Initialize_ITSM_Description": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "TeamsMessage",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "Scope": {
+                    "actions": {
+                        "Condition_Severity_0": {
+                            "actions": {
+                                "Condition": {
+                                    "actions": {
+                                        "Set_EmailBody": {
+                                            "runAfter": {
+                                                "Set_SMSBody": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "EmailBody",
+                                                "value": "Description: @{triggerBody()?['data']?['essentials']?['description']} <br>Severity: @{triggerBody()?['data']?['essentials']?['severity']} <br> Category: @{triggerBody()?['data']?['essentials']?['signalType']}  <br> Resource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']} <br> Incident number: @{json(body('HTTP_CreateITSMTicket')).TicketNo} <br> Assignment group: @{parameters('ITSMWorkGroup')} <br>Comments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']} <br> <br> <br>\n"
+                                            }
+                                        },
+                                        "Set_SMSBody": {
+                                            "runAfter": {},
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "SMSBody",
+                                                "value": "Severity: @{triggerBody()?['data']?['essentials']?['severity']} \nSignal Type: @{triggerBody()?['data']?['essentials']?['signalType']}\nDescription: @{triggerBody()?['data']?['essentials']?['description']}\nComment: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']} \nIncident number: @{json(body('HTTP_CreateITSMTicket')).TicketNo}  "
+                                            }
+                                        },
+                                        "Set_TeamsMessage": {
+                                            "runAfter": {
+                                                "Set_EmailBody": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "TeamsMessage",
+                                                "value": "Description: @{triggerBody()?['data']?['essentials']?['description']}\nSeverity: @{triggerBody()?['data']?['essentials']?['severity']}\nCategory: @{triggerBody()?['data']?['essentials']?['signalType']}  \nResource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']}\n\nIncident number: @{json(body('HTTP_CreateITSMTicket')).TicketNo}\nAssignment group: @{parameters('ITSMWorkGroup')}\n\nComments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}\n"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_CreateITSMTicket": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Set_Email_Body": {
+                                                "runAfter": {
+                                                    "Set_SMS_Body": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "EmailBody",
+                                                    "value": "Description: @{triggerBody()?['data']?['essentials']?['description']} <br>Severity: @{triggerBody()?['data']?['essentials']?['severity']} <br> Category: @{triggerBody()?['data']?['essentials']?['signalType']}  <br> Resource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']} <br> Not able to save ticket details in ITSM <br> Assignment group: @{parameters('ITSMWorkGroup')} <br>Comments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']} <br> <br> <br>"
+                                                }
+                                            },
+                                            "Set_SMS_Body": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "SMSBody",
+                                                    "value": "Severity: @{triggerBody()?['data']?['essentials']?['severity']} \nSignal Type: @{triggerBody()?['data']?['essentials']?['signalType']}\nDescription: @{triggerBody()?['data']?['essentials']?['description']}\nComment: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']} \nNot able to save ticket details in ITSM"
+                                                }
+                                            },
+                                            "Set_Teams_Message": {
+                                                "runAfter": {
+                                                    "Set_Email_Body": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "TeamsMessage",
+                                                    "value": "Description: @{triggerBody()?['data']?['essentials']?['description']}\nSeverity: @{triggerBody()?['data']?['essentials']?['severity']}\nCategory: @{triggerBody()?['data']?['essentials']?['signalType']}\nResource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']}.\n\nIncident number: Not able to save ticket details. in ITSM.\nAssignment group: @{parameters('ITSMWorkGroup')}.\n\nComments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@json(body('HTTP_CreateITSMTicket')).Message",
+                                                    "New ticket has been logged successfully"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type": "If"
+                                },
+                                "For_each_Email": {
+                                    "foreach": "@parameters('emailAddress')",
+                                    "actions": {
+                                        "HTTP_to_Send_Email": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                                "body": {
+                                                    "channelOverride": true,
+                                                    "message": "@variables('EmailBody')",
+                                                    "nonProfileAddress": "@items('For_each_Email')",
+                                                    "nonProfileOverride": true,
+                                                    "status": "Sending",
+                                                    "subject": "@{triggerBody()?['data']?['essentials']?['severity']} : @{triggerBody()?['data']?['essentials']?['monitorCondition']}",
+                                                    "templateId": "100",
+                                                    "type": "Email"
+                                                },
+                                                "headers": {
+                                                    "Authorization": "Bearer @{body('Parse_JSON')?['access_token']}"
+                                                },
+                                                "method": "POST",
+                                                "queries": {
+                                                    "api-version": "@{int('1')}"
+                                                },
+                                                "uri": "https://api.tasmu.gov.qa/notification/api/Notification/NotificationSingle"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "For_each_Mobile_Number": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                },
+                                "For_each_Mobile_Number": {
+                                    "foreach": "@parameters('mobileNumber')",
+                                    "actions": {
+                                        "HTTP_Call_to_Send_SMS": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                                "body": {
+                                                    "address": "",
+                                                    "channelOverride": true,
+                                                    "message": "@variables('SMSBody')",
+                                                    "nonProfileAddress": "@items('For_each_Mobile_Number')",
+                                                    "nonProfileOverride": true,
+                                                    "status": "Sending",
+                                                    "subject": "@{triggerBody()?['data']?['essentials']?['severity']}: @{triggerBody()?['data']?['essentials']?['monitorCondition']}",
+                                                    "templateId": "100",
+                                                    "type": "SMS"
+                                                },
+                                                "headers": {
+                                                    "Authorization": "Bearer @{body('Parse_JSON')?['access_token']}"
+                                                },
+                                                "method": "POST",
+                                                "queries": {
+                                                    "api-version": "@{int('1')}"
+                                                },
+                                                "uri": "https://api.tasmu.gov.qa/notification/api/Notification/NotificationSingle"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Condition": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                },
+                                "HTTP_CreateITSMTicket": {
+                                    "runAfter": {
+                                        "Parse_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": {
+                                            "ServiceName": "IM_LogOrUpdateIncident",
+                                            "objCommonParameters": {
+                                                "RequestType": "RemoteCall",
+                                                "_ProxyDetails": {
+                                                    "APIKey": "@{parameters('ITSMAPIKEY')}",
+                                                    "AuthType": "APIKEY",
+                                                    "OrgID": 1,
+                                                    "ProxyID": 0,
+                                                    "ReturnType": "JSON"
+                                                },
+                                                "incidentParamsJSON": {
+                                                    "IncidentContainerJsonObj": {
+                                                        "CI_Key": "hostname",
+                                                        "CI_Value": "",
+                                                        "Ticket": {
+                                                            "Assigned_WorkGroup_Name": "@parameters('ITSMWorkGroup')",
+                                                            "CI_ID": "",
+                                                            "Caller_EmailID": "@{parameters('ITSMCallerId')}",
+                                                            "Category_Name": "Azure AD",
+                                                            "Classification_Name": "",
+                                                            "Description": "@variables('ITSM Description')",
+                                                            "Impact_Name": "High",
+                                                            "IsFromWebService": true,
+                                                            "Medium": "Web",
+                                                            "OpenCategory_Name": "",
+                                                            "PageName": "TicketDetail",
+                                                            "Priority_Name": "P1",
+                                                            "SLA_Name": "24*7",
+                                                            "Source": "@{parameters('ITSMSource')}",
+                                                            "Status": "New",
+                                                            "Sup_Function": "IT",
+                                                            "Urgency_Name": "High"
+                                                        },
+                                                        "TicketInformation": {
+                                                            "Information": "@{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}/@{triggerBody()?['data']?['essentials']?['configurationItems']}",
+                                                            "InternalLog": "",
+                                                            "Solution": "",
+                                                            "UserLog": ""
+                                                        },
+                                                        "Updater": "Executive"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "headers": {
+                                            "Content-Type": "application/json"
+                                        },
+                                        "method": "POST",
+                                        "uri": "@parameters('ITSMAPIURL')"
+                                    }
+                                },
+                                "HTTP_GenerateToken": {
+                                    "runAfter": {},
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": "client_id=@{body('Get_NotificationClientId')?['value']}&client_secret=@{body('Get_NotificationClientSecret')?['value']}&grant_type=client_credentials&scope=@{body('Get_Scope')?['value']}",
+                                        "headers": {
+                                            "Content-Type": "application/x-www-form-urlencoded"
+                                        },
+                                        "method": "POST",
+                                        "uri": "https://login.microsoftonline.com/26aa757b-a20c-4270-bc1c-d946b1f3e4a2/oauth2/v2.0/token"
+                                    }
+                                },
+                                "Parse_JSON": {
+                                    "runAfter": {
+                                        "HTTP_GenerateToken": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP_GenerateToken')",
+                                        "schema": {
+                                            "properties": {
+                                                "access_token": {
+                                                    "type": "string"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer"
+                                                },
+                                                "ext_expires_in": {
+                                                    "type": "integer"
+                                                },
+                                                "token_type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "Post_a_message_(V3)": {
+                                    "runAfter": {
+                                        "For_each_Email": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "body": {
+                                                "content": "<p>@{variables('TeamsMessage')}</p>",
+                                                "contentType": "html"
+                                            }
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['teams_1']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v3/beta/teams/@{encodeURIComponent('e696d8e1-8b44-4370-99f3-4441cbf4fb2e')}/channels/@{encodeURIComponent('19:2e17f14440a0463183353e055ac96ebf@thread.tacv2')}/messages"
+                                    }
+                                }
+                            },
+                            "runAfter": {},
+                            "else": {
+                                "actions": {
+                                    "Condition_2": {
+                                        "actions": {
+                                            "Condition_3": {
+                                                "actions": {
+                                                    "Post_message_in_a_chat_or_channel": {
+                                                        "runAfter": {},
+                                                        "type": "ApiConnection",
+                                                        "inputs": {
+                                                            "body": {
+                                                                "messageBody": "<p>Description: @{triggerBody()?['data']?['essentials']?['description']}<br>\nSeverity: @{triggerBody()?['data']?['essentials']?['severity']}<br>\nCategory: @{triggerBody()?['data']?['essentials']?['signalType']}<br>\nResource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']}.<br>\n<br>\nIncident number: @{json(body('HTTP_CreateITSMTicket2')).TicketNo}.<br>\nAssignment group: @{parameters('ITSMWorkGroup')}.<br>\n<br>\nComments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}</p>",
+                                                                "recipient": {
+                                                                    "channelId": "19:2e17f14440a0463183353e055ac96ebf@thread.tacv2",
+                                                                    "groupId": "e696d8e1-8b44-4370-99f3-4441cbf4fb2e"
+                                                                }
+                                                            },
+                                                            "host": {
+                                                                "connection": {
+                                                                    "name": "@parameters('$connections')['teams_1']['connectionId']"
+                                                                }
+                                                            },
+                                                            "method": "post",
+                                                            "path": "/beta/teams/conversation/message/poster/@{encodeURIComponent('User')}/location/@{encodeURIComponent('Channel')}"
+                                                        }
+                                                    }
+                                                },
+                                                "runAfter": {
+                                                    "HTTP_CreateITSMTicket2": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "else": {
+                                                    "actions": {
+                                                        "Post_message_in_a_chat_or_channel_2": {
+                                                            "runAfter": {},
+                                                            "type": "ApiConnection",
+                                                            "inputs": {
+                                                                "body": {
+                                                                    "messageBody": "<p>Description: @{triggerBody()?['data']?['essentials']?['description']}<br>\nSeverity: @{triggerBody()?['data']?['essentials']?['severity']}<br>\nCategory: @{triggerBody()?['data']?['essentials']?['signalType']}<br>\nResource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']}.<br>\n<br>\n<span style=\"color: rgb(226,80,65)\">Not able to save ticket details in ITSM</span><br>\nAssignment group: @{parameters('ITSMWorkGroup')}.<br>\n<br>\nComments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}</p>",
+                                                                    "recipient": {
+                                                                        "channelId": "19:2e17f14440a0463183353e055ac96ebf@thread.tacv2",
+                                                                        "groupId": "e696d8e1-8b44-4370-99f3-4441cbf4fb2e"
+                                                                    }
+                                                                },
+                                                                "host": {
+                                                                    "connection": {
+                                                                        "name": "@parameters('$connections')['teams_1']['connectionId']"
+                                                                    }
+                                                                },
+                                                                "method": "post",
+                                                                "path": "/beta/teams/conversation/message/poster/@{encodeURIComponent('User')}/location/@{encodeURIComponent('Channel')}"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "expression": {
+                                                    "and": [
+                                                        {
+                                                            "equals": [
+                                                                "@json(body('HTTP_CreateITSMTicket2')).Message",
+                                                                "New ticket has been logged successfully"
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "type": "If"
+                                            },
+                                            "HTTP_CreateITSMTicket2": {
+                                                "runAfter": {},
+                                                "type": "Http",
+                                                "inputs": {
+                                                    "body": {
+                                                        "ServiceName": "IM_LogOrUpdateIncident",
+                                                        "objCommonParameters": {
+                                                            "RequestType": "RemoteCall",
+                                                            "_ProxyDetails": {
+                                                                "APIKey": "@{parameters('ITSMAPIKEY')}",
+                                                                "AuthType": "APIKEY",
+                                                                "OrgID": 1,
+                                                                "ProxyID": 0,
+                                                                "ReturnType": "JSON"
+                                                            },
+                                                            "incidentParamsJSON": {
+                                                                "IncidentContainerJsonObj": {
+                                                                    "CI_Key": "hostname",
+                                                                    "CI_Value": "",
+                                                                    "Ticket": {
+                                                                        "Assigned_WorkGroup_Name": "@parameters('ITSMWorkGroup')",
+                                                                        "CI_ID": "",
+                                                                        "Caller_EmailID": "@{parameters('ITSMCallerId')}",
+                                                                        "Category_Name": "Azure AD",
+                                                                        "Classification_Name": "",
+                                                                        "Description": "@variables('ITSM Description')",
+                                                                        "Impact_Name": "Medium",
+                                                                        "IsFromWebService": true,
+                                                                        "Medium": "Web",
+                                                                        "OpenCategory_Name": "",
+                                                                        "PageName": "TicketDetail",
+                                                                        "Priority_Name": "P2",
+                                                                        "SLA_Name": "24*7",
+                                                                        "Source": "@{parameters('ITSMSource')}",
+                                                                        "Status": "New",
+                                                                        "Sup_Function": "IT",
+                                                                        "Urgency_Name": "High"
+                                                                    },
+                                                                    "TicketInformation": {
+                                                                        "Information": "@{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}/@{triggerBody()?['data']?['essentials']?['configurationItems']}",
+                                                                        "InternalLog": "",
+                                                                        "Solution": "",
+                                                                        "UserLog": ""
+                                                                    },
+                                                                    "Updater": "Executive"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "headers": {
+                                                        "Content-Type": "application/json"
+                                                    },
+                                                    "method": "POST",
+                                                    "uri": "@parameters('ITSMAPIURL')"
+                                                }
+                                            }
+                                        },
+                                        "runAfter": {},
+                                        "else": {
+                                            "actions": {
+                                                "Condition_4": {
+                                                    "actions": {
+                                                        "HTTP_CreateITSMTicket3": {
+                                                            "runAfter": {},
+                                                            "type": "Http",
+                                                            "inputs": {
+                                                                "body": {
+                                                                    "ServiceName": "IM_LogOrUpdateIncident",
+                                                                    "objCommonParameters": {
+                                                                        "RequestType": "RemoteCall",
+                                                                        "_ProxyDetails": {
+                                                                            "APIKey": "@{parameters('ITSMAPIKEY')}",
+                                                                            "AuthType": "APIKEY",
+                                                                            "OrgID": 1,
+                                                                            "ProxyID": 0,
+                                                                            "ReturnType": "JSON"
+                                                                        },
+                                                                        "incidentParamsJSON": {
+                                                                            "IncidentContainerJsonObj": {
+                                                                                "CI_Key": "hostname",
+                                                                                "CI_Value": "",
+                                                                                "Ticket": {
+                                                                                    "Assigned_WorkGroup_Name": "@parameters('ITSMWorkGroup')",
+                                                                                    "CI_ID": "",
+                                                                                    "Caller_EmailID": "@{parameters('ITSMCallerId')}",
+                                                                                    "Category_Name": "Azure AD",
+                                                                                    "Classification_Name": "",
+                                                                                    "Description": "@variables('ITSM Description')",
+                                                                                    "Impact_Name": "Medium",
+                                                                                    "IsFromWebService": true,
+                                                                                    "Medium": "Web",
+                                                                                    "OpenCategory_Name": "",
+                                                                                    "PageName": "TicketDetail",
+                                                                                    "Priority_Name": "P3",
+                                                                                    "SLA_Name": "24*7",
+                                                                                    "Source": "@{parameters('ITSMSource')}",
+                                                                                    "Status": "New",
+                                                                                    "Sup_Function": "IT",
+                                                                                    "Urgency_Name": "Medium"
+                                                                                },
+                                                                                "TicketInformation": {
+                                                                                    "Information": "@{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']} / @{triggerBody()?['data']?['essentials']?['configurationItems']}",
+                                                                                    "InternalLog": "",
+                                                                                    "Solution": "",
+                                                                                    "UserLog": ""
+                                                                                },
+                                                                                "Updater": "Executive"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "headers": {
+                                                                    "Content-Type": "application/json"
+                                                                },
+                                                                "method": "POST",
+                                                                "uri": "@parameters('ITSMAPIURL')"
+                                                            }
+                                                        }
+                                                    },
+                                                    "runAfter": {},
+                                                    "expression": {
+                                                        "and": [
+                                                            {
+                                                                "equals": [
+                                                                    "@triggerBody()?['data']?['essentials']?['severity']",
+                                                                    "@string('Sev2')"
+                                                                ]
+                                                            },
+                                                            {
+                                                                "equals": [
+                                                                    "@triggerBody()?['data']?['essentials']?['signalType']",
+                                                                    "@parameters('SignalType')"
+                                                                ]
+                                                            },
+                                                            {
+                                                                "equals": [
+                                                                    "@triggerBody()?['data']?['essentials']?['severity']",
+                                                                    "@string('Sev3')"
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "type": "If"
+                                                }
+                                            }
+                                        },
+                                        "expression": {
+                                            "and": [
+                                                {
+                                                    "equals": [
+                                                        "@triggerBody()?['data']?['essentials']?['severity']",
+                                                        "@string('Sev1')"
+                                                    ]
+                                                },
+                                                {
+                                                    "equals": [
+                                                        "@triggerBody()?['data']?['essentials']?['signalType']",
+                                                        "@parameters('SignalType')"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "type": "If"
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['data']?['essentials']?['severity']",
+                                            "@string('Sev0')"
+                                        ]
+                                    },
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['data']?['essentials']?['signalType']",
+                                            "@parameters('SignalType')"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        }
+                    },
+                    "runAfter": {
+                        "Get_Scope": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Scope"
+                },
+                "Set_ITSM_Description": {
+                    "runAfter": {
+                        "Initialize_Teams_Message": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable",
+                    "inputs": {
+                        "name": "ITSM Description",
+                        "value": "Description: @{triggerBody()?['data']?['essentials']?['description']}  <br> Severity: @{triggerBody()?['data']?['essentials']?['severity']} <br> Category: @{triggerBody()?['data']?['essentials']?['signalType']}  <br> Resource: @{triggerBody()?['data']?['essentials']?['alertTargetIDs']} <br>Comments: @{triggerBody()?['data']?['alertContext']?['authorization']?['action']} on @{triggerBody()?['data']?['alertContext']?['authorization']?['scope']}  "
+                    }
+                }
+            }
+        },    
+        "workflowParameters": {
+            "value": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "tags": {
+            "value": {
+                "Environment": ""
+            }
+        },
+        "connectionParameters": {
+            "value": {
+                "$connections": {
+                    "value": {
+                        "teams-1": {
+                          "connectionId": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/resourceGroups/rg-cph-glob-mon-prd-qc-01/providers/Microsoft.Web/connections/teams-1",
+                          "connectionName": "teams-1",
+                          "id": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/providers/Microsoft.Web/locations/qatarcentral/managedApis/teams"
+                        },
+                        "keyvault-5": {
+                          "connectionId": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/resourceGroups/rg-cph-glob-mon-prd-qc-01/providers/Microsoft.Web/connections/keyvault-5",
+                          "connectionName": "keyvault-5",
+                          "id": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/providers/Microsoft.Web/locations/qatarcentral/managedApis/keyvault"
+                        }
+                      }
+                }
+            }
+        }
+    }
+}
