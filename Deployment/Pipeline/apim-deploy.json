@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "outputs": {},
+  "parameters": {
+    "apimNameParam": {
+      "metadata": {
+        "description": "The name of the apim"
+      },
+      "type": "string"
+    },
+    "baseFileNameParam": {
+      "metadata": {
+        "description": "The name of the base file"
+      },
+      "type": "string"
+    },
+    "apimResourcegroupParam": {
+      "metadata": {
+        "description": "The name of the resource group"
+      },
+      "type": "string"
+    },
+    "componentStorageAccountId": {
+      "metadata": {
+        "description": "The resource Id of component storage account"
+      },
+      "type": "string"
+    },
+    "deploymentNameasParameter": {
+      "metadata": {
+        "description": "The name of the deployment"
+      },
+      "type": "string"
+    },
+    "folderForApi": {
+      "metadata": {
+        "description": "The name of the folder of ARM tempalates for given api in Blob"
+      },
+      "type": "string"
+    },
+    "templateEnvFolderName": {
+      "metadata": {
+        "description": "The name of the ARM tempalates folder in Blob"
+      },
+      "type": "string"
+    },
+    "utcYear": {
+      "defaultValue": "[utcNow('yyyy')]",
+      "metadata": {
+        "description": "Optional. Year data used to generate a SAS token. Default is the current year."
+      },
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2019-10-01",
+      "dependsOn": [],
+      "name": "[parameters('deploymentNameasParameter')]",
+      "properties": {
+        "debugSetting": {
+          "detailLevel": "requestContent,responseContent"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "ApimServiceName": {
+            "value": "[parameters('apimNameParam')]"
+          },
+          "LinkedTemplatesBaseUrl": {
+            "value": "[variables('modulesPath')]"
+          },
+          "linkedTemplatesUrlQueryString": {
+            "value": "[concat('?', listAccountSas(parameters('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+          }
+        },
+        "templateLink": {
+          "uri": "[concat(variables('modulesPath'), '/', parameters('baseFileNameParam'), '-master.template.json', '?', listAccountSas(parameters('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+        }
+      },
+      "resourceGroup": "[parameters('apimResourcegroupParam')]",
+      "type": "Microsoft.Resources/deployments"
+    }
+  ],
+  "variables": {
+    "accountSasProperties": {
+      "signedExpiry": "[concat(string(add(int(parameters('utcYear')), 1)), '-12-31T23:59:59Z')]",
+      "signedPermission": "racuw",
+      "signedProtocol": "https",
+      "signedResourceTypes": "co",
+      "signedServices": "bt"
+    },
+    "componentsBaseUrl": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/', variables('containerName'))]",
+    "containerName": "components",
+    "modulesPath": "[concat(variables('componentsBaseUrl'), '/APIMConfig/ARM/', parameters('templateEnvFolderName'),'/', parameters('folderForApi'))]",
+    "storageAccountName": "[if(not(empty(parameters('componentStorageAccountId'))), split(parameters('componentStorageAccountId'), '/')[8], 'placeholder')]"
+  }
+}

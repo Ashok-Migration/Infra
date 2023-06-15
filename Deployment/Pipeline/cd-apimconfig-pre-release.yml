@@ -1,0 +1,39 @@
+name: CD-APIMConfig-pre-Release
+
+trigger: none
+
+variables:
+  - name: poolName
+    value: "tasmumsiprdagents"
+  - name: templateFilePath
+    value: pipelines/apim/deployment/pipeline/apim-deploy.json
+  - name: componentStorageAccountId
+    value: "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-iacstg-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiacstgprdwe01"
+  - name: location
+    value: westeurope
+  - name: serviceConnection
+    value: sqcp-ado-spn-pre
+
+stages:
+  - stage: Deploypre
+    displayName: Deploy pre stage
+    variables:
+      - name: environment
+        value: pre
+      - name: resourceGroupName
+        value: rg-cpp-shrd-pre-we-01
+      - name: apimName
+        value: apim-cpp-shrd-pre-we-01
+    jobs:
+      - job: Build_Queue
+        pool:
+          name: $(poolName)
+        steps:
+          - task: PowerShell@2
+            name: setBuildQueue
+            inputs:
+              targetType: filePath
+              filePath: "pipelines/apim/deployment/pipeline/templates/get-service-queue.ps1"
+            displayName: "Get Service Build Queue"
+
+      - template: ./templates/apim-apis.yml

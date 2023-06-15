@@ -1,0 +1,115 @@
+parameters:
+  - name: FolderForApiVal
+    type: string
+
+  - name: dependent
+    type: boolean
+    default: true
+
+  - name: dependsonParam
+    type: string
+    default: ""
+
+jobs:
+  - job: ${{ parameters.FolderForApiVal }}_Job
+
+    ${{ if not(parameters.dependent) }}:
+      dependsOn: Build_Queue
+    ${{ if parameters.dependent }}:
+      dependsOn:
+        - Build_Queue
+        - ${{ parameters.dependsonParam }}_Job
+    displayName: ${{ parameters.FolderForApiVal }} Deploy Template
+    pool:
+      name: $(poolName)
+    condition: or(contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.FolderForApiVal }}'), contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], 'AllApis'))
+    steps:
+      - task: AzurePowerShell@4
+        displayName: Rename File for deployment to api
+        inputs:
+          azurePowerShellVersion: LatestVersion
+          azureSubscription: "$(serviceConnection)"
+          scriptArguments: '-pathToFileToRename "$(Build.SourcesDirectory)\$(templateFilePath)" -name $(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json'
+          ScriptPath: '$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\templates\rename.ps1'
+
+      - task: AzurePowerShell@4
+        displayName: Validate template on $(resourceGroupName)
+        inputs:
+          azurePowerShellVersion: LatestVersion
+          azureSubscription: "$(serviceConnection)"
+          ScriptType: InlineScript
+          inline: |
+            $ValidationErrors = $null
+                          
+            $params = @{
+              templateEnvFolderName = "$(environment)"
+              deploymentNameasParameter = "DEP-$(apimName)-${{ parameters.FolderForApiVal }}"
+              folderForApi = '${{ parameters.FolderForApiVal }}'
+              componentStorageAccountId = '$(componentStorageAccountId)'
+              baseFileNameParam = "$(environment)${{ parameters.FolderForApiVal }}we01"
+              apimResourcegroupParam = "$(resourceGroupName)"
+              apimNameParam = '$(apimName)'
+            }
+            $Location = "$(location)" -replace " ",""
+
+            $DeploymentInputs = @{
+              Location              = "$Location"
+              TemplateFile          = "$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
+              TemplateParameterObject = $params
+              Verbose               = $true
+              OutVariable           = "ValidationErrors"
+            }
+            
+            Test-AzDeployment @DeploymentInputs
+
+            if ($ValidationErrors)
+            {
+              Write-Error "Template is not valid."
+            }
+
+      - task: AzurePowerShell@4
+        displayName: Deploy template on $(resourceGroupName)
+        inputs:
+          azurePowerShellVersion: LatestVersion
+          azureSubscription: "$(serviceConnection)"
+          ScriptType: InlineScript
+          inline: |
+            $Location = "$(location)" -replace " ",""
+
+            $params = @{
+              templateEnvFolderName = "$(environment)"
+              deploymentNameasParameter = "DEP-$(apimName)-${{ parameters.FolderForApiVal }}"
+              folderForApi = '${{ parameters.FolderForApiVal }}'
+              apimResourcegroupParam = "$(resourceGroupName)"
+              apimNameParam = '$(apimName)'
+              componentStorageAccountId = '$(componentStorageAccountId)'
+              baseFileNameParam = "$(environment)${{ parameters.FolderForApiVal }}we01"
+            }
+            $Location = "$(location)" -replace " ",""
+
+            $DeploymentInputs = @{
+              Location              = "$Location"
+              TemplateFile          = "$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
+              TemplateParameterObject = $params
+              DeploymentDebugLogLevel = "All"
+              Verbose                 = $true
+              ErrorAction             = "Stop"
+            }
+            New-AzDeployment @DeploymentInputs
+
+      - task: AzurePowerShell@4
+        displayName: Update APIs URL Scheme on $(apimName)
+        #enabled: false
+        inputs:
+          azurePowerShellVersion: LatestVersion
+          azureSubscription: "$(serviceConnection)"
+          ScriptType: InlineScript
+          inline: |
+            $context = New-AzApiManagementContext -ResourceGroupName $(resourceGroupName) -ServiceName $(apimName);
+            $api = Get-AzApiManagementApi -Context $context -ApiId ${{parameters.FolderForApiVal}};
+            if($api -eq $null){
+              Write-Host "API ${{parameters.FolderForApiVal}} not found"
+            }
+            else{
+              Set-AzApiManagementApi -Context $context -ApiId $api.ApiId -Name $api.Name -ServiceUrl $api.ServiceUrl -Protocols @('http','https');
+            }

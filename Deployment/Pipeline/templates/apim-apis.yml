@@ -1,0 +1,610 @@
+jobs:
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: Profile
+      dependent: false
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationApi
+      dependsonParam: Profile
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: Config
+      dependsonParam: NotificationApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: Smartparking
+      dependsonParam: Config
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: Demographic
+      dependsonParam: Smartparking
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: Case
+      dependsonParam: Demographic
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: KnowledgeBaseAPI
+      dependsonParam: Case
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: MarketplaceCatalogue
+      dependsonParam: KnowledgeBaseAPI
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: OrganisationProfile
+      dependsonParam: MarketplaceCatalogue
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: cmscontentapi
+      dependsonParam: OrganisationProfile
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: cmsdocumentsapi
+      dependsonParam: cmscontentapi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: cmsmediaassetsapi
+      dependsonParam: cmsdocumentsapi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SMSPublisherApi
+      dependsonParam: cmsmediaassetsapi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationTemplate
+      dependsonParam: SMSPublisherApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: ParkingLotServiceApi
+      dependsonParam: NotificationTemplate
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: OrderManagementApi
+      dependsonParam: ParkingLotServiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NARouteApi
+      dependsonParam: OrderManagementApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeocodeApi
+      dependsonParam: NARouteApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeometryApi
+      dependsonParam: GeocodeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SearchApi
+      dependsonParam: GeometryApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CustomerOnboardingApi
+      dependsonParam: SearchApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeofencingApi
+      dependsonParam: CustomerOnboardingApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeotaggingApi
+      dependsonParam: GeofencingApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HeatMapServiceApi
+      dependsonParam: GeotaggingApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HotspotServiceApi
+      dependsonParam: HeatMapServiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: ClosestFacilityApi
+      dependsonParam: HotspotServiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SatelliteAndStreetMapApi
+      dependsonParam: ClosestFacilityApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCFarmsWFSApi
+      dependsonParam: SatelliteAndStreetMapApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCFarmsWMSApi
+      dependsonParam: DFCFarmsWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCMunicipalityWFSApi
+      dependsonParam: DFCFarmsWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCMunicipalityWMSApi
+      dependsonParam: DFCMunicipalityWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCZonesWFSApi
+      dependsonParam: DFCMunicipalityWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DFCZonesWMSApi
+      dependsonParam: DFCZonesWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISFarmsWFSApi
+      dependsonParam: DFCZonesWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISFarmsWMSApi
+      dependsonParam: CGISFarmsWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISLandmarkAddLocatorAraApi
+      dependsonParam: CGISFarmsWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISLandmarkAddLocatorEngApi
+      dependsonParam: CGISLandmarkAddLocatorAraApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISLandmarkRAddLocatorEngApi
+      dependsonParam: CGISLandmarkAddLocatorEngApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISMunicipalityWFSApi
+      dependsonParam: CGISLandmarkRAddLocatorEngApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISMunicipalityWMSApi
+      dependsonParam: CGISMunicipalityWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISQatarAddLocatorApi
+      dependsonParam: CGISMunicipalityWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISQatarAddLocatorWGSApi
+      dependsonParam: CGISQatarAddLocatorApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISQatarFarmsGenSvcApi
+      dependsonParam: CGISQatarAddLocatorWGSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISQatarMunicipalityGenSvcApi
+      dependsonParam: CGISQatarFarmsGenSvcApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISQatarZonesGenSvcApi
+      dependsonParam: CGISQatarMunicipalityGenSvcApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISRouteDistanceApi
+      dependsonParam: CGISQatarZonesGenSvcApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISRouteDistanceWGSApi
+      dependsonParam: CGISRouteDistanceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISRouteTimeApi
+      dependsonParam: CGISRouteDistanceWGSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISRouteTimeWGSApi
+      dependsonParam: CGISRouteTimeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISStreetMapAraApi
+      dependsonParam: CGISRouteTimeWGSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISStreetMapHybridAraApi
+      dependsonParam: CGISStreetMapAraApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISStreetMapHybridEngApi
+      dependsonParam: CGISStreetMapHybridAraApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISStreetMapserverApi
+      dependsonParam: CGISStreetMapHybridEngApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISTopoMapserverApi
+      dependsonParam: CGISStreetMapserverApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISZonesWFSApi
+      dependsonParam: CGISTopoMapserverApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CGISZonesWMSApi
+      dependsonParam: CGISZonesWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: MapServerApi
+      dependsonParam: CGISZonesWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: CustomerManagementApi
+      dependsonParam: MapServerApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: AccountManagementApi
+      dependsonParam: CustomerManagementApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: FieldService
+      dependsonParam: AccountManagementApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: EventManagementApi
+      dependsonParam: FieldService
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SMSProviderApi
+      dependsonParam: EventManagementApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: BillingEntityInfoApi
+      dependsonParam: SMSProviderApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: PaymentApi
+      dependsonParam: BillingEntityInfoApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DownloadInvoiceApi
+      dependsonParam: PaymentApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: BotDirectlineApi
+      dependsonParam: DownloadInvoiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationEmailFreeApi
+      dependsonParam: BotDirectlineApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationEmailPremiumApi
+      dependsonParam: NotificationEmailFreeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationEmailStandardApi
+      dependsonParam: NotificationEmailPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationGSmsApi
+      dependsonParam: NotificationEmailStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationSmsFreeApi
+      dependsonParam: NotificationGSmsApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationSmsPremiumApi
+      dependsonParam: NotificationSmsFreeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: NotificationSmsStandardApi
+      dependsonParam: NotificationSmsPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: PushNotificationFreeApi
+      dependsonParam: NotificationSmsStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: PushNotificationPremiumApi
+      dependsonParam: PushNotificationFreeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: PushNotificationStandardApi
+      dependsonParam: PushNotificationPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: ScheduledNotificationApi
+      dependsonParam: PushNotificationStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeometryFreeApi
+      dependsonParam: ScheduledNotificationApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeometryStandardApi
+      dependsonParam: GeometryFreeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeometryPremiumApi
+      dependsonParam: GeometryStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeofencingFreeApi
+      dependsonParam: GeometryPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeofencingStandardApi
+      dependsonParam: GeofencingFreeApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeofencingPremiumApi
+      dependsonParam: GeofencingStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeotaggingStandardApi
+      dependsonParam: GeofencingPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: GeotaggingPremiumApi
+      dependsonParam: GeotaggingStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HeatMapPremiumServiceApi
+      dependsonParam: GeotaggingPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HotspotPremiumServiceApi
+      dependsonParam: HeatMapPremiumServiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SubscriptionStandardApi
+      dependsonParam: HotspotPremiumServiceApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SubscriptionPremiumApi
+      dependsonParam: SubscriptionStandardApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: DataUploadApi
+      dependsonParam: SubscriptionPremiumApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SMSGatewayDomesticApi
+      dependsonParam: DataUploadApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: SMSGatewayInternationalApi
+      dependsonParam: SMSGatewayDomesticApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: StreetMapHybridArabicApi
+      dependsonParam: SMSGatewayInternationalApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: StreetMapHybridEnglishApi
+      dependsonParam: StreetMapHybridArabicApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: AddressLocatorArabicApi
+      dependsonParam: StreetMapHybridEnglishApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: AddressLocatorWGS84EnglishApi
+      dependsonParam: AddressLocatorArabicApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: RoutingDistanceWGS84Api
+      dependsonParam: AddressLocatorWGS84EnglishApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: RoutingTimeWGS84Api
+      dependsonParam: RoutingDistanceWGS84Api
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: BackOfficeAdminPortalApi
+      dependsonParam: RoutingTimeWGS84Api
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCWFSApi
+      dependsonParam: BackOfficeAdminPortalApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCWMSApi
+      dependsonParam: UCTTCCWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCSignalPolesWFSApi
+      dependsonParam: UCTTCCWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCSignalPolesWMSApi
+      dependsonParam: UCTTCCSignalPolesWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCTrafficSignsWFSApi
+      dependsonParam: UCTTCCSignalPolesWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCTrafficSignsWMSApi
+      dependsonParam: UCTTCCTrafficSignsWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCPOIWMSApi
+      dependsonParam: UCTTCCTrafficSignsWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCPOIWFSApi
+      dependsonParam: UCTTCCPOIWMSApi  
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCFlowlineWFSApi
+      dependsonParam: UCTTCCPOIWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCFlowlineWMSApi
+      dependsonParam: UCTTCCFlowlineWFSApi  
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCMetroAlignmentWFSApi
+      dependsonParam: UCTTCCFlowlineWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCMetroAlignmentWMSApi
+      dependsonParam: UCTTCCMetroAlignmentWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCMetroStationsWFSApi
+      dependsonParam: UCTTCCMetroAlignmentWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCMetroStationsWMSApi
+      dependsonParam: UCTTCCMetroStationsWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCStationEntriesWFSApi
+      dependsonParam: UCTTCCMetroStationsWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCStationEntriesWMSApi
+      dependsonParam: UCTTCCStationEntriesWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCLRTAlignmentWMSApi
+      dependsonParam: UCTTCCStationEntriesWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCLRTAlignmentWFSApi
+      dependsonParam: UCTTCCLRTAlignmentWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCLRTStationsWFSApi
+      dependsonParam: UCTTCCLRTAlignmentWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UCTTCCLRTStationsWMSApi
+      dependsonParam: UCTTCCLRTStationsWFSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: UberApi
+      dependsonParam: UCTTCCLRTStationsWMSApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HeatMapApi
+      dependsonParam: UberApi
+
+  - template: ./testandDeployTemplate.yml
+    parameters:
+      FolderForApiVal: HayyaApi
+      dependsonParam: HeatMapApi
