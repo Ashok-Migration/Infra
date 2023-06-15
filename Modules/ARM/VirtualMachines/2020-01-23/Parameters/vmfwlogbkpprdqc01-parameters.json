@@ -14,71 +14,84 @@
         "standardImage": {
             "value": {
               "publisher": "Microsoft.OSTCExtensions",
-              "offer": "WindowsServer",
+              "offer": "Linux",
               "sku": "2019-Datacenter",
               "version": "latest"
             }
         },
         "osDisk": {
             "value": {
-                "createOption": "fromImage",
-                "diskSizeGB": "256",
+                "createOption": "Attach",
+                "caching": "ReadWrite",
+                "diskSizeGB": "64",
                 "managedDisk": {
-                    "storageAccountType": "StandardSSD_LRS"
-                }
+                    "storageAccountType": "Premium_LRS"
+                    },
+                "deleteOption": "Detach",
+                "writeAcceleratorEnabled": false
+                
             }
         },
         "dataDisks": {
             "value": [
                 {
                     "caching": "ReadOnly",
-                    "createOption": "Empty",
-                    "diskSizeGB": "128",
+                    "createOption": "Attach",
+                    "diskSizeGB": "16",
                     "managedDisk": {
                         "storageAccountType": "StandardSSD_LRS"
-                    }
+                    },
+                    "writeAcceleratorEnabled": false,
+                    "deleteOption": "Detach",
+                    "toBeDetached": false
                 },
                 {
                     "caching": "ReadOnly",
-                    "createOption": "Empty",
-                    "diskSizeGB": "128",
+                    "createOption": "Attach",
+                    "diskSizeGB": "256",
                     "managedDisk": {
                         "storageAccountType": "StandardSSD_LRS"
-                    }
+                    },
+                    "writeAcceleratorEnabled": false,
+                    "deleteOption": "Detach",
+                    "toBeDetached": false
                 },
                 {
                     "caching": "ReadOnly",
-                    "createOption": "Empty",
-                    "diskSizeGB": "128",
+                    "createOption": "Attach",
+                    "diskSizeGB": "256",
                     "managedDisk": {
                         "storageAccountType": "StandardSSD_LRS"
-                    }
+                    },
+                    "writeAcceleratorEnabled": false,
+                    "deleteOption": "Detach",
+                    "toBeDetached": false
                 }
             ]
         },
-        "NetworkDetails": {
-            "value": {
-                "vnetRG": "rg-cph-pltf-net-prd-qc-01",
-                "vnet": "vnet-cph-pltf-prd-qc-01",
-                "subnet": "snet-cph-pltf-iacbl-prd-qc-01"
-            }
-        },
-        "adminUsername": {
-            "reference": {
-                "keyVault": {
-                    "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-sec-prd-qc-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-qc-01"
-                },
-                "secretName": "Tasmuqc123qc"
-            }
-        },
-        "adminPassword": {
-            "reference": {
-                "keyVault": {
-                    "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-sec-prd-qc-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-qc-01"
-                },
-                "secretName": "Welcome12345"
-            }
-        },
+        // "NetworkDetails": {
+        //     "value": {
+        //         "vnetRG": "rg-cph-pltf-net-prd-qc-01",
+        //         "vnet": "vnet-cph-pltf-prd-qc-01",
+        //         "subnet": "snet-cph-pltf-iacbl-prd-qc-01"
+        //     }
+        // },
+        // "adminUsername": {
+        //     "reference": {
+        //         "keyVault": {
+        //             "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-sec-prd-qc-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-qc-01"
+        //         },
+        //         "secretName": "Tasmuqc123qc"
+        //     }
+        // },
+        // "adminPassword": {
+        //     "reference": {
+        //         "keyVault": {
+        //             "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-sec-prd-qc-01/providers/Microsoft.KeyVault/vaults/kv-cph-pltf-prd-qc-01"
+        //         },
+        //         "secretName": "Welcome12345"
+        //     }
+        // },
         "availabilitySetName": {
             "value": ""
         },
@@ -105,13 +118,13 @@
             "value": true
         },
         "diagnosticStorageAccountId": {
-            "value": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-mon-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdqc01"
+            "value": ""
         },
         "diagnosticStorageAccountName": {
-            "value": "stcphpltfdiagprdqc01"
+            "value": ""
         },
         "workspaceId": {
-            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+            "value": ""
         },
         "eventHubAuthorizationRuleId": {
             "value": ""
