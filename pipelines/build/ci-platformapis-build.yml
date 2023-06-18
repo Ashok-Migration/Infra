@@ -6,7 +6,15 @@ pool:
   name: "tasmumsagents"
 
 resources:
-  - repo: self
+  - repository: platform-apis # The name used to reference this repository in the checkout step
+      type: git
+      name: TASMU Central Platform/platform-apis
+      ref: master
+
+    - repository: QC-Infra-repo # The name used to reference this repository in the checkout step
+      type: git
+      name: QC-Infra
+      ref: Ashok/PlatformApis
 
 jobs:
   - job: Build_Queue
