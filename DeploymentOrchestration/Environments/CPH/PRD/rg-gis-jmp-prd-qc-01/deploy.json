@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-rg-gis-jmp-npd-qc-01",
+            "name": "DEP-rg-gis-jmp-prd-qc-01",
             "location": "[variables('location')]",
             "dependsOn": [
                 
@@ -47,7 +47,7 @@
                     "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-gis-jmp-npd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'ResourceGroup/2019-11-28/Parameters/rg-gis-jmp-prd-qc-01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         },
@@ -55,9 +55,9 @@
             "apiVersion": "2019-08-01",
             "name": "[variables('CUA')]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "rg-gis-jmp-npd-qc-01",
+            "resourceGroup": "rg-gis-jmp-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-gis-jmp-npd-qc-01"
+                "DEP-rg-gis-jmp-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -71,10 +71,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-08-01",
-            "name": "DEP-jmpgisnpdqc01",
-            "resourceGroup": "rg-gis-jmp-npd-qc-01",
+            "name": "DEP-jmpgisprdqc01",
+            "resourceGroup": "rg-gis-jmp-prd-qc-01",
             "dependsOn": [
-                "DEP-rg-gis-jmp-npd-qc-01"
+                "DEP-rg-gis-jmp-prd-qc-01"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -85,7 +85,28 @@
                     "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 },
                 "parametersLink": {
-                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpgisnpdqc01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpgisprdqc01-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "DEP-jmpgisprdqc02",
+            "resourceGroup": "rg-gis-jmp-prd-qc-01",
+            "dependsOn": [
+                "DEP-rg-gis-jmp-prd-qc-01"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "debugSetting": {
+                    "detailLevel": "requestContent,responseContent"
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/deploy.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
+                },
+                "parametersLink": {
+                    "uri": "[concat(variables('modulesPath'), 'VirtualMachines/2020-01-23/Parameters/jmpgisprdqc02-parameters.json', '?', listAccountSas(variables('componentStorageAccountId'), '2019-04-01', variables('accountSasProperties')).accountSasToken)]"
                 }
             }
         }
