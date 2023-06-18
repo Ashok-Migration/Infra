@@ -6,13 +6,13 @@ variables:
   - name: poolName
     value: "tasmumsagents"
   - name: templateFilePath
-    value: pipelines/apim/deployment/pipeline/apim-deploy.json
+    value: deployment/pipeline/apim-deploy.json
   - name: componentStorageAccountId
-    value: "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourceGroups/rg-cpd-pltf-iacstg-npd-we-01/providers/Microsoft.Storage/storageAccounts/stcpdpltfiacstgnpdwe01"
+    value: "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-cph-pltf-iactst-prd-qc-01/providers/Microsoft.Storage/storageAccounts/stcphpltfiactstprdqc01"
   - name: location
-    value: westeurope
+    value: qatarcentral
   - name: serviceConnection
-    value: sqcp-ado-spn-dev
+    value: sqcp-ado-spn-hub-qc
 
 stages:
   - stage: DeployDEV
@@ -21,9 +21,9 @@ stages:
       - name: environment
         value: dev
       - name: resourceGroupName
-        value: rg-cpd-shrd-dev-we-01
+        value: rg-integ-api-dev-qc-01
       - name: apimName
-        value: apim-cpd-shrd-dev-we-01
+        value: apim-shared-integ-dev-qc-01
     jobs:
       - job: Build_Queue
         pool:
@@ -33,7 +33,7 @@ stages:
             name: setBuildQueue
             inputs:
               targetType: filePath
-              filePath: "pipelines/apim/deployment/pipeline/templates/get-service-queue.ps1"
+              filePath: "deployment/pipeline/templates/get-service-queue.ps1"
             displayName: "Get Service Build Queue"
 
       - template: ./templates/apim-apis.yml
