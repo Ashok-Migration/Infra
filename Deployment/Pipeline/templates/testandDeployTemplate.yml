@@ -29,7 +29,7 @@ jobs:
         inputs:
           azurePowerShellVersion: LatestVersion
           azureSubscription: "$(serviceConnection)"
-          scriptArguments: '-pathToFileToRename "$(Build.SourcesDirectory)\$(templateFilePath)" -name $(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json'
+          scriptArguments: '-pathToFileToRename "$(Build.SourcesDirectory)\$(templateFilePath)" -name $(Build.SourcesDirectory)\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json'
           ScriptPath: '$(Build.SourcesDirectory)\deployment\pipeline\templates\rename.ps1'
 
       - task: AzurePowerShell@4
@@ -54,7 +54,7 @@ jobs:
 
             $DeploymentInputs = @{
               Location              = "$Location"
-              TemplateFile          = "$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
+              TemplateFile          = "$(Build.SourcesDirectory)\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
               TemplateParameterObject = $params
               Verbose               = $true
               OutVariable           = "ValidationErrors"
@@ -89,7 +89,7 @@ jobs:
 
             $DeploymentInputs = @{
               Location              = "$Location"
-              TemplateFile          = "$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
+              TemplateFile          = "$(Build.SourcesDirectory)\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json"
               TemplateParameterObject = $params
               DeploymentDebugLogLevel = "All"
               Verbose                 = $true
