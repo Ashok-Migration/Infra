@@ -30,7 +30,7 @@ jobs:
           azurePowerShellVersion: LatestVersion
           azureSubscription: "$(serviceConnection)"
           scriptArguments: '-pathToFileToRename "$(Build.SourcesDirectory)\$(templateFilePath)" -name $(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\$(environment)${{ parameters.FolderForApiVal }}we01.json'
-          ScriptPath: '$(Build.SourcesDirectory)\pipelines\apim\deployment\pipeline\templates\rename.ps1'
+          ScriptPath: '$(Build.SourcesDirectory)\deployment\pipeline\templates\rename.ps1'
 
       - task: AzurePowerShell@4
         displayName: Validate template on $(resourceGroupName)
