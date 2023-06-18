@@ -1,0 +1,41 @@
+steps:
+    - checkout: self
+
+    - task: NodeTool@0
+      displayName: 'Use Node 12.16.1'
+      inputs:
+        versionSpec: 12.16.1
+
+    - task: Npm@1
+      displayName: 'NPM Install bot cli tools'
+      inputs:
+        command: custom
+        verbose: false
+        customCommand: 'install -g botdispatch @microsoft/botframework-cli'
+
+    - task: Npm@1
+      displayName: 'NPM Install bot cli tools'
+      inputs:
+        command: custom
+        verbose: false
+        customCommand: 'install -g botskills@latest'
+
+    - pwsh: |
+        az login --service-principal --username "$(ServicePrincipal)" --password "$(AzureDevOps-ServicePrincipal-Secret)" --tenant "$(Azure_Tenant)"
+        az account set --subscription "$(azureSubscriptionName)"
+        pwsh.exe -File './scripts/deploy_cognitive_models.ps1' -name tasmubot -resourceGroup $(azureResourceGroup) -languages 'en-us,ar-ar' -outFolder '$(Build.SourcesDirectory)/$(outFolder)' -luisAuthoringRegion westeurope -luisAccountName $(luisAccountName) -luisAccountRegion westeurope -luisEndpoint $(luisEndpoint) -luisAuthoringKey $(Bot-AppSettings-LuisAuthSubscriptionKey) -qnaEndpoint $(qnaEndpoint) -qnaSubscriptionKey $(Bot-AppSettings-QnaEnSubscriptionKey) -azureSubscriptionId $(azureSubscription) --useDispatch --qnaArSubscriptionKey $(Bot-AppSettings-QnaArSubscriptionKey) --luisRtEndpoint $(luisRtEndpoint) --luisRtAccountName $(luisRtAccountName)
+      errorActionPreference: continue
+      failOnStderr: false
+      workingDirectory: '$(Build.SourcesDirectory)/$(outFolder)'
+      displayName: 'Deploy_CognitiveModels_en_CLI_inline'
+      continueOnError: true
+      
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: $(Build.SourcesDirectory)/pipelines/bot
+        targetFolder: $(Build.ArtifactStagingDirectory)/deploy
+        cleanTargetFolder: false 
+      
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: botinitialdeploymentArtifacts$(env)
+      

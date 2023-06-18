@@ -1,0 +1,80 @@
+parameters:
+  - name: updateHelmResources
+    type: boolean
+    default: false
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+
+steps:
+  - task: HelmDeploy@0
+    displayName: "Add application-gateway-kubernetes-ingress to Helm Repo"
+    continueOnError: true
+    enabled: ${{ parameters.updateHelmResources }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/"
+
+  - task: HelmDeploy@0
+    displayName: "Add aad-pod-identity to Helm Repo"
+    continueOnError: true
+    enabled: ${{ parameters.updateHelmResources }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts"
+
+  - task: HelmDeploy@0
+    displayName: "Helm Repo update"
+    continueOnError: true
+    enabled: ${{ parameters.updateHelmResources }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "update"
+
+  - task: HelmDeploy@0
+    displayName: Enable Identity
+    continueOnError: true
+    enabled: ${{ parameters.updateHelmResources }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      namespace: "kube-system"
+      command: "upgrade"
+      chartType: "FilePath"
+      chartPath: $(Pipeline.Workspace)/charts/stable/aad-pod-identity-$(env)
+      releaseName: "aks-essentials"
+      install: true
+      waitForExecution: true
+      arguments: "--create-namespace"
+
+  - task: HelmDeploy@0
+    displayName: Install ingress-azure
+    continueOnError: true
+    enabled: ${{ parameters.updateHelmResources }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      namespace: "ingress"
+      command: "upgrade"
+      chartType: "Name"
+      chartName: "application-gateway-kubernetes-ingress/ingress-azure"
+      releaseName: "ingress-azure"
+      install: true
+      waitForExecution: true
+      arguments: "--create-namespace -f $(Pipeline.Workspace)/charts/stable/agic-ingress/$(env)/helm-config.yaml --version 1.2.0-rc3"

@@ -1,0 +1,238 @@
+trigger: none
+
+variables:
+  outFolder: "pipelines/bot"  
+  qnaEndpoint: https://westus.api.cognitive.microsoft.com/qnamaker/v4.0
+
+pool:
+  name: "platformapispool"
+
+stages:
+  - stage: Deploy_initial_sbx
+    displayName: Initial Deploy BOT resources sbx stage
+    condition: eq(variables.deployTo, 'sbx')
+    variables:
+      - group: Sandbox
+      - name: azureSubscriptionName
+        value: 'Central Platform Development'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-dev"
+      - name: env
+        value: sbx
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-sbx-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-sbx-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-sbx-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpd-apps-luisrt-sbx-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpd-apps-luisrt-sbx-we-01.cognitiveservices.azure.com/
+
+
+    jobs:
+      - deployment: Deploy_initial_sbx
+        displayName: Initial Deploy BOT resources sbx
+        environment: "Sbx"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_dev
+    displayName: Initial Deploy BOT resources dev stage
+    dependsOn: Deploy_initial_sbx
+    condition: eq(variables.deployTo, 'dev')
+    variables:
+      - group: Dev
+      - name: azureSubscriptionName
+        value: 'Central Platform Development'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-dev"
+      - name: env
+        value: dev
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-dev-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-dev-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-dev-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpd-apps-luisrt-dev-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpd-apps-luisrt-dev-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_initial_dev
+        displayName: Initial Deploy BOT resources dev
+        environment: "Dev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_tst
+    displayName: Initial Deploy BOT resources tst stage
+    dependsOn: Deploy_initial_sbx
+    condition: eq(variables.deployTo, 'tst')
+    variables:
+      - group: Tst
+      - name: azureSubscriptionName
+        value: 'Central Platform Development'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-dev"
+      - name: env
+        value: tst
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-tst-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-tst-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-tst-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpd-apps-luisrt-tst-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpd-apps-luisrt-tst-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_BOT
+        displayName: Deploy tst Bot
+        environment: "Tst"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_tra
+    displayName: Initial Deploy BOT resources tra stage
+    dependsOn: Deploy_initial_sbx
+    condition: eq(variables.deployTo, 'tra')
+    variables:
+      - group: tra
+      - name: azureSubscriptionName
+        value: 'Central Platform Development'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-dev"
+      - name: env
+        value: tra
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-tra-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-tra-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-tra-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpd-apps-luisrt-tra-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpd-apps-luisrt-tra-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy tra Bot
+        environment: "Tra"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_uat
+    displayName: Initial Deploy BOT resources uat stage
+    dependsOn: Deploy_initial_sbx
+    condition: eq(variables.deployTo, 'uat')
+    variables:
+      - group: uat
+      - name: azureSubscriptionName
+        value: 'Central Platform Development'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-dev"
+      - name: env
+        value: uat
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-uat-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-uat-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-uat-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpd-apps-luisrt-uat-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpd-apps-luisrt-uat-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy uat Bot
+        environment: "uat"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_pre
+    displayName: Initial Deploy BOT resources pre stage
+    condition: eq(variables.deployTo, 'pre')
+    variables:
+      - group: pre
+      - name: azureSubscriptionName
+        value: 'Central Platform Production'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-pre"
+      - name: env
+        value: pre
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-cog-pre-we-01"
+      - name: luisAccountName
+        value: cog-cpp-apps-luisauth-pre-we-01
+      - name: luisEndpoint
+        value: https://cog-cpp-apps-luisauth-pre-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpp-apps-luisrt-pre-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpp-apps-luisrt-pre-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy pre Bot
+        environment: "pre"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml
+
+  - stage: Deploy_initial_prd
+    displayName: Initial Deploy BOT resources prd stage
+    condition: eq(variables.deployTo, 'prd')
+    variables:
+      - group: prd
+      - name: azureSubscriptionName
+        value: 'Central Platform Production'
+      - name: azureSubscription
+        value: "sqcp-ado-spn-prd"
+      - name: env
+        value: prd
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-cog-prd-we-01"
+      - name: luisAccountName
+        value: cog-cpp-apps-luisauth-prd-we-01
+      - name: luisEndpoint
+        value: https://cog-cpp-apps-luisauth-prd-we-01.cognitiveservices.azure.com/
+      - name: luisRtAccountName
+        value: cog-cpp-apps-luisrt-prd-we-01
+      - name: luisRtEndpoint
+        value: https://cog-cpp-apps-luisrt-prd-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy prd Bot
+        environment: "prd"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/build-luisandqna.yml

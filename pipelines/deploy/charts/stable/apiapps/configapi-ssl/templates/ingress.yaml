@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}-ingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/backend-path-prefix: {{ .Values.ingress.backendPrefix }}
+    appgw.ingress.kubernetes.io/backend-protocol: {{ .Values.ingress.backendProtocol }}
+    appgw.ingress.kubernetes.io/backend-hostname: {{ .Values.ingress.backendHostName }}
+    appgw.ingress.kubernetes.io/appgw-trusted-root-certificate: {{ .Values.ingress.agwRootCert }}
+    appgw.ingress.kubernetes.io/use-private-ip: "true"
+    appgw.ingress.kubernetes.io/request-timeout: "{{ .Values.ingress.requestTimeout }}"
+spec:
+  tls:
+    - secretName: {{ .Values.ingress.tlsSecret}}
+      hosts:
+        - "*.tasmucp.gov.qa"
+  rules:
+    - host: "*.tasmucp.gov.qa"
+      http:
+        paths:
+        - path: {{ .Values.ingress.path }}
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: {{ .Chart.Name }}
+              port:
+                number: {{ .Values.service.port}}

@@ -1,0 +1,27 @@
+apiVersion: keda.k8s.io/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Chart.Name}}
+  labels:
+    deploymentName: {{ .Chart.Name}}
+spec:
+  scaleTargetRef:
+    deploymentName: {{ .Chart.Name}}
+  pollingInterval: 10
+  cooldownPeriod: 30
+  minReplicas: 0
+  maxReplicas: 2
+  triggers:
+  - type: azure-servicebus
+    metadata:
+      type: serviceBusTrigger
+      connection: AzureWebJobsServiceBus
+      queueName: events.d365
+      name: message
+  
+  - type: azure-servicebus
+    metadata:
+      type: serviceBusTrigger
+      connection: AzureWebJobsServiceBus
+      queueName: events.o365
+      name: message

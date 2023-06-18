@@ -1,0 +1,116 @@
+parameters:
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+
+steps:
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(paymentfunctionAppName)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(paymentfunctionAppName)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(reconcileRefundFunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(reconcileRefundFunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+  #- task: AzureRmWebAppDeployment@4
+    #displayName: Deploy $(ckanResourceCreationFunctionAppName)
+    #inputs:
+      #ConnectionType: "AzureRM"
+      #azureSubscription: ${{ parameters.azureSubscription }}
+      #appType: "functionApp"
+      #WebAppName: $(ckanResourceCreationFunctionAppName)
+      #packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(consumptionfunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(consumptionfunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+  - task: AzureAppServiceManage@0
+    displayName: Stop $(businessProcessfunctionApp)
+    continueOnError: true
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      action: "Stop Azure App Service"
+      webAppName: $(businessProcessfunctionApp)
+      
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(businessProcessfunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(businessProcessfunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+  - task: AzureAppServiceManage@0
+    displayName: Start $(businessProcessfunctionApp)
+    continueOnError: true
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      action: "Start Azure App Service"
+      webAppName: $(businessProcessfunctionApp)
+
+  - task: AzureAppServiceManage@0
+    displayName: Stop $(sharepointNotifyfunctionApp)
+    continueOnError: true
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      action: "Stop Azure App Service"
+      webAppName: $(sharepointNotifyfunctionApp)
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(sharepointNotifyfunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(sharepointNotifyfunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+  - task: AzureAppServiceManage@0
+    displayName: Start $(sharepointNotifyfunctionApp)
+    continueOnError: true
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      action: "Start Azure App Service"
+      webAppName: $(sharepointNotifyfunctionApp)
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(d365ProfilefunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(d365ProfilefunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy $(captchafunctionApp)
+    continueOnError: true
+    inputs:
+      ConnectionType: "AzureRM"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: "functionApp"
+      WebAppName: $(captchafunctionApp)
+      packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Captcha.AzureFunctions.zip"

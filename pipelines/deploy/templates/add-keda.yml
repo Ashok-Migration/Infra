@@ -1,0 +1,51 @@
+parameters:
+  - name: addKeda
+    type: boolean
+    default: false
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+
+  
+steps:
+  - task: HelmDeploy@0
+    displayName: 'Add keda to Helm Repo'
+    continueOnError: true    
+    enabled: ${{ parameters.addKeda }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "add kedacore https://kedacore.github.io/charts"
+
+  - task: HelmDeploy@0
+    displayName: 'Helm Repo update'
+    continueOnError: true    
+    enabled: ${{ parameters.addKeda }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "update"                          
+  
+  - task: HelmDeploy@0
+    displayName: Install KEDA
+    continueOnError: true   
+    enabled: ${{ parameters.addKeda }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      namespace: "keda"
+      command: upgrade       
+      chartType: "Name"  
+      chartName: "kedacore/keda"      
+      releaseName: "keda"          
+      install: true
+      waitForExecution: true       
+      arguments: "--create-namespace --version 1.5.0"

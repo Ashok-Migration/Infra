@@ -1,0 +1,118 @@
+parameters:
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-pre"
+
+steps:
+  - template: helm-upgrade.yml
+    parameters:
+      name: smsprovider
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/smsprovider-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: smspublisher
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/smspublisher-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: knowledgebaseapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/knowledgebaseapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: caseapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/case-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: fieldserviceapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/fieldservice-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: organisationprofileapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/organisationprofile-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: profileapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/profileapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: marketplacecatalogueapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/marketplacecatalogueapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: demographicapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/demographicapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: configapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/configapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: notificationapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/notification-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: notificationtemplateapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/notificationtemplate-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: cmscontentapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/cmscontentapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: cmsdocumentsapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/cmsdocumentsapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: cmsmediaassetsapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/cmsmediaassetsapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: paymentgwapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/paymentgw-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: notificationfunc
+      chartPath: "$(Pipeline.Workspace)/charts/stable/jobs/notificationfunc"
+      namespace: jobs
+      customValuestoAppend: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),secret.AzureWebJobsStorage=$(ConnectionStrings-StorageAccount),secret.ServiceBusConnectionString=$(NotificationSettings-NotificationServiceBusConnectionString),secret.APPINSIGHTS_INSTRUMENTATIONKEY=$(ApplicationInsights-InstrumentationKey),secret.APPLICATIONINSIGHTS_CONNECTION_STRING=$(ApplicationInsights-ConnectionString)"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: manageeventfunc
+      chartPath: "$(Pipeline.Workspace)/charts/stable/jobs/manageeventfunc"
+      namespace: jobs
+      customValuestoAppend: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),secret.AzureWebJobsStorage=$(ConnectionStrings-StorageAccount),secret.AzureWebJobsServiceBus=$(ConnectionStrings-IntegrationServiceBus),secret.APPINSIGHTS_INSTRUMENTATIONKEY=$(ApplicationInsights-InstrumentationKey),secret.APPLICATIONINSIGHTS_CONNECTION_STRING=$(ApplicationInsights-ConnectionString)"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: fieldservicefunc
+      chartPath: "$(Pipeline.Workspace)/charts/stable/jobs/fieldservicefunc"
+      namespace: jobs
+      customValuestoAppend: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),secret.AzureWebJobsStorage=$(ConnectionStrings-StorageAccount),secret.AzureWebJobsServiceBus=$(ConnectionStrings-IntegrationServiceBus),secret.APPINSIGHTS_INSTRUMENTATIONKEY=$(ApplicationInsights-InstrumentationKey),secret.APPLICATIONINSIGHTS_CONNECTION_STRING=$(ApplicationInsights-ConnectionString)"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: subscriptionsapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/subscriptionsapi-prd"
+      azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: backofficeapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/backoffice"
+      azureSubscription: ${{ parameters.azureSubscription }}
+# Add more template jobs with parameters for other Services

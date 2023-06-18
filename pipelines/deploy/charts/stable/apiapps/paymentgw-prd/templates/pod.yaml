@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name}}  
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version}}
+    aadpodidbinding: {{ .Values.podIdentity}}        
+spec:
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name}}
+  replicas: {{ .Values.replicaCount}}
+  template:
+      metadata:
+        labels:
+            app: {{ .Chart.Name}}
+            aadpodidbinding: {{ .Values.podIdentity}}            
+      spec:
+        nodeSelector: 
+          agentpool: {{ .Values.nodeSelector }}
+        containers:
+        - name: {{ .Chart.Name}}
+          image: {{ .Values.image.repository}}:{{ .Values.image.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy}}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu}}
+              memory: {{ .Values.resources.requests.memory}}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu}}
+              memory: {{ .Values.resources.limits.memory}}
+          ports:
+          - containerPort: {{ .Values.container.containerPort}}
+          env:
+          - name: ConnectionStrings__AppConfig
+            value: {{ .Values.environment.ConnectionStrings__AppConfig}}

@@ -1,0 +1,33 @@
+parameters:
+  - name: artifactName
+    type: string
+    default: ""
+
+steps:
+    
+  - task: NodeTool@0 
+    inputs:
+      versionSpec: 12.x
+
+  # Install dev dependencies
+  - script: npm install
+    workingDirectory: $(System.DefaultWorkingDirectory)/$(node_function_app_folder)
+    displayName: "Install npm"
+
+  # Prune dev dependencies
+  - script: npm prune --production
+    workingDirectory: $(System.DefaultWorkingDirectory)/$(node_function_app_folder) 
+    displayName: "Prune dev dependencies"
+
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/$(node_function_app_folder)"
+      includeRootFolder: false
+      archiveFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}build$(Build.BuildId).zip'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}build$(Build.BuildId).zip'
+      artifactName: ${{ parameters.artifactName }} 
+      

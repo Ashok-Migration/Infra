@@ -1,0 +1,46 @@
+namespace: apiapps
+environment:
+  ConnectionStrings__AppConfig: ""
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 2
+service:
+  type: ClusterIP
+  port: 80
+container:
+  containerPort: 80
+resources:
+  limits:
+    cpu: 0.3
+    memory: 1024Mi
+  requests:
+    cpu: 0.2
+    memory: 1024Mi
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 2
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 10
+  minReplicas: 4
+  targetCPUUtilizationPercentage: 50
+ingress:
+  path: /notification/*
+  backendPrefix: "/"
+  requestTimeout: "120"
+  sslCertificate: "httpsvaultCert"
+  host: ""
+daprio:
+  id: "notification"
+  port: "'80'"
+  loglevel: "debug"
+  logasjson: "'true'"
+  config: "tracing"
+  sidecarcpulimit: "'0.8'"
+  sidecarmemorylimit: "512Mi"
+  sidecarcpurequest: "'0.6'"
+  sidecarmemoryrequest: "256Mi"
+nodeSelector: apps

@@ -1,0 +1,69 @@
+parameters:
+  - name: projectPath
+    type: string
+    default: ""
+
+  - name: artifactName
+    type: string
+    default: ""
+
+  - name: isWebProject
+    type: boolean
+    default: true
+    
+  - name: projectFolderName
+    type: string
+    default: "--"
+
+steps:
+  - task: UseDotNet@2
+    displayName: "Use .NET Core sdk 3.1.x"
+    inputs:
+      packageType: "sdk"
+      version: "3.1.x"
+      includePreviewVersions: true
+
+  - task: DotNetCoreCLI@2
+    displayName: Build ${{ parameters.projectPath }}
+    inputs:
+      command: "restore"
+      projects: ${{ parameters.projectPath }}
+      feedsToUse: "select"
+      vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: Build ${{ parameters.projectPath }}
+    inputs:
+      command: "build"
+      projects: ${{ parameters.projectPath }}
+      arguments: --configuration Release
+      feedsToUse: "select"
+      vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+      noCache: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish and zip ${{ parameters.projectPath }}'
+    inputs:
+      command: publish
+      publishWebProjects: ${{ parameters.isWebProject }}
+      projects: ${{ parameters.projectPath }}
+      arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}Output'
+      feedsToUse: "select"
+      vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"      
+      zipAfterPublish: false
+      noCache: true
+      modifyOutputPath: true
+      
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}Output/${{ parameters.projectFolderName }}'
+      includeRootFolder: false
+      archiveFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}build$(Build.BuildId).zip'
+        
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifactName }}build$(Build.BuildId).zip' 
+      artifactName: ${{ parameters.artifactName }} 
+      

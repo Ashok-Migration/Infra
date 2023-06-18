@@ -1,0 +1,36 @@
+namespace: apiapps
+environment:
+  ConnectionStrings__AppConfig: ""
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+container:
+  containerPort: 80
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 2
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 20
+  minReplicas: 3
+  targetCPUUtilizationPercentage: 50
+ingress:
+  path: /config/*
+  backendPrefix: "/"
+  requestTimeout: "120"
+  sslCertificate: "httpsvaultCert"
+  host: ""
+nodeSelector: apps

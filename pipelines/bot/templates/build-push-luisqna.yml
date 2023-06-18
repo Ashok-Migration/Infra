@@ -1,0 +1,13 @@
+
+steps:
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: "$(Build.SourcesDirectory)/pipelines/bot"
+      contents: '**' 
+      targetFolder: "$(Build.ArtifactStagingDirectory)/botresources"
+      cleanTargetFolder: true 
+
+
+  - publish: $(Build.ArtifactStagingDirectory)/botresources
+    artifact: botresourcesartifacts

@@ -1,0 +1,42 @@
+namespace: apiapps
+environment:
+  ConnectionStrings__AppConfig: ""
+  kestrelDefPwd: ""
+  kestrelDefPath: "/https/tasmu_aks.pfx" 
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 8443
+container:
+  containerPort: 443
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 1
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 8
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 50
+ingress:
+  path: /config-ssl/* 
+  backendPrefix: "/"
+  host: "*.tasmucp.gov.qa"
+  backendHostName: "aks.tasmucp.gov.qa"
+  backendProtocol: "https"
+  agwRootCert: "tasmu-aks-tls"
+  usePrivateIp: "true"
+  tlsSecret: "tasmu-frontend-tls"
+  requestTimeout: "120"
+nodeSelector: apps

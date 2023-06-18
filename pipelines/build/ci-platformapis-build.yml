@@ -1,0 +1,195 @@
+trigger:
+  branches:
+    include:
+      - master
+pool:
+  name: "tasmumsagents"
+
+resources:
+  - repo: self
+
+jobs:
+  - job: Build_Queue
+    steps:
+      - task: PowerShell@2
+        name: setBuildQueue
+        inputs:
+          targetType: filePath
+          filePath: "pipelines/build/get-service-queue.ps1"
+        displayName: "Get Service Build Queue"
+
+  - template: build-template.yml
+    parameters:
+      name: Reference
+      solutionFolder: "Reference"
+      solutionPath: "src/services/Reference"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: MCSTASMUBot
+      solutionFolder: "MCSTASMUBot"
+      solutionPath: "src/services/BOT"
+      dockerBuild: false
+
+  - template: build-template.yml
+    parameters:
+      name: cmscontentapi
+      solutionFolder: "cmscontentapi"
+      solutionPath: "src/services/Mcs.TASMU.CMS.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: cmsdocumentsapi
+      solutionFolder: "cmsdocumentsapi"
+      solutionPath: "src/services/Mcs.TASMU.CMS.Documents.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: cmsmediaassetsapi
+      solutionFolder: "cmsmediaassetsapi"
+      solutionPath: "src/services/Mcs.TASMU.CMS.MediaAssets.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: cmsbinarymediaapi
+      solutionFolder: "cmsbinarymediaapi"
+      solutionPath: "src/services/Mcs.TASMU.CMS.BinaryMedia.Api"
+      dockerBuild: false
+
+  - template: build-template.yml
+    parameters:
+      name: KnowledgeBaseAPI
+      solutionFolder: "KnowledgebaseArticle"
+      solutionPath: "src/services/Mcs.Tasmu.KnowledgebaseArticle.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: Complaint
+      solutionFolder: "Complaint"
+      solutionPath: "src/services/Mcs.Tasmu.Complaint.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: OrganisationProfile
+      solutionFolder: "OrganisationProfile"
+      solutionPath: "src/services/Mcs.Tasmu.OrganisationProfile.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: Profile
+      solutionFolder: "Profile"
+      solutionPath: "src/services/Mcs.Tasmu.Profile.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: ServiceRequest
+      solutionFolder: "ServiceRequest"
+      solutionPath: "src/services/Mcs.Tasmu.ServiceRequest.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: MarketplaceCatalogue
+      solutionFolder: "MarketplaceCatalogue"
+      solutionPath: "src/services/Mcs.Tasmu.MarketplaceCatalogue.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: Demographic
+      solutionFolder: "Demographic"
+      solutionPath: "src/services/Mcs.Tasmu.Demographic.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: EmailTemplate
+      solutionFolder: "EmailTemplate"
+      solutionPath: "src/services/Mcs.Tasmu.EmailTemplate.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: SmsTemplate
+      solutionFolder: "SmsTemplate"
+      solutionPath: "src/services/Mcs.Tasmu.SmsTemplate.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: Config
+      solutionFolder: "Config"
+      solutionPath: "src/services/Mcs.Tasmu.Config.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: Notification
+      solutionFolder: "Notification"
+      solutionPath: "src/services/Notification"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: SmsPublisher
+      solutionFolder: "SmsPublisher"
+      solutionPath: "src/services/SmsPublisher"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: SmsProvider
+      solutionFolder: "SmsProvider"
+      solutionPath: "src/services/SmsProvider"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: NotificationFunction
+      solutionFolder: "NotificationFunction"
+      solutionPath: "src/functions/Notification"
+      dockerBuild: false
+
+  - template: build-template.yml
+    parameters:
+      name: Smartparking
+      solutionFolder: "Smartparking"
+      solutionPath: "src/services/Smartparking"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: PaymentGW
+      solutionFolder: "PaymentGW"
+      solutionPath: "src/services/Mcs.Tasmu.PaymentGW.Api"
+      dockerBuild: false 
+
+  - template: build-template.yml
+    parameters:
+      name: NotificationTemplate
+      solutionFolder: "NotificationTemplate"
+      solutionPath: "src/services/NotificationTemplate"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: BackOffice
+      solutionFolder: "BackOffice"
+      solutionPath: "src/services/Mcs.Tasmu.BackOfficePortal.Api"
+      dockerBuild: true
+
+  - template: build-template.yml
+    parameters:
+      name: CaptchaFunction
+      solutionFolder: "CaptchaFunction"
+      solutionPath: "src/functions/Captcha"
+      dockerBuild: true
+# Add more template jobs with parameters for other Services

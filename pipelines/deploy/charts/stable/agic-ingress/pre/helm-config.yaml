@@ -1,0 +1,40 @@
+verbosityLevel: 3
+
+################################################################################
+# Specify which application gateway the ingress controller will manage
+#
+appgw:
+    subscriptionId: 8964f3c1-44f5-4094-80eb-4334845bdfb1
+    resourceGroup: rg-cpp-apps-aks-pre-we-01
+    name: agw-cpp-apps-aks-pre-we-01
+
+    usePrivateIP: true
+
+    # Setting appgw.shared to "true" will create an AzureIngressProhibitedTarget CRD.
+    # This prohibits AGIC from applying config for any host/path.
+    # Use "kubectl get AzureIngressProhibitedTargets" to view and change this.
+    shared: false
+
+################################################################################
+# Specify which kubernetes namespace the ingress controller will watch
+# Default value is "default"
+# Leaving this variable out or setting it to blank or empty string would
+# result in Ingress Controller observing all acessible namespaces.
+#
+# kubernetes:
+#   watchNamespace: <namespace>
+
+################################################################################
+# Specify the authentication with Azure Resource Manager
+#
+# Two authentication methods are available:
+# - Option 1: AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity)
+armAuth:
+    type: aadPodIdentity
+    identityResourceID: /subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourcegroups/rg-cpp-apps-aksnode-pre-we-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-cpp-apps-aks-pre-we-01
+    identityClientID: 34b58a66-a534-4b74-8276-92fc1df15665
+
+################################################################################
+# Specify if the cluster is RBAC enabled or not
+rbac:
+    enabled: true

@@ -1,0 +1,63 @@
+parameters:
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+    
+    
+steps:
+
+    - download: current
+      artifact: botresourcesartifacts
+      
+    - task: replacetokens@3
+      inputs:
+        targetFiles: "$(Pipeline.Workspace)/botresourcesartifacts/cognitiveModels/cognitivemodels.json"
+        encoding: "auto"
+        writeBOM: true
+        verbosity: "detailed"
+        actionOnMissing: "warn"
+        keepToken: false
+        tokenPrefix: "{#"
+        tokenSuffix: "#}"
+      displayName: Perform variable substitution in json file
+
+    - task: NodeTool@0
+      displayName: 'Use Node 12.16.1'
+      inputs:
+        versionSpec: 12.16.1
+
+    - task: Npm@1
+      displayName: 'NPM Install bot cli tools'
+      inputs:
+        command: custom
+        verbose: false
+        customCommand: 'install -g botdispatch @microsoft/botframework-cli'
+
+    - task: Npm@1
+      displayName: 'NPM Install bot cli tools'
+      inputs:
+        command: custom
+        verbose: false
+        customCommand: 'install -g botskills@latest'
+
+    - pwsh: |        
+        az login --service-principal --username "$(ServicePrincipal)" --password "$(AzureDevOps-ServicePrincipal-Secret)" --tenant "$(Azure_Tenant)"
+        
+        az account set --subscription "$(azureSubscriptionName)"
+        pwsh.exe -File '.\scripts\update_cognitive_models.ps1' -luisFolder '.\resources\lu\' -configFile '.\cognitiveModels\cognitivemodels.json' -name tasmubot -resourceGroup $(azureResourceGroup) -languages ''en-us,ar-ar'' -luisAuthoringRegion westeurope -luisAccountName $(luisAccountName) -luisAccountRegion westeurope -luisEndpoint $(luisEndpoint) -luisAuthoringKey $(Bot-AppSettings-LuisAuthSubscriptionKey) -azureSubscriptionId ${{ parameters.azureSubscription }}
+      errorActionPreference: continue
+      failOnStderr: false
+      workingDirectory: '$(Pipeline.Workspace)\botresourcesartifacts'
+      displayName: 'update cognitive models'
+      continueOnError: true
+
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: $(Pipeline.Workspace)/botresourcesartifacts
+        targetFolder: $(Build.ArtifactStagingDirectory)/update
+        cleanTargetFolder: false 
+    
+        
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: botupdatedeploymentArtifacts$(env)
+      

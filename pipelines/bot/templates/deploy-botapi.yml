@@ -1,0 +1,129 @@
+
+parameters:
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+    
+    
+steps:
+
+  - task: DownloadBuildArtifacts@0
+    displayName: Download BOT API
+    inputs:
+      buildType: 'current' 
+      downloadType: 'single'
+      artifactName: botapiArtifact
+      downloadPath: '$(System.ArtifactsDirectory)' 
+
+
+  - task: DownloadBuildArtifacts@0
+    displayName: Download Qnasync
+    inputs:
+      buildType: 'current' 
+      downloadType: 'single'
+      artifactName: qnamakersyncFuncArtifacts
+      downloadPath: '$(System.ArtifactsDirectory)' 
+
+
+  - task: DownloadBuildArtifacts@0
+    displayName: Download Luis Trainer
+    inputs:
+      buildType: 'current' 
+      downloadType: 'single'
+      artifactName: luisTrainerFuncArtifacts
+      downloadPath: '$(System.ArtifactsDirectory)' 
+
+  - task: AzureWebApp@1
+    displayName: Deploy BOT API - Azure Web App $(appserviceName) Deploy
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appName: $(appserviceName)
+      package: $(System.ArtifactsDirectory)/botapiArtifact/botapiArtifactbuild$(Build.BuildId).zip
+      appType: webApp
+      removeAdditionalFilesFlag: true 
+      deploymentMethod: zipDeploy 
+        
+  - task: AzureAppServiceSettings@1
+    displayName: BOT API - Azure App Service Settings
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appName: $(appserviceName)
+    # To deploy the settings on a slot, provide slot name as below. By default, the settings would be applied to the actual Web App (Production slot)
+    # slotName: staging
+      connectionStrings: |
+        [
+          {
+            "name": "AppConfig",
+            "value": "$(ConfigStoreUrl)",
+            "type": "Custom",
+            "slotSetting": false
+          }
+        ]
+
+
+
+  - task: AzureFunctionApp@1 # Add this at the end of your file
+    displayName: Deploy Qnasync - Azure Func App $(qnasyncFunctionAppName) Deploy
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: functionApp
+      appName: $(qnasyncFunctionAppName)
+      package: $(System.ArtifactsDirectory)/qnamakersyncFuncArtifacts/qnamakersyncFuncArtifactsbuild$(Build.BuildId).zip
+      deploymentMethod: zipDeploy
+      
+  - task: AzureAppServiceSettings@1
+    displayName: Qnasync - Azure App Service Settings
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appName: $(qnasyncFunctionAppName)
+      appSettings: |
+        [
+          {
+            "name": "QnaKbScheduleTriggerTime",
+            "value": "0 */3 * * * *",
+            "slotSetting": false
+          }
+        ]
+
+    # To deploy the settings on a slot, provide slot name as below. By default, the settings would be applied to the actual Web App (Production slot)
+    # slotName: staging
+      connectionStrings: |
+        [
+          {
+            "name": "AppConfig",
+            "value": "$(ConfigStoreUrl)",
+            "type": "Custom",
+            "slotSetting": false
+          }
+        ]
+
+  - task: AzureFunctionApp@1 # Add this at the end of your file
+    displayName: Deploy Luis Trainer - Azure Func App $(luisTrainerFunctionAppName) Deploy
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appType: functionApp
+      appName: $(luisTrainerFunctionAppName)
+      package: $(System.ArtifactsDirectory)/luisTrainerFuncArtifacts/luisTrainerFuncArtifactsbuild$(Build.BuildId).zip
+      deploymentMethod: zipDeploy
+
+      
+  - task: AzureAppServiceSettings@1
+    displayName: Luis Trainer - Azure App Service Settings
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      appName: $(luisTrainerFunctionAppName)
+      # To deploy the settings on a slot, provide slot name as below. By default, the settings would be applied to the actual Web App (Production slot)
+      # slotName: staging
+      appSettings: |
+        [
+          {
+            "name": "AppConfigConnectionString",
+            "value": "$(ConfigStoreUrl)",
+            "slotSetting": false
+          },          
+          {
+            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+            "value": "~10",
+            "slotSetting": false
+          }
+        ]

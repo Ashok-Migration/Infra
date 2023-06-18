@@ -1,0 +1,327 @@
+trigger: none
+
+resources:
+  - repo: self
+
+variables:
+  namespace: "apiapps"
+  vmImage: "ubuntu-latest"
+  dockerRegistryServiceConnectionPrd: "acrcppglobprdwe01-spn2"
+  functionSolutionPath: "src/functions/*/*.sln"
+  BuildConfiguration: "Release"
+  BuildPlatform: "Any CPU"
+  tag: "$(Build.BuildId)"
+  serviceConnection: sqcp-ado-spn-prd
+
+pool:
+  vmImage: "$(vmImage)"
+stages:
+  - stage: Enableacrpublicips
+    displayName: Enableacrpublicips
+    jobs:
+      - template: templates/enable-acr-publicips-prd.yml
+
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: smsprovider
+          solutionPath: "src/services/SmsProvider"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: smspublisher
+          solutionPath: "src/services/SmsPublisher"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: notificationfunc
+          solutionPath: "src/functions/Notification"
+          namespace: "jobs"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: manageeventfunc
+          solutionPath: "src/functions/ManageEvent"
+          namespace: "jobs"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: fieldservicefunc
+          solutionPath: "src/functions/FieldService"
+          namespace: "jobs"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: knowledgebaseapi
+          solutionPath: "src/services/Mcs.Tasmu.KnowledgebaseArticle.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: caseapi
+          solutionPath: "src/services/Case"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: fieldserviceapi
+          solutionPath: "src/services/FieldService"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: organisationprofileapi
+          solutionPath: "src/services/Mcs.Tasmu.OrganisationProfile.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: profileapi
+          solutionPath: "src/services/Mcs.Tasmu.Profile.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: marketplacecatalogueapi
+          solutionPath: "src/services/Mcs.Tasmu.MarketplaceCatalogue.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: demographicapi
+          solutionPath: "src/services/Mcs.Tasmu.Demographic.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: configapi
+          solutionPath: "src/services/Mcs.Tasmu.Config.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: notificationapi
+          solutionPath: "src/services/Notification"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: notificationtemplateapi
+          solutionPath: "src/services/NotificationTemplate"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: cmscontentapi
+          solutionPath: "src/services/Mcs.TASMU.CMS.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: cmsdocumentsapi
+          solutionPath: "src/services/Mcs.TASMU.CMS.Documents.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: cmsmediaassetsapi
+          solutionPath: "src/services/Mcs.TASMU.CMS.MediaAssets.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: paymentgwapi
+          solutionPath: "src/services/Mcs.Tasmu.PaymentGW.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: subscriptionsapi
+          solutionPath: "src/services/Mcs.Tasmu.Subscriptions.Api"
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: backofficeapi
+          solutionPath: "src/services/Mcs.Tasmu.BackOfficePortal.Api"
+
+      # Add more template jobs with parameters for other Services
+
+      # Build Function Apps
+      - template: templates/build-funcapps.yml
+        parameters:
+          poolName: "platformapispool"
+
+      # Publish Artifacts
+      - template: templates/publish-artifacts.yml
+        parameters:
+          chartsPath: "pipelines/deploy/charts"
+          poolName: "platformapispool"
+
+  - stage: Disableacrpublicips
+    displayName: Disableacrpublicips
+    jobs:
+      - template: templates/disable-acr-publicips-prd.yml
+
+  - stage: Deploy_Pre
+    displayName: Deploy Pre stage
+    dependsOn: Build
+    variables:
+      - group: pre
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-aks-pre-we-01"
+      - name: kubernetesCluster
+        value: "aks-cpp-apps-pre-we-01"
+      - name: "enablehpa"
+        value: "true"
+      - name: containerRegistry
+        value: "acrcppglobprdwe01.azurecr.io"
+      - name: appConfigConnection
+        value: "https://acst-cpp-apps-str-pre-we-01.azconfig.io"
+      - name: podIdentity
+        value: "mi-cpp-apps-aks-pre-we-01"
+      - name: env
+        value: "pre"
+      - name: apiHost
+        value: "api.pre.sqcp.qa"
+      - name: paymentfunctionAppName
+        value: "func-cpp-apps-pt-pre-we-01"
+      - name: consumptionfunctionApp
+        value: "func-cpp-apps-acm-pre-we-01"
+      - name: businessProcessfunctionApp
+        value: "func-cpp-apps-intbpa-pre-we-01"
+      - name: sharepointNotifyfunctionApp
+        value: "func-cpp-apps-intntf-pre-we-01"
+      - name: ckanResourceCreationFunctionAppName
+        value: "func-cpp-apps-ckan-pre-we-01"
+      - name: d365ProfilefunctionApp
+        value: "func-cpp-apps-prflint-pre-we-01"
+      - name: reconcileRefundFunctionApp
+        value: "func-cpp-apps-rrf-pre-we-01"
+      - name: captchafunctionApp
+        value: "func-cpp-apps-cpch-pre-we-01"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy pre APIs
+        environment: pre-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: "Allow Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --default-action Allow
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled true
+
+                - task: HelmInstaller@1
+                  inputs:
+                    helmVersionToInstall: "3.2.1"
+
+                - template: templates/deploy-dapr.yml
+                  parameters:
+                    installDapr: true
+                    azureSubscription: sqcp-ado-spn-pre
+
+                - template: templates/deploy-apps-prd.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+                - template: templates/deploy-funcapps.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(ckanResourceCreationFunctionAppName)
+                  continueOnError: true
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-pre
+                    appType: "functionApp"
+                    WebAppName: $(ckanResourceCreationFunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+                - task: AzureCLI@2
+                  displayName: "Disable Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled false    
+
+  - stage: Deploy_Prd
+    displayName: Deploy Prd stage
+    dependsOn: Deploy_Pre
+    variables:
+      - group: prd
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-aks-prd-we-01"
+      - name: kubernetesCluster
+        value: "aks-cpp-apps-prd-we-01"
+      - name: "enablehpa"
+        value: "true"
+      - name: containerRegistry
+        value: "acrcppglobprdwe01.azurecr.io"
+      - name: appConfigConnection
+        value: "https://acst-cpp-apps-str-prd-we-01.azconfig.io"
+      - name: podIdentity
+        value: "mi-cpp-apps-aks-prd-we-01"
+      - name: env
+        value: "prd"
+      - name: apiHost
+        value: "api.tasmu.gov.qa"
+      - name: paymentfunctionAppName
+        value: "func-cpp-apps-pt-prd-we-01"
+      - name: consumptionfunctionApp
+        value: "func-cpp-apps-acm-prd-we-01"
+      - name: businessProcessfunctionApp
+        value: "func-cpp-apps-intbpa-prd-we-01"
+      - name: sharepointNotifyfunctionApp
+        value: "func-cpp-apps-intntf-prd-we-01"
+      - name: ckanResourceCreationFunctionAppName
+        value: "func-cpp-apps-ckan-prd-we-01"
+      - name: d365ProfilefunctionApp
+        value: "func-cpp-apps-prflint-prd-we-01"
+      - name: reconcileRefundFunctionApp
+        value: "func-cpp-apps-rrf-prd-we-01"
+      - name: captchafunctionApp
+        value: "func-cpp-apps-cpch-prd-we-01"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy prd APIs
+        environment: prd
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: "Allow Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --default-action Allow
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled true
+
+                - task: HelmInstaller@1
+                  inputs:
+                    helmVersionToInstall: "3.2.1"
+
+                - template: templates/deploy-dapr.yml
+                  parameters:
+                    installDapr: true
+                    azureSubscription: sqcp-ado-spn-prd
+
+                - template: templates/deploy-apps-prd.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd
+
+                - template: templates/deploy-funcapps.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd
+
+                - task: AzureCLI@2
+                  displayName: "Disable Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled false    

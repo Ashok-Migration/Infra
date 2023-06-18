@@ -1,0 +1,80 @@
+trigger: none
+
+pool:
+  name: "platformapispool"
+
+variables:
+  buildConfiguration: "Release"
+  buildPlatform: "Any CPU"
+  workingDirectory: "src/**/**/**/**.csproj"
+
+jobs:
+  - job: SonarPipeline
+    displayName: Sonar Pipeline
+    timeoutInMinutes: 120
+    steps:
+
+      - task: CredScan@2
+        displayName: "Run CredScan"
+        inputs:
+          debugMode: false
+
+      - task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@4
+        displayName: "Prepare the SonarQube analysis"
+        inputs:
+          SonarQube: "tasmu-sonar-platform-apis"
+          projectKey: "TASMU_MSI_platform-apis_AYQUb7_rb-Vs0ydWkZhz"
+          projectName: "platform-apis"
+          projectVersion: "$(Build.BuildNumber)"
+          extraProperties: "sonar.ps.plugin.skip=true"
+          sonar.verbose: true
+
+      - task: UseDotNet@2
+        displayName: "Use .NET Core sdk 3.1.x"
+        inputs:
+          packageType: "sdk"
+          version: "3.1.x"
+          includePreviewVersions: true
+
+      - task: DotNetCoreCLI@2
+        displayName: "dotnet restore"
+        inputs:
+          command: "restore"
+          projects: "$(workingDirectory)"
+          vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+      - task: VSBuild@1
+        inputs:
+          solution: "$(workingDirectory)"
+          vsVersion: "16.0"
+          msbuildArgs: '/p:OutputPath="$(Build.BinariesDirectory)\$(buildConfiguration)/" /p:OutDir="$(Build.BinariesDirectory)\$(buildConfiguration)\\" /p:ReferencesLogFolder=$(Agent.BuildDirectory) /p:GenerateProjectSpecificOutputFolder=true /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.BinariesDirectory)\$(buildConfiguration)\\"'
+          platform: "$(buildPlatform)"
+          configuration: "$(buildConfiguration)"
+
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+          projects: "$(workingDirectory)"
+          arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --collect "Code Coverage"'
+          continueOnError: true
+
+      - task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@5
+        displayName: 'Run Code Analysis'
+
+      - task: PublishCodeCoverageResults@1
+        displayName: "Publish code coverage Angular results"
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: "$(workingDirectory)/coverage/cobertura-coverage.xml"
+          reportDirectory: $(workingDirectory)/coverage
+          failIfCoverageEmpty: false         
+
+      - task: DotNetCoreCLI@2
+        displayName: "dotnet publish"
+        inputs:
+          command: publish
+          arguments: "--output $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)"
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: drop'

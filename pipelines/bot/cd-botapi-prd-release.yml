@@ -1,0 +1,119 @@
+trigger: none
+
+variables:
+  outFolder: "pipelines/bot"
+  buildPlatform: "Any CPU"
+  buildConfiguration: "Release"
+  node_function_app_folder: "src/functions/LuisTrainerFunction"
+
+pool:
+    name: "platformapispool"
+
+stages:
+  - stage: Build
+    displayName: Build BOT Api
+    variables:
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+    jobs:
+      - job: Build_Queue
+        steps:
+          - template: templates/build-push-luisqna.yml
+
+          - template: templates/build-push-botapi.yml
+            parameters:
+              projectPath: "src/services/BOT/Mcs.TASMU.Bot/Mcs.TASMU.Bot.csproj"
+              artifactName: botapiArtifact
+              isWebProject: True
+              projectFolderName: "Mcs.Tasmu.Bot"
+
+          - template: templates/build-push-botapi.yml
+            parameters:
+              projectPath: "src/functions/QnAMakerSync/Mcs.Tasmu.QnAMakerSync.AzureFunction/Mcs.Tasmu.QnAMakerSync.AzureFunction.csproj"
+              artifactName: qnamakersyncFuncArtifacts
+              projectFolderName: "Mcs.Tasmu.QnAMakerSync.AzureFunction"
+              isWebProject: False
+
+          - template: templates/build-push-nodefunc.yml
+            parameters:
+              artifactName: luisTrainerFuncArtifacts
+
+  - stage: Deploy_BOT_pre
+    displayName: Deploy BOT pre stage
+    dependsOn: Build
+    variables:
+      - group: pre
+      - name: azureSubscriptionName
+        value: "Central Platform Production"
+      - name: env
+        value: pre
+      - name: ConfigStoreUrl
+        value: "https://acst-cpp-apps-str-pre-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpp-apps-bot-pre-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpp-apps-qnasync-pre-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpp-apps-luistra-pre-we-01
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-cog-pre-we-01"
+      - name: luisAccountName
+        value: cog-cpp-apps-luisauth-pre-we-01
+      - name: luisEndpoint
+        value: https://cog-cpp-apps-luisauth-pre-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy pre Bot
+        environment: "pre"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+  - stage: Deploy_BOT_prd
+    displayName: Deploy BOT prd stage
+    dependsOn: Build
+    variables:
+      - group: prd
+      - name: azureSubscriptionName
+        value: "Central Platform Production"
+      - name: env
+        value: prd
+      - name: ConfigStoreUrl
+        value: "https://acst-cpp-apps-str-prd-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpp-apps-bot-prd-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpp-apps-qnasync-prd-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpp-apps-luistra-prd-we-01
+      - name: azureResourceGroup
+        value: "rg-cpp-apps-cog-prd-we-01"
+      - name: luisAccountName
+        value: cog-cpp-apps-luisauth-prd-we-01
+      - name: luisEndpoint
+        value: https://cog-cpp-apps-luisauth-prd-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy prd Bot
+        environment: "prd"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd

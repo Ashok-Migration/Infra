@@ -1,0 +1,472 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  paths:
+    include:
+      - src/functions/PaymentPreferenceFunction/*
+      - src/functions/CkanResourceCreationFunction/*
+      - src/functions/BlobEventCreator/*
+      - src/functions/BusinessProcess/*
+      - src/functions/SharePointNotify/*
+
+variables:
+  BuildConfiguration: "Release"
+  BuildPlatform: "Any CPU"
+  solutionPath: "src/functions/*/*.sln"
+  poolName: "tasmumsagents"
+
+pool:
+  name: "$(poolName)"
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: BuildJob
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET Core sdk 3.1.x"
+            inputs:
+              packageType: "sdk"
+              version: "3.1.x"
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet restore"
+            inputs:
+              command: "restore"
+              projects: "$(solutionPath)"
+              feedsToUse: "select"
+              vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+          - task: VSBuild@1
+            inputs:
+              solution: "$(solutionPath)"
+              vsVersion: "16.0"
+              msbuildArgs: '/p:OutputPath="$(Build.BinariesDirectory)\$(buildConfiguration)/" /p:OutDir="$(Build.BinariesDirectory)\$(buildConfiguration)\\" /p:ReferencesLogFolder=$(Agent.BuildDirectory) /p:GenerateProjectSpecificOutputFolder=true /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.BinariesDirectory)\$(buildConfiguration)\\"'
+              platform: "$(buildPlatform)"
+              configuration: "$(buildConfiguration)"
+
+          - task: CopyFiles@2
+            displayName: "Copy zip files to $(build.artifactstagingdirectory)"
+            inputs:
+              SourceFolder: "$(Build.BinariesDirectory)/$(BuildConfiguration)"
+              Contents: '**\*.zip'
+              TargetFolder: "$(build.artifactstagingdirectory)"
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: "$(build.artifactstagingdirectory)"
+              ArtifactName: "functionapps"
+              publishLocation: Container
+
+  - stage: Deploy_sbx
+    displayName: Deploy sbx stage
+    dependsOn: Build
+    variables:
+      paymentfunctionAppName: "func-cpd-apps-pt-sbx-we-01"
+      reconcileRefundFunctionApp: "func-cpd-apps-rrf-sbx-we-01"
+      consumptionfunctionApp: "func-cpd-apps-acm-sbx-we-01"
+      businessProcessfunctionApp: "func-cpd-apps-intbpa-sbx-we-01"
+      sharepointNotifyfunctionApp: "func-cpd-apps-intntf-sbx-we-01"
+      d365functionApp: "func-cpd-apps-prflint-sbx-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy sbx payment preference and cms func app
+        environment: "sbx"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(paymentfunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(paymentfunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(reconcileRefundFunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(reconcileRefundFunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(consumptionfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(consumptionfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(businessProcessfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(businessProcessfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(sharepointNotifyfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(sharepointNotifyfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(d365functionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(d365functionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+  - stage: Deploy_dev
+    displayName: Deploy dev stage
+    dependsOn: Build
+    variables:
+      paymentfunctionAppName: "func-cpd-apps-pt-dev-we-01"
+      reconcileRefundFunctionApp: "func-cpd-apps-rrf-dev-we-01"
+      consumptionfunctionApp: "func-cpd-apps-acm-dev-we-01"
+      businessProcessfunctionApp: "func-cpd-apps-intbpa-dev-we-01"
+      sharepointNotifyfunctionApp: "func-cpd-apps-intntf-dev-we-01"
+      ckanResourceCreationFunctionAppName: "func-cpd-apps-ckan-dev-we-01"
+      d365functionApp: "func-cpd-apps-prflint-dev-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy dev payment preference and cms func app
+        environment: "dev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(paymentfunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(paymentfunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(reconcileRefundFunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(reconcileRefundFunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(ckanResourceCreationFunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(ckanResourceCreationFunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(consumptionfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(consumptionfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(businessProcessfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(businessProcessfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(sharepointNotifyfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(sharepointNotifyfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(d365functionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(d365functionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+  - stage: Deploy_tst
+    displayName: Deploy tst stage
+    dependsOn: Deploy_dev
+    variables:
+      paymentfunctionAppName: "func-cpd-apps-pt-tst-we-01"
+      reconcileRefundFunctionApp: "func-cpd-apps-rrf-tst-we-01"
+      consumptionfunctionApp: "func-cpd-apps-acm-tst-we-01"
+      businessProcessfunctionApp: "func-cpd-apps-intbpa-tst-we-01"
+      sharepointNotifyfunctionApp: "func-cpd-apps-intntf-tst-we-01"
+      ckanResourceCreationFunctionAppName: "func-cpd-apps-ckan-tst-we-01"
+      d365functionApp: "func-cpd-apps-prflint-tst-we-01"
+      captchafunctionApp: "func-cpd-apps-cpch-tst-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy tst payment preference and cms func app
+        environment: "tst"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(paymentfunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(paymentfunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(reconcileRefundFunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(reconcileRefundFunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(ckanResourceCreationFunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(ckanResourceCreationFunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(consumptionfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(consumptionfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(businessProcessfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(businessProcessfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(sharepointNotifyfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(sharepointNotifyfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(d365functionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(d365functionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(captchafunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(captchafunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Captcha.AzureFunctions.zip"
+
+  - stage: Deploy_tra
+    displayName: Deploy tra stage
+    dependsOn: Deploy_tst
+    variables:
+      paymentfunctionAppName: "func-cpd-apps-pt-tra-we-01"
+      reconcileRefundFunctionApp: "func-cpd-apps-rrf-tra-we-01"
+      consumptionfunctionApp: "func-cpd-apps-acm-tra-we-01"
+      businessProcessfunctionApp: "func-cpd-apps-intbpa-tra-we-01"
+      sharepointNotifyfunctionApp: "func-cpd-apps-intntf-tra-we-01"
+      d365functionApp: "func-cpd-apps-prflint-tra-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy tra payment preference and cms func app
+        environment: "tra"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(paymentfunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(paymentfunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(reconcileRefundFunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(reconcileRefundFunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(consumptionfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(consumptionfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(businessProcessfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(businessProcessfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(sharepointNotifyfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(sharepointNotifyfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(d365functionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(d365functionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+  - stage: Deploy_uat
+    displayName: Deploy uat stage
+    dependsOn: Deploy_tst
+    variables:
+      paymentfunctionAppName: "func-cpd-apps-pt-uat-we-01"
+      reconcileRefundFunctionApp: "func-cpd-apps-rrf-uat-we-01"
+      consumptionfunctionApp: "func-cpd-apps-acm-uat-we-01"
+      businessProcessfunctionApp: "func-cpd-apps-intbpa-uat-we-01"
+      sharepointNotifyfunctionApp: "func-cpd-apps-intntf-uat-we-01"
+      ckanResourceCreationFunctionAppName: "func-cpd-apps-ckan-uat-we-01"
+      d365functionApp: "func-cpd-apps-prflint-uat-we-01"
+      captchafunctionApp: "func-cpd-apps-cpch-uat-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy uat payment preference and cms func app
+        environment: "uat"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(paymentfunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(paymentfunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/PaymentPreferenceFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(reconcileRefundFunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(reconcileRefundFunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/ReconcileRefundFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(ckanResourceCreationFunctionAppName)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(ckanResourceCreationFunctionAppName)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(consumptionfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(consumptionfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/BlobEventCreator.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(businessProcessfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(businessProcessfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Functions.Webhook.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(sharepointNotifyfunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(sharepointNotifyfunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.TASMU.CMS.Notifications.Functions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(d365functionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(d365functionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Profile.AzureFunctions.zip"
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy $(captchafunctionApp)
+                  inputs:
+                    ConnectionType: "AzureRM"
+                    azureSubscription: sqcp-ado-spn-dev
+                    appType: "functionApp"
+                    WebAppName: $(captchafunctionApp)
+                    packageForLinux: "$(Pipeline.Workspace)/functionapps/Mcs.Tasmu.Captcha.AzureFunctions.zip"

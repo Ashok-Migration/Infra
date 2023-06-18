@@ -1,0 +1,77 @@
+parameters:
+  - name: installDapr
+    type: boolean
+    default: true
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+
+steps:
+  - task: HelmDeploy@0
+    displayName: "Add Dapr to Helm Repo"
+    continueOnError: true
+    enabled: ${{ parameters.installDapr }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "add dapr https://daprio.azurecr.io/helm/v1/repo"
+
+  - task: HelmDeploy@0
+    displayName: "Helm Repo update"
+    continueOnError: true
+    enabled: ${{ parameters.installDapr }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "repo"
+      arguments: "update"
+
+  - task: HelmDeploy@0
+    displayName: UnInstall Dapr
+    continueOnError: true
+    enabled: ${{ parameters.installDapr }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "uninstall"
+      arguments: "dapr -n apiapps"
+
+  - task: HelmDeploy@0
+    displayName: Install Dapr
+    continueOnError: true
+    enabled: ${{ parameters.installDapr }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      namespace: "apiapps"
+      command: upgrade
+      chartType: "Name"
+      chartName: "dapr/dapr"
+      releaseName: "dapr"
+      arguments: "--install --wait --create-namespace --set global.ha.enabled=true --set dapr_sidecar_injector.logLevel=debug --set dapr_placement.logLevel=debug --set dapr_operator.logLevel=debug --set global.logAsJson=true --set global.tag=0.9.0 --set global.mtls.enabled=false"
+
+  - task: HelmDeploy@0
+    displayName: Install Dapr service bus component
+    continueOnError: true
+    enabled: ${{ parameters.installDapr }}
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      command: "upgrade"
+      chartType: "FilePath"
+      chartPath: $(Pipeline.Workspace)/charts/stable/daprservicebus
+      install: false
+      waitForExecution: false
+      releaseName: "dapr-pubsub"
+      arguments: "--install --set environment.ConnectionString__ServiceBus=$(NotificationSettings-NotificationServiceBusConnectionString)"

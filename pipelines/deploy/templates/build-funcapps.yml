@@ -1,0 +1,44 @@
+parameters:
+  - name: poolName
+    type: string
+    default: "platformapispool"
+
+jobs:
+  - job: BuildFunctionApps
+    pool:
+        name: ${{ parameters.poolName }}
+    steps:
+      - task: UseDotNet@2
+        displayName: "Use .NET Core sdk 3.1.x"
+        inputs:
+          packageType: "sdk"
+          version: "3.1.x"
+
+      - task: DotNetCoreCLI@2
+        displayName: "dotnet restore"
+        inputs:
+          command: "restore"
+          projects: "$(functionSolutionPath)"
+          feedsToUse: "select"
+          vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+      - task: VSBuild@1
+        inputs:
+          solution: "$(functionSolutionPath)"
+          vsVersion: "16.0"
+          msbuildArgs: '/p:OutputPath="$(Build.BinariesDirectory)\$(buildConfiguration)/" /p:OutDir="$(Build.BinariesDirectory)\$(buildConfiguration)\\" /p:ReferencesLogFolder=$(Agent.BuildDirectory) /p:GenerateProjectSpecificOutputFolder=true /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.BinariesDirectory)\$(buildConfiguration)\\"'
+          platform: "$(buildPlatform)"
+          configuration: "$(buildConfiguration)"
+
+      - task: CopyFiles@2
+        displayName: "Copy zip files to $(build.artifactstagingdirectory)"
+        inputs:
+          SourceFolder: "$(Build.BinariesDirectory)/$(BuildConfiguration)"
+          Contents: '**\*.zip'
+          TargetFolder: "$(build.artifactstagingdirectory)"
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: "$(build.artifactstagingdirectory)"
+          ArtifactName: "functionapps"
+          publishLocation: Container

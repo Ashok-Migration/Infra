@@ -1,0 +1,95 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: k6-load-test@0
+    inputs: 
+      filename: './src/k6-tests/script.js'
+    displayName: K6 - Test Script
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-marketplace.js'
+    displayName: TEST - GET Marketplace catalogue product (Marketplace API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-smartparking.js'
+    displayName: TEST - GET Smart parking lot from ID (Smart Parking API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-demographic.js'
+    displayName: TEST - GET list of Districts (Demographic API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-complaint.js'
+    displayName: TEST - GET Complaint options set codes (Complaint API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-knowledgebase.js'
+    displayName: TEST - GET list of Knowledge base Articles (Knowledgebase API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-profile-api.js'
+    displayName: TEST - GET profile from ID (Profile API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-announcements.js'
+    displayName: TEST - GET announcement from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-articles.js'
+    displayName: TEST - GET article from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-campaigns.js'
+    displayName: TEST - GET campaign from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-contacts.js'
+    displayName: TEST - GET contact from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-events.js'
+    displayName: TEST - GET event from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-projects.js'
+    displayName: TEST - GET project from ID (CMS API)
+    continueOnError: true
+
+  - task: k6-load-test@0
+    inputs:
+      filename: './src/k6-tests/script-cms-sponsors.js'
+    displayName: TEST - GET sponsor from ID (CMS API)
+    continueOnError: true
+
+
+schedules:
+    - cron: '0 0 * * *'
+      displayName: Daily K6 API Performance Test
+      branches:
+          include: 
+            - shansin/10196

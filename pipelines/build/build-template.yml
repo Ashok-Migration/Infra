@@ -1,0 +1,78 @@
+parameters:
+  name: "--"
+  BuildConfiguration: "Release"
+  BuildPlatform: "Any CPU"
+  solutionFolder: "--"
+  solutionPath: "--"  
+  dockerBuild: false
+
+jobs:
+  - job: ${{ parameters.name }}
+    dependsOn: Build_Queue
+    variables:
+      BuildConfiguration: ${{ parameters.BuildConfiguration }}
+      BuildPlatform: ${{ parameters.BuildPlatform }}
+      Parameters.solutionPath: ${{ parameters.solutionPath }}
+      myBuildQueue: $[ dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'] ]
+      dockerBuild: ${{ parameters.dockerBuild }}
+    condition: and(succeeded(), contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.solutionFolder }}'))
+    steps:
+      - task: powershell@2
+        inputs:
+          targetType: inline
+          script: 'Write-Host "Build Queue init: $(buildQueueInit) and from parameters $(myBuildQueue)"'
+
+      - task: UseDotNet@2
+        displayName: "Use .NET Core sdk 3.1.x"
+        inputs:
+          packageType: "sdk"
+          version: "3.1.x"
+          includePreviewVersions: true
+
+      - task: DotNetCoreCLI@2
+        displayName: "dotnet restore"
+        inputs:
+          command: "restore"
+          projects: "$(Parameters.solutionPath)/*.sln"
+          feedsToUse: "select"
+          vstsFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+
+      - task: VSBuild@1
+        inputs:
+          solution: "$(Parameters.solutionPath)/*.sln"
+          vsVersion: "16.0"
+          msbuildArgs: '/p:OutputPath="$(Build.BinariesDirectory)\$(buildConfiguration)/" /p:OutDir="$(Build.BinariesDirectory)\$(buildConfiguration)\\" /p:ReferencesLogFolder=$(Agent.BuildDirectory) /p:GenerateProjectSpecificOutputFolder=true /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.BinariesDirectory)\$(buildConfiguration)\\"'
+          platform: "$(buildPlatform)"
+          configuration: "$(buildConfiguration)"
+
+      #- task: DotNetCoreCLI@2
+      #  displayName: Test
+      #  inputs:
+      #    command: test
+      #    projects: '$(Parameters.solutionPath)/*[Tt]est*/**/*.csproj'
+      #    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --collect "Code Coverage"'
+
+  # - job: ${{ parameters.name }}DockerBuild
+  #   dependsOn: Build_Queue
+  #   variables:
+  #     Parameters.solutionPath: ${{ parameters.solutionPath }}
+  #     myBuildQueue: $[ dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'] ]
+  #     dockerBuild: ${{ parameters.dockerBuild }}
+  #   condition: |
+  #     and
+  #     (
+  #       contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.solutionFolder }}'),
+  #       eq('${{ parameters.dockerBuild }}', true)
+  #     )
+  #   displayName: ${{ parameters.name }} Docker Build
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   steps:
+  #   - task: Docker@2
+  #     displayName: Build image            
+  #     inputs:
+  #       command: 'build'
+  #       Dockerfile: '$(Parameters.solutionPath)/Dockerfile'
+  #       tags: '$(tag)'
+  #       arguments: '--build-arg PAT=$(System.NugetAccessToken) --build-arg FEED_URL=$(nugetFeed)'

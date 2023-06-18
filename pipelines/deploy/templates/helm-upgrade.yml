@@ -1,0 +1,33 @@
+parameters:
+  - name: name
+    type: string
+    default: ""
+  - name: chartPath
+    type: string
+    default: "$(Pipeline.Workspace)/charts/stable/coreapi"
+  - name: namespace
+    type: string
+    default: "apiapps"
+  - name: customValuestoAppend
+    type: string
+    default: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),host=$(apiHost)"
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+steps:
+  - task: HelmDeploy@0
+    displayName: ${{ parameters.name }} helm upgrade
+    continueOnError: true
+    inputs:
+      connectionType: "Azure Resource Manager"
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: $(azureResourceGroup)
+      kubernetesCluster: $(kubernetesCluster)
+      namespace: "${{ parameters.namespace}}"
+      command: "upgrade"
+      chartType: "FilePath"
+      chartPath: ${{ parameters.chartPath }}
+      releaseName: ${{ parameters.name }}
+      install: true
+      waitForExecution: true
+      arguments: "--create-namespace --timeout 10m0s --set image.tag=$(tag),image.repository=$(containerRegistry)/${{ parameters.namespace}}/${{ parameters.name }},podIdentity=$(podIdentity),hpa.enabled=$(enablehpa)${{ parameters.customValuestoAppend}}"

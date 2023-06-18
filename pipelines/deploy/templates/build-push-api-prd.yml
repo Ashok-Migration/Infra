@@ -1,0 +1,34 @@
+parameters:
+  - name: name
+    type: string
+    default: ""
+  - name: solutionPath
+    type: string
+    default: ""
+  - name: namespace
+    type: string
+    default: "apiapps"
+
+jobs:
+  - job: ${{ parameters.name }}
+    variables:
+      dockerfilePath: ${{ parameters.solutionPath }}/Dockerfile
+      imageRepository: ${{ parameters.namespace}}/${{ parameters.name }}
+    steps:
+      - task: Docker@2
+        displayName: Build image
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnectionPrd)"
+          repository: "$(imageRepository)"
+          command: "build"
+          Dockerfile: "$(dockerfilePath)"
+          tags: "$(tag)"
+          arguments: "--build-arg PAT=$(System.NugetAccessToken) --build-arg FEED_URL=$(nugetFeed)"
+
+      - task: Docker@2
+        displayName: Push image to container registry
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnectionPrd)"
+          repository: "$(imageRepository)"
+          command: "push"
+          tags: "$(tag)"

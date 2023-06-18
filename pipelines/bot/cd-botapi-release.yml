@@ -1,0 +1,241 @@
+trigger: none
+
+variables:
+  outFolder: "pipelines/bot"
+  buildPlatform: "Any CPU"
+  buildConfiguration: "Release"
+  node_function_app_folder: "src/functions/LuisTrainerFunction"
+
+pool:
+    name: "platformapispool"
+
+stages:
+  - stage: Build_BOT_Api
+    displayName: Build BOT Api
+    variables:
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+    jobs:
+      - job: Build_Queue
+        steps:
+          - checkout: self
+
+          - template: templates/build-push-luisqna.yml
+
+          - template: templates/build-push-botapi.yml
+            parameters:
+              projectPath: "src/services/BOT/Mcs.TASMU.Bot/Mcs.TASMU.Bot.csproj"
+              artifactName: botapiArtifact
+              isWebProject: True
+              projectFolderName: "Mcs.Tasmu.Bot"
+
+          - template: templates/build-push-botapi.yml
+            parameters:
+              projectPath: "src/functions/QnAMakerSync/Mcs.Tasmu.QnAMakerSync.AzureFunction/Mcs.Tasmu.QnAMakerSync.AzureFunction.csproj"
+              artifactName: qnamakersyncFuncArtifacts
+              projectFolderName: "Mcs.Tasmu.QnAMakerSync.AzureFunction"
+              isWebProject: False
+
+          - template: templates/build-push-nodefunc.yml
+            parameters:
+              artifactName: luisTrainerFuncArtifacts
+
+  - stage: Deploy_BOT_sbx
+    displayName: Deploy BOT sbx stage
+    dependsOn: Build_BOT_Api
+    variables:
+      - group: Sandbox
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+      - name: env
+        value: sbx
+      - name: ConfigStoreUrl
+        value: "https://acst-cpd-apps-str-sbx-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpd-apps-bot-sbx-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpd-apps-qnasync-sbx-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpd-apps-luistra-sbx-we-01
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-sbx-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-sbx-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-sbx-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_BOT_sbx
+        displayName: Deploy BOT sbx
+        environment: "Sbx"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_BOT_dev
+    displayName: Deploy BOT dev stage
+    dependsOn: Deploy_BOT_sbx
+    variables:
+      - group: Dev
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+      - name: env
+        value: dev
+      - name: ConfigStoreUrl
+        value: "https://acst-cpd-apps-str-dev-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpd-apps-bot-dev-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpd-apps-qnasync-dev-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpd-apps-luistra-dev-we-01
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-dev-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-dev-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-dev-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_BOT_dev
+        displayName: Deploy BOT dev
+        environment: "Dev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_BOT_tst
+    displayName: Deploy BOT tst stage
+    dependsOn: Deploy_BOT_dev
+    variables:
+      - group: Tst
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+      - name: env
+        value: tst
+      - name: ConfigStoreUrl
+        value: "https://acst-cpd-apps-str-tst-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpd-apps-bot-tst-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpd-apps-qnasync-tst-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpd-apps-luistra-tst-we-01
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-tst-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-tst-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-tst-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_BOT
+        displayName: Deploy tst Bot
+        environment: "Tst"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_BOT_tra
+    displayName: Deploy BOT tra stage
+    dependsOn: Deploy_BOT_tst
+    variables:
+      - group: tra
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+      - name: env
+        value: tra
+      - name: ConfigStoreUrl
+        value: "https://acst-cpd-apps-str-tra-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpd-apps-bot-tra-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpd-apps-qnasync-tra-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpd-apps-luistra-tra-we-01
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-tra-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-tra-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-tra-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy tra Bot
+        environment: "Tra"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_BOT_uat
+    displayName: Deploy BOT uat stage
+    dependsOn: Deploy_BOT_tst
+    variables:
+      - group: uat
+      - name: azureSubscriptionName
+        value: "Central Platform Development"
+      - name: env
+        value: uat
+      - name: ConfigStoreUrl
+        value: "https://acst-cpd-apps-str-uat-we-01.azconfig.io"
+      - name: appserviceName
+        value: app-cpd-apps-bot-uat-we-01
+      - name: qnasyncFunctionAppName
+        value: func-cpd-apps-qnasync-uat-we-01
+      - name: luisTrainerFunctionAppName
+        value: func-cpd-apps-luistra-uat-we-01
+      - name: azureResourceGroup
+        value: "rg-cpd-apps-cog-uat-we-01"
+      - name: luisAccountName
+        value: cog-cpd-apps-luisauth-uat-we-01
+      - name: luisEndpoint
+        value: https://cog-cpd-apps-luisauth-uat-we-01.cognitiveservices.azure.com/
+
+    jobs:
+      - deployment: Deploy_Bot
+        displayName: Deploy uat Bot
+        environment: "uat"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/deploy-botapi.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+                - template: templates/update-luisandqna.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
