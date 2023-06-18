@@ -1,21 +1,19 @@
-trigger:
-  branches:
-    include:
-      - master
 pool:
   name: "tasmumsagents"
 
 resources:
   repositories:
     - repository: platform-apis # The name used to reference this repository in the checkout step
-        # type: git
+        type: git
         name: TASMU Central Platform/platform-apis
         ref: master
 
       - repository: QC-Infra # The name used to reference this repository in the checkout step
-        # type: git
+        type: git
         name: QC-Infra
         ref: Ashok/PlatformApis
+
+trigger: none 
 
 jobs:
   - job: Build_Queue
