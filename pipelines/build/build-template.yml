@@ -17,6 +17,10 @@ jobs:
       dockerBuild: ${{ parameters.dockerBuild }}
     condition: and(succeeded(), contains(dependencies.Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.solutionFolder }}'))
     steps:
+      - checkout: platform-apis # self represents the repo where the initial Pipelines YAML file was found
+        clean: true # whether to fetch clean each time
+        path: TASMU Central Platform/platform-apis
+
       - task: powershell@2
         inputs:
           targetType: inline
