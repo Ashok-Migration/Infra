@@ -14,7 +14,7 @@ resources:
 variables:
   namespace: "apiapps"
   vmImage: "ubuntu-latest"
-  # dockerRegistryServiceConnection: "acrcpdglobnpdwe02-spn"
+  dockerRegistryServiceConnection: "acrcpdglobnpdwe02-spn"
   functionSolutionPath: "src/functions/*/*.sln"
   BuildConfiguration: "Release"
   BuildPlatform: "Any CPU"
@@ -169,17 +169,17 @@ stages:
     variables:
       - group: Dev
       - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-dev-we-01"
+        value: "rg-shared-svcs-dev-qc-01"
       - name: kubernetesCluster
-        value: "aks-cpd-apps-dev-we-01"
+        value: "aks-shared-svcs-dev-qc-01"
       - name: "enablehpa"
         value: "false"
       - name: containerRegistry
-        value: "acrcpdglobnpdwe01.azurecr.io"
+        value: "acrsharedsvcsnpdqc01.azurecr.io"
       - name: appConfigConnection
-        value: "https://acst-cpd-apps-str-dev-we-01.azconfig.io"
+        value: "https://acst-shared-str-dev-qc-01.azconfig.io"
       - name: podIdentity
-        value: "mi-cpd-apps-aksnode-dev-we-01"
+        value: "mi-shared-aksnode-dev-qc-01"
       - name: env
         value: "dev"
       - name: apiHost
