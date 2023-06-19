@@ -21,7 +21,7 @@ steps:
       azureSubscription: ${{parameters.azureSubscription}}
       targetType: 'inline'
       script: |
-        az aks get-credentials -n $(kubernetesCluster) -g $(azureResourceGroup)
+        az aks get-credentials -n $(kubernetesCluster) -g $(azureResourceGroup) --overwrite-existing true
         kubelogin convert-kubeconfig -l msi
 
   - task: HelmDeploy@0
