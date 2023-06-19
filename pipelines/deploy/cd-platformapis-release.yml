@@ -14,12 +14,12 @@ resources:
 variables:
   namespace: "apiapps"
   vmImage: "ubuntu-latest"
-  dockerRegistryServiceConnection: "acrsharedsvcsnpdqc01-spn"
+  dockerRegistryServiceConnection: "spn-acrsharedsvcsnpdqc01"
   functionSolutionPath: "src/functions/*/*.sln"
   BuildConfiguration: "Release"
   BuildPlatform: "Any CPU"
   tag: "$(Build.BuildId)"
-  serviceConnection: sqcp-ado-spn-hub-qc
+  serviceConnection: sqcp-ado-spn-qc-shared-services
 
 pool:
   vmImage: "$(vmImage)"
@@ -229,7 +229,7 @@ stages:
 
                 - template: templates/deploy-apps.yml
                   parameters:
-                    azureSubscription: sqcp-ado-spn-hub-qc
+                    azureSubscription: sqcp-ado-spn-qc-shared-services
 
                 # - template: templates/deploy-funcapps.yml
                 #   parameters:
