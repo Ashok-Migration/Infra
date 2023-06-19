@@ -29,13 +29,13 @@ stages:
   #   jobs:
   #     - template: templates/enable-acr-publicips.yml
 
-  # - stage: Build
-  #   displayName: Build stage
-  #   jobs:
-  #     - template: templates/build-push-api.yml
-  #       parameters:
-  #         name: smsprovider
-  #         solutionPath: "src/services/SmsProvider"
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - template: templates/build-push-api.yml
+        parameters:
+          name: smsprovider
+          solutionPath: "src/services/SmsProvider"
 
       # - template: templates/build-push-api.yml
       #   parameters:
@@ -150,13 +150,13 @@ stages:
       # Build Function Apps
       # - template: templates/build-funcapps.yml
       #   parameters:
-      #     poolName: "platformapispool"
+      #     poolName: "tasmumsaagents"
 
       # Publish Artifacts
-      # - template: templates/publish-artifacts.yml
-      #   parameters:
-      #     chartsPath: "pipelines/deploy/charts"
-      #     poolName: "platformapispool"
+      - template: templates/publish-artifacts.yml
+        parameters:
+          chartsPath: "pipelines/deploy/charts"
+          poolName: "tasmumsaagents"
 
   # - stage: Disableacrpublicips
   #   displayName: Disableacrpublicips
@@ -199,7 +199,7 @@ stages:
       - name: d365ProfilefunctionApp
         value: "func-cpd-apps-prflint-dev-we-01"
     pool:
-      name: "platformapispool"
+      name: "tasmumsaagents"
     jobs:
       - deployment: Deploy
         displayName: Deploy Dev APIs
