@@ -1,12 +1,12 @@
 trigger: none
 resources:
   repositories:
-    - repository: platform-apis # The name used to reference this repository in the checkout step
+    - repository: platform-apis
       type: git
       name: TASMU Central Platform/platform-apis
       ref: master
 
-    - repository: QC-Infra # The name used to reference this repository in the checkout step
+    - repository: QC-Infra 
       type: git
       name: QC-Infra
       ref: Ashok/PlatformApis
@@ -148,9 +148,9 @@ stages:
       # Add more template jobs with parameters for other Services
 
       # Build Function Apps
-      - template: templates/build-funcapps.yml
-        parameters:
-          poolName: "tasmumsagents"
+      # - template: templates/build-funcapps.yml
+      #   parameters:
+      #     poolName: "tasmumsagents"
 
       # Publish Artifacts
       - template: templates/publish-artifacts.yml
@@ -215,8 +215,8 @@ stages:
                 #     scriptType: "pscore"
                 #     scriptLocation: inlineScript
                 #     inlineScript: |
-                #       az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
+                #       az acr update --name aacrsharedsvcsnpdqc01 --default-action Allow
+                #       az acr update --name acrsharedsvcsnpdqc01 --public-network-enabled true
 
                 - task: HelmInstaller@1
                   inputs:
@@ -242,7 +242,7 @@ stages:
                 #     scriptType: "pscore"
                 #     scriptLocation: inlineScript
                 #     inlineScript: |
-                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled false    
+                #       az acr update --name acrsharedsvcsnpdqc01 --public-network-enabled false    
 
   # - stage: Deploy_tst
   #   displayName: Deploy tst stage
@@ -287,85 +287,6 @@ stages:
   #     - deployment: Deploy
   #       displayName: Deploy tst APIs
   #       environment: "tst"
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - task: AzureCLI@2
-  #                 displayName: "Allow Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
-
-  #               - task: HelmInstaller@1
-  #                 inputs:
-  #                   helmVersionToInstall: "3.2.1"
-
-  #               - template: templates/deploy-dapr.yml
-  #                 parameters:
-  #                   installDapr: true
-  #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - template: templates/deploy-apps.yml
-  #                 parameters:
-  #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - template: templates/deploy-funcapps.yml
-  #                 parameters:
-  #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - task: AzureCLI@2
-  #                 displayName: "Disable Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
-
-  # - stage: Deploy_tra
-  #   displayName: Deploy tra stage
-  #   dependsOn: Deploy_tst
-  #   variables:
-  #     - group: tra
-  #     - name: azureResourceGroup
-  #       value: "rg-cpd-apps-aks-tra-we-01"
-  #     - name: kubernetesCluster
-  #       value: "aks-cpd-apps-tra-we-01"
-  #     - name: "enablehpa"
-  #       value: "false"
-  #     - name: containerRegistry
-  #       value: "acrcpdglobnpdwe01.azurecr.io"
-  #     - name: appConfigConnection
-  #       value: "https://acst-cpd-apps-str-tra-we-01.azconfig.io"
-  #     - name: podIdentity
-  #       value: "mi-cpd-apps-aksnode-tra-we-01"
-  #     - name: env
-  #       value: "tra"
-  #     - name: apiHost
-  #       value: "api.trn.sqcp.qa"
-  #     - name: paymentfunctionAppName
-  #       value: "func-cpd-apps-pt-tra-we-01"
-  #     - name: reconcileRefundFunctionApp
-  #       value: "func-cpd-apps-rrf-tra-we-01"
-  #     - name: consumptionfunctionApp
-  #       value: "func-cpd-apps-acm-tra-we-01"
-  #     - name: businessProcessfunctionApp
-  #       value: "func-cpd-apps-intbpa-tra-we-01"
-  #     - name: sharepointNotifyfunctionApp
-  #       value: "func-cpd-apps-intntf-tra-we-01"
-  #     - name: d365ProfilefunctionApp
-  #       value: "func-cpd-apps-prflint-tra-we-01"
-  #   pool:
-  #     name: "testagentpool"
-  #   jobs:
-  #     - deployment: Deploy
-  #       displayName: Deploy tra APIs
-  #       environment: "tra"
   #       strategy:
   #         runOnce:
   #           deploy:
