@@ -19,9 +19,8 @@ steps:
     displayName: aks non-admin login using kubelogin
     inputs:
       azureSubscription: ${{parameters.azureSubscription}}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
+      targetType: 'inline'
+      script: |
         az aks get-credentials -n $(kubernetesCluster) -g $(azureResourceGroup)
         kubelogin convert-kubeconfig -l msi
 
