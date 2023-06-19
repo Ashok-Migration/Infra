@@ -29,13 +29,13 @@ stages:
   #   jobs:
   #     - template: templates/enable-acr-publicips.yml
 
-  # - stage: Build
-  #   displayName: Build stage
-  #   jobs:
-  #     - template: templates/build-push-api.yml
-  #       parameters:
-  #         name: smsprovider
-  #         solutionPath: "src/services/SmsProvider"
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - template: templates/build-push-api.yml
+        parameters:
+          name: smsprovider
+          solutionPath: "src/services/SmsProvider"
 
       # - template: templates/build-push-api.yml
       #   parameters:
@@ -152,11 +152,11 @@ stages:
       #   parameters:
       #     poolName: "platformapispool"
 
-      # Publish Artifacts
-      # - template: templates/publish-artifacts.yml
-      #   parameters:
-      #     chartsPath: "pipelines/deploy/charts"
-      #     poolName: "platformapispool"
+      Publish Artifacts
+      - template: templates/publish-artifacts.yml
+        parameters:
+          chartsPath: "pipelines/deploy/charts"
+          poolName: "platformapispool"
 
   # - stage: Disableacrpublicips
   #   displayName: Disableacrpublicips
@@ -165,7 +165,7 @@ stages:
 
   - stage: Deploy_dev
     displayName: Deploy dev stage
-    # dependsOn: Build
+    dependsOn: Build
     variables:
       - group: Dev
       - name: azureResourceGroup
