@@ -15,14 +15,21 @@ parameters:
     type: string
     default: "sqcp-ado-spn-qc-shared-services"
 steps:
+  - task: Bash@3
+    displayName: aks non-admin login using kubelogin
+    inputs:
+      azureSubscription: ${{parameters.azureSubscription}}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az aks get-credentials -n $(kubernetesCluster) -g $(azureResourceGroup)
+        kubelogin convert-kubeconfig -l msi
+
   - task: HelmDeploy@0
     displayName: ${{ parameters.name }} helm upgrade
     continueOnError: true
     inputs:
-      connectionType: "Azure Resource Manager"
-      azureSubscription: ${{ parameters.azureSubscription }}
-      azureResourceGroup: $(azureResourceGroup)
-      kubernetesCluster: $(kubernetesCluster)
+      connectionType: "None"
       namespace: "${{ parameters.namespace}}"
       command: "upgrade"
       chartType: "FilePath"
@@ -30,5 +37,22 @@ steps:
       releaseName: ${{ parameters.name }}
       install: true
       waitForExecution: true
-      useClusterAdmin: true
-      arguments: "--create-namespace --timeout 60m0s --set image.tag=$(tag),image.repository=$(containerRegistry)/${{ parameters.namespace}}/${{ parameters.name }},podIdentity=$(podIdentity),hpa.enabled=$(enablehpa)${{ parameters.customValuestoAppend}}"
+      arguments: "--create-namespace --timeout 10m0s --set image.tag=$(tag),image.repository=$(containerRegistry)/${{ parameters.namespace}}/${{ parameters.name }},podIdentity=$(podIdentity),hpa.enabled=$(enablehpa)${{ parameters.customValuestoAppend}}"      
+
+  # - task: HelmDeploy@0
+  #   displayName: ${{ parameters.name }} helm upgrade
+  #   continueOnError: true
+  #   inputs:
+  #     connectionType: "Azure Resource Manager"
+  #     azureSubscription: ${{ parameters.azureSubscription }}
+  #     azureResourceGroup: $(azureResourceGroup)
+  #     kubernetesCluster: $(kubernetesCluster)
+  #     namespace: "${{ parameters.namespace}}"
+  #     command: "upgrade"
+  #     chartType: "FilePath"
+  #     chartPath: ${{ parameters.chartPath }}
+  #     releaseName: ${{ parameters.name }}
+  #     install: true
+  #     waitForExecution: true
+  #     useClusterAdmin: true
+  #     arguments: "--create-namespace --timeout 60m0s --set image.tag=$(tag),image.repository=$(containerRegistry)/${{ parameters.namespace}}/${{ parameters.name }},podIdentity=$(podIdentity),hpa.enabled=$(enablehpa)${{ parameters.customValuestoAppend}}"
