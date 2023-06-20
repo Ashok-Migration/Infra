@@ -68,7 +68,7 @@ metadata:
   name: azureidentities.aadpodidentity.k8s.io
   annotations:
     helm.sh/hook: crd-install
-    api-approved.kubernetes.io: "true"
+    api-approved.kubernetes.io: "approved"
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -86,6 +86,8 @@ spec:
     - name: v1
       served: true
       storage: true
+      subresources:
+        status: {}
   status:
     storedVersions:
       - v1
