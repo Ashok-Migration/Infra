@@ -1,59 +1,25 @@
 trigger: none
-
 resources:
-  - repo: self
+  repositories:
+    - repository: platform-apis
+      type: git
+      name: TASMU Central Platform/platform-apis
+      ref: Ashok/QC-deployment
+
+    - repository: QC-Infra 
+      type: git
+      name: QC-Infra
+      ref: Ashok/PlatformApis
 
 stages:
   - stage: Build
     pool:
-      name: "testagentpool"
+      name: "tasmumsagents"
     displayName: Build stage
     jobs:
       - template: templates/publish-artifacts.yml
         parameters:
           chartsPath: "pipelines/deploy/charts"
-
-  - stage: Deploy_Sbx
-    displayName: Deploy sbx stage
-    dependsOn: Build
-    variables:
-      - group: Sandbox
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-sbx-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-sbx-we-01"
-      - name: podIdentity
-        value: "mi-cpd-apps-aks-sbx-we-01"
-      - name: env
-        value: "sbx"
-    pool:
-      name: "testagentpool"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy sbx APIs
-        environment: sbx
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
-
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-dev
-
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
-
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-dev
 
   - stage: Deploy_dev
     displayName: Deploy dev stage
@@ -61,15 +27,15 @@ stages:
     variables:
       - group: Dev
       - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-dev-we-01"
+        value: "rg-shared-svcs-dev-qc-01"
       - name: kubernetesCluster
-        value: "aks-cpd-apps-dev-we-01"
+        value: "aks-shared-svcs-dev-qc-01"
       - name: podIdentity
-        value: "mi-cpd-apps-aksnode-dev-we-01"
+        value: "mi-shared-aksnode-dev-qc-01"
       - name: env
         value: "dev"
     pool:
-      name: "testagentpool"
+      name: "tasmumsagents"
     jobs:
       - deployment: Deploy
         displayName: Deploy Dev APIs
@@ -85,224 +51,224 @@ stages:
                 - template: templates/helm-resources.yml
                   parameters:
                     updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-dev
+                    azureSubscription: sqcp-ado-spn-qc-shared-services
 
                 - template: templates/deploy-dapr.yml
                   parameters:
                     installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+                    azureSubscription: sqcp-ado-spn-qc-shared-services
 
                 - template: templates/add-keda.yml
                   parameters:
                     addKeda: true
-                    azureSubscription: sqcp-ado-spn-dev
+                    azureSubscription: sqcp-ado-spn-qc-shared-services
 
-  - stage: Deploy_tst
-    displayName: Deploy tst stage
-    dependsOn: Build
-    variables:
-      - group: Tst
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-tst-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-tst-we-01"
-      - name: podIdentity
-        value: "mi-cpd-apps-aksnode-tst-we-01"
-      - name: env
-        value: "tst"
-    pool:
-      name: "testagentpool"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy tst APIs
-        environment: "tst"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  # - stage: Deploy_tst
+  #   displayName: Deploy tst stage
+  #   dependsOn: Build
+  #   variables:
+  #     - group: Tst
+  #     - name: azureResourceGroup
+  #       value: "rg-cpd-apps-aks-tst-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpd-apps-tst-we-01"
+  #     - name: podIdentity
+  #       value: "mi-cpd-apps-aksnode-tst-we-01"
+  #     - name: env
+  #       value: "tst"
+  #   pool:
+  #     name: "tasmumsagents"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy tst APIs
+  #       environment: "tst"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/helm-resources.yml
+  #                 parameters:
+  #                   updateHelmResources: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/add-keda.yml
+  #                 parameters:
+  #                   addKeda: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-  - stage: Deploy_tra
-    displayName: Deploy tra stage
-    dependsOn: Build
-    variables:
-      - group: tra
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-tra-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-tra-we-01"
-      - name: podIdentity
-        value: "mi-cpd-apps-aksnode-tra-we-01"
-      - name: env
-        value: "tra"
-    pool:
-      name: "testagentpool"
-    jobs:
-      - deployment: Deploy
-        displayName: Set up training AKS
-        environment: "tra"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  # - stage: Deploy_tra
+  #   displayName: Deploy tra stage
+  #   dependsOn: Build
+  #   variables:
+  #     - group: tra
+  #     - name: azureResourceGroup
+  #       value: "rg-cpd-apps-aks-tra-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpd-apps-tra-we-01"
+  #     - name: podIdentity
+  #       value: "mi-cpd-apps-aksnode-tra-we-01"
+  #     - name: env
+  #       value: "tra"
+  #   pool:
+  #     name: "tasmumsagents"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Set up training AKS
+  #       environment: "tra"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/helm-resources.yml
+  #                 parameters:
+  #                   updateHelmResources: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/add-keda.yml
+  #                 parameters:
+  #                   addKeda: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-  - stage: Deploy_uat
-    displayName: Deploy uat stage
-    dependsOn: Build
-    variables:
-      - group: uat
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-uat-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-uat-we-01"
-      - name: podIdentity
-        value: "mi-cpd-apps-aksnode-uat-we-01"
-      - name: env
-        value: "uat"
-    pool:
-      name: "testagentpool"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy uat APIs
-        environment: "uat"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  # - stage: Deploy_uat
+  #   displayName: Deploy uat stage
+  #   dependsOn: Build
+  #   variables:
+  #     - group: uat
+  #     - name: azureResourceGroup
+  #       value: "rg-cpd-apps-aks-uat-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpd-apps-uat-we-01"
+  #     - name: podIdentity
+  #       value: "mi-cpd-apps-aksnode-uat-we-01"
+  #     - name: env
+  #       value: "uat"
+  #   pool:
+  #     name: "tasmumsagents"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy uat APIs
+  #       environment: "uat"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/helm-resources.yml
+  #                 parameters:
+  #                   updateHelmResources: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/add-keda.yml
+  #                 parameters:
+  #                   addKeda: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-  - stage: Deploy_Pre
-    displayName: Deploy Pre stage
-    dependsOn: Build
-    variables:
-      - group: pre
-      - name: azureResourceGroup
-        value: "rg-cpp-apps-aks-pre-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpp-apps-pre-we-01"
-      - name: podIdentity
-        value: "mi-cpp-apps-aks-pre-we-01"
-      - name: env
-        value: "pre"
-    pool:
-      name: "tasmumsiprdagents"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy pre APIs
-        environment: pre
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  # - stage: Deploy_Pre
+  #   displayName: Deploy Pre stage
+  #   dependsOn: Build
+  #   variables:
+  #     - group: pre
+  #     - name: azureResourceGroup
+  #       value: "rg-cpp-apps-aks-pre-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpp-apps-pre-we-01"
+  #     - name: podIdentity
+  #       value: "mi-cpp-apps-aks-pre-we-01"
+  #     - name: env
+  #       value: "pre"
+  #   pool:
+  #     name: "tasmumsiprdagents"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy pre APIs
+  #       environment: pre
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-pre
+  #               - template: templates/helm-resources.yml
+  #                 parameters:
+  #                   updateHelmResources: true
+  #                   azureSubscription: sqcp-ado-spn-pre
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-pre
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-pre
 
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-pre
+  #               - template: templates/add-keda.yml
+  #                 parameters:
+  #                   addKeda: true
+  #                   azureSubscription: sqcp-ado-spn-pre
 
-  - stage: Deploy_Prd
-    displayName: Deploy Prd stage
-    dependsOn: Build
-    variables:
-      - group: prd
-      - name: azureResourceGroup
-        value: "rg-cpp-apps-aks-prd-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpp-apps-prd-we-01"
-      - name: podIdentity
-        value: "mi-cpp-apps-aks-prd-we-01"
-      - name: env
-        value: "prd"
-    pool:
-      name: "tasmumsiprdagents"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy prd APIs
-        environment: prd
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  # - stage: Deploy_Prd
+  #   displayName: Deploy Prd stage
+  #   dependsOn: Build
+  #   variables:
+  #     - group: prd
+  #     - name: azureResourceGroup
+  #       value: "rg-cpp-apps-aks-prd-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpp-apps-prd-we-01"
+  #     - name: podIdentity
+  #       value: "mi-cpp-apps-aks-prd-we-01"
+  #     - name: env
+  #       value: "prd"
+  #   pool:
+  #     name: "tasmumsiprdagents"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy prd APIs
+  #       environment: prd
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/helm-resources.yml
-                  parameters:
-                    updateHelmResources: true
-                    azureSubscription: sqcp-ado-spn-prd
+  #               - template: templates/helm-resources.yml
+  #                 parameters:
+  #                   updateHelmResources: true
+  #                   azureSubscription: sqcp-ado-spn-prd
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-prd
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-prd
 
-                - template: templates/add-keda.yml
-                  parameters:
-                    addKeda: true
-                    azureSubscription: sqcp-ado-spn-prd
+  #               - template: templates/add-keda.yml
+  #                 parameters:
+  #                   addKeda: true
+  #                   azureSubscription: sqcp-ado-spn-prd
