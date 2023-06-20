@@ -1,7 +1,7 @@
 parameters:
   - name: poolName
     type: string
-    default: "platformapispool"
+    default: "tasmumsagents"
   - name: chartsPath
     type: string
     default: "pipelines/deploy/charts"
@@ -13,8 +13,7 @@ jobs:
     steps:
       - checkout: platform-apis
         clean: true 
-        path: TASMU Central Platform/platform-apis
-        
+        path: TASMU Central Platform/platform-apis   
       - task: CopyFiles@2
         inputs:
           SourceFolder: ${{ parameters.chartsPath }}
