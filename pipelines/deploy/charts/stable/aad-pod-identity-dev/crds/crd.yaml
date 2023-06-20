@@ -4,7 +4,6 @@ metadata:
   name: azureassignedidentities.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
-    api-approved.kubernetes.io: v1.0.0
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -12,35 +11,18 @@ metadata:
     helm.sh/chart: aad-pod-identity
 spec:
   group: aadpodidentity.k8s.io
-  versions:
-    - name: v1
-      served: true
-      storage: true
+  version: v1
   names:
     kind: AzureAssignedIdentity
     plural: azureassignedidentities
   scope: Namespaced
-  additionalPrinterColumns:
-    - name: Assigned Identity
-      type: string
-      JSONPath: .spec.azureIdentityRef.name
-    - name: Node Selector
-      type: string
-      JSONPath: .spec.nodeSelector
-  subresources:
-    status: {}
-  status:
-    storedVersions:
-      - v1
 ---
-
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: azureidentitybindings.aadpodidentity.k8s.io
   annotations:
-    helm.sh/hook: crd-install
-    api-approved.kubernetes.io: approved
+    "helm.sh/hook": crd-install
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -53,24 +35,13 @@ spec:
     kind: AzureIdentityBinding
     plural: azureidentitybindings
   scope: Namespaced
-  versions:
-    - name: v1
-      served: true
-      storage: true
-      subresources:
-        status: {}
-  status:
-    storedVersions:
-      - v1
 ---
-
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: azureidentities.aadpodidentity.k8s.io
   annotations:
-    helm.sh/hook: crd-install
-    api-approved.kubernetes.io: approved
+    "helm.sh/hook": crd-install
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -84,24 +55,13 @@ spec:
     singular: azureidentity
     plural: azureidentities
   scope: Namespaced
-  versions:
-    - name: v1
-      served: true
-      storage: true
-      subresources:
-        status: {}
-  status:
-    storedVersions:
-      - v1
 ---
-
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: azurepodidentityexceptions.aadpodidentity.k8s.io
   annotations:
-    helm.sh/hook: crd-install
-    api-approved.kubernetes.io: unapproved-missing-url
+    "helm.sh/hook": crd-install
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -115,15 +75,3 @@ spec:
     singular: azurepodidentityexception
     plural: azurepodidentityexceptions
   scope: Namespaced
-  versions:
-    - name: v1
-      served: true
-      storage: true
-      subresources:
-        status: {}
-      schema:
-        openAPIV3Schema:
-          type: object
-  status:
-    storedVersions:
-      - v1
