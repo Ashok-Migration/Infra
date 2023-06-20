@@ -4,7 +4,7 @@ metadata:
   name: azureassignedidentities.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
-    "api-approved.kubernetes.io": "true"
+    "api-approved.kubernetes.io": "unapproved: This group is not approved by my organization."
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -16,10 +16,34 @@ spec:
     - name: v1
       served: true
       storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                azureIdentity:
+                  type: string
+                pod:
+                  type: object
+                  properties:
+                    selector:
+                      type: object
+                      properties:
+                        matchLabels:
+                          type: object
+                          additionalProperties:
+                            type: string
+      additionalPrinterColumns:
+        - name: AzureIdentity
+          type: string
+          description: The Azure identity assigned to the pod
+          JSONPath: .spec.azureIdentity
   names:
     kind: AzureAssignedIdentity
     plural: azureassignedidentities
-  scope: Namespaced
+scope: Namespaced
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -27,7 +51,7 @@ metadata:
   name: azureidentitybindings.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
-    "api-approved.kubernetes.io": "true"
+    "api-approved.kubernetes.io": "unapproved: This group is not approved by my organization."
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -39,10 +63,35 @@ spec:
     - name: v1
       served: true
       storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                azureIdentity:
+                  type: string
+                selector:
+                  type: object
+                  properties:
+                    matchLabels:
+                      type: object
+                      additionalProperties:
+                        type: string
+              required:
+                - azureIdentity
+                - selector
+      additionalPrinterColumns:
+        - name: AzureIdentity
+          type: string
+          description: The Azure identity to bind to the pod
+          JSONPath: .spec.azureIdentity
   names:
     kind: AzureIdentityBinding
     plural: azureidentitybindings
-  scope: Namespaced
+
+scope: Namespaced
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -50,7 +99,7 @@ metadata:
   name: azureidentities.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
-    "api-approved.kubernetes.io": "true"
+    "api-approved.kubernetes.io": "unapproved: This group is not approved by my organization."
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -62,11 +111,33 @@ spec:
     - name: v1
       served: true
       storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                type: string
+                resourceID: string
+              required:
+                - type
+                - resourceID
+      additionalPrinterColumns:
+        - name: Type
+          type: string
+          description: The type of Azure identity
+          JSONPath: .spec.type
+        - name: ResourceID
+          type: string
+          description: The Azure resource ID of the identity
+          JSONPath: .spec.resourceID
   names:
     kind: AzureIdentity
     singular: azureidentity
     plural: azureidentities
-  scope: Namespaced
+
+scope: Namespaced
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -74,7 +145,7 @@ metadata:
   name: azurepodidentityexceptions.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
-    "api-approved.kubernetes.io": "true"
+    "api-approved.kubernetes.io": "unapproved: This group is not approved by my organization."
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -86,6 +157,24 @@ spec:
     - name: v1
       served: true
       storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                podLabels:
+                  type: object
+                  additionalProperties:
+                    type: string
+              required:
+                - podLabels
+      additionalPrinterColumns:
+        - name: PodLabels
+          type: string
+          description: The labels for the pods excluded from Azure Pod Identity
+          JSONPath: .spec.podLabels
   names:
     kind: AzurePodIdentityException
     singular: azurepodidentityexception
