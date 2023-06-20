@@ -4,6 +4,7 @@ metadata:
   name: azureassignedidentities.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
+    "api-approved.kubernetes.io": "true"
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -11,7 +12,10 @@ metadata:
     helm.sh/chart: aad-pod-identity
 spec:
   group: aadpodidentity.k8s.io
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: AzureAssignedIdentity
     plural: azureassignedidentities
@@ -23,6 +27,7 @@ metadata:
   name: azureidentitybindings.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
+    "api-approved.kubernetes.io": "true"
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -30,7 +35,10 @@ metadata:
     helm.sh/chart: aad-pod-identity
 spec:
   group: aadpodidentity.k8s.io
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: AzureIdentityBinding
     plural: azureidentitybindings
@@ -42,6 +50,7 @@ metadata:
   name: azureidentities.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
+    "api-approved.kubernetes.io": "true"
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -49,7 +58,10 @@ metadata:
     helm.sh/chart: aad-pod-identity
 spec:
   group: aadpodidentity.k8s.io
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: AzureIdentity
     singular: azureidentity
@@ -62,6 +74,7 @@ metadata:
   name: azurepodidentityexceptions.aadpodidentity.k8s.io
   annotations:
     "helm.sh/hook": crd-install
+    "api-approved.kubernetes.io": "true"
   labels:
     app.kubernetes.io/name: aad-pod-identity
     app.kubernetes.io/instance: aad-pod-identity
@@ -69,7 +82,10 @@ metadata:
     helm.sh/chart: aad-pod-identity
 spec:
   group: aadpodidentity.k8s.io
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: AzurePodIdentityException
     singular: azurepodidentityexception
