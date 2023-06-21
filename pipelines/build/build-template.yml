@@ -27,10 +27,10 @@ jobs:
           script: 'Write-Host "Build Queue init: $(buildQueueInit) and from parameters $(myBuildQueue)"'
 
       - task: UseDotNet@2
-        displayName: "Use .NET Core sdk 3.1.x"
+        displayName: "Use .NET Core sdk 6.0.x"
         inputs:
           packageType: "sdk"
-          version: "3.1.x"
+          version: "6.0.x"
           includePreviewVersions: true
 
       - task: DotNetCoreCLI@2
@@ -45,7 +45,7 @@ jobs:
       - task: VSBuild@1
         inputs:
           solution: "$(Parameters.solutionPath)/*.sln"
-          vsVersion: "16.0"
+          vsVersion: "17.0"
           msbuildArgs: '/p:OutputPath="$(Build.BinariesDirectory)\$(buildConfiguration)/" /p:OutDir="$(Build.BinariesDirectory)\$(buildConfiguration)\\" /p:ReferencesLogFolder=$(Agent.BuildDirectory) /p:GenerateProjectSpecificOutputFolder=true /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.BinariesDirectory)\$(buildConfiguration)\\"'
           platform: "$(buildPlatform)"
           configuration: "$(buildConfiguration)"
