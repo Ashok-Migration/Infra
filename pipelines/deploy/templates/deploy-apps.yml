@@ -4,11 +4,11 @@ parameters:
     default: "sqcp-ado-spn-qc-shared-services"
 
 steps:
-  - template: helm-upgrade.yml
-    parameters:
-      name: smsprovider
-      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/smsprovider"
-      azureSubscription: ${{ parameters.azureSubscription }}
+  # - template: helm-upgrade.yml
+  #   parameters:
+  #     name: smsprovider
+  #     chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/smsprovider"
+  #     azureSubscription: ${{ parameters.azureSubscription }}
   # - template: helm-upgrade.yml
   #   parameters:
   #     name: smspublisher
@@ -69,11 +69,11 @@ steps:
   #     name: smartparkingapi
   #     chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/smartparking"
   #     azureSubscription: ${{ parameters.azureSubscription }}
-  # - template: helm-upgrade.yml
-  #   parameters:
-  #     name: cmscontentapi
-  #     chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/cmscontentapi"
-  #     azureSubscription: ${{ parameters.azureSubscription }}
+  - template: helm-upgrade.yml
+    parameters:
+      name: cmscontentapi
+      chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/cmscontentapi"
+      azureSubscription: ${{ parameters.azureSubscription }}
   # - template: helm-upgrade.yml
   #   parameters:
   #     name: cmsdocumentsapi
