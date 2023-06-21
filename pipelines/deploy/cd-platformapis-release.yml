@@ -4,12 +4,7 @@ resources:
     - repository: platform-apis
       type: git
       name: TASMU Central Platform/platform-apis
-      ref: Ashok/QC-deployment
-
-    - repository: QC-Infra 
-      type: git
-      name: QC-Infra
-      ref: Ashok/PlatformApis
+      ref: features/dotnet-modernization
 
 variables:
   namespace: "apiapps"
@@ -29,13 +24,13 @@ stages:
   #   jobs:
   #     - template: templates/enable-acr-publicips.yml
 
-  # - stage: Build
-  #   displayName: Build stage
-  #   jobs:
-  #     - template: templates/build-push-api.yml
-  #       parameters:
-  #         name: smsprovider
-  #         solutionPath: "src/services/SmsProvider"
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - template: templates/build-push-api.yml
+        parameters:
+          name: smsprovider
+          solutionPath: "src/services/SmsProvider"
 
       # - template: templates/build-push-api.yml
       #   parameters:
@@ -153,10 +148,10 @@ stages:
       #     poolName: "tasmumsagents"
 
       # Publish Artifacts
-      # - template: templates/publish-artifacts.yml
-      #   parameters:
-      #     chartsPath: "pipelines/deploy/charts"
-      #     poolName: "tasmumsagents"
+      - template: templates/publish-artifacts.yml
+        parameters:
+          chartsPath: "pipelines/deploy/charts"
+          poolName: "tasmumsagents"
 
   # - stage: Disableacrpublicips
   #   displayName: Disableacrpublicips
