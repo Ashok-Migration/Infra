@@ -1,0 +1,12 @@
+jobs:
+  - job: AllowPublicIPs
+    steps:
+      - task: AzureCLI@2
+        displayName: "Allow Public IPs"
+        inputs:
+          azureSubscription: $(serviceConnection)
+          scriptType: "pscore"
+          scriptLocation: inlineScript
+          inlineScript: |
+            az acr update --name acrcpdglobnpdwe01 --default-action Allow
+            az acr update --name acrcpdglobnpdwe01 --public-network-enabled true

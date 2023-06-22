@@ -1,0 +1,80 @@
+trigger: none
+
+variables:
+  namespace: "webapps"
+  poolName: "tasmumsiprdagents"
+  appContainerName: app
+
+pool:
+  name: "$(poolName)"
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: PublishCDNArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              sourceFolder: "$(Build.SourcesDirectory)/cdncontainer/"
+              contents: "**"
+              targetFolder: "$(Build.ArtifactStagingDirectory)/cdncontainer"
+              cleanTargetFolder: true
+
+          - publish: "$(Build.ArtifactStagingDirectory)/cdncontainer"
+            artifact: cdncontainer
+
+  - stage: Deploy_Pre
+    displayName: Deploy Pre stage
+    dependsOn: Build
+    variables:
+      azureResourceGroupStrgAcc: "rg-cpp-shrd-pre-we-01"
+      botDirectlineEndpoint: "https://api.pre.sqcp.qa/bot/directline"
+      cdnStorageAccountName: stcppshrdprewe01
+      componentStorageAccountSubscriptionId: "8964f3c1-44f5-4094-80eb-4334845bdfb1"
+      cdnProfileName: cdn-cpp-shrd-pre-we-01
+      cdnEndPoint: pre-cdntasmu
+      strAccUrl: "https://stcppshrdprewe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.pre.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.pre.sqcp.qa/"
+      cdnAccountUrl: "https://account.pre.sqcp.qa/"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deploypre
+        displayName: Deploy Pre APIs and Update Configs
+        environment: "pre-prod"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+  - stage: Deploy_Prd
+    displayName: Deploy Prd stage
+    dependsOn: Build
+    variables:
+      azureResourceGroupStrgAcc: "rg-cpp-shrd-prd-we-01"
+      botDirectlineEndpoint: "https://api.tasmu.gov.qa/bot/directline"
+      cdnStorageAccountName: stcppshrdprdwe01
+      componentStorageAccountSubscriptionId: "8964f3c1-44f5-4094-80eb-4334845bdfb1"
+      cdnProfileName: cdn-cpp-shrd-prd-we-01
+      cdnEndPoint: prd-cdntasmu
+      strAccUrl: "https://stcppshrdprdwe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://platform.tasmu.gov.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.tasmu.gov.qa/"
+      cdnAccountUrl: "https://account.tasmu.gov.qa/"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deployprd
+        displayName: Deploy Prd APIs and Update Configs
+        environment: "prd"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd

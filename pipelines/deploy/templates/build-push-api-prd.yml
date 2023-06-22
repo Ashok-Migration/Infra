@@ -1,0 +1,33 @@
+parameters:
+  - name: name
+    type: string
+    default: ""
+  - name: solutionPath
+    type: string
+    default: ""
+  - name: feedURL
+    type: string
+jobs:
+  - job: ${{ parameters.name }}
+    variables:
+      dockerfilePath: ${{ parameters.solutionPath }}/Dockerfile
+      imageRepository: $(namespace)/${{ parameters.name }}
+    steps:
+      # Build and Push to Prd ACR
+      - task: Docker@2
+        displayName: Build image
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnectionPrd)"
+          repository: "$(imageRepository)"
+          command: "build"
+          Dockerfile: "$(dockerfilePath)"
+          tags: "$(tag)"
+          arguments: "--build-arg PAT=$(System.NugetAccessToken) --build-arg FEED_URL=${{ parameters.feedURL }}"
+
+      - task: Docker@2
+        displayName: Push image to container registry
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnectionPrd)"
+          repository: "$(imageRepository)"
+          command: "push"
+          tags: "$(tag)"

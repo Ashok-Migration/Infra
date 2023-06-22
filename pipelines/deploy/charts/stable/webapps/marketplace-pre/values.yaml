@@ -1,0 +1,78 @@
+namespace: webapps
+environment:
+  ConnectionStrings__AppConfig: ""
+  env__name: "Maketplace update using HELM"
+  botIframeUrl: ""
+  privacyPolicyUrl_en: ""
+  privacyPolicyUrl_ar: ""
+  baseUrl: ""
+  accountUrl: ""
+  payment_gatewayUrl: ""
+  trackingArticleId: ""
+  trackingArticleId_AR: ""
+  hostUrl: ""
+  appInsightsKey: ""
+  aad_clientid: ""
+  aad_authority: ""
+  aad_authority_b2b: ""
+  aad_redirectUri: ""
+  aad_postLogoutRedirectUri: ""
+  aad_redirectUri_eservices: ""
+  aad_postLogoutRedirectUri_eservices: ""
+  apim_subscriptionId: ""
+  names_signUpSignIn: ""
+  names_resetPassword: ""
+  b2b_authority_signUpSignIn: ""
+  b2b_authority_resetPassword: ""
+  b2b_authority_changePassword: ""
+  b2b_authority_linkAccount: ""
+  b2c_authority_signUpSignIn: ""
+  b2c_authority_resetPassword: ""
+  b2c_authority_changePassword: ""
+  b2c_authority_linkAccount: ""
+  scope_profileapi_read: ""
+  scope_profileapi_write: ""
+  scope_caseapi_read: ""
+  scope_caseapi_write: ""
+  scope_organizationapi_read: ""
+  scope_organizationapi_write: ""
+  scope_smartparkingapi_read: ""
+  scope_subscriptionapi_read: ""
+  scope_subscriptionapi_write: ""
+  scope_reviewapi_write: ""
+  openDataPortal: ""
+  developerPortal: ""
+  eservices: ""
+  marketplace: ""
+  portalAssets: ""
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+container:
+  containerPort: 80
+resources:
+  limits:
+    cpu: 500m
+  requests:
+    cpu: 500m
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 1
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 50
+  minReplicas: 10
+  targetCPUUtilizationPercentage: 40
+ingress:
+  path: /*
+  backendPrefix: "/"
+  requestTimeout: "120"
+  sslCertificate: "httpsvaultCert"
+  host: ""
+nodeSelector: portal

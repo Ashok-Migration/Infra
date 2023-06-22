@@ -1,0 +1,17 @@
+parameters:
+  - name: chartsPath
+    type: string
+    default: "pipelines/deploy/charts"
+jobs:
+  - job: PublishArtifacts
+    steps:
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: ${{ parameters.chartsPath }}
+          Contents: "**"
+          TargetFolder: "$(build.artifactstagingdirectory)/deploy"
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: ${{ parameters.chartsPath }}
+          artifact: "charts"
+          publishLocation: "pipeline"

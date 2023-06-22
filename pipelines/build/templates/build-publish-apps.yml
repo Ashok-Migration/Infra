@@ -1,0 +1,50 @@
+parameters:
+  - name: name
+    type: string
+    default: ""
+  - name: workingDirectory
+    type: string
+    default: ""
+  - name: publishProject
+    type: string
+    default: ""
+
+jobs:
+  - job: ${{ parameters.name }}
+    dependsOn: Get_Build_Queue
+    condition: and(succeeded(), contains(dependencies.Get_Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.name }}'))
+    steps:
+      - task: NodeTool@0
+        displayName: "Use Node 12.x"
+        inputs:
+          versionSpec: 12.x
+
+      - task: Npm@1
+        displayName: "npm install"
+        inputs:
+          workingDir: ${{ parameters.workingDirectory }}
+          verbose: true
+          customRegistry: "useFeed"
+          customFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+      - task: Npm@1
+        displayName: "install cli"
+        inputs:
+          command: custom
+          workingDir: ${{ parameters.workingDirectory }}
+          verbose: true
+          customCommand: "install @angular/cli@9.1.5 -g -f"
+
+      - script: "ng build --prod"
+        workingDirectory: ${{ parameters.workingDirectory }}
+        displayName: "ng build --prod"
+
+      - task: Npm@1
+        displayName: "npm publish"
+        continueOnError: true
+        inputs:
+          command: publish
+          workingDir: ${{ parameters.workingDirectory }}/dist/${{ parameters.publishProject }}
+          verbose: true
+          publishRegistry: "useFeed"
+          publishFeed: $(feedURL)

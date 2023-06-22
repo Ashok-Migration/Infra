@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name}}  
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version}}
+    aadpodidbinding: {{ .Values.podIdentity}}        
+spec:
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name}}
+  replicas: {{ .Values.replicaCount}}
+  template:
+      metadata:
+        labels:
+            app: {{ .Chart.Name}}
+            aadpodidbinding: {{ .Values.podIdentity}}            
+      spec:
+        nodeSelector: 
+          agentpool: {{ .Values.nodeSelector }}
+        containers:
+        - name: {{ .Chart.Name}}
+          image: {{ .Values.image.repository}}:{{ .Values.image.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy}}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu}}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu}}
+          ports:
+          - containerPort: {{ .Values.container.containerPort}}
+          env:
+          - name: ConnectionStrings__AppConfig
+            value: {{ .Values.environment.ConnectionStrings__AppConfig}}
+          - name: env__name
+            value: {{ .Values.environment.env__name}}
+          - name: botIframeUrl
+            value: {{ .Values.environment.botIframeUrl}}
+          - name: privacyPolicyUrl_en
+            value: {{.Values.environment.privacyPolicyUrl_en}}
+          - name: privacyPolicyUrl_ar
+            value: {{.Values.environment.privacyPolicyUrl_ar}}
+          - name: baseUrl
+            value: {{ .Values.environment.baseUrl}}
+          - name: accountUrl
+            value: {{ .Values.environment.accountUrl}}
+          - name: payment_gatewayUrl
+            value: {{ .Values.environment.payment_gatewayUrl}}
+          - name: trackingArticleId
+            value: {{ .Values.environment.trackingArticleId}}
+          - name: trackingArticleId_AR
+            value: {{ .Values.environment.trackingArticleId_AR}} 
+          - name: hostUrl
+            value: {{ .Values.environment.hostUrl}}
+          - name: aad_redirectUri
+            value: {{ .Values.environment.aad_redirectUri}}   
+          - name: aad_postLogoutRedirectUri
+            value: {{ .Values.environment.aad_postLogoutRedirectUri}}  
+          - name: appInsightsKey
+            value: {{ .Values.environment.appInsightsKey}}                          
+          - name: aad_clientid
+            value: {{ .Values.environment.aad_clientid}}          
+          - name: aad_authority
+            value: {{ .Values.environment.aad_authority}}
+          - name: aad_authority_b2b
+            value: {{ .Values.environment.aad_authority_b2b}}
+          - name: aad_redirectUri_eservices
+            value: {{ .Values.environment.aad_redirectUri_eservices}}
+          - name: aad_postLogoutRedirectUri_eservices
+            value: {{ .Values.environment.aad_postLogoutRedirectUri_eservices}}
+          - name: apim_subscriptionId
+            value: {{ .Values.environment.apim_subscriptionId}}
+          - name: names_signUpSignIn
+            value: {{ .Values.environment.names_signUpSignIn}}
+          - name: names_resetPassword
+            value: {{ .Values.environment.names_resetPassword}}
+          - name: b2b_authority_signUpSignIn
+            value: {{ .Values.environment.b2b_authority_signUpSignIn}}
+          - name: b2b_authority_resetPassword
+            value: {{ .Values.environment.b2b_authority_resetPassword}}
+          - name: b2b_authority_changePassword
+            value: {{ .Values.environment.b2b_authority_changePassword}}
+          - name: b2b_authority_linkAccount
+            value: {{ .Values.environment.b2b_authority_linkAccount}} 
+          - name: b2c_authority_signUpSignIn
+            value: {{ .Values.environment.b2c_authority_signUpSignIn}}
+          - name: b2c_authority_resetPassword
+            value: {{ .Values.environment.b2c_authority_resetPassword}}
+          - name: b2c_authority_changePassword
+            value: {{ .Values.environment.b2c_authority_changePassword}}
+          - name: b2c_authority_linkAccount
+            value: {{ .Values.environment.b2c_authority_linkAccount}} 
+          - name: scope_profileapi_read
+            value: {{ .Values.environment.scope_profileapi_read}}
+          - name: scope_profileapi_write
+            value: {{ .Values.environment.scope_profileapi_write}}
+          - name: scope_caseapi_read
+            value: {{ .Values.environment.scope_caseapi_read}}
+          - name: scope_caseapi_write
+            value: {{ .Values.environment.scope_caseapi_write}}
+          - name: scope_organizationapi_read
+            value: {{ .Values.environment.scope_organizationapi_read}}
+          - name: scope_organizationapi_write
+            value: {{ .Values.environment.scope_organizationapi_write}}
+          - name: scope_smartparkingapi_read
+            value: {{ .Values.environment.scope_smartparkingapi_read}}
+          - name: scope_subscriptionapi_read
+            value: {{ .Values.environment.scope_subscriptionapi_read}}
+          - name: scope_subscriptionapi_write
+            value: {{ .Values.environment.scope_subscriptionapi_write}} 
+          - name: scope_reviewapi_write
+            value: {{ .Values.environment.scope_reviewapi_write}}         
+          - name: openDataPortal
+            value: {{ .Values.environment.openDataPortal}}                        
+          - name: developerPortal
+            value: {{ .Values.environment.developerPortal}}                        
+          - name: eservices
+            value: {{ .Values.environment.eservices}}                        
+          - name: marketplace
+            value: {{ .Values.environment.marketplace}}
+          - name: portalAssets
+            value: {{ .Values.environment.portalAssets}}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/en/assets/config/config.deploy.json > /usr/share/nginx/html/en/assets/config/config.deploy.json.tmp && mv /usr/share/nginx/html/en/assets/config/config.deploy.json.tmp /usr/share/nginx/html/en/assets/config/config.deploy.json && envsubst < /usr/share/nginx/html/ar/assets/config/config.deploy.json > /usr/share/nginx/html/ar/assets/config/config.deploy.json.tmp && mv /usr/share/nginx/html/ar/assets/config/config.deploy.json.tmp /usr/share/nginx/html/ar/assets/config/config.deploy.json  && envsubst < /usr/share/nginx/html/en/sitemap.xml > /usr/share/nginx/html/en/sitemap.xml.tmp && mv /usr/share/nginx/html/en/sitemap.xml.tmp /usr/share/nginx/html/en/sitemap.xml && envsubst < /usr/share/nginx/html/ar/sitemap.xml > /usr/share/nginx/html/ar/sitemap.xml.tmp && mv /usr/share/nginx/html/ar/sitemap.xml.tmp /usr/share/nginx/html/ar/sitemap.xml && envsubst < /usr/share/nginx/html/en/robots.txt > /usr/share/nginx/html/en/robots.txt.tmp && mv /usr/share/nginx/html/en/robots.txt.tmp /usr/share/nginx/html/en/robots.txt && envsubst < /usr/share/nginx/html/ar/robots.txt > /usr/share/nginx/html/ar/robots.txt.tmp && mv /usr/share/nginx/html/ar/robots.txt.tmp /usr/share/nginx/html/ar/robots.txt"]

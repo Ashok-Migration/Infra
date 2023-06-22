@@ -1,0 +1,162 @@
+trigger: none
+
+variables:
+  namespace: "webapps"
+  poolName: "webappspool"
+  appContainerName: app
+
+pool:
+  name: "$(poolName)"
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: PublishCDNArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              sourceFolder: "$(Build.SourcesDirectory)/cdncontainer/"
+              contents: "**"
+              targetFolder: "$(Build.ArtifactStagingDirectory)/cdncontainer"
+              cleanTargetFolder: true
+
+          - publish: "$(Build.ArtifactStagingDirectory)/cdncontainer"
+            artifact: cdncontainer
+
+  - stage: Deploy_sbx
+    displayName: Deploy sbx stage
+    variables:
+      botDirectlineEndpoint: "https://apim-cpd-shrd-sbx-we-01.azure-api.net/bot/directline"
+      strAccUrl: "https://stcpdshrdsbxwe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.sbx.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.sbx.sqcp.qa/"
+      cdnAccountUrl: "https://account.sbx.sqcp.qa/"
+      cdnProfileName: cdn-cpd-shrd-sbx-we-01
+      cdnEndPoint: sbx-cdntasmu
+      cdnStorageAccountName: stcpdshrdsbxwe01
+      azureResourceGroupStrgAcc: "rg-cpd-shrd-sbx-we-01"
+      componentStorageAccountSubscriptionId: "d0694def-b27e-4bb7-900d-437fbeb802da"
+    pool:
+      name: "testagentpool"
+    jobs:
+      - deployment: Deploysbx
+        displayName: Deploy sbx CDN
+        environment: "sbx"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_dev
+    displayName: Deploy dev stage
+    variables:
+      botDirectlineEndpoint: "https://api.dev.sqcp.qa/bot/directline"
+      strAccUrl: "https://stcpdshrddevwe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.dev.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.dev.sqcp.qa/"
+      cdnAccountUrl: "https://account.dev.sqcp.qa/"
+      cdnProfileName: cdn-cpd-shrd-dev-we-01
+      cdnEndPoint: dev-cdntasmu
+      cdnStorageAccountName: stcpdshrddevwe01
+      azureResourceGroupStrgAcc: "rg-cpd-shrd-dev-we-01"
+      componentStorageAccountSubscriptionId: "d0694def-b27e-4bb7-900d-437fbeb802da"
+    pool:
+      name: "testagentpool"
+    jobs:
+      - deployment: DeployDev
+        displayName: Deploy Dev CDN
+        environment: "Dev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_tst
+    displayName: Deploy tst stage
+    dependsOn: Deploy_dev
+    variables:
+      botDirectlineEndpoint: "https://api.tst.sqcp.qa/bot/directline"
+      strAccUrl: "https://stcpdshrdtstwe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.tst.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.tst.sqcp.qa/"
+      cdnAccountUrl: "https://account.tst.sqcp.qa/"
+      cdnProfileName: cdn-cpd-shrd-tst-we-01
+      cdnEndPoint: tst-cdntasmu
+      cdnStorageAccountName: stcpdshrdtstwe01
+      azureResourceGroupStrgAcc: "rg-cpd-shrd-tst-we-01"
+      componentStorageAccountSubscriptionId: "d0694def-b27e-4bb7-900d-437fbeb802da"
+    pool:
+      name: "testagentpool"
+    jobs:
+      - deployment: DeployTst
+        displayName: Deploy tst CDN
+        environment: "tst"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_tra
+    displayName: Deploy tra stage
+    dependsOn: Deploy_tst
+    variables:
+      botDirectlineEndpoint: "https://api.trn.sqcp.qa/bot/directline"
+      strAccUrl: https://stcpdshrdtrawe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.trn.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.trn.sqcp.qa/"
+      cdnAccountUrl: "https://account.trn.sqcp.qa/"
+      cdnProfileName: cdn-cpd-shrd-tra-we-01
+      cdnEndPoint: tra-cdntasmu
+      cdnStorageAccountName: stcpdshrdtrawe01
+      azureResourceGroupStrgAcc: "rg-cpd-shrd-tra-we-01"
+      componentStorageAccountSubscriptionId: "d0694def-b27e-4bb7-900d-437fbeb802da"
+    pool:
+      name: "testagentpool"
+    jobs:
+      - deployment: Deploytra
+        displayName: Deploy tra APIs and Update Configs
+        environment: "tra"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev
+
+  - stage: Deploy_uat
+    displayName: Deploy uat stage
+    dependsOn: Deploy_tst
+    variables:
+      botDirectlineEndpoint: "https://api.uat.sqcp.qa/bot/directline"
+      strAccUrl: "https://stcpdshrduatwe01.blob.core.windows.net/"
+      cdnMarketplaceUrl: "https://marketplace.uat.sqcp.qa/"
+      cdnMyTasmuUrl: "https://mytasmu.uat.sqcp.qa/"
+      cdnAccountUrl: "https://account.uat.sqcp.qa/"
+      cdnProfileName: cdn-cpd-shrd-uat-we-01
+      cdnEndPoint: uat-cdntasmu
+      cdnStorageAccountName: stcpdshrduatwe01
+      azureResourceGroupStrgAcc: "rg-cpd-shrd-uat-we-01"
+      componentStorageAccountSubscriptionId: "d0694def-b27e-4bb7-900d-437fbeb802da"
+    pool:
+      name: "testagentpool"
+    jobs:
+      - deployment: Deployuat
+        displayName: Deploy uat APIs and Update Configs
+        environment: "uat"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/update-cdnstorage.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-dev

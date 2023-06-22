@@ -1,0 +1,93 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+trigger: none
+
+pool:
+  name: "webappspool"
+
+variables:
+  workingDirectory: "marketplace/marketplace"
+  buildConfiguration: "Release"
+  buildPlatform: "Any CPU"
+  solutionFiles: "**/**.sln"
+
+jobs:
+  - job: SonarPipeline
+    displayName: Sonar Pipeline
+    timeoutInMinutes: 220
+    steps:
+
+      - task: CredScan@2
+        displayName: "Run CredScan"
+        inputs:
+          debugMode: false
+
+      - task: SonarQubePrepare@4
+        displayName: "Prepare analysis on SonarQube"
+        inputs:
+          SonarQube: "tasmu-sonar-web-apps"
+          scannerMode: CLI
+          configMode: manual
+          cliProjectKey: "TASMU_Central_Platform_web-apps_AYQnt9iN5StDFlqea3pR"
+          cliProjectName: "web-apps"
+          sonar.verbose: true
+
+      - task: NodeTool@0
+        displayName: "Use Node 10.x"
+        inputs:
+          versionSpec: 10.x
+
+      - task: Npm@1
+        displayName: "npm install Marketplace"
+        inputs:
+          workingDir: $(workingDirectory)
+          verbose: false
+          customRegistry: "useFeed"
+          customFeed: "d0902a05-fe88-4eb4-bab4-badafc58ebfa/f333d4e3-324a-45e6-9c13-ccc90b82eac4"
+
+      - task: Npm@1
+        displayName: "install cli"
+        inputs:
+          command: custom
+          workingDir: $(workingDirectory)
+          verbose: false
+          customCommand: "install @angular/cli@9.1.5 -g -f"
+
+      - task: DeleteFiles@1
+        displayName: "Delete JUnit files"
+        inputs:
+          SourceFolder: $(workingDirectory)/junit
+          Contents: "TESTS*.xml"
+
+      - task: Npm@1
+        displayName: "Test Angular"
+        inputs:
+          command: custom
+          customCommand: run test -- --watch=false --code-coverage
+          workingDir: $(workingDirectory)
+          codeCoverageEnabled: true
+
+      - task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@5
+        displayName: 'Run Code Analysis'
+        
+      - task: PublishCodeCoverageResults@1
+        displayName: "Publish code coverage Angular results"
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: "$(workingDirectory)/coverage/cobertura-coverage.xml"
+          reportDirectory: $(workingDirectory)/coverage
+          failIfCoverageEmpty: false
+
+      - task: DotNetCoreCLI@2
+        displayName: "dotnet publish"
+        inputs:
+          command: publish
+          arguments: "--output $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)"
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          PathtoPublish: '$(build.artifactstagingdirectory)'
+        condition: succeededOrFailed()

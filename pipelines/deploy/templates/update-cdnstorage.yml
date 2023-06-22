@@ -1,0 +1,82 @@
+parameters:
+  - name: azureSubscription
+    type: string
+    default: "sqcp-ado-spn-dev"
+steps:
+  - task: replacetokens@3
+    inputs:
+      targetFiles: "$(Pipeline.Workspace)/cdncontainer/htmlpages/B2C_Configuration/UI/*.html"
+      encoding: "auto"
+      writeBOM: true
+      verbosity: "detailed"
+      actionOnMissing: "warn"
+      keepToken: false
+      tokenPrefix: "#{"
+      tokenSuffix: "}#"
+    displayName: Perform variable substitution in html files
+
+  - task: replacetokens@3
+    inputs:
+      targetFiles: "$(Pipeline.Workspace)/cdncontainer/htmlpages/B2C_Configuration/UI/css/*.css"
+      encoding: "auto"
+      writeBOM: true
+      verbosity: "detailed"
+      actionOnMissing: "warn"
+      keepToken: false
+      tokenPrefix: "#{"
+      tokenSuffix: "}#"
+    displayName: Perform variable substitution in css files
+    
+  - task: replacetokens@3
+    inputs:
+      targetFiles: "$(Pipeline.Workspace)/cdncontainer/botwebchat/content/custombotchat.js"
+      encoding: "auto"
+      writeBOM: true
+      verbosity: "detailed"
+      actionOnMissing: "warn"
+      keepToken: false
+      tokenPrefix: "#{"
+      tokenSuffix: "}#"
+    displayName: Perform variable substitution in js file
+  
+  - task: Npm@1
+    displayName: "npm install"
+    inputs:
+      command: custom
+      workingDir: "$(Pipeline.Workspace)/cdncontainer"
+      verbose: true
+      customCommand: "install gulp@4.0.2 gulp-clean-css@4.3.0 gulp-htmlmin@5.0.1 gulp-imagemin@7.1.0 merge-stream@2.0.0 gulp-uglify@3.0.2 uglify-es@3.3.9"
+
+  - task: gulp@1
+    displayName: "gulp minify"
+    inputs:
+      gulpFile: "$(Pipeline.Workspace)/cdncontainer/gulpfile.js"
+      targets: 'minify'
+      enableCodeCoverage: false
+  
+  - task: DeleteFiles@1
+    displayName: 'Cleanup cdn folder'
+    inputs:
+      SourceFolder: "$(Pipeline.Workspace)/cdncontainer"
+      Contents: |
+        node_modules
+        gulpfile.js
+        package-lock.json
+
+  - task: AzureCLI@2
+    displayName: Copy Container Contents for CDN
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      scriptType: "ps"
+      scriptLocation: inlineScript
+      inlineScript: |
+        az storage blob upload-batch --source "$(Pipeline.Workspace)/cdncontainer" --destination "$(appContainerName)" --account-name "$(cdnStorageAccountName)" --subscription  "$(componentStorageAccountSubscriptionId)" --overwrite
+
+  - task: AzureCLI@2
+    displayName: "Azure CLI: Purge CDN"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      scriptType: "ps"
+      scriptLocation: inlineScript
+      inlineScript: |
+        az cdn endpoint purge -g $(azureResourceGroupStrgAcc) --profile-name $(cdnProfileName) --name $(cdnEndPoint) --no-wait --content-paths "/app/*"

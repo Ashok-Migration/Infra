@@ -1,0 +1,77 @@
+namespace: webapps
+environment:
+  ConnectionStrings__AppConfig: ""
+  env__name: "Account update using HELM"
+  baseUrl: ""
+  payment_gatewayUrl: ""
+  b2bHostUrl: ""
+  b2cHostUrl: ""
+  aad_redirectUri: ""
+  aad_postLogoutRedirectUri: ""
+  appInsightsKey: ""
+  aad_clientid: ""
+  aad_authority: ""
+  names_signUpSignIn: ""
+  names_resetPassword: ""
+  names_signUpLinkage: ""
+  b2b_authority_signUpSignInB2B: ""
+  b2c_authority_signUpSignInB2CIndividual: ""
+  b2c_authority_signUpSignInB2CBusinessOwner: ""
+  b2b_authority_resetPassword: ""
+  b2b_authority_changePassword: ""
+  b2b_authority_linkAccount: ""
+  scope_profileapi_read: ""
+  scope_profileapi_write: ""
+  scope_caseapi_read: ""
+  scope_caseapi_write: ""
+  scope_organizationapi_read: ""
+  scope_organizationapi_write: ""
+  scope_subscriptionapi_read: ""
+  scope_subscriptionapi_write: ""
+  openDataPortal: ""
+  developerPortal: ""
+  eservices: ""
+  marketplace: ""
+  powerbi_embedUrl: ""
+  tasmuProvider: ""
+  workspaceid: ""
+  insightsreportid: ""
+  servicehealth_1reportid: ""
+  a2bProvider: ""
+  servicehealth_2reportid: ""
+  atProvider: ""
+  tProvider: ""
+  portalAssets: ""
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+container:
+  containerPort: 80
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 1
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 10
+  minReplicas: 2
+  targetCPUUtilizationPercentage: 50
+ingress:
+  path: /account/*
+  backendPrefix: "/"
+  requestTimeout: "120"
+  sslCertificate: "httpsvaultCert"
+  host: ""
+nodeSelector: apps

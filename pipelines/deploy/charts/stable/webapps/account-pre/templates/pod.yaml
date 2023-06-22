@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name}}  
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version}}
+    aadpodidbinding: {{ .Values.podIdentity}}        
+spec:
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name}}
+  replicas: {{ .Values.replicaCount}}
+  template:
+      metadata:
+        labels:
+            app: {{ .Chart.Name}}
+            aadpodidbinding: {{ .Values.podIdentity}}            
+      spec:
+        nodeSelector: 
+          agentpool: {{ .Values.nodeSelector }}
+        containers:
+        - name: {{ .Chart.Name}}
+          image: {{ .Values.image.repository}}:{{ .Values.image.tag}}
+          imagePullPolicy: {{ .Values.image.pullPolicy}}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu}}
+              memory: {{ .Values.resources.requests.memory}}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu}}
+              memory: {{ .Values.resources.limits.memory}}
+          ports:
+          - containerPort: {{ .Values.container.containerPort}}
+          env:
+          - name: ConnectionStrings__AppConfig
+            value: {{ .Values.environment.ConnectionStrings__AppConfig}}
+          - name: env__name
+            value: {{ .Values.environment.env__name}}
+          - name: baseUrl
+            value: {{ .Values.environment.baseUrl}}
+          - name: payment_gatewayUrl
+            value: {{ .Values.environment.payment_gatewayUrl}}
+          - name : powerbi_embedUrl
+            value: {{ .Values.environment.powerbi_embedUrl}}
+          - name : tasmuProvider
+            value: {{ .Values.environment.tasmuProvider}}
+          - name : workspaceid
+            value: {{ .Values.environment.workspaceid}}
+          - name : insightsreportid
+            value: {{ .Values.environment.insightsreportid}}
+          - name : servicehealth_1reportid
+            value: {{ .Values.environment.servicehealth_1reportid}}
+          - name : a2bProvider
+            value: {{ .Values.environment.a2bProvider}}
+          - name : servicehealth_2reportid
+            value: {{ .Values.environment.servicehealth_2reportid}}
+          - name : atProvider
+            value: {{ .Values.environment.atProvider}}
+          - name : tProvider
+            value: {{ .Values.environment.tProvider}}
+          - name: b2bHostUrl
+            value: {{ .Values.environment.b2bHostUrl}}
+          - name: b2cHostUrl
+            value: {{ .Values.environment.b2cHostUrl}}
+          - name: aad_redirectUri
+            value: {{ .Values.environment.aad_redirectUri}}            
+          - name: aad_postLogoutRedirectUri
+            value: {{ .Values.environment.aad_postLogoutRedirectUri}}            
+          - name: appInsightsKey
+            value: {{ .Values.environment.appInsightsKey}}
+          - name: aad_clientid
+            value: {{ .Values.environment.aad_clientid}}            
+          - name: aad_authority
+            value: {{ .Values.environment.aad_authority}}
+          - name: names_signUpSignIn
+            value: {{ .Values.environment.names_signUpSignIn}}
+          - name: names_resetPassword
+            value: {{ .Values.environment.names_resetPassword}}
+          - name: names_signUpLinkage
+            value: {{ .Values.environment.names_signUpLinkage}}
+          - name: b2b_authority_signUpSignInB2B
+            value: {{ .Values.environment.b2b_authority_signUpSignInB2B}}
+          - name: b2c_authority_signUpSignInB2CIndividual
+            value: {{ .Values.environment.b2c_authority_signUpSignInB2CIndividual}}
+          - name: b2c_authority_signUpSignInB2CBusinessOwner
+            value: {{ .Values.environment.b2c_authority_signUpSignInB2CBusinessOwner}}
+          - name: b2b_authority_resetPassword
+            value: {{ .Values.environment.b2b_authority_resetPassword}}
+          - name: b2b_authority_changePassword
+            value: {{ .Values.environment.b2b_authority_changePassword}}
+          - name: b2b_authority_linkAccount
+            value: {{ .Values.environment.b2b_authority_linkAccount}} 
+          - name: scope_profileapi_read
+            value: {{ .Values.environment.scope_profileapi_read}}
+          - name: scope_profileapi_write
+            value: {{ .Values.environment.scope_profileapi_write}}
+          - name: scope_caseapi_read
+            value: {{ .Values.environment.scope_caseapi_read}}
+          - name: scope_caseapi_write
+            value: {{ .Values.environment.scope_caseapi_write}}
+          - name: scope_organizationapi_read
+            value: {{ .Values.environment.scope_organizationapi_read}}
+          - name: scope_organizationapi_write
+            value: {{ .Values.environment.scope_organizationapi_write}}
+          - name: scope_subscriptionapi_read
+            value: {{ .Values.environment.scope_subscriptionapi_read}}
+          - name: scope_subscriptionapi_write
+            value: {{ .Values.environment.scope_subscriptionapi_write}}            
+          - name: openDataPortal
+            value: {{ .Values.environment.openDataPortal}}                        
+          - name: developerPortal
+            value: {{ .Values.environment.developerPortal}}                        
+          - name: eservices
+            value: {{ .Values.environment.eservices}}                        
+          - name: marketplace
+            value: {{ .Values.environment.marketplace}}  
+          - name: portalAssets
+            value: {{ .Values.environment.portalAssets}}                                                           
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/en/assets/config/config.deploy.json > /usr/share/nginx/html/en/assets/config/config.deploy.json.tmp && mv /usr/share/nginx/html/en/assets/config/config.deploy.json.tmp /usr/share/nginx/html/en/assets/config/config.deploy.json && envsubst < /usr/share/nginx/html/ar/assets/config/config.deploy.json > /usr/share/nginx/html/ar/assets/config/config.deploy.json.tmp && mv /usr/share/nginx/html/ar/assets/config/config.deploy.json.tmp /usr/share/nginx/html/ar/assets/config/config.deploy.json"]               

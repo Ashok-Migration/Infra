@@ -1,0 +1,293 @@
+trigger: none
+
+variables:
+  namespace: "webapps"
+  vmImage: "ubuntu-latest"
+  dockerRegistryServiceConnectionPrd: "acrcppglobprdwe01-spn2" #Update Production Service Connection for ACR
+  tag: "$(Build.BuildId)"
+  serviceConnection: sqcp-ado-spn-prd
+
+pool:
+  vmImage: "$(vmImage)"
+stages:
+  - stage: Enableacrpublicips
+    displayName: Enableacrpublicips
+    jobs:
+      - template: templates/enable-acr-publicips-prd.yml
+
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: marketplace
+          solutionPath: "marketplace/marketplace"
+          feedURL: $(npmFeed)
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: eservices
+          solutionPath: "marketplace/eservices"
+          feedURL: $(npmFeed)
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: account
+          solutionPath: "marketplace/account"
+          feedURL: $(npmFeed)
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: adminportal
+          solutionPath: "adminportal"
+          feedURL: $(nugetFeed)
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: powerbiembed
+          solutionPath: "powerbiembed"
+          feedURL: $(nugetFeed)
+
+      - template: templates/build-push-api-prd.yml
+        parameters:
+          name: authorizecard
+          solutionPath: "authorizecard"
+          feedURL: $(nugetFeed)
+
+      #Publish Artifacts
+      - template: templates/publish-artifacts.yml
+        parameters:
+          chartsPath: "pipelines/deploy/charts"
+
+  - stage: Disableacrpublicips
+    displayName: Disableacrpublicips
+    jobs:
+      - template: templates/disable-acr-publicips-prd.yml        
+
+  - stage: Deploy_Pre
+    displayName: Deploy Pre stage
+    dependsOn: Build
+    variables:
+      azureResourceGroup: "rg-cpp-apps-aks-pre-we-01"
+      kubernetesCluster: "aks-cpp-apps-pre-we-01"
+      containerRegistry: "acrcppglobprdwe01.azurecr.io"
+      podIdentity: "mi-cpp-apps-aks-pre-we-01"
+      enablehpa: "true"
+      accountHost: "account.pre.sqcp.qa"
+      adminportalHost: "cpadmin.pre.sqcp.qa"
+      authorizecardHost: "account.pre.sqcp.qa"
+      eservicesHost: "mytasmu.pre.sqcp.qa"
+      marketplaceHost: "marketplace.pre.sqcp.qa"
+      powerbiembedHost: "account.pre.sqcp.qa"
+      appConfigConnection: "https://acst-cpp-apps-str-pre-we-01.azconfig.io"
+      baseUrl: "https://api.pre.sqcp.qa/"
+      accountUrl: "https://account.pre.sqcp.qa/"
+      hostUrl: "https://marketplace.pre.sqcp.qa/"
+      payment_gatewayUrl: https://account.pre.sqcp.qa/authorizecard
+      trackingArticleId: "56fa4f19-90d6-491a-adc4-e7bb7be81d7f"
+      trackingArticleId_AR: "2fa12a4f-25c6-eb11-bacc-002248813a23"
+      b2bHostUrl: "https://marketplace.pre.sqcp.qa/"
+      b2cHostUrl: "https://mytasmu.pre.sqcp.qa/"
+      # Client Id of the TASMU-Portal App Registration
+      aad_clientid: "a362df42-1511-4a1c-afba-73cf45f962be"
+      aad_authority: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PPD"
+      aad_authority_b2b: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PPD"
+      aad_redirectUri: "https://marketplace.pre.sqcp.qa/"
+      aad_postLogoutRedirectUri: "https://marketplace.pre.sqcp.qa/"
+      aad_redirectUri_eservices: "https://mytasmu.pre.sqcp.qa/"
+      aad_postLogoutRedirectUri_eservices: "https://mytasmu.pre.sqcp.qa/"
+      botIframeUrl: "https://pre-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
+      privacyPolicyUrl_en: "https://pre-cdntasmu.azureedge.net/app/privacypages/privacypolicy_en.html"
+      privacyPolicyUrl_ar: "https://pre-cdntasmu.azureedge.net/app/privacypages/privacypolicy_ar.html"
+      appInsightsKey: "7ac19769-96b6-49d3-812e-84e69c5f52d8"
+      apim_subscriptionId: ""
+      names_signUpSignIn: "B2C_1A_signup_signin_PPD"
+      names_resetPassword: "B2C_1A_PasswordReset_PPD"
+      names_signUpLinkage: "B2C_1A_SignUpLinkage_PPD"
+      b2b_authority_signUpSignInB2B: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PPD"
+      b2c_authority_signUpSignInB2CIndividual: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PPD"
+      b2c_authority_signUpSignInB2CBusinessOwner: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_BO_signup_signin_PPD"
+      b2b_authority_signUpSignIn: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PPD"
+      b2b_authority_resetPassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_PasswordReset_PPD"
+      b2b_authority_changePassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_PasswordChange_PPD"
+      b2b_authority_linkAccount: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_SignUpLinkage_PPD"
+      b2c_authority_signUpSignIn: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PPD"
+      b2c_authority_resetPassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_PasswordReset_PPD"
+      b2c_authority_changePassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_PasswordChange_PPD"
+      b2c_authority_linkAccount: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_SignUpLinkage_PPD"
+      scope_profileapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Profile.Read"
+      scope_profileapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Profile.Write"
+      scope_caseapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Case.Read"
+      scope_caseapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Case.Write"
+      scope_organizationapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Organisation.Read"
+      scope_organizationapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Organisation.Write"
+      scope_smartparkingapi_read: "https://tasmucpb2cprod.onmicrosoft.com/SmartParkingAPI/read"
+      scope_subscriptionapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Subscription.Read"
+      scope_subscriptionapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Subscription.Write"
+      scope_reviewapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Review.Write"
+      # powerbiembed settings to be retrieved from Data Team
+      powerbi_embedUrl: "https://account.pre.sqcp.qa/powerbiembed/"
+      tasmuProvider: "3350b5f7-e666-eb11-a812-000d3abb5370"
+      workspaceid: "eb5afa3d-8f5a-4f8a-8c60-322d95e64bc5"
+      insightsreportid: "3aa7cf3b-4079-407b-b610-9ae27a5a2238"
+      servicehealth_1reportid: "deede915-89eb-46fe-8c18-1f0e2dd53a59"
+      a2bProvider: "c2a83c7e-697a-eb11-a812-0022487fa73a"
+      servicehealth_2reportid: "c2a83c7e-697a-eb11-a812-0022487fa73a"
+      atProvider: ""
+      tProvider: ""
+      # powerbiembed settings end
+      openDataPortal: "https://opendata.pre.sqcp.qa/"
+      developerPortal: "https://developer.pre.sqcp.qa/"
+      eservices: "https://mytasmu.pre.sqcp.qa/"
+      marketplace: "https://marketplace.pre.sqcp.qa/"
+      portalAssets: "https://pre-cdntasmu.azureedge.net/app/portalassets/"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deploypre
+        displayName: Deploy Pre APIs and Update Configs
+        environment: "pre-prod"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: "Allow Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --default-action Allow
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled true
+
+                - task: HelmInstaller@1
+                  inputs:
+                    helmVersionToInstall: "3.2.1"
+
+                - template: templates/deploy-webapps-pre.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-pre
+
+                - task: AzureCLI@2
+                  displayName: "Disable Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled false    
+
+  - stage: Deploy_Prd
+    displayName: Deploy Prd stage
+    dependsOn: Build
+    variables:
+      azureResourceGroup: "rg-cpp-apps-aks-prd-we-01"
+      kubernetesCluster: "aks-cpp-apps-prd-we-01"
+      containerRegistry: "acrcppglobprdwe01.azurecr.io"
+      podIdentity: "mi-cpp-apps-aks-prd-we-01"
+      enablehpa: "true"
+      accountHost: "account.tasmu.gov.qa"
+      adminportalHost: "cpadmin.tasmu.gov.qa"
+      authorizecardHost: "account.tasmu.gov.qa"
+      eservicesHost: "mytasmu.tasmu.gov.qa"
+      marketplaceHost: "platform.tasmu.gov.qa"
+      powerbiembedHost: "account.tasmu.gov.qa"
+      appConfigConnection: "https://acst-cpp-apps-str-prd-we-01.azconfig.io"
+      baseUrl: "https://api.tasmu.gov.qa/"
+      accountUrl: "https://account.tasmu.gov.qa/"
+      hostUrl: "https://platform.tasmu.gov.qa/"
+      payment_gatewayUrl: https://account.tasmu.gov.qa/authorizecard
+      trackingArticleId: "fb799150-9cad-eb11-8236-000d3a2062c9"
+      trackingArticleId_AR: "2fa12a4f-25c6-eb11-bacc-002248813a23"
+      b2bHostUrl: "https://platform.tasmu.gov.qa/"
+      b2cHostUrl: "https://mytasmu.tasmu.gov.qa/"
+      # Client Id of the TASMU-Portal App Registration
+      aad_clientid: "a362df42-1511-4a1c-afba-73cf45f962be"
+      aad_authority: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PRD"
+      aad_authority_b2b: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PRD"
+      aad_redirectUri: "https://platform.tasmu.gov.qa/"
+      aad_postLogoutRedirectUri: "https://platform.tasmu.gov.qa/"
+      aad_redirectUri_eservices: "https://mytasmu.tasmu.gov.qa/"
+      aad_postLogoutRedirectUri_eservices: "https://mytasmu.tasmu.gov.qa/"
+      botIframeUrl: "https://prd-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
+      privacyPolicyUrl_en: "https://prd-cdntasmu.azureedge.net/app/privacypages/privacypolicy_en.html"
+      privacyPolicyUrl_ar: "https://prd-cdntasmu.azureedge.net/app/privacypages/privacypolicy_ar.html"
+      appInsightsKey: "8ad7db04-e544-49c4-8dc8-e46690658dd4"
+      apim_subscriptionId: ""
+      names_signUpSignIn: "B2C_1A_signup_signin_PRD"
+      names_resetPassword: "B2C_1A_PasswordReset_PRD"
+      names_signUpLinkage: "B2C_1A_SignUpLinkage_PRD"
+      b2b_authority_signUpSignInB2B: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PRD"
+      b2c_authority_signUpSignInB2CIndividual: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PRD"
+      b2c_authority_signUpSignInB2CBusinessOwner: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_BO_signup_signin_PRD"
+      b2b_authority_signUpSignIn: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_PRD"
+      b2b_authority_resetPassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_PasswordReset_PRD"
+      b2b_authority_changePassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_B2B_PasswordChange_PRD"
+      b2b_authority_linkAccount: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_SignUpLinkage_PRD"
+      b2c_authority_signUpSignIn: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_signup_signin_PRD"
+      b2c_authority_resetPassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_PasswordReset_PRD"
+      b2c_authority_changePassword: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_PasswordChange_PRD"
+      b2c_authority_linkAccount: "https://tasmucpb2cprod.b2clogin.com/tasmucpb2cprod.onmicrosoft.com/B2C_1A_SignUpLinkage_PRD"
+      scope_profileapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Profile.Read"
+      scope_profileapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Profile.Write"
+      scope_caseapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Case.Read"
+      scope_caseapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Case.Write"
+      scope_organizationapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Organisation.Read"
+      scope_organizationapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Organisation.Write"
+      scope_smartparkingapi_read: "https://tasmucpb2cprod.onmicrosoft.com/SmartParkingAPI/read"
+      scope_subscriptionapi_read: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Subscription.Read"
+      scope_subscriptionapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Subscription.Write"
+      scope_reviewapi_write: "https://tasmucpb2cprod.onmicrosoft.com/central-platform-core-apis/Review.Write"
+      # powerbiembed settings to be retrieved from Data Team
+      powerbi_embedUrl: "https://account.tasmu.gov.qa/powerbiembed/"
+      tasmuProvider: ""
+      workspaceid: ""
+      insightsreportid: ""
+      servicehealth_1reportid: ""
+      a2bProvider: ""
+      servicehealth_2reportid: ""
+      atProvider: ""
+      tProvider: ""
+      # powerbiembed settings end
+      openDataPortal: "https://opendata.tasmu.gov.qa/"
+      developerPortal: "https://developer.tasmu.gov.qa/"
+      eservices: "https://mytasmu.tasmu.gov.qa/"
+      marketplace: "https://platform.tasmu.gov.qa/"
+      portalAssets: "https://prd-cdntasmu.azureedge.net/app/portalassets/"
+    pool:
+      name: "tasmumsiprdagents"
+    jobs:
+      - deployment: Deployprd
+        displayName: Deploy Prd APIs and Update Configs
+        environment: "prd"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: "Allow Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --default-action Allow
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled true
+
+                - task: HelmInstaller@1
+                  inputs:
+                    helmVersionToInstall: "3.2.1"
+
+                - template: templates/deploy-webapps-prd.yml
+                  parameters:
+                    azureSubscription: sqcp-ado-spn-prd
+
+                - task: AzureCLI@2
+                  displayName: "Disable Public IPs"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az acr update --name acrcppglobprdwe01 --public-network-enabled false    

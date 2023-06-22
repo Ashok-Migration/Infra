@@ -1,0 +1,37 @@
+namespace: webapps
+environment:
+  ConnectionStrings__AppConfig: ""
+
+podIdentity: ""
+image:
+  repository: ""
+  tag: "default"
+  pullPolicy: ""
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+container:
+  containerPort: 80
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+pdb: #pod disruption budget
+  enabled: false
+  minAvailable: 1
+hpa: #horizontal pod autoscale
+  enabled: true
+  maxReplicas: 8
+  minReplicas: 3
+  targetCPUUtilizationPercentage: 50
+ingress:
+  path: /account/powerbiembed/*
+  backendPrefix: "/"
+  requestTimeout: "120"
+  sslCertificate: "httpsvaultCert"
+  host: ""
+nodeSelector: portal
