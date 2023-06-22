@@ -15,7 +15,7 @@ variables:
   powerbiSolutionPath: "powerbiembed/Mcs.Tasmu.Portal.PowerBIEmbed.sln"
   BuildConfiguration: "Release"
   BuildPlatform: "Any CPU"
-  authorizecardSolutionPath: "TASMU Central Platform/web-apps/authorizecard/Mcs.Tasmu.Portal.Authorizecard.sln"
+  authorizecardSolutionPath: "authorizecard/Mcs.Tasmu.Portal.Authorizecard.sln"
 
 jobs:
   - job: Get_Build_Queue
@@ -226,6 +226,10 @@ jobs:
     pool:
       name: $(poolName)
     steps:
+      - checkout: web-apps
+        clean: true 
+        path: TASMU Central Platform/web-apps
+
       - task: UseDotNet@2
         displayName: "Use .NET Core sdk 6.0.x"
         inputs:
