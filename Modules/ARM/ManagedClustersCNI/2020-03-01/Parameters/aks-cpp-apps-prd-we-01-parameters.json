@@ -1,0 +1,168 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "acrName": {
+            "value": "acrcppglobprdwe01"
+        },
+        "acrResourceGroup": {
+            "value": "rg-cpp-glob-prd-we-01"
+        },
+        "clusterName": {
+            "value": "aks-cpp-apps-prd-we-01"
+        },
+        "dnsprefix": {
+            "value": "aks-cpp-apps-prd-we-01-dns"
+        },
+        "dnsServiceIP": {
+            "value": "10.0.0.10"
+        },
+        "dockerBridgeCidr": {
+            "value": "172.17.0.1/16"
+        },
+        "enableHttpApplicationRouting": {
+            "value": false
+        },
+        "enablePrivateCluster": {
+            "value": true
+        },
+        "enableRBAC": {
+            "value": true
+        },
+        "kubernetesVersion": {
+            "value": "1.22.6"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "networkPlugin": {
+            "value": "azure"
+        },
+        "networkPolicy": {
+            "value": "azure"
+        },
+        "serviceCidr": {
+            "value": "10.0.0.0/16"
+        },
+        "subnetName": {
+            "value": "snet-cpp-apps-aks-prd-we-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Production"
+            }
+        },
+        "virtualNetworkName": {
+            "value": "vnet-cpp-pltf-prd-we-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-cpp-pltf-net-prd-we-01"
+        },
+        "acrRoleGuidValue": {
+            "value": "470d1a05-ea30-4404-af37-94d6f9f56090"
+        },
+        "omsRoleGuidValue": {
+            "value": "8873c61b-7a12-4e46-854d-cc42847519c9"
+        },
+        "subnetRoleGuidValue": {
+            "value": "ed36a37e-b425-4b28-aa9d-12e155638ae3"
+        },
+        "micGuidValue": {
+            "value": "bf14034f-8ba9-4692-ba00-0baa010721e7"
+        },
+        "vmcGuidValue": {
+            "value": "5e21484c-420f-4190-bf42-5b6d252550e8"
+        },
+        "configStoreRoleGuidValue": {
+            "value": "8b8b9e6b-413a-49ab-b588-6146b9eb196a"
+        },
+        "configStoreResourceId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-str-prd-we-01/providers/Microsoft.AppConfiguration/configurationStores/acst-cpp-apps-str-prd-we-01"
+        },
+        "nodeResourceGroup": {
+            "value": "rg-cpp-apps-aksnode-prd-we-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.Storage/storageAccounts/stcphpltfdiagprdwe01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/Microsoft.OperationalInsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-apps-mon-prd-we-01/providers/Microsoft.EventHub/namespaces/evhns-cpp-apps-mon-prd-we-01/authorizationrules/RootManageSharedAccessKey"
+        },
+        "eventHubName": {
+            "value": "evh-cpp-apps-mon-prd-we-01"
+        },
+        "agentPoolProfiles": {
+            "value": [
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "minCount": 3,
+                    "maxCount": 20,
+                    "maxPods": 30,
+                    "mode": "System",
+                    "name": "apps",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_D4s_v3",
+                    "vnetSubnetID": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-prd-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-prd-we-01/subnets/snet-cpp-apps-aks-prd-we-01"
+                },
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "minCount": 3,
+                    "maxCount": 20,
+                    "maxPods": 30,
+                    "mode": "System",
+                    "name": "jobs",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_D4s_v3",
+                    "vnetSubnetID": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-prd-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-prd-we-01/subnets/snet-cpp-apps-aks-prd-we-01"
+                },
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 10,
+                    "enableAutoScaling": true,
+                    "minCount": 10,
+                    "maxCount": 30,
+                    "maxPods": 30,
+                    "mode": "System",
+                    "name": "portal",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_D4s_v3",
+                    "vnetSubnetID": "/subscriptions/8964f3c1-44f5-4094-80eb-4334845bdfb1/resourceGroups/rg-cpp-pltf-net-prd-we-01/providers/Microsoft.Network/virtualNetworks/vnet-cpp-pltf-prd-we-01/subnets/snet-cpp-apps-aks-prd-we-01"
+                }
+            ]
+        },
+        "omsSubscriptionId": {
+            "value": "d8c326fb-f8b4-4854-a2af-dd55e86f6117"
+        }
+    }
+}
