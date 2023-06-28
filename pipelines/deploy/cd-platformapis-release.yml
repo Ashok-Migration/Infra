@@ -29,8 +29,8 @@ stages:
     jobs:
     - template: templates/build-push-api.yml
       parameters:
-        name: smsprovider
-        solutionPath: "src/services/SmsProvider"
+         name: smsprovider
+         solutionPath: "src/services/SmsProvider"
 
     - template: templates/build-push-api.yml
       parameters:
@@ -147,20 +147,20 @@ stages:
     # Add more template jobs with parameters for other Services
 
     # Build Function Apps
-    - template: templates/build-funcapps.yml
-      parameters:
-        poolName: "tasmumsagents"
+    # - template: templates/build-funcapps.yml
+    #   parameters:
+    #     poolName: "tasmumsagents"
 
     # Publish Artifacts
     - template: templates/publish-artifacts.yml
       parameters:
         chartsPath: "pipelines/deploy/charts"
-        poolName: "tasmumsagents"   
+        poolName: "platformapispool"   
 
-  - stage: Disableacrpublicips
-    displayName: Disableacrpublicips
-    jobs:
-      - template: templates/disable-acr-publicips.yml        
+  # - stage: Disableacrpublicips
+  #   displayName: Disableacrpublicips
+  #   jobs:
+  #     - template: templates/disable-acr-publicips.yml        
 
   - stage: Deploy_dev
     displayName: Deploy dev stage
@@ -168,17 +168,17 @@ stages:
     variables:
       - group: Dev
       - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-dev-we-01"
+        value: "rg-shared-svcs-dev-qc-01"
       - name: kubernetesCluster
-        value: "aks-cpd-apps-dev-we-01"
+        value: "aks-shared-svcs-dev-qc-01"
       - name: "enablehpa"
         value: "false"
       - name: containerRegistry
-        value: "acrcpdglobnpdwe01.azurecr.io"
+        value: "acrsharedsvcsnpdqc01.azurecr.io"
       - name: appConfigConnection
-        value: "https://acst-cpd-apps-str-dev-we-01.azconfig.io"
+        value: "https://acst-shared-str-dev-qc-01.azconfig.io"
       - name: podIdentity
-        value: "mi-cpd-apps-aksnode-dev-we-01"
+        value: "mi-shared-aksnode-dev-qc-01"
       - name: env
         value: "dev"
       - name: apiHost
@@ -198,8 +198,7 @@ stages:
       - name: captchafunctionApp
         value: "func-cpd-apps-cpch-dev-we-01"
       - name: NotificationfunctionAppName
-        value: "func-cpd-apps-ntf-dev-we-01"   
-
+        value: "func-cpd-apps-ntf-dev-we-01" 
     pool:
       name: "tasmumsagents"
     jobs:
@@ -210,206 +209,216 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: AzureCLI@2
-                  displayName: "Allow Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
+                # - task: AzureCLI@2
+                #   displayName: "Allow Public IPs"
+                #   inputs:
+                #     azureSubscription: $(serviceConnection)
+                #     scriptType: "pscore"
+                #     scriptLocation: inlineScript
+                #     inlineScript: |
+                #       az acr update --name aacrsharedsvcsnpdqc01 --default-action Allow
+                #       az acr update --name acrsharedsvcsnpdqc01 --public-network-enabled true
 
                 - task: HelmInstaller@1
                   inputs:
                     helmVersionToInstall: "3.2.1"
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+                # - template: templates/deploy-dapr.yml
+                #   parameters:
+                #     installDapr: true
+                #     azureSubscription: sqcp-ado-spn-dev
 
                 - template: templates/deploy-apps.yml
                   parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+                    azureSubscription: sqcp-ado-spn-qc-shared-services
 
-                - template: templates/deploy-funcapps.yml
-                  parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+                # - template: templates/deploy-funcapps.yml
+                #   parameters:
+                #     azureSubscription: sqcp-ado-spn-dev
 
-                - task: AzureCLI@2
-                  displayName: "Disable Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled false    
+                # - task: AzureCLI@2
+                #   displayName: "Disable Public IPs"
+                #   inputs:
+                #     azureSubscription: $(serviceConnection)
+                #     scriptType: "pscore"
+                #     scriptLocation: inlineScript
+                #     inlineScript: |
+                #       az acr update --name acrsharedsvcsnpdqc01 --public-network-enabled false    
 
-  - stage: Deploy_tst
-    displayName: Deploy tst stage
-    dependsOn: Deploy_dev
-    variables:
-      - group: Tst
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-tst-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-tst-we-01"
-      - name: "enablehpa"
-        value: "true"
-      - name: containerRegistry
-        value: "acrcpdglobnpdwe01.azurecr.io"
-      - name: appConfigConnection
-        value: "https://acst-cpd-apps-str-tst-we-01.azconfig.io"
-      - name: podIdentity
-        value: "mi-cpd-apps-aksnode-tst-we-01"
-      - name: env
-        value: "tst"
-      - name: apiHost
-        value: "api.tst.sqcp.qa"
-      - name: paymentfunctionAppName
-        value: "func-cpd-apps-pt-tst-we-01"
-      - name: reconcileRefundFunctionApp
-        value: "func-cpd-apps-rrf-tst-we-01"
-      - name: consumptionfunctionApp
-        value: "func-cpd-apps-acm-tst-we-01"
-      - name: businessProcessfunctionApp
-        value: "func-cpd-apps-intbpa-tst-we-01"
-      - name: sharepointNotifyfunctionApp
-        value: "func-cpd-apps-intntf-tst-we-01"
-      - name: d365ProfilefunctionApp
-        value: "func-cpd-apps-prflint-tst-we-01"
-      - name: captchafunctionApp
-        value: "func-cpd-apps-cpch-tst-we-01"
-      - name: NotificationfunctionAppName
-        value: "func-cpd-apps-ntf-tst-we-01"
-      - name: ManageEventfunctionAppName
-        value: "func-cpd-apps-mgevt-tst-we-01"
-    pool:
-      name: "tasmumsagents"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy tst APIs
-        environment: "tst"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureCLI@2
-                  displayName: "Allow Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
+  # - stage: Deploy_tst
+  #   displayName: Deploy tst stage
+  #   dependsOn: Deploy_dev
+  #   variables:
+  #     - group: Tst
+  #     - name: azureResourceGroup
+  #       value: "rg-cpd-apps-aks-tst-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpd-apps-tst-we-01"
+  #     - name: "enablehpa"
+  #       value: "true"
+  #     - name: containerRegistry
+  #       value: "acrcpdglobnpdwe01.azurecr.io"
+  #     - name: appConfigConnection
+  #       value: "https://acst-cpd-apps-str-tst-we-01.azconfig.io"
+  #     - name: podIdentity
+  #       value: "mi-cpd-apps-aksnode-tst-we-01"
+  #     - name: env
+  #       value: "tst"
+  #     - name: apiHost
+  #       value: "api.tst.sqcp.qa"
+  #     - name: paymentfunctionAppName
+      #   value: "func-cpd-apps-pt-tst-we-01"
+      # - name: reconcileRefundFunctionApp
+      #   value: "func-cpd-apps-rrf-tst-we-01"
+      # - name: consumptionfunctionApp
+      #   value: "func-cpd-apps-acm-tst-we-01"
+      # - name: businessProcessfunctionApp
+      #   value: "func-cpd-apps-intbpa-tst-we-01"
+      # - name: sharepointNotifyfunctionApp
+      #   value: "func-cpd-apps-intntf-tst-we-01"
+      # - name: d365ProfilefunctionApp
+      #   value: "func-cpd-apps-prflint-tst-we-01"
+      # - name: captchafunctionApp
+      #   value: "func-cpd-apps-cpch-tst-we-01"
+      # - name: NotificationfunctionAppName
+      #   value: "func-cpd-apps-ntf-tst-we-01"
+      # - name: ManageEventfunctionAppName
+      #   value: "func-cpd-apps-mgevt-tst-we-01"
+  #   pool:
+  #     name: "testagentpool"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy tst APIs
+  #       environment: "tst"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: AzureCLI@2
+  #                 displayName: "Allow Public IPs"
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnection)
+  #                   scriptType: "pscore"
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
+  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
 
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-apps.yml
-                  parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-apps.yml
+  #                 parameters:
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-funcapps.yml
-                  parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-funcapps.yml
+  #                 parameters:
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - task: AzureCLI@2
-                  displayName: "Disable Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
+  #               - task: AzureCLI@2
+  #                 displayName: "Disable Public IPs"
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnection)
+  #                   scriptType: "pscore"
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
 
-  - stage: Deploy_uat
-    displayName: Deploy uat stage
-    dependsOn: Deploy_tst
-    variables:
-      - group: uat
-      - name: azureResourceGroup
-        value: "rg-cpd-apps-aks-uat-we-01"
-      - name: kubernetesCluster
-        value: "aks-cpd-apps-uat-we-01"
-      - name: "enablehpa"
-        value: "true"
-      - name: containerRegistry
-        value: "acrcpdglobnpdwe01.azurecr.io"
-      - name: appConfigConnection
-        value: "https://acst-cpd-apps-str-uat-we-01.azconfig.io"
-      - name: podIdentity
-        value: "mi-cpd-apps-aksnode-uat-we-01"
-      - name: env
-        value: "uat"
-      - name: apiHost
-        value: "api.uat.sqcp.qa"
-      - name: paymentfunctionAppName
-        value: "func-cpd-apps-pt-uat-we-01"
-      - name: reconcileRefundFunctionApp
-        value: "func-cpd-apps-rrf-uat-we-01"
-      - name: consumptionfunctionApp
-        value: "func-cpd-apps-acm-uat-we-01"
-      - name: businessProcessfunctionApp
-        value: "func-cpd-apps-intbpa-uat-we-01"
-      - name: sharepointNotifyfunctionApp
-        value: "func-cpd-apps-intntf-uat-we-01"
-      - name: d365ProfilefunctionApp
-        value: "func-cpd-apps-prflint-uat-we-01"
-      - name: captchafunctionApp
-        value: "func-cpd-apps-cpch-uat-we-01"
-      - name: NotificationfunctionAppName
-        value: "func-cpd-apps-ntf-uat-we-01"
-    pool:
-      name: "tasmumsagents"
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy uat APIs
-        environment: "uat"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureCLI@2
-                  displayName: "Allow Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
+  # - stage: Deploy_uat
+  #   displayName: Deploy uat stage
+  #   dependsOn: Deploy_tst
+  #   variables:
+  #     - group: uat
+  #     - name: azureResourceGroup
+  #       value: "rg-cpd-apps-aks-uat-we-01"
+  #     - name: kubernetesCluster
+  #       value: "aks-cpd-apps-uat-we-01"
+  #     - name: "enablehpa"
+  #       value: "true"
+  #     - name: containerRegistry
+  #       value: "acrcpdglobnpdwe01.azurecr.io"
+  #     - name: appConfigConnection
+  #       value: "https://acst-cpd-apps-str-uat-we-01.azconfig.io"
+  #     - name: podIdentity
+  #       value: "mi-cpd-apps-aksnode-uat-we-01"
+  #     - name: env
+  #       value: "uat"
+  #     - name: apiHost
+  #       value: "api.uat.sqcp.qa"
+      # - name: paymentfunctionAppName
+      #   value: "func-cpd-apps-pt-uat-we-01"
+      # - name: reconcileRefundFunctionApp
+      #   value: "func-cpd-apps-rrf-uat-we-01"
+      # - name: consumptionfunctionApp
+      #   value: "func-cpd-apps-acm-uat-we-01"
+      # - name: businessProcessfunctionApp
+      #   value: "func-cpd-apps-intbpa-uat-we-01"
+      # - name: sharepointNotifyfunctionApp
+      #   value: "func-cpd-apps-intntf-uat-we-01"
+      # - name: d365ProfilefunctionApp
+      #   value: "func-cpd-apps-prflint-uat-we-01"
+      # - name: captchafunctionApp
+      #   value: "func-cpd-apps-cpch-uat-we-01"
+      # - name: NotificationfunctionAppName
+      #   value: "func-cpd-apps-ntf-uat-we-01"
+  #   pool:
+  #     name: "testagentpool"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Deploy uat APIs
+  #       environment: "uat"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: AzureCLI@2
+  #                 displayName: "Allow Public IPs"
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnection)
+  #                   scriptType: "pscore"
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
+  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
 
-                - task: HelmInstaller@1
-                  inputs:
-                    helmVersionToInstall: "3.2.1"
+  #               - task: HelmInstaller@1
+  #                 inputs:
+  #                   helmVersionToInstall: "3.2.1"
 
-                - template: templates/deploy-dapr.yml
-                  parameters:
-                    installDapr: true
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-dapr.yml
+  #                 parameters:
+  #                   installDapr: true
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-apps.yml
-                  parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-apps.yml
+  #                 parameters:
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - template: templates/deploy-funcapps.yml
-                  parameters:
-                    azureSubscription: sqcp-ado-spn-dev
+  #               - template: templates/deploy-funcapps.yml
+  #                 parameters:
+  #                   azureSubscription: sqcp-ado-spn-dev
 
-                - task: AzureCLI@2
-                  displayName: "Disable Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
+  #               - task: AzureRmWebAppDeployment@4
+  #                 displayName: Deploy $(ckanResourceCreationFunctionAppName)
+  #                 continueOnError: true
+  #                 inputs:
+  #                   ConnectionType: "AzureRM"
+  #                   azureSubscription: sqcp-ado-spn-dev
+  #                   appType: "functionApp"
+  #                   WebAppName: $(ckanResourceCreationFunctionAppName)
+  #                   packageForLinux: "$(Pipeline.Workspace)/functionapps/CkanResourceCreationFunction.zip"
+
+  #               - task: AzureCLI@2
+  #                 displayName: "Disable Public IPs"
+  #                 inputs:
+  #                   azureSubscription: $(serviceConnection)
+  #                   scriptType: "pscore"
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
