@@ -21,7 +21,7 @@ if ($env:BUILDQUEUEINIT)
 }
 
 # Get all files that were changed
-$editedFiles = git diff HEAD HEAD~ --name-only
+$editedFiles = git diff origin/master... --name-only
 
 # Check each file that was changed and add that Service to Build Queue
 $editedFiles | ForEach-Object {
