@@ -13,6 +13,10 @@ jobs:
       dockerfilePath: ${{ parameters.solutionPath }}/Dockerfile
       imageRepository: $(namespace)/${{ parameters.name }}
     steps:
+      - checkout: web-apps
+        clean: true 
+        path: TASMU Central Platform/web-apps
+
       - task: Docker@2
         displayName: Build image
         inputs:
