@@ -16,10 +16,10 @@ variables:
 pool:
   vmImage: "$(vmImage)"
 stages:
-  - stage: Enableacrpublicips
-    displayName: Enableacrpublicips
-    jobs:
-      - template: templates/enable-acr-publicips.yml
+  # - stage: Enableacrpublicips
+  #   displayName: Enableacrpublicips
+  #   jobs:
+  #     - template: templates/enable-acr-publicips.yml
 
   - stage: Build
     displayName: Build stage
@@ -65,10 +65,10 @@ stages:
         parameters:
           chartsPath: "pipelines/deploy/charts"
 
-  - stage: Disableacrpublicips
-    displayName: Disableacrpublicips
-    jobs:
-      - template: templates/disable-acr-publicips.yml           
+  # - stage: Disableacrpublicips
+  #   displayName: Disableacrpublicips
+  #   jobs:
+  #     - template: templates/disable-acr-publicips.yml           
 
   - stage: Deploy_dev
     displayName: Deploy dev stage
@@ -157,15 +157,15 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: AzureCLI@2
-                  displayName: "Allow Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
+                # - task: AzureCLI@2
+                #   displayName: "Allow Public IPs"
+                #   inputs:
+                #     azureSubscription: $(serviceConnection)
+                #     scriptType: "pscore"
+                #     scriptLocation: inlineScript
+                #     inlineScript: |
+                #       az acr update --name acrcpdglobnpdwe01 --default-action Allow
+                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
 
                 - task: HelmInstaller@1
                   inputs:
@@ -175,14 +175,14 @@ stages:
                   parameters:
                     azureSubscription: sqcp-ado-spn-qc-shared-services
 
-                - task: AzureCLI@2
-                  displayName: "Disable Public IPs"
-                  inputs:
-                    azureSubscription: $(serviceConnection)
-                    scriptType: "pscore"
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az acr update --name acrcpdglobnpdwe01 --public-network-enabled false                              
+                # - task: AzureCLI@2
+                #   displayName: "Disable Public IPs"
+                #   inputs:
+                #     azureSubscription: $(serviceConnection)
+                #     scriptType: "pscore"
+                #     scriptLocation: inlineScript
+                #     inlineScript: |
+                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled false                              
 
   # - stage: Deploy_tst
   #   displayName: Deploy tst stage
