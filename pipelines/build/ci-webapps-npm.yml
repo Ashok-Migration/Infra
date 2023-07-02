@@ -1,10 +1,8 @@
-trigger: none
-resources:
-  repositories:
-    - repository: web-apps # The name used to reference this repository in the checkout step
-      type: git
-      name: TASMU Central Platform/web-apps
-      ref: master
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
 
   paths:
     include:
@@ -29,6 +27,8 @@ jobs:
         clean: true 
         path: TASMU Central Platform/web-apps
 
+  - job: Get_Build_Queue
+    steps:
       - task: PowerShell@2
         name: setBuildQueue
         inputs:
