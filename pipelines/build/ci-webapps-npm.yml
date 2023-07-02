@@ -1,10 +1,17 @@
-trigger: none
-resources:
-  repositories:
-    - repository: web-apps # The name used to reference this repository in the checkout step
-      type: git
-      name: TASMU Central Platform/web-apps
-      ref: master
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  paths:
+    include:
+      - marketplace/news/projects/tasmu-news/package.json
+      - marketplace/aboutTasmu/projects/tasmu-about/package.json
+      - marketplace/productAndService/projects/products-and-services/package.json
+      - marketplace/support/projects/tasmu-support/package.json
+      - marketplace/my-account/projects/tasmu-myaccount/package.json
+      - marketplace/common-ui/projects/tasmu-common-ui/package.json
 
 variables:
   poolName: "tasmumsagents"
@@ -16,6 +23,10 @@ pool:
 jobs:
   - job: Get_Build_Queue
     steps:
+      - checkout: web-apps
+        clean: true 
+        path: TASMU Central Platform/web-apps
+        
       - task: PowerShell@2
         name: setBuildQueue
         inputs:
