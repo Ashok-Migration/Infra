@@ -14,6 +14,10 @@ jobs:
     dependsOn: Get_Build_Queue
     condition: and(succeeded(), contains(dependencies.Get_Build_Queue.outputs['setBuildQueue.buildQueue'], '${{ parameters.name }}'))
     steps:
+      - checkout: web-apps
+        clean: true 
+        path: TASMU Central Platform/web-apps
+
       - task: NodeTool@0
         displayName: "Use Node 12.x"
         inputs:
