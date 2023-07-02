@@ -108,19 +108,5 @@ steps:
     parameters:
       name: referenceapi
       chartPath: "$(Pipeline.Workspace)/charts/stable/apiapps/referenceapi"
-      azureSubscription: ${{ parameters.azureSubscription }}  
-  - template: helm-upgrade.yml
-    parameters:
-      name: manageeventfunc
-      chartPath: "$(Pipeline.Workspace)/charts/stable/jobs/manageeventfunc"
-      namespace: jobs
-      customValuestoAppend: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),secret.AzureWebJobsStorage=$(ConnectionStrings-StorageAccount),secret.AzureWebJobsServiceBus=$(ConnectionStrings-IntegrationServiceBus),secret.APPINSIGHTS_INSTRUMENTATIONKEY=$(ApplicationInsights-InstrumentationKey),secret.APPLICATIONINSIGHTS_CONNECTION_STRING=$(ApplicationInsights-ConnectionString)"
-      azureSubscription: ${{ parameters.azureSubscription }}
-  - template: helm-upgrade.yml
-    parameters:
-      name: fieldservicefunc
-      chartPath: "$(Pipeline.Workspace)/charts/stable/jobs/fieldservicefunc"
-      namespace: jobs
-      customValuestoAppend: ",environment.ConnectionStrings__AppConfig=$(appConfigConnection),secret.AzureWebJobsStorage=$(ConnectionStrings-StorageAccount),secret.AzureWebJobsServiceBus=$(ConnectionStrings-IntegrationServiceBus),secret.APPINSIGHTS_INSTRUMENTATIONKEY=$(ApplicationInsights-InstrumentationKey),secret.APPLICATIONINSIGHTS_CONNECTION_STRING=$(ApplicationInsights-ConnectionString)"
       azureSubscription: ${{ parameters.azureSubscription }}
   
