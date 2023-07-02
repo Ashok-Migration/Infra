@@ -18,7 +18,7 @@ variables:
   authorizecardSolutionPath: "authorizecard/Mcs.Tasmu.Portal.Authorizecard.sln"
 
 jobs:
-  - job: checkout
+  - job: Get_Build_Queue
     pool:
       name: $(poolName)
     steps:
@@ -209,7 +209,7 @@ jobs:
       - checkout: web-apps
         clean: true 
         path: TASMU Central Platform/web-apps
-
+        
       - task: UseDotNet@2
         displayName: "Use .NET Core sdk 3.1.x"
         inputs:
