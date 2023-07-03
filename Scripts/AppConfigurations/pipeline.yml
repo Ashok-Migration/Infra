@@ -1,0 +1,193 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  paths:
+    include:
+      - Scripts/AppConfigurations/keyvaultref/*
+      - Scripts/AppConfigurations/settings/*
+
+variables:
+  - name: PoolName
+    value: "tasmumsagents"
+  - name: azureSubscription
+    value: sqcp-ado-spn-qc-shared-services
+pool:
+  name: $(PoolName)
+
+stages:
+  - stage: PublishArtifacts
+    jobs:
+      - job: PublishArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: Scripts/AppConfigurations
+              Contents: "**"
+              TargetFolder: "$(build.artifactstagingdirectory)/configurations"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: Scripts/AppConfigurations
+              artifact: "configurations"
+              publishLocation: "pipeline"
+
+  - stage: Dev
+    displayName: Update App Configurations for dev
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-shared-str-dev-qc-01"
+      - name: aksResourceGroupName
+        value: "rg-shared-svcs-dev-qc-01"
+      - name: aksClusterName
+        value: "aks-shared-svcs-dev-qc-01"
+      - name: env
+        value: "dev"
+      # - name: botApiName
+      #   value: "app-cpd-apps-bot-dev-we-01"
+      # - name: qnaSyncFuncName
+      #   value: "func-cpd-apps-qnasync-dev-we-01"
+      # - name: luisTraFuncName
+      #   value: "func-cpd-apps-luistra-dev-we-01"
+      # - name: intBPAFuncName
+      #   value: "func-cpd-apps-intbpa-dev-we-01"
+      # - name: intntfFuncName
+      #   value: "func-cpd-apps-intntf-dev-we-01"
+      # - name: ptFuncName
+      #   value: "func-cpd-apps-pt-dev-we-01"
+      # - name: d365ProfilefunctionApp
+      #   value: "func-cpd-apps-prflint-dev-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for dev
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+                - template: restart-pods.yml
+                - template: restart-appservice.yml
+  # - stage: Tst
+  #   displayName: Update App Configurations for tst
+  #   dependsOn: Dev
+  #   variables:
+  #     - name: appConfigName
+  #       value: "acst-cpd-apps-str-tst-we-01"
+  #     - name: aksResourceGroupName
+  #       value: "rg-cpd-apps-aks-tst-we-01"
+  #     - name: aksClusterName
+  #       value: "aks-cpd-apps-tst-we-01"
+  #     - name: env
+  #       value: "tst"
+  #     - name: botApiName
+  #       value: "app-cpd-apps-bot-tst-we-01"
+  #     - name: qnaSyncFuncName
+  #       value: "func-cpd-apps-qnasync-tst-we-01"
+  #     - name: luisTraFuncName
+  #       value: "func-cpd-apps-luistra-tst-we-01"
+  #     - name: intBPAFuncName
+  #       value: "func-cpd-apps-intbpa-tst-we-01"
+  #     - name: intntfFuncName
+  #       value: "func-cpd-apps-intntf-tst-we-01"
+  #     - name: ptFuncName
+  #       value: "func-cpd-apps-pt-tst-we-01"
+  #     - name: d365ProfilefunctionApp
+  #       value: "func-cpd-apps-prflint-tst-we-01"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Update App Configurations for tst
+  #       environment: tst
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - template: update-app-config.yml
+  #               - template: restart-pods.yml
+  #               - template: restart-appservice.yml
+
+  # - stage: tra
+  #   displayName: Update App Configurations for tra
+  #   dependsOn: PublishArtifacts
+  #   variables:
+  #     - name: appConfigName
+  #       value: "acst-cpd-apps-str-tra-we-01"
+  #     - name: aksResourceGroupName
+  #       value: "rg-cpd-apps-aks-tra-we-01"
+  #     - name: aksClusterName
+  #       value: "aks-cpd-apps-tra-we-01"
+  #     - name: env
+  #       value: "tra"
+  #     - name: botApiName
+  #       value: "app-cpd-apps-bot-tra-we-01"
+  #     - name: qnaSyncFuncName
+  #       value: "func-cpd-apps-qnasync-tra-we-01"
+  #     - name: luisTraFuncName
+  #       value: "func-cpd-apps-luistra-tra-we-01"
+  #     - name: intBPAFuncName
+  #       value: "func-cpd-apps-intbpa-tra-we-01"
+  #     - name: intntfFuncName
+  #       value: "func-cpd-apps-intntf-tra-we-01"
+  #     - name: ptFuncName
+  #       value: "func-cpd-apps-pt-tra-we-01"
+  #     - name: d365ProfilefunctionApp
+  #       value: "func-cpd-apps-prflint-tra-we-01"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Update App Configurations for tra
+  #       environment: tra
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - template: update-app-config.yml
+  #               - template: restart-pods.yml
+  #               - template: restart-appservice.yml
+
+  # - stage: uat
+  #   displayName: Update App Configurations for uat
+  #   dependsOn: Tst
+  #   variables:
+  #     - name: appConfigName
+  #       value: "acst-cpd-apps-str-uat-we-01"
+  #     - name: aksResourceGroupName
+  #       value: "rg-cpd-apps-aks-uat-we-01"
+  #     - name: aksClusterName
+  #       value: "aks-cpd-apps-uat-we-01"
+  #     - name: env
+  #       value: "uat"
+  #     - name: botApiName
+  #       value: "app-cpd-apps-bot-uat-we-01"
+  #     - name: qnaSyncFuncName
+  #       value: "func-cpd-apps-qnasync-uat-we-01"
+  #     - name: luisTraFuncName
+  #       value: "func-cpd-apps-luistra-uat-we-01"
+  #     - name: intBPAFuncName
+  #       value: "func-cpd-apps-intbpa-uat-we-01"
+  #     - name: intntfFuncName
+  #       value: "func-cpd-apps-intntf-uat-we-01"
+  #     - name: ptFuncName
+  #       value: "func-cpd-apps-pt-uat-we-01"
+  #     - name: ckanFuncName
+  #       value: "func-cpd-apps-ckan-uat-we-01"
+  #     - name: d365ProfilefunctionApp
+  #       value: "func-cpd-apps-prflint-uat-we-01"
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: Update App Configurations for uat
+  #       environment: uat
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - template: update-app-config.yml
+  #               - template: restart-pods.yml
+  #               - template: restart-appservice.yml
+  #               - task: AzureAppServiceManage@0
+  #                 displayName: Restart function app ckan
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   action: "Restart Azure App Service"
+  #                   webAppName: $(ckanFuncName)

@@ -1,0 +1,27 @@
+parameters:
+  - name: certificateName
+    type: string
+    default: ""
+  - name: certificatePassword
+    type: string
+    default: ""
+  - name: downloadFileName
+    type: string
+    default: "cmscertificate"
+  - name: secureFile
+    type: string
+    default: "TASMUDev.pfx"
+
+steps:
+  - task: DownloadSecureFile@1
+    name: ${{ parameters.downloadFileName }}
+    inputs:
+      secureFile: ${{ parameters.secureFile }}
+
+  - task: AzurePowerShell@3
+    displayName: Import Certificate ${{ parameters.certificateName }} in KV
+    inputs:
+      azureSubscription: "$(serviceConnection)"
+      ScriptPath: '$(Pipeline.Workspace)/scripts/Import-AzureKeyVaultCertificate.ps1'
+      ScriptArguments: '-keyVaultName "$(keyVaultName)" -certificateName "${{ parameters.certificateName }}" -certificatePass "$(${{ parameters.certificatePassword }})" -filePath $(${{ parameters.downloadFileName }}.secureFilePath)'
+      azurePowerShellVersion: LatestVersion
