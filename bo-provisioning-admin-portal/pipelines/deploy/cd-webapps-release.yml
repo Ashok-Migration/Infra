@@ -11,64 +11,23 @@ variables:
   vmImage: "ubuntu-latest"
   dockerRegistryServiceConnection: "spn-acrsharedsvcsnpdqc01"
   tag: "$(Build.BuildId)"
-  serviceConnection: sqcp-ado-spn-qc-shared-services
 
 pool:
   vmImage: "$(vmImage)"
 stages:
-  # - stage: Enableacrpublicips
-  #   displayName: Enableacrpublicips
-  #   jobs:
-  #     - template: templates/enable-acr-publicips.yml
-
   - stage: Build
     displayName: Build stage
     jobs:
-      # - template: templates/build-push-api.yml
-      #   parameters:
-      #     name: marketplace
-      #     solutionPath: "marketplace/marketplace"
-      #     feedURL: $(npmFeed)
-
-      # - template: templates/build-push-api.yml
-      #   parameters:
-      #     name: eservices
-      #     solutionPath: "marketplace/eservices"
-      #     feedURL: $(npmFeed)
-
-      # - template: templates/build-push-api.yml
-      #   parameters:
-      #     name: account
-      #     solutionPath: "marketplace/account"
-      #     feedURL: $(npmFeed)
-
       - template: templates/build-push-api.yml
         parameters:
-          name: adminportal
-          solutionPath: "adminportal"
-          feedURL: $(nugetFeed)
-
-      # - template: templates/build-push-api.yml
-      #   parameters:
-      #     name: powerbiembed
-      #     solutionPath: "powerbiembed"
-      #     feedURL: $(nugetFeed)
-
-      # - template: templates/build-push-api.yml
-      #   parameters:
-      #     name: authorizecard
-      #     solutionPath: "authorizecard"
-      #     feedURL: $(nugetFeed)                 
+          name: boadminportal
+          solutionPath: "bo-provisioning-admin-portal"
+          feedURL: $(npmFeed)
 
       #Publish Artifacts
       - template: templates/publish-artifacts.yml
         parameters:
-          chartsPath: "pipelines/deploy/charts"
-
-  # - stage: Disableacrpublicips
-  #   displayName: Disableacrpublicips
-  #   jobs:
-  #     - template: templates/disable-acr-publicips.yml           
+          chartsPath: "bo-provisioning-admin-portal/pipelines/deploy/charts"
 
   - stage: Deploy_dev
     displayName: Deploy dev stage
@@ -79,12 +38,7 @@ stages:
       containerRegistry: "acrsharedsvcsnpdqc01.azurecr.io"
       podIdentity: "mi-shared-aksnode-dev-qc-01"
       enablehpa: "false"
-      accountHost: "account.dev.sqcp.qa"
-      adminportalHost: "cpadmin.dev.sqcp.qa"
-      authorizecardHost: "account.dev.sqcp.qa"
-      eservicesHost: "mytasmu.dev.sqcp.qa"
-      marketplaceHost: "marketplace.dev.sqcp.qa"
-      powerbiembedHost: "account.dev.sqcp.qa"
+      orderingtoolHost: "ordering-tool.dev.sqcp.qa"
       appConfigConnection: "https://acst-shared-str-dev-qc-01.azconfig.io"
       baseUrl: "https://api.dev.sqcp.qa/"
       accountUrl: "https://account.dev.sqcp.qa/"
@@ -98,8 +52,8 @@ stages:
       aad_clientid: "dd0623e2-0163-4b05-82f8-ef798ff16c86"
       aad_authority: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_DEV"
       aad_authority_b2b: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_DEV"
-      aad_redirectUri: "https://marketplace.dev.sqcp.qa/"
-      aad_postLogoutRedirectUri: "https://marketplace.dev.sqcp.qa/"
+      aad_redirectUri: "https://ordering-tool.dev.sqcp.qa/"
+      aad_postLogoutRedirectUri: "https://ordering-tool.dev.sqcp.qa/"
       aad_redirectUri_eservices: "https://mytasmu.dev.sqcp.qa/"
       aad_postLogoutRedirectUri_eservices: "https://mytasmu.dev.sqcp.qa/"
       botIframeUrl: "https://dev-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
@@ -107,8 +61,8 @@ stages:
       privacyPolicyUrl_ar: "https://dev-cdntasmu.azureedge.net/app/privacypages/privacypolicy_ar.html"
       appInsightsKey: "b2f52ea9-2092-4daa-93c4-6887eaba0281"
       apim_subscriptionId: ""
-      names_signUpSignIn: "B2C_1A_signup_signin_DEV"
-      names_resetPassword: "B2C_1A_PasswordReset_DEV"
+      names_signUpSignIn: "B2C_1A_B2B_signup_signin_DEV"
+      names_resetPassword: "B2C_1A_B2B_PasswordReset_DEV"
       names_signUpLinkage: "B2C_1A_SignUpLinkage_DEV"
       b2b_authority_signUpSignInB2B: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_DEV"
       b2c_authority_signUpSignInB2CIndividual: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_DEV"
@@ -116,7 +70,7 @@ stages:
       b2b_authority_signUpSignIn: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_DEV"
       b2b_authority_resetPassword: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_PasswordReset_DEV"
       b2b_authority_changePassword: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_PasswordChange_DEV"
-      b2b_authority_linkAccount: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_SignUpLinkage_DEV"
+      b2b_authority_linkAccount: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_SignUpLinkage_DEV"
       b2c_authority_signUpSignIn: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_DEV"
       b2c_authority_resetPassword: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_PasswordReset_DEV"
       b2c_authority_changePassword: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_PasswordChange_DEV"
@@ -157,32 +111,13 @@ stages:
           runOnce:
             deploy:
               steps:
-                # - task: AzureCLI@2
-                #   displayName: "Allow Public IPs"
-                #   inputs:
-                #     azureSubscription: $(serviceConnection)
-                #     scriptType: "pscore"
-                #     scriptLocation: inlineScript
-                #     inlineScript: |
-                #       az acr update --name acrcpdglobnpdwe01 --default-action Allow
-                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
-
                 - task: HelmInstaller@1
                   inputs:
                     helmVersionToInstall: "3.2.1"
 
                 - template: templates/deploy-webapps.yml
                   parameters:
-                    azureSubscription: sqcp-ado-spn-qc-shared-services
-
-                # - task: AzureCLI@2
-                #   displayName: "Disable Public IPs"
-                #   inputs:
-                #     azureSubscription: $(serviceConnection)
-                #     scriptType: "pscore"
-                #     scriptLocation: inlineScript
-                #     inlineScript: |
-                #       az acr update --name acrcpdglobnpdwe01 --public-network-enabled false                              
+                    azureSubscription: sqcp-ado-spn-dev
 
   # - stage: Deploy_tst
   #   displayName: Deploy tst stage
@@ -193,12 +128,7 @@ stages:
   #     containerRegistry: "acrcpdglobnpdwe01.azurecr.io"
   #     podIdentity: "mi-cpd-apps-aksnode-tst-we-01"
   #     enablehpa: "true"
-  #     accountHost: "account.tst.sqcp.qa"
-  #     adminportalHost: "cpadmin.tst.sqcp.qa"
-  #     authorizecardHost: "account.tst.sqcp.qa"
-  #     eservicesHost: "mytasmu.tst.sqcp.qa"
-  #     marketplaceHost: "marketplace.tst.sqcp.qa"
-  #     powerbiembedHost: "account.tst.sqcp.qa"
+  #     orderingtoolHost: "ordering-tool.tst.sqcp.qa"
   #     appConfigConnection: "https://acst-cpd-apps-str-tst-we-01.azconfig.io"
   #     baseUrl: "https://api.tst.sqcp.qa/"
   #     accountUrl: "https://account.tst.sqcp.qa/"
@@ -211,8 +141,8 @@ stages:
   #     aad_clientid: "dd0623e2-0163-4b05-82f8-ef798ff16c86"
   #     aad_authority: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_TST"
   #     aad_authority_b2b: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_TST"
-  #     aad_redirectUri: "https://marketplace.tst.sqcp.qa/"
-  #     aad_postLogoutRedirectUri: "https://marketplace.tst.sqcp.qa/"
+  #     aad_redirectUri: "https://ordering-tool.tst.sqcp.qa/"
+  #     aad_postLogoutRedirectUri: "https://ordering-tool.tst.sqcp.qa/"
   #     aad_redirectUri_eservices: "https://mytasmu.tst.sqcp.qa/"
   #     aad_postLogoutRedirectUri_eservices: "https://mytasmu.tst.sqcp.qa/"
   #     botIframeUrl: "https://tst-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
@@ -270,16 +200,6 @@ stages:
   #         runOnce:
   #           deploy:
   #             steps:
-  #               - task: AzureCLI@2
-  #                 displayName: "Allow Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
-
   #               - task: HelmInstaller@1
   #                 inputs:
   #                   helmVersionToInstall: "3.2.1"
@@ -287,15 +207,6 @@ stages:
   #               - template: templates/deploy-webapps.yml
   #                 parameters:
   #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - task: AzureCLI@2
-  #                 displayName: "Disable Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false 
 
   # - stage: Deploy_tra
   #   displayName: Deploy tra stage
@@ -306,12 +217,7 @@ stages:
   #     containerRegistry: "acrcpdglobnpdwe01.azurecr.io"
   #     podIdentity: "mi-cpd-apps-aksnode-tra-we-01"
   #     enablehpa: "false"
-  #     accountHost: "account.trn.sqcp.qa"
-  #     adminportalHost: "cpadmin.trn.sqcp.qa"
-  #     authorizecardHost: "account.trn.sqcp.qa"
-  #     eservicesHost: "mytasmu.trn.sqcp.qa"
-  #     marketplaceHost: "marketplace.trn.sqcp.qa"
-  #     powerbiembedHost: "account.trn.sqcp.qa"
+  #     orderingtoolHost: "ordering-tool.trn.sqcp.qa"
   #     appConfigConnection: "https://acst-cpd-apps-str-tra-we-01.azconfig.io"
   #     baseUrl: "https://api.trn.sqcp.qa/"
   #     accountUrl: "https://account.trn.sqcp.qa/"
@@ -325,8 +231,8 @@ stages:
   #     aad_clientid: "dd0623e2-0163-4b05-82f8-ef798ff16c86"
   #     aad_authority: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_TRN"
   #     aad_authority_b2b: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_TRN"
-  #     aad_redirectUri: "https://marketplace.trn.sqcp.qa/"
-  #     aad_postLogoutRedirectUri: "https://marketplace.trn.sqcp.qa/"
+  #     aad_redirectUri: "https://ordering-tool.tst.sqcp.qa/"
+  #     aad_postLogoutRedirectUri: "https://ordering-tool.tst.sqcp.qa/"
   #     aad_redirectUri_eservices: "https://mytasmu.trn.sqcp.qa/"
   #     aad_postLogoutRedirectUri_eservices: "https://mytasmu.trn.sqcp.qa/"
   #     botIframeUrl: "https://tra-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
@@ -384,16 +290,6 @@ stages:
   #         runOnce:
   #           deploy:
   #             steps:
-  #               - task: AzureCLI@2
-  #                 displayName: "Allow Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
-
   #               - task: HelmInstaller@1
   #                 inputs:
   #                   helmVersionToInstall: "3.2.1"
@@ -401,15 +297,6 @@ stages:
   #               - template: templates/deploy-webapps.yml
   #                 parameters:
   #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - task: AzureCLI@2
-  #                 displayName: "Disable Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
 
   # - stage: Deploy_uat
   #   displayName: Deploy uat stage
@@ -420,12 +307,7 @@ stages:
   #     containerRegistry: "acrcpdglobnpdwe01.azurecr.io"
   #     podIdentity: "mi-cpd-apps-aksnode-uat-we-01"
   #     enablehpa: "true"
-  #     accountHost: "account.uat.sqcp.qa"
-  #     adminportalHost: "cpadmin.uat.sqcp.qa"
-  #     authorizecardHost: "account.uat.sqcp.qa"
-  #     eservicesHost: "mytasmu.uat.sqcp.qa"
-  #     marketplaceHost: "marketplace.uat.sqcp.qa"
-  #     powerbiembedHost: "account.uat.sqcp.qa"
+  #     orderingtoolHost: "ordering-tool.uat.sqcp.qa"
   #     appConfigConnection: "https://acst-cpd-apps-str-uat-we-01.azconfig.io"
   #     baseUrl: "https://api.uat.sqcp.qa/"
   #     accountUrl: "https://account.uat.sqcp.qa/"
@@ -439,8 +321,8 @@ stages:
   #     aad_clientid: "dd0623e2-0163-4b05-82f8-ef798ff16c86"
   #     aad_authority: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_signup_signin_UAT"
   #     aad_authority_b2b: "https://tasmucpb2cnonprod.b2clogin.com/tasmucpb2cnonprod.onmicrosoft.com/B2C_1A_B2B_signup_signin_UAT"
-  #     aad_redirectUri: "https://marketplace.uat.sqcp.qa/"
-  #     aad_postLogoutRedirectUri: "https://marketplace.uat.sqcp.qa/"
+  #     aad_redirectUri: "https://ordering-tool.uat.sqcp.qa/"
+  #     aad_postLogoutRedirectUri: "https://ordering-tool.uat.sqcp.qa/"
   #     aad_redirectUri_eservices: "https://mytasmu.uat.sqcp.qa/"
   #     aad_postLogoutRedirectUri_eservices: "https://mytasmu.uat.sqcp.qa/"
   #     botIframeUrl: "https://uat-cdntasmu.azureedge.net/app/botwebchat/botchatui.html?locale="
@@ -498,16 +380,6 @@ stages:
   #         runOnce:
   #           deploy:
   #             steps:
-  #               - task: AzureCLI@2
-  #                 displayName: "Allow Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --default-action Allow
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled true
-
   #               - task: HelmInstaller@1
   #                 inputs:
   #                   helmVersionToInstall: "3.2.1"
@@ -515,12 +387,3 @@ stages:
   #               - template: templates/deploy-webapps.yml
   #                 parameters:
   #                   azureSubscription: sqcp-ado-spn-dev
-
-  #               - task: AzureCLI@2
-  #                 displayName: "Disable Public IPs"
-  #                 inputs:
-  #                   azureSubscription: $(serviceConnection)
-  #                   scriptType: "pscore"
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     az acr update --name acrcpdglobnpdwe01 --public-network-enabled false
