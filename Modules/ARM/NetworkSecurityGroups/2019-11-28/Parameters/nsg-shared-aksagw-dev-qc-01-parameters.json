@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-shared-aksagw-dev-qc-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "allow-in-any-httphttps",
+          "properties": {
+            "description": "Allow65200-65535",
+            "protocol": "*",
+            "sourcePortRange": "*",
+            "destinationPortRange": "65200-65535",
+            "sourceAddressPrefix": "*",
+            "destinationAddressPrefix": "*",
+            "access": "Allow",
+            "priority": 100,
+            "direction": "Inbound",
+            "sourcePortRanges": [],
+            "destinationPortRanges": [],
+            "sourceAddressPrefixes": [],
+            "destinationAddressPrefixes": []
+          }                            
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": "rg-cph-pltf-mon-prdqc-01"
+    },
+    "flowLogStorageAccountName": {
+      "value": "stcphpltfnsgflprdqc01"
+    },
+    "workspaceRGName": {
+      "value": ""
+    },
+    "workspaceName": {
+      "value": ""
+    },
+    "NSGFlowsubscriptionid": {
+      "value": "f7bbaaa3-d43f-4710-b974-5a9c87916d64"
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "diagnosticSettingName": {
+      "value": ""
+    },
+    "tags": {
+      "value": {
+        "Environment": ""
+      }
+    }
+  }
+}
