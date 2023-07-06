@@ -1,0 +1,348 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allocationMethod": {
+            "value": "Static"
+        },
+        "applicationGatewayName": {
+            "value": "agw-shared-api-dev-qc-01"
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        },
+        "capacity": {
+            "value": 2
+        },
+        "location": {
+            "value": "qatarcentral"
+        },
+        "privateIPAddress": {
+            "value": "172.27.166.61"
+        },
+        "publicIpAddressName": {
+            "value": "agw-shared-api-dev-qc-01-ip"
+        },
+        "publicIpZones": {
+            "value": []
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "WAF_v2"
+        },
+        "subnetName": {
+            "value": "snet-shared-apiagw-dev-qc-01"
+        },
+        "frontendPorts": {
+            "value": [
+                {
+                    "name": "port_80",
+                    "properties": {
+                        "port": 80
+                    }
+                },
+                {
+                    "name": "port_443",
+                    "properties": {
+                        "port": 443
+                    }
+                }
+            ]
+        },
+        "backendAddressPools": {
+            "value": [
+                {
+                    "name": "apim-cpd-shrd-dev-qc-01",
+                    "properties": {
+                        "backendAddresses": [
+                            {
+                                "ipAddress": "172.27.166.4"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "backendHttpSettingsCollection": {
+            "value": [
+                {
+                    "name": "apim-dev-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "api.dev.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "affinityCookieName": "ApplicationGatewayAffinity",
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/probes/apimprobe"
+                        }
+                    }
+                },
+                {
+                    "name": "developer-dev-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "developer.dev.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/probes/developer-portal-probe"
+                        }
+                    }
+                },
+                {
+                    "name": "api-management-dev-sqcp-https",
+                    "properties": {
+                        "port": 443,
+                        "protocol": "Https",
+                        "cookieBasedAffinity": "Disabled",
+                        "hostName": "api-management.dev.sqcp.qa",
+                        "pickHostNameFromBackendAddress": false,
+                        "requestTimeout": 60,
+                        "probe": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/probes/developer-portal-probe"
+                        }
+                    }
+                }
+            ]
+        },
+        "httpListeners": {
+            "value": [
+                {
+                    "name": "dev-api-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendIPConfigurations/agw-cpd-apps-api-dev-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/sslCertificates/dev-api-sqcp-httpsvaultCert"
+                        },
+                        "hostName": "api.dev.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
+                    "name": "dev-developer-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendIPConfigurations/agw-cpd-apps-api-dev-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/sslCertificates/dev-api-sqcp-httpsvaultCert"
+                        },
+                        "hostName": "developer.dev.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                },
+                {
+                    "name": "dev-api-management-sqcp-https",
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendIPConfigurations/agw-cpd-apps-api-dev-we-01-privateip"
+                        },
+                        "frontendPort": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/frontendPorts/port_443"
+                        },
+                        "protocol": "Https",
+                        "sslCertificate": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/sslCertificates/dev-api-sqcp-httpsvaultCert"
+                        },
+                        "hostName": "api-management.dev.sqcp.qa",
+                        "hostNames": [],
+                        "requireServerNameIndication": true
+                    }
+                }
+            ]
+        },
+        "requestRoutingRules": {
+            "value": [
+                {
+                    "name": "dev-api-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/httpListeners/dev-api-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendAddressPools/apim-cpd-shrd-dev-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendHttpSettingsCollection/apim-dev-sqcp-https"
+                        }
+                    }
+                },
+                {
+                    "name": "dev-developer-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/httpListeners/dev-developer-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendAddressPools/apim-cpd-shrd-dev-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendHttpSettingsCollection/developer-dev-sqcp-https"
+                        }
+                    }
+                },
+                {
+                    "name": "dev-api-management-sqcp-443",
+                    "properties": {
+                        "ruleType": "Basic",
+                        "httpListener": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/httpListeners/dev-api-management-sqcp-https"
+                        },
+                        "backendAddressPool": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendAddressPools/apim-cpd-shrd-dev-we-01"
+                        },
+                        "backendHttpSettings": {
+                            "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-integ-api-dev-qc-01/providers/Microsoft.Network/applicationGateways/agw-shared-api-dev-qc-01/backendHttpSettingsCollection/api-management-dev-sqcp-https"
+                        }
+                    }
+                }
+            ]
+        },
+        "probes": {
+            "value": [
+                {
+                    "name": "apimprobe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "api.dev.sqcp.qa",
+                        "path": "/status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 60,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "developer-portal-probe",
+                    "properties": {
+                        "protocol": "Https",
+                        "host": "api.dev.sqcp.qa",
+                        "port": 443,
+                        "path": "/status-0123456789abcdef",
+                        "interval": 30,
+                        "timeout": 60,
+                        "unhealthyThreshold": 3,
+                        "pickHostNameFromBackendHttpSettings": false,
+                        "minServers": 0,
+                        "match": {
+                            "statusCodes": [
+                                "200-399"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "firewallMode": {
+            "value": "Prevention"
+        },
+        "sslCertificates": {
+            "value": [
+                {
+                    "name": "dev-api-sqcp-httpsvaultCert",
+                    "properties": {
+                        "keyVaultSecretId": "https://kv-cpd-pltf-dev-we-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
+                    }
+                }
+            ]
+        },
+        "managedIdentityId": {
+            "value": "/subscriptions/f7bbaaa3-d43f-4710-b974-5a9c87916d64/resourcegroups/rg-shared-sec-dev-qc-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-shared-pltf-dev-qc-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        },
+        "tier": {
+            "value": "WAF_v2"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-shared-apim-dev-qc-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-apim-net-dev-qc-01"
+        },
+        "zones": {
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "wafPolicyName": {
+            "value": "waf-integ-api-dev-qc-01"
+        },
+        "managedRuleSets": {
+            "value": [
+                {
+                    "ruleSetType": "Microsoft_BotManagerRuleSet",
+                    "ruleSetVersion": "0.1",
+                    "ruleGroupOverrides": []
+                },
+                {
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.1",
+                    "ruleGroupOverrides": []
+                }
+            ]
+        },
+        "customRules": {
+            "value": []
+        },
+        "enableHttp2": {
+            "value": true
+        },
+        "firewallEnabled": {
+            "value": true
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourcegroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        }
+    }
+}
