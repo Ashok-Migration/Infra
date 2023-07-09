@@ -6,7 +6,7 @@ trigger:
 
 resources:
   repositories:
-    - repository: platform-apis # The name used to reference this repository in the checkout step
+    - repository: infra # The name used to reference this repository in the checkout step
       type: git
       name: TASMU Central Platform/infra
       ref: master      
@@ -24,6 +24,9 @@ stages:
     jobs:
       - job: PublishArtifacts
         steps:
+          - checkout: infra
+            clean: true 
+            path: TASMU Central Platform/infra
           - task: CopyFiles@2
             inputs:
               SourceFolder: Scripts/AppConfigurations
