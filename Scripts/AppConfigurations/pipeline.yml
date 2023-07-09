@@ -4,12 +4,10 @@ trigger:
     include:
       - master
 
-resources:
-  repositories:
-    - repository: infra # The name used to reference this repository in the checkout step
-      type: git
-      name: TASMU Central Platform/infra
-      ref: master      
+  paths:
+    include:
+      - Scripts/AppConfigurations/keyvaultref/*
+      - Scripts/AppConfigurations/settings/*
 
 variables:
   - name: PoolName
@@ -24,9 +22,6 @@ stages:
     jobs:
       - job: PublishArtifacts
         steps:
-          - checkout: infra
-            clean: true 
-            path: TASMU Central Platform/infra
           - task: CopyFiles@2
             inputs:
               SourceFolder: Scripts/AppConfigurations
