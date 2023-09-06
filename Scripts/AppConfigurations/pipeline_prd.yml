@@ -1,0 +1,119 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  paths:
+    include:
+      - Scripts/AppConfigurations/keyvaultref/*
+      - Scripts/AppConfigurations/settings/*
+
+variables:
+  - name: PoolName
+    value: "tasmumsiagents"
+  - name: azureSubscription
+    value: sqcp-ado-spn-pre
+pool:
+  name: $(PoolName)
+
+stages:
+  - stage: PublishArtifacts
+    jobs:
+      - job: PublishArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: Scripts/AppConfigurations
+              Contents: "**"
+              TargetFolder: "$(build.artifactstagingdirectory)/configurations"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: Scripts/AppConfigurations
+              artifact: "configurations"
+              publishLocation: "pipeline"
+
+  - stage: Pre
+    displayName: Update App Configurations for pre
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-cpp-apps-str-pre-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpp-apps-aks-pre-we-01"
+      - name: aksClusterName
+        value: "aks-cpp-apps-pre-we-01"
+      - name: env
+        value: "pre"
+      - name: botApiName
+        value: "app-cpp-apps-bot-pre-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpp-apps-qnasync-pre-we-01"
+      - name: luisTraFuncName
+        value: "func-cpp-apps-luistra-pre-we-01"
+      - name: intBPAFuncName
+        value: "func-cpp-apps-intbpa-pre-we-01"
+      - name: intntfFuncName
+        value: "func-cpp-apps-intntf-pre-we-01"
+      - name: ptFuncName
+        value: "func-cpp-apps-pt-pre-we-01"
+      - name: ckanFuncName
+        value: "func-cpp-apps-ckan-pre-we-01"
+      - name: d365ProfilefunctionApp
+        value: "func-cpp-apps-prflint-pre-we-01"
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for pre
+        environment: pre
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+                - template: restart-pods.yml
+                - template: restart-appservice.yml
+                - task: AzureAppServiceManage@0
+                  displayName: Restart function app ckan
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    action: "Restart Azure App Service"
+                    webAppName: $(ckanFuncName)
+
+  - stage: Prd
+    displayName: Update App Configurations for prd
+    dependsOn: PublishArtifacts
+    variables:
+      - name: appConfigName
+        value: "acst-cpp-apps-str-prd-we-01"
+      - name: aksResourceGroupName
+        value: "rg-cpp-apps-aks-prd-we-01"
+      - name: aksClusterName
+        value: "aks-cpp-apps-prd-we-01"
+      - name: env
+        value: "prd"
+      - name: botApiName
+        value: "app-cpp-apps-bot-prd-we-01"
+      - name: qnaSyncFuncName
+        value: "func-cpp-apps-qnasync-prd-we-01"
+      - name: luisTraFuncName
+        value: "func-cpp-apps-luistra-prd-we-01"
+      - name: intBPAFuncName
+        value: "func-cpp-apps-intbpa-prd-we-01"
+      - name: intntfFuncName
+        value: "func-cpp-apps-intntf-prd-we-01"
+      - name: ptFuncName
+        value: "func-cpp-apps-pt-prd-we-01"
+      - name: d365ProfilefunctionApp
+        value: "func-cpp-apps-prflint-prd-we-01"
+
+    jobs:
+      - deployment: Deploy
+        displayName: Update App Configurations for prd
+        environment: prd
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: update-app-config.yml
+                - template: restart-pods.yml
+                - template: restart-appservice.yml

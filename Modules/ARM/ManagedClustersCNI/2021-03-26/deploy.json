@@ -1,0 +1,371 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "dnsServiceIP": {
+            "type": "string",
+            "metadata": {
+                "description": "Containers DNS server IP address."
+            }
+        },
+        "dockerBridgeCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "A CIDR notation IP for Docker bridge."
+            }
+        },
+        "enableHttpApplicationRouting": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off http application routing."
+            }
+        },
+        "enableOmsAgent": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off omsagent addon."
+            }
+        },
+        "enablePrivateCluster": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Enable private network access to the Kubernetes cluster."
+            }
+        },
+        "enableRBAC": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off of RBAC."
+            }
+        },
+        "kubernetesVersion": {
+            "type": "string",
+            "defaultValue": "1.22.6",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location of AKS resource."
+            }
+        },
+        "networkPlugin": {
+            "type": "string",
+            "allowedValues": [
+                "azure",
+                "kubenet"
+            ],
+            "metadata": {
+                "description": "Network plugin used for building Kubernetes network."
+            }
+        },
+        "networkPolicy": {
+            "type": "string",
+            "metadata": {
+                "description": "Network policy used for building Kubernetes network."
+            }
+        },
+        "nodeResourceGroup": {
+            "type": "string"
+        },
+        "serviceCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "A CIDR notation IP range from which to assign service cluster IPs."
+            }
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "tags": {
+            "defaultValue": {},
+            "metadata": {
+                "description": "Optional. Resource tags."
+            },
+            "type": "object"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "vnet-cpd-pltf-dev-we-01"
+        },
+        "vnetResourceGroup": {
+            "type": "string",
+            "defaultValue": "rg-cpd-pltf-net-dev-we-01"
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the name of the OMS workspace."
+            }
+        },
+        "diagnosticLogsRetentionInDays": {
+            "type": "int",
+            "defaultValue": 365,
+            "minValue": 0,
+            "maxValue": 365,
+            "metadata": {
+                "description": "Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely."
+            }
+        },
+        "diagnosticStorageAccountId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource identifier of the Diagnostic Storage Account."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Resource ID of the event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional. Name of the event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category."
+            }
+        },
+        "agentPoolProfiles": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "agentpool",
+                    "osDiskSizeGB": 0,
+                    "count": 4,
+                    "vmSize": "Standard_DS2_v2",
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "maxCount": 10,
+                    "minCount": 3,
+                    "mode": "System",
+                    "maxPods": 30,
+                    "enableAutoScaling": true,
+                    "vnetSubnetID": "[json('null')]",
+                    "availabilityZones": "[json('null')]"
+                }
+            ]
+        },
+        "userAssignedIdentityId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "User Assigned Identity Id"
+            }
+        },
+        "servicePrincipalClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principal Client Id"
+            }
+        },
+        "servicePrincipalClientSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principal Client Secret"
+            }
+        }
+    },
+    "variables": {
+        "vnetSubnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]",
+        "subscriptionId": "[subscription().subscriptionId]",
+        "diagnosticsLogs": [
+            {
+                "category": "kube-apiserver",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "kube-audit",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "kube-audit-admin",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "kube-controller-manager",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "kube-scheduler",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "cluster-autoscaler",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            },
+            {
+                "category": "guard",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "diagnosticsMetrics": [
+            {
+                "category": "AllMetrics",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": "[parameters('diagnosticLogsRetentionInDays')]",
+                    "enabled": true
+                }
+            }
+        ],
+        "servicePrincipalProfile": {
+            "clientId": "[parameters('servicePrincipalClientId')]",
+            "secret": "[parameters('servicePrincipalClientSecret')]"
+        },
+        "identity": {
+            "type": "UserAssigned",
+            "userAssignedIdentities": {
+                "[parameters('userAssignedIdentityId')]": {}
+            }
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2021-02-01",
+            "dependsOn": [],
+            "type": "Microsoft.ContainerService/managedClusters",
+            "location": "[parameters('location')]",
+            "name": "[parameters('clusterName')]",
+            "identity": "[if(empty(parameters('servicePrincipalClientId')), variables('identity'), json('null'))]",
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",
+                "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "agentPoolProfiles": "[parameters('agentPoolProfiles')]",
+                "networkProfile": {
+                    "loadBalancerSku": "standard",
+                    "networkPlugin": "[parameters('networkPlugin')]",
+                    "networkPolicy": "[parameters('networkPolicy')]",
+                    "serviceCidr": "[parameters('serviceCidr')]",
+                    "dnsServiceIP": "[parameters('dnsServiceIP')]",
+                    "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
+                },
+                "servicePrincipalProfile": "[if( parameters('enableRBAC'), variables('servicePrincipalProfile'), json('null'))]",
+                "apiServerAccessProfile": {
+                    "enablePrivateCluster": "[parameters('enablePrivateCluster')]"
+                },
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": "[parameters('enableHttpApplicationRouting')]"
+                    },
+                    "omsagent": {
+                        "enabled": "[parameters('enableOmsAgent')]",
+                        "config": {
+                            "logAnalyticsWorkspaceResourceID": "[parameters('workspaceId')]"
+                        }
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.ContainerService/managedClusters/providers/diagnosticsettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "[concat(parameters('clusterName'), '/Microsoft.Insights/service')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ContainerService/managedClusters', parameters('clusterName'))]"
+                    ],
+                    "condition": "[or(not(empty(parameters('diagnosticStorageAccountId'))),not(empty(parameters('workspaceId'))),not(empty(parameters('eventHubAuthorizationRuleId'))),not(empty(parameters('eventHubName'))))]",
+                    "properties": {
+                        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), json('null'), parameters('diagnosticStorageAccountId'))]",
+                        "workspaceId": "[if(empty(parameters('workspaceId')), json('null'), parameters('workspaceId'))]",
+                        "eventHubAuthorizationRuleId": "[if(empty(parameters('eventHubAuthorizationRuleId')), json('null'), parameters('eventHubAuthorizationRuleId'))]",
+                        "eventHubName": "[if(empty(parameters('eventHubName')), json('null'), parameters('eventHubName'))]",
+                        "metrics": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsMetrics'))]",
+                        "logs": "[if(and(empty(parameters('diagnosticStorageAccountId')), empty(parameters('workspaceId')), empty(parameters('eventHubAuthorizationRuleId')), empty(parameters('eventHubName'))), json('null'), variables('diagnosticsLogs'))]"
+                    }
+                }
+            ],
+            "tags": "[parameters('tags')]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "[concat('DEP-', parameters('clusterName'), '-Solution')]",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[if(empty(parameters('workspaceId')),resourceGroup().id,split(parameters('workspaceId'),'/')[4] )]",
+            "subscriptionId": "[variables('subscriptionId')]",
+            "condition": "[not(empty(parameters('workspaceId')))]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2015-11-01-preview",
+                            "type": "Microsoft.OperationsManagement/solutions",
+                            "location": "[parameters('location')]",
+                            "name": "[concat('ContainerInsights', '(', split(parameters('workspaceId'),'/')[8], ')')]",
+                            "properties": {
+                                "workspaceResourceId": "[parameters('workspaceId')]"
+                            },
+                            "plan": {
+                                "name": "[concat('ContainerInsights', '(', split(parameters('workspaceId'),'/')[8], ')')]",
+                                "product": "[concat('OMSGallery/', 'ContainerInsights')]",
+                                "promotionCode": "",
+                                "publisher": "Microsoft"
+                            },
+                            "tags": "[parameters('tags')]"
+                        }
+                    ]
+                }
+            },
+            "dependsOn": []
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}

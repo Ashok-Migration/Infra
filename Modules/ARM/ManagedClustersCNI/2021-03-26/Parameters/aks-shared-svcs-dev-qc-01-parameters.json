@@ -1,0 +1,129 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "agentPoolProfiles": {
+            "value": [
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 10,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "apps",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_DS2_v2",
+                    "vnetSubnetID": "/subscriptions/f7bbaaa3-d43f-4710-b974-5a9c87916d64/resourceGroups/rg-shared-net-dev-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-shared-net-dev-qc-01/subnets/snet-shared-aks-dev-qc-01"
+                },
+                {
+                    "availabilityZones": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "count": 3,
+                    "enableAutoScaling": true,
+                    "maxCount": 10,
+                    "maxPods": 30,
+                    "minCount": 3,
+                    "mode": "System",
+                    "name": "jobs",
+                    "osDiskSizeGB": 0,
+                    "osType": "Linux",
+                    "storageProfile": "ManagedDisks",
+                    "type": "VirtualMachineScaleSets",
+                    "vmSize": "Standard_DS2_v2",
+                    "vnetSubnetID": "/subscriptions/f7bbaaa3-d43f-4710-b974-5a9c87916d64/resourceGroups/rg-shared-net-dev-qc-01/providers/Microsoft.Network/virtualNetworks/vnet-shared-net-dev-qc-01/subnets/snet-shared-aks-dev-qc-01"
+                }
+            ]
+        },
+        "clusterName": {
+            "value": "aks-shared-svcs-dev-qc-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "dnsPrefix": {
+            "value": "aks-shared-svcs-dev-qc-01-dns"
+        },
+        "dnsServiceIP": {
+            "value": "10.0.0.10"
+        },
+        "dockerBridgeCidr": {
+            "value": "172.17.0.1/16"
+        },
+        "enableHttpApplicationRouting": {
+            "value": false
+        },
+        "enablePrivateCluster": {
+            "value": true
+        },
+        "enableRBAC": {
+            "value": true
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "kubernetesVersion": {
+            "value": "1.25.6"
+        },
+        "location": {
+            "value": "qatarcentral"
+        },
+        "networkPlugin": {
+            "value": "azure"
+        },
+        "networkPolicy": {
+            "value": "azure"
+        },
+        "nodeResourceGroup": {
+            "value": "rg-shared-aksnode-dev-qc-01"
+        },
+        "serviceCidr": {
+            "value": "10.0.0.0/16"
+        },
+        "servicePrincipalClientId": {
+            "value": "cb37a940-37f2-483f-abfd-8492eeaebc96"
+        },
+        "servicePrincipalClientSecret": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/f7bbaaa3-d43f-4710-b974-5a9c87916d64/resourceGroups/rg-shared-sec-dev-qc-01/providers/Microsoft.KeyVault/vaults/kv-shared-sec-dev-qc-01"
+                },
+                "secretName": "aks-spn-dev-secret"
+            }
+        },
+        "subnetName": {
+            "value": "snet-shared-aks-dev-qc-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        },
+        "virtualNetworkName": {
+            "value": "vnet-shared-net-dev-qc-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-shared-net-dev-qc-01"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d8c326fb-f8b4-4854-a2af-dd55e86f6117/resourceGroups/rg-cph-pltf-mon-prd-we-01/providers/microsoft.operationalinsights/workspaces/log-cph-pltf-prd-we-01"
+        }
+    }
+}

@@ -1,0 +1,1965 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "allocationMethod": {
+      "value": "Static"
+    },
+    "applicationGatewayName": {
+      "value": "agw-api-xff-npd-qc-01"
+    },
+    "autoScaleMaxCapacity": {
+      "value": 30
+    },
+    "capacity": {
+      "value": 10
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "publicIpAddressName": {
+      "value": "pip-api-agwxff-npd-qc-01"
+    },
+    "publicIpZones": {
+      "value": [
+        "3",
+        "2",
+        "1"
+      ]
+    },
+    "sku": {
+      "value": "Standard"
+    },
+    "skuSize": {
+      "value": "Standard_v2"
+    },
+    "subnetName": {
+      "value": "snet-cph-pltf-api-npd-qc-01"
+    },
+    "frontendPorts": {
+      "value": [
+        {
+          "name": "port_443",
+          "properties": {
+            "port": 443
+          }
+        }
+      ]
+    },
+    "backendAddressPools": {
+      "value": [
+        {
+          "name": "pafw-cph-pltf-fwin-prd-qc-01",
+          "properties": {
+            "backendAddresses": [
+              {
+                "ipAddress": "172.27.94.86"
+              },
+              {
+                "ipAddress": "172.27.94.87"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "backendHttpSettingsCollection": {
+      "value": [
+        {
+          "name": "api-dev-sqcp-https",
+          "properties": {
+            "port": 10000,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api.dev.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/dev-api-probe"
+            }
+          }
+        },
+        {
+          "name": "developer-dev-sqcp-https",
+          "properties": {
+            "port": 10000,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "developer.dev.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/dev-developer-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "api-management-dev-sqcp-https",
+          "properties": {
+            "port": 10000,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api-management.dev.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/dev-api-management-probe"
+            }
+          }
+        },
+        {
+          "name": "bot-dev-sqcp-https",
+          "properties": {
+            "port": 10001,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "bot.dev.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/dev-bot-probe"
+            }
+          }
+        },
+        {
+          "name": "upload-dev-sqcp-https",
+          "properties": {
+            "port": 10002,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "upload.dev.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/dev-upload-probe"
+            }
+          }
+        },
+        {
+          "name": "api-tst-sqcp-https",
+          "properties": {
+            "port": 10010,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api.tst.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tst-api-probe"
+            }
+          }
+        },
+        {
+          "name": "developer-tst-sqcp-https",
+          "properties": {
+            "port": 10010,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "developer.tst.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tst-developer-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "api-management-tst-sqcp-https",
+          "properties": {
+            "port": 10010,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api-management.tst.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tst-api-management-probe"
+            }
+          }
+        },
+        {
+          "name": "bot-tst-sqcp-https",
+          "properties": {
+            "port": 10011,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "bot.tst.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tst-bot-probe"
+            }
+          }
+        },
+        {
+          "name": "upload-tst-sqcp-https",
+          "properties": {
+            "port": 10012,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "upload.tst.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tst-upload-probe"
+            }
+          }
+        },
+        {
+          "name": "api-tra-sqcp-https",
+          "properties": {
+            "port": 10020,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api.trn.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tra-api-probe"
+            }
+          }
+        },
+        {
+          "name": "developer-tra-sqcp-https",
+          "properties": {
+            "port": 10020,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "developer.trn.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tra-developer-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "api-management-tra-sqcp-https",
+          "properties": {
+            "port": 10020,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api-management.trn.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tra-api-management-probe"
+            }
+          }
+        },
+        {
+          "name": "bot-tra-sqcp-https",
+          "properties": {
+            "port": 10021,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "bot.trn.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tra-bot-probe"
+            }
+          }
+        },
+        {
+          "name": "upload-tra-sqcp-https",
+          "properties": {
+            "port": 10022,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "upload.trn.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/tra-upload-probe"
+            }
+          }
+        },
+        {
+          "name": "api-uat-sqcp-https",
+          "properties": {
+            "port": 10030,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api.uat.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "affinityCookieName": "ApplicationGatewayAffinity",
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/uat-api-probe"
+            }
+          }
+        },
+        {
+          "name": "developer-uat-sqcp-https",
+          "properties": {
+            "port": 10030,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "developer.uat.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/uat-developer-portal-probe"
+            }
+          }
+        },
+        {
+          "name": "api-management-uat-sqcp-https",
+          "properties": {
+            "port": 10030,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "api-management.uat.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/uat-api-management-probe"
+            }
+          }
+        },
+        {
+          "name": "bot-uat-sqcp-https",
+          "properties": {
+            "port": 10031,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "bot.uat.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/uat-bot-probe"
+            }
+          }
+        },
+        {
+          "name": "upload-uat-sqcp-https",
+          "properties": {
+            "port": 10032,
+            "protocol": "Https",
+            "cookieBasedAffinity": "Disabled",
+            "hostName": "upload.uat.sqcp.qa",
+            "pickHostNameFromBackendAddress": false,
+            "requestTimeout": 30,
+            "probe": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/probes/uat-upload-probe"
+            }
+          }
+        }
+      ]
+    },
+    "httpListeners": {
+      "value": [
+        {
+          "name": "dev-api-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/DEV-SQCP-QA"
+            },
+            "hostName": "api.dev.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "dev-developer-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/DEV-SQCP-QA"
+            },
+            "hostName": "developer.dev.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "dev-api-management-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/DEV-SQCP-QA"
+            },
+            "hostName": "api-management.dev.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "dev-bot-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/DEV-SQCP-QA"
+            },
+            "hostName": "bot.dev.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "dev-upload-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/DEV-SQCP-QA"
+            },
+            "hostName": "upload.dev.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tst-api-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TST-SQCP-QA"
+            },
+            "hostName": "api.tst.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tst-developer-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TST-SQCP-QA"
+            },
+            "hostName": "developer.tst.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tst-api-management-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TST-SQCP-QA"
+            },
+            "hostName": "api-management.tst.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tst-bot-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TST-SQCP-QA"
+            },
+            "hostName": "bot.tst.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tst-upload-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TST-SQCP-QA"
+            },
+            "hostName": "upload.tst.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tra-api-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TRN-SQCP-QA"
+            },
+            "hostName": "api.trn.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tra-developer-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TRN-SQCP-QA"
+            },
+            "hostName": "developer.trn.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tra-api-management-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TRN-SQCP-QA"
+            },
+            "hostName": "api-management.trn.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tra-bot-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TRN-SQCP-QA"
+            },
+            "hostName": "bot.trn.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "tra-upload-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/TRN-SQCP-QA"
+            },
+            "hostName": "upload.trn.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "uat-api-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/uat-SQCP-QA"
+            },
+            "hostName": "api.uat.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "uat-developer-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/uat-SQCP-QA"
+            },
+            "hostName": "developer.uat.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "uat-api-management-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/uat-SQCP-QA"
+            },
+            "hostName": "api-management.uat.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "uat-bot-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/uat-SQCP-QA"
+            },
+            "hostName": "bot.uat.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        },
+        {
+          "name": "uat-upload-sqcp-https",
+          "properties": {
+            "frontendIPConfiguration": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendIPConfigurations/pip-api-agwxff-npd-qc-01"
+            },
+            "frontendPort": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/frontendPorts/port_443"
+            },
+            "protocol": "Https",
+            "sslCertificate": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/sslCertificates/uat-SQCP-QA"
+            },
+            "hostName": "upload.uat.sqcp.qa",
+            "hostNames": [],
+            "requireServerNameIndication": true
+          }
+        }
+      ]
+    },
+    "requestRoutingRules": {
+      "value": [
+        {
+          "name": "dev-api-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/dev-api-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-dev-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-api-dev-rewrite"
+            }
+          }
+        },
+        {
+          "name": "dev-developer-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/dev-developer-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/developer-dev-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-developer-dev-rewrite"
+            }
+          }
+        },
+        {
+          "name": "dev-api-management-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/dev-api-management-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-management-dev-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-management-dev-rewrite"
+            }
+          }
+        },
+        {
+          "name": "dev-bot-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/dev-bot-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/bot-dev-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-bot-dev-rewrite"
+            }
+          }
+        },
+        {
+          "name": "dev-upload-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/dev-upload-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/upload-dev-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-upload-dev-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tst-api-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tst-api-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-tst-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-api-tst-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tst-developer-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tst-developer-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/developer-tst-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-developer-tst-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tst-api-management-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tst-api-management-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-management-tst-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-management-tst-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tst-bot-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tst-bot-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/bot-tst-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-bot-tst-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tst-upload-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tst-upload-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/upload-tst-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-upload-tst-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tra-api-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tra-api-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-tra-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-api-tra-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tra-developer-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tra-developer-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/developer-tra-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-developer-tra-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tra-api-management-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tra-api-management-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-management-tra-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-management-tra-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tra-bot-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tra-bot-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/bot-tra-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-bot-tra-rewrite"
+            }
+          }
+        },
+        {
+          "name": "tra-upload-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/tra-upload-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/upload-tra-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-upload-tra-rewrite"
+            }
+          }
+        },
+        {
+          "name": "uat-api-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/uat-api-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-uat-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-api-uat-rewrite"
+            }
+          }
+        },
+        {
+          "name": "uat-developer-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/uat-developer-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/developer-uat-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-developer-uat-rewrite"
+            }
+          }
+        },
+        {
+          "name": "uat-api-management-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/uat-api-management-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/api-management-uat-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-management-uat-rewrite"
+            }
+          }
+        },
+        {
+          "name": "uat-bot-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/uat-bot-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/bot-uat-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-bot-uat-rewrite"
+            }
+          }
+        },
+        {
+          "name": "uat-upload-sqcp-443",
+          "properties": {
+            "ruleType": "Basic",
+            "httpListener": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/httpListeners/uat-upload-sqcp-https"
+            },
+            "backendAddressPool": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendAddressPools/pafw-cph-pltf-fwin-prd-qc-01"
+            },
+            "backendHttpSettings": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/backendHttpSettingsCollection/upload-uat-sqcp-https"
+            },
+            "rewriteRuleSet": {
+              "id": "/subscriptions/4e865dba-bf2f-463a-a957-c69f5fb32ec5/resourceGroups/rg-edgeagw-xff-npd-qc-01/providers/Microsoft.Network/applicationGateways/agw-api-xff-npd-qc-01/rewriteRuleSets/xff-upload-uat-rewrite"
+            }
+          }
+        }
+      ]
+    },
+    "probes": {
+      "value": [
+        {
+          "name": "dev-api-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api.dev.sqcp.qa",
+            "path": "/config/api/feature",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "dev-developer-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "developer.dev.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "dev-api-management-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api-management.dev.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "dev-bot-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "bot.dev.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "dev-upload-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "upload.dev.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tst-api-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api.tst.sqcp.qa",
+            "path": "/config/api/feature",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tst-developer-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "developer.tst.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tst-api-management-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api-management.tst.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tst-bot-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "bot.tst.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tst-upload-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "upload.tst.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tra-api-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api.trn.sqcp.qa",
+            "path": "/config/api/feature",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tra-developer-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "developer.trn.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tra-api-management-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api-management.trn.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tra-bot-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "bot.trn.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tra-upload-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "upload.trn.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uat-api-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api.uat.sqcp.qa",
+            "path": "/config/api/feature",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uat-developer-portal-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "developer.uat.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uat-api-management-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "api-management.uat.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uat-bot-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "bot.uat.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        },
+        {
+          "name": "uat-upload-probe",
+          "properties": {
+            "protocol": "Https",
+            "host": "upload.uat.sqcp.qa",
+            "path": "/status-0123456789abcdef",
+            "interval": 30,
+            "timeout": 30,
+            "unhealthyThreshold": 3,
+            "pickHostNameFromBackendHttpSettings": false,
+            "minServers": 0,
+            "match": {
+              "statusCodes": [
+                "200-600"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "rewriteRuleSets": {
+      "value": [
+        {
+          "name": "xff-api-dev-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-api-tst-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-api-tra-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-api-uat-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-developer-dev-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-developer-tst-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-developer-tra-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-developer-uat-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-management-dev-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-management-tst-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-management-tra-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-management-uat-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-bot-dev-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-bot-tst-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-bot-tra-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-bot-uat-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-upload-dev-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-upload-tst-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-upload-tra-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "xff-upload-uat-rewrite",
+          "properties": {
+            "rewriteRules": [
+              {
+                "ruleSequence": 100,
+                "conditions": [],
+                "name": "xff-header",
+                "actionSet": {
+                  "requestHeaderConfigurations": [
+                    {
+                      "headerName": "X-Forwarded-For",
+                      "headerValue": "{var_add_x_forwarded_for_proxy}"
+                    }
+                  ],
+                  "responseHeaderConfigurations": []
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    // "sslCertificates": {
+    //   "value": [
+    //     {
+    //       "name": "DEV-SQCP-QA",
+    //       "properties": {
+    //         "keyVaultSecretId": "https://kv-cph-pltf-npd-we-01.vault.azure.net/secrets/DEV-SQCP-QA"
+    //       }
+    //     },
+    //     {
+    //       "name": "TST-SQCP-QA",
+    //       "properties": {
+    //         "keyVaultSecretId": "https://kv-cph-pltf-npd-we-01.vault.azure.net/secrets/TST-SQCP"
+    //       }
+    //     },
+    //     {
+    //       "name": "TRN-SQCP-QA",
+    //       "properties": {
+    //         "keyVaultSecretId": "https://kv-cph-pltf-npd-we-01.vault.azure.net/secrets/TRN-SQCP-QA"
+    //       }
+    //     },
+    //     {
+    //       "name": "UAT-SQCP-QA",
+    //       "properties": {
+    //         "keyVaultSecretId": "https://kv-cph-pltf-npd-we-01.vault.azure.net/secrets/UAT-SQCP-QA"
+    //       }
+    //     }
+    //   ]
+    // },
+    "managedIdentityId": {
+      "value": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/resourcegroups/rg-mgmt-sec-npd-qc-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-apps-pltf-npd-qc-01"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Non-Production"
+      }
+    },
+    "tier": {
+      "value": "Standard_v2"
+    },
+    "virtualNetworkName": {
+      "value": "vnet-cph-pltf-edgeagw-prd-qc-01"
+    },
+    "vnetResourceGroup": {
+      "value": "rg-cph-pltf-net-prd-qc-01"
+    },
+    "zones": {
+      "value": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "enableHttp2": {
+      "value": true
+    },
+    "sslPolicy": {
+      "value": {
+        "policyType": "Custom",
+        "minProtocolVersion": "TLSv1_2",
+        "cipherSuites": [
+          "TLS_RSA_WITH_AES_256_CBC_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+          "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_RSA_WITH_AES_128_CBC_SHA256"                                     
+        ]
+      }
+    },
+    "dnsSettings": {
+      "value": {
+        "domainNameLabel": "pip-api-agwxff-npd-qc-01",
+        "fqdn": "pip-api-agwxff-npd-qc-01.westeurope.cloudapp.azure.com"
+      }
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "diagnosticStorageAccountId": {
+      "value": ""
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "diagnosticSettingsName": {
+      "value": "appgwdiag"
+    }
+  }
+}

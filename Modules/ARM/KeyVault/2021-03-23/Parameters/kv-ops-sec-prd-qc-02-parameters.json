@@ -1,0 +1,212 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "keyVaultName": {
+      "value": "kv-ops-sec-prd-qc-02"
+    },
+    "accessPolicies": {
+      "value": [
+        {
+          "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+          "objectId": "00fee05b-e007-4fec-a804-65a6b1b15b99",
+          "permissions": {
+              "keys": [
+                  "Get",
+                  "List",
+                  "Update",
+                  "Create",
+                  "Import",
+                  "Delete",
+                  "Recover",
+                  "Backup",
+                  "Restore"
+              ],
+              "secrets": [
+                  "Get",
+                  "List",
+                  "Set",
+                  "Delete",
+                  "Recover",
+                  "Backup",
+                  "Restore"
+              ],
+              "certificates": [
+                  "Get",
+                  "List",
+                  "Update",
+                  "Create",
+                  "Import",
+                  "Delete",
+                  "Recover",
+                  "Backup",
+                  "Restore",
+                  "ManageContacts",
+                  "ManageIssuers",
+                  "GetIssuers",
+                  "ListIssuers",
+                  "SetIssuers",
+                  "DeleteIssuers"
+              ]
+          }
+        },
+        {
+            "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+            "objectId": "c73cefda-1554-45f6-89a5-c28ff1eb1bf6",
+            "permissions": {
+                "keys": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                ],
+                "secrets": [
+                    "Get",
+                    "List",
+                    "Set",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                ],
+                "certificates": []
+            }
+        },
+        {
+            "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+            "objectId": "4766a497-3464-43c3-b720-c0f2149b6cbb",
+            "permissions": {
+                "keys": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                ],
+                "secrets": [
+                    "Get",
+                    "List",
+                    "Set",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore"
+                ],
+                "certificates": [
+                    "Get",
+                    "List",
+                    "Update",
+                    "Create",
+                    "Import",
+                    "Delete",
+                    "Recover",
+                    "Backup",
+                    "Restore",
+                    "ManageContacts",
+                    "ManageIssuers",
+                    "GetIssuers",
+                    "ListIssuers",
+                    "SetIssuers",
+                    "DeleteIssuers"
+                ]
+            }
+        },
+        {
+            "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+            "objectId": "94b6f964-c200-4838-ba99-c9a3207163b6",
+            "permissions": {
+                "certificates": [
+                    "get",
+                    "list"
+                ],
+                "keys": [
+                    "get",
+                    "list"
+                ],
+                "secrets": [
+                    "get",
+                    "list"
+                ]
+            }
+        },
+        {
+            "tenantId": "cd53d24e-70fc-4ebc-9777-7dbfc5648d06",
+            "objectId": "e1ef2212-eb2c-409b-9463-766b5de71f2c",
+            "permissions": {
+                "keys": [],
+                "secrets": [
+                    "Set"
+                ]
+            }
+        }             
+      ]
+    },
+    "secretsObject": {
+      "value": {
+        "secrets": []
+      }
+    },
+    "enableVaultForDeployment": {
+      "value": true
+    },
+    "enableVaultForDiskEncryption": {
+      "value": true
+    },
+    "enableVaultForTemplateDeployment": {
+      "value": true
+    },
+    "enableSoftDelete": {
+      "value": true
+    },
+    "vaultSku": {
+      "value": "Premium"
+    },
+    "networkAcls": {
+      "value": {
+        "bypass": "AzureServices",
+        "defaultAction": "Deny",
+        "virtualNetworkRules": [
+            {
+                "subnet": "snet-repat-net-prd-qc-01"
+            }
+          ],
+          "ipRules": []
+        }
+    },
+    "vNetName": {
+      "value": "/subscriptions/a18d9218-4e1f-4faa-8027-e1600440272a/resourceGroups/rg-mgmt-net-prd-qc-01/providers/microsoft.network/virtualnetworks/vnet-mgmt-net-prd-qc-01"
+    },  
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    }, 
+    "diagnosticStorageAccountId": {
+            "value": ""
+        },
+    "workspaceId": {
+      "value": ""
+    },
+    "eventHubAuthorizationRuleId": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production"
+      }
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "allocationMethod": {
+            "value": "Static"
+        },
+        "applicationGatewayName": {
+            "value": "agw-shared-svcs-dev-qc-01"
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        },
+        "capacity": {
+            "value": 2
+        },
+        "location": {
+            "value": "qatarcentral"
+        },
+        "privateIPAddress": {
+            "value": "172.27.196.30"
+        },
+        "publicIpAddressName": {
+            "value": "agw-shared-svcs-dev-qc-01-ip"
+        },
+        "publicIpZones": {
+            "value": []
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "Standard_v2"
+        },
+        "subnetName": {
+            "value": "snet-shared-aksagw-dev-qc-01"
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development",
+                "managed-by-k8s-ingress": "1.5.0/cba70048/2022-02-02-01:05T+0000"
+            }
+        },
+        "tier": {
+            "value": "Standard_v2"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-shared-net-dev-qc-01"
+        },
+        "vnetResourceGroup": {
+            "value": "rg-shared-net-dev-qc-01"
+        },
+        "zones": {
+            "value": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "enableHttp2": {
+            "value": true
+        },
+        "sslPolicyType": {
+            "value": "Predefined"
+        },
+        "sslPolicyName": {
+            "value": "AppGwSslPolicy20170401S"
+        },
+        "sslCertificates": {
+            "value": [
+                {
+                    "name": "httpsvaultCert",
+                    "properties": {
+                        "keyVaultSecretId": "https://kv-shared-pltf-dev-qc-01.vault.azure.net/secrets/Dev-SQCP-Certificate/"
+                    }
+                }
+            ]
+        },
+        "managedIdentityId": {
+            "value": "/subscriptions/f7bbaaa3-d43f-4710-b974-5a9c87916d64/resourcegroups/rg-shared-svcs-dev-qc-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mi-shared-aksagw-dev-qc-01"
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "firewallEnabled": {
+            "value": false
+        }
+    }
+}

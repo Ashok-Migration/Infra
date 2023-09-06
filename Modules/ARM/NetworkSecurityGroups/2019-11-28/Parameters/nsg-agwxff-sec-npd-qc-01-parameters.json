@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "value": "nsg-agwxff-sec-npd-qc-01"
+    },
+    "networkSecurityGroupSecurityRules": {
+      "value": [
+        {
+          "name": "allow-in-any-httphttps",
+          "properties": {
+              "description": "allow-in-any-httphttps",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 150,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [
+                  "80",
+                  "443"
+              ],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+          }
+        },
+        {
+            "name": "Allow65200-65535",
+            "properties": {
+                "description": "Allow65200-65535",
+                "protocol": "TCP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "65200-65535",
+                "sourceAddressPrefix": "GatewayManager",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 4096,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        }
+      ]
+    },
+    "flowLogsDeloy": {
+      "value": true
+    },
+    "flowLogsEnabled": {
+      "value": true
+    },
+    "flowLogStorageAccountRGName": {
+      "value": ""
+    },
+    "flowLogStorageAccountName": {
+      "value": ""
+    },
+    "workspaceRGName": {
+      "value": ""
+    },
+    "workspaceName": {
+      "value": ""
+    },
+    "NSGFlowsubscriptionid": {
+      "value": ""
+    },
+    "diagnosticLogsRetentionInDays": {
+      "value": 365
+    },
+    "lockForDeletion": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "Environment": "Non-Production"
+      }
+    }
+  }
+}

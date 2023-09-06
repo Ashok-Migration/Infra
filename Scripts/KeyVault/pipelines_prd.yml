@@ -1,0 +1,45 @@
+trigger:
+  - none
+
+variables:
+  - name: PoolName
+    value: "tasmumsagents"
+  - name: serviceConnection
+    value: sqcp-ado-spn-dev
+  - group: "Shared"
+
+pool:
+  name: $(PoolName)
+
+stages:
+  - stage: PublishArtifacts
+    jobs:
+      - job: PublishArtifacts
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: Scripts/KeyVault
+              Contents: "**"
+              TargetFolder: "$(build.artifactstagingdirectory)/scripts"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: Scripts/KeyVault
+              artifact: "scripts"
+              publishLocation: "pipeline"
+
+  - stage: pre
+    displayName: Add pre KV Secrets
+    dependsOn: PublishArtifacts
+    variables:
+      - group: "pre"
+      - name: keyVaultName
+        value: kv-cpp-apps-pre-we-01
+    jobs:
+      - deployment: Deploy
+        displayName: Add pre Key Vault Secrets
+        environment: pre
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: all-secrets-prd.yml

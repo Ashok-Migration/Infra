@@ -1,0 +1,703 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "vnet-cpd-pltf-dev-we-01"
+        },
+        "vnetAddressPrefixes": {
+            "value": [
+                "172.20.40.0/22",
+                "172.20.44.0/22",
+                "172.20.48.0/22",
+                "172.20.52.0/23",
+                "172.20.54.0/25"
+            ]
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "snet-cpd-pltf-aks-dev-we-01",
+                    "addressPrefix": "172.20.40.0/23",
+                    "networkSecurityGroupName": "nsg-cpd-apps-aks-dev-we-01",
+                    "routeTableName": "route-cpd-apps-aks-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.AzureCosmosDB",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.ServiceBus",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-agw-dev-we-01",
+                    "addressPrefix": "172.20.42.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agw-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-apps-agwweb-dev-we-01",
+                    "addressPrefix": "172.20.42.32/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agwweb-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-agwapi-dev-we-01",
+                    "addressPrefix": "172.20.42.160/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agwapi-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-pltf-apim-dev-we-01",
+                    "addressPrefix": "172.20.42.64/26",
+                    "networkSecurityGroupName": "nsg-cpd-apps-apim-dev-we-01",
+                    "routeTableName": "route-cpd-apps-apim-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-bkend-dev-we-01",
+                    "addressPrefix": "172.20.43.0/25",
+                    "networkSecurityGroupName": "nsg-cpd-apps-bkend-dev-we-01",
+                    "routeTableName": "route-cpd-apps-bkend-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.AzureCosmosDB",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.ServiceBus",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.Web",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-asecog-dev-we-01",
+                    "addressPrefix": "172.20.43.160/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-apps-asecog-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-planint-dev-we-01",
+                    "addressPrefix": "172.20.43.192/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-apps-planint-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.ServiceBus",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-planpt-dev-we-01",
+                    "addressPrefix": "172.20.43.224/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-apps-planpt-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-apps-agwbot-dev-we-01",
+                    "addressPrefix": "172.20.54.64/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agwbot-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-agwckm-dev-we-01",
+                    "addressPrefix": "172.20.54.96/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agwckm-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },           
+                {
+                    "name": "snet-cpd-pltf-daisvcs-dev-we-01",
+                    "addressPrefix": "172.20.46.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-data-daisvcs-dev-we-01",
+                    "routeTableName": "route-cpd-data-daisvcs-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.KeyVault",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-hdi-dev-we-01",
+                    "addressPrefix": "172.20.47.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-data-hdi-dev-we-01",
+                    "routeTableName": "route-cpd-data-hdi-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-hdi-dev-we-02",
+                    "addressPrefix": "172.20.48.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-data-hdi-dev-we-02",
+                    "routeTableName": "route-cpd-data-hdi-dev-we-02",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-sqlmi-dev-we-01",
+                    "addressPrefix": "172.20.49.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-data-sqlmi-dev-we-01",
+                    "routeTableName": "route-cpd-data-sqlmi-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "dlg-sqlmi-cpd-data-dev-we-01",
+                            "properties": {
+                                "serviceName": "Microsoft.Sql/managedInstances"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-bkup-dev-we-01",
+                    "addressPrefix": "172.20.50.0/24",
+                    "networkSecurityGroupName": "nsg-cpd-data-bkup-dev-we-01",
+                    "routeTableName": "route-cpd-data-bkup-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-6d-web-dev-we-01",
+                    "addressPrefix": "172.20.52.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-6d-web-dev-we-01",
+                    "routeTableName": "route-cpd-6d-web-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-6d-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-6d-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-6d-app-dev-we-01",
+                    "addressPrefix": "172.20.52.32/27",
+                    "networkSecurityGroupName": "nsg-cpd-6d-app-dev-we-01",
+                    "routeTableName": "route-cpd-6d-app-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-6d-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-6d-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-6d-db-dev-we-01",
+                    "addressPrefix": "172.20.52.64/27",
+                    "networkSecurityGroupName": "nsg-cpd-6d-db-dev-we-01",
+                    "routeTableName": "route-cpd-6d-db-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-6d-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-6d-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-gis-web-dev-we-01",
+                    "addressPrefix": "172.20.52.96/27",
+                    "networkSecurityGroupName": "nsg-cpd-gis-web-dev-we-01",
+                    "routeTableName": "route-cpd-gis-web-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-gis-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-gis-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-gis-app-dev-we-01",
+                    "addressPrefix": "172.20.52.128/27",
+                    "networkSecurityGroupName": "nsg-cpd-gis-app-dev-we-01",
+                    "routeTableName": "route-cpd-gis-app-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-gis-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-gis-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-gis-db-dev-we-01",
+                    "addressPrefix": "172.20.52.160/27",
+                    "networkSecurityGroupName": "nsg-cpd-gis-db-dev-we-01",
+                    "routeTableName": "route-cpd-gis-db-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-gis-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-gis-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-bpm-web-dev-we-01",
+                    "addressPrefix": "172.20.52.192/27",
+                    "networkSecurityGroupName": "nsg-cpd-bpm-web-dev-we-01",
+                    "routeTableName": "route-cpd-bpm-web-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "rg-cpd-bpm-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-bpm-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-bpm-app-dev-we-01",
+                    "addressPrefix": "172.20.52.224/27",
+                    "networkSecurityGroupName": "nsg-cpd-bpm-app-dev-we-01",
+                    "routeTableName": "route-cpd-bpm-app-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-bpm-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-bpm-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-bpm-db-dev-we-01",
+                    "addressPrefix": "172.20.53.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-bpm-db-dev-we-01",
+                    "routeTableName": "route-cpd-bpm-db-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-bpm-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-bpm-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-itsm-web-dev-we-01",
+                    "addressPrefix": "172.20.53.32/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-itsm-web-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-itsm-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-itsm-app-dev-we-01",
+                    "addressPrefix": "172.20.53.64/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-itsm-app-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-itsm-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-itsm-db-dev-we-01",
+                    "addressPrefix": "172.20.53.96/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "route-cpd-itsm-db-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": "rg-cpd-itsm-net-dev-we-01"
+                },
+                {
+                    "name": "AzureBastionSubnet",
+                    "addressPrefix": "172.20.42.224/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-testvms-dev-we-01",
+                    "addressPrefix": "172.20.42.128/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-agwntf-dev-we-01",
+                    "addressPrefix": "172.20.42.192/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-agwntf-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-cknagw-dev-we-01",
+                    "addressPrefix": "172.20.54.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-cknagw-dev-we-01",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": ""
+                },
+                {
+                    "name": "snet-cpd-apps-ckndflt-dev-we-01",
+                    "addressPrefix": "172.20.54.32/27",
+                    "networkSecurityGroupName": "nsg-cpd-apps-ckndflt-dev-we-01",
+                    "routeTableName": "route-cpd-apps-ckndflt-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                            "service": "Microsoft.Sql",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        },
+                        {
+                            "service": "Microsoft.Storage",
+                            "locations": [
+                                "westeurope"
+                            ]
+                        }
+                    ],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-apps-cknredis-dev-we-01",
+                    "addressPrefix": "172.20.53.176/28",
+                    "networkSecurityGroupName": "nsg-cpd-apps-cknredis-dev-we-01",
+                    "routeTableName": "route-cpd-apps-cknredis-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [],
+                    "nsgsRGName": "rg-cpd-apps-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-apps-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-data-adx-dev-we-01",
+                    "addressPrefix": "172.20.51.0/27",
+                    "networkSecurityGroupName": "nsg-cpd-data-adx-dev-we-01",
+                    "routeTableName": "route-cpd-data-adx-dev-we-01",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                      {
+                        "name": "Microsoft.Kusto.clusters",
+                        "properties": {
+                          "serviceName": "Microsoft.Kusto/clusters"
+                        }
+                      }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-data-dbrpub-dev-we-01",
+                    "addressPrefix": "172.20.44.0/26",
+                    "networkSecurityGroupName": "nsg-cpd-data-dbrpub-dev-we-01",
+                    "routeTableName": "route-cpd-data-dbrpub-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage",
+                          "locations": [
+                            "westeurope"
+                          ]
+                        }
+                    ],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks.workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-data-dbrpri-dev-we-01",
+                    "addressPrefix": "172.20.44.64/26",
+                    "networkSecurityGroupName": "nsg-cpd-data-dbrpri-dev-we-01",
+                    "routeTableName": "route-cpd-data-dbrpri-dev-we-01",
+                    "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage",
+                          "locations": [
+                            "westeurope"
+                          ]
+                        }
+                    ],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Databricks.workspaces",
+                            "properties": {
+                                "serviceName": "Microsoft.Databricks/workspaces"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-data-daisvcs-dev-we-01",
+                    "addressPrefix": "172.20.44.128/25",
+                    "networkSecurityGroupName": "nsg-cpd-data-daisvcs-dev-we-01",
+                    "routeTableName": "route-cpd-data-daisvcs-dev-we-01",
+                    "serviceEndpoints": [
+                      {
+                        "service": "Microsoft.Storage",
+                        "locations": [
+                          "westeurope"
+                        ]
+                      },
+                      {
+                        "service": "Microsoft.KeyVault",
+                        "locations": [
+                          "westeurope"
+                        ]
+                      }
+                    ],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-pwa-dev-we-01",
+                    "addressPrefix": "172.20.53.160/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-pwa-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-pwa-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-oor-dev-we-01",
+                    "addressPrefix": "172.20.45.0/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-oor-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-oor-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-hia-dev-we-01",
+                    "addressPrefix": "172.20.45.16/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-hia-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-hia-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-mwa-dev-we-01",
+                    "addressPrefix": "172.20.45.32/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-mwa-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-mwa-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-scom-dev-we-01",
+                    "addressPrefix": "172.20.45.48/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-scom-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-scom-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-q22-dev-we-01",
+                    "addressPrefix": "172.20.45.64/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-q22-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-q22-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qrail-dev-we-01",
+                    "addressPrefix": "172.20.45.80/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qrail-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qrail-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qmic-dev-we-01",
+                    "addressPrefix": "172.20.45.96/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qmic-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qmic-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qeeri-dev-we-01",
+                    "addressPrefix": "172.20.45.112/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qeeri-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qeeri-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-qta-dev-we-01",
+                    "addressPrefix": "172.20.45.128/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-qta-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-qta-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-dlz-ubr-dev-we-01",
+                    "addressPrefix": "172.20.45.144/28",
+                    "networkSecurityGroupName": "nsg-cpd-dlz-ubr-dev-we-01",
+                    "routeTableName": "route-cpd-dlz-ubr-dev-we-01",
+                    "serviceEndpoints": [],
+                    "nsgsRGName": "rg-cpd-data-sec-dev-we-01",
+                    "routesRGName": "rg-cpd-data-net-dev-we-01"
+                },
+                {
+                    "name": "snet-cpd-pltf-plancog-dev-we-01",
+                    "addressPrefix": "172.20.43.128/27",
+                    "networkSecurityGroupName": "",
+                    "routeTableName": "",
+                    "serviceEndpoints": [],
+                    "delegations": [
+                        {
+                            "name": "Microsoft.Web.serverFarms",
+                            "properties": {
+                                "serviceName": "Microsoft.Web/serverFarms"
+                            }
+                        }
+                    ],
+                    "nsgsRGName": "",
+                    "routesRGName": ""
+                }
+                
+            ]
+        },
+        "dnsServers": {
+            "value": [
+                "172.20.33.170"
+            ]
+        },
+        "ddosProtectionPlanId": {
+            "value": ""
+        },
+        "diagnosticLogsRetentionInDays": {
+            "value": 365
+        },
+        "diagnosticStorageAccountId": {
+            "value": ""
+        },
+        "workspaceId": {
+            "value": "/subscriptions/d0694def-b27e-4bb7-900d-437fbeb802da/resourcegroups/rg-cpd-pltf-mon-npd-we-01/providers/microsoft.operationalinsights/workspaces/log-cpd-pltf-npd-we-01"
+        },
+        "eventHubAuthorizationRuleId": {
+            "value": ""
+        },
+        "eventHubName": {
+            "value": ""
+        },
+        "lockForDeletion": {
+            "value": false
+        },
+        "tags": {
+            "value": {
+                "Environment": "Development"
+            }
+        }
+    }
+}
