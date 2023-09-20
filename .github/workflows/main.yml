@@ -1,6 +1,6 @@
 #Note: Azure DevOps template does not have an equivalent in GitHub Actions yet
 #Note: Azure DevOps template does not have an equivalent in GitHub Actions yet
-name: ${{ env.moduleName }}-${{ env.moduleVersion }}
+name: Build
 on:
   workflow_dispatch:
   push:
@@ -13,20 +13,20 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-
+    
       - name: Validate
         uses: actions/checkout@v3
         with:
-          context: .
-          file : pipeline.jobs.validate.yml
-          templateFile: Modules/ARM/NetworkSecurityGroups/2019-11-28/deploy.json
-          parametersFile: Modules/ARM/NetworkSecurityGroups/2019-11-28/Parameters/parameters.json
-
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+    
       - name: Publish
         uses: actions/checkout@v3
         with:
-           context: .
-           file : pipeline.jobs.publish.yml   
-     
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+               file : pipeline.jobs.publish.yml   
+         
